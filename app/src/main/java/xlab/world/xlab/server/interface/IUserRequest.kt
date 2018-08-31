@@ -13,5 +13,5 @@ import xlab.world.xlab.server.ApiURL.USER_LOGIN
 interface IUserRequest {
     @POST(USER_LOGIN)
     fun login(@Body reqLoginData: ReqLoginData,
-              @Query("type") type: Int): Single<ResLoginData>
+              @Query("type") type: Int): Observable<ResLoginData>
 }

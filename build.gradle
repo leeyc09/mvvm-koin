@@ -46,6 +46,7 @@ ext {
     compileSdkVersion = 28
 
     androidDesignVersion = '27.1.1'
+    constraintVersion = '1.1.3'
     koinVersion = '0.9.3'
     rxJavaVersion = '2.2.1'
     rxAndroidVersion = '2.1.0'

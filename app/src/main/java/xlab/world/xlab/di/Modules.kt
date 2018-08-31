@@ -13,26 +13,24 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import xlab.world.xlab.server.ApiURL
+import xlab.world.xlab.server.ApiUserProvider
 import xlab.world.xlab.server.ApiUser
-import xlab.world.xlab.server.ApiUserImpl
 import xlab.world.xlab.server.`interface`.IUserRequest
-import xlab.world.xlab.utils.ViewFunction
+import xlab.world.xlab.utils.support.SocialAuth
 import java.util.concurrent.TimeUnit
 
 /**
  *  Koin main module
  */
-val viewModelModule: Module = applicationContext {
-    // provided common view function
-    bean { ViewFunction() }
+val baseModule: Module = applicationContext {
+    // provided rx scheduler
+    bean { ApplicationSchedulerProvider() as SchedulerProvider }
+
+    // provided social auth
+    bean { SocialAuth() }
 
     // ViewModel for Login View
-    viewModel { LoginViewModel(get()) }
-}
-
-val rxModule: Module = applicationContext {
-    // provided components
-    bean { ApplicationSchedulerProvider() as SchedulerProvider }
+    viewModel { LoginViewModel(apiUser = get(), socialAuth = get(), scheduler = get()) }
 }
 
 val remoteModule: Module = applicationContext {
@@ -41,7 +39,7 @@ val remoteModule: Module = applicationContext {
     // user api interface
     bean { createRetrofit<IUserRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL_SSL) }
     // user api implement
-    bean { ApiUserImpl(get()) as ApiUser }
+    bean { ApiUser(iUserRequest = get()) as ApiUserProvider }
 }
 
 fun createOkHttpClient(): OkHttpClient {
@@ -79,4 +77,4 @@ inline fun <reified T> createRetrofit(client: OkHttpClient, baseUrl: String): T 
 /**
  * Module list
  */
-val appModule = listOf(viewModelModule, rxModule, remoteModule)
+val appModule = listOf(baseModule, remoteModule)
