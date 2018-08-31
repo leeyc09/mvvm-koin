@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="color3F51B5">#3F51B5</color>
+    <color name="color4A4A4A">#4A4A4A</color>
+    <color name="colorFF4081">#FF4081</color>
+    <color name="colorFFFFFF">#FFFFFF</color>
+    <color name="color000000">#000000</color>
+    <color name="colorA4A4A4">#A4A4A4</color>
+    <color name="colorBFBFBF">#BFBFBF</color>
+    <color name="colorC1C1C1">#C1C1C1</color>
+    <color name="color601EC7">#601EC7</color>
+    <color name="color5300ED">#5300ED</color>
+    <color name="color6D38FF">#6D38FF</color>
+    <color name="color521AE8">#521AE8</color>
+    <color name="colorDE5359">#DE5359</color>
+    <color name="color6D6D6D">#6D6D6D</color>
+    <color name="colorE2E2E2">#E2E2E2</color>
+    <color name="colorF5F5F5">#F5F5F5</color>
+    <color name="colorF83A42">#F83A42</color>
+    <color name="colorD8D8D8">#D8D8D8</color>
+    <color name="color979797">#979797</color>
+    <color name="color303030">#303030</color>
+    <color name="colorEBEBEB">#EBEBEB</color>
+    <color name="colorFAFAFA">#FAFAFA</color>
+    <color name="color212121">#212121</color>
+    <color name="color141414">#141414</color>
+    <color name="colorEDEDED">#EDEDED</color>
+
+    <color name="colorBlack90">#E6000000</color>
+    <color name="colorBlack80">#CC000000</color>
+    <color name="colorBlack70">#B3000000</color>
+    <color name="colorBlack60">#99000000</color>
+    <color name="colorBlack54">#8A000000</color>
+    <color name="colorBlack50">#80000000</color>
+    <color name="colorBlack40">#66000000</color>
+    <color name="colorBlack30">#4D000000</color>
+    <color name="colorBlack20">#33000000</color>
+    <color name="colorBlack03">#08000000</color>
+
+    <color name="colorWhite90">#E6FFFFFF</color>
+    <color name="colorWhite85">#D9FFFFFF</color>
+    <color name="colorWhite80">#CCFFFFFF</color>
+    <color name="colorWhite60">#99FFFFFF</color>
+    <color name="colorWhite50">#80FFFFFF</color>
+
+    <!--TODO: Topic color string-->
+    <string name="xlabTopic1">FF959C</string>
+    <string name="xlabTopic2">FFDB5D</string>
+    <string name="xlabTopic3">FCC18B</string>
+    <string name="xlabTopic4">FFA085</string>
+    <string name="xlabTopic5">80D4E1</string>
+    <string name="xlabTopic6">6CE3CC</string>
+    <string name="xlabTopic7">FFE4BA</string>
+    <string name="xlabTopic8">A590FF</string>
+    <string name="xlabTopic9">8DB5FF</string>
+    <string name="xlabTopic10">C6F696</string>
+    <string name="xlabTopic11">D5D5D5</string>
+
+    <array name="topicColorStringList">
+        <item>@string/xlabTopic1</item>
+        <item>@string/xlabTopic2</item>
+        <item>@string/xlabTopic3</item>
+        <item>@string/xlabTopic4</item>
+        <item>@string/xlabTopic5</item>
+        <item>@string/xlabTopic6</item>
+        <item>@string/xlabTopic7</item>
+        <item>@string/xlabTopic8</item>
+        <item>@string/xlabTopic9</item>
+        <item>@string/xlabTopic10</item>
+        <item>@string/xlabTopic11</item>
+    </array>
+
+</resources>

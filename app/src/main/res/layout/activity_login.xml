@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:context=".view.login.LoginActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/mainLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Social Login Button -->
+            <com.facebook.login.widget.LoginButton
+                android:id="@+id/originFacebookBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+            <com.kakao.usermgmt.LoginButton
+                android:id="@+id/originKakaoBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <!-- Action Bar -->
+            <include
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                layout="@layout/action_bar_default"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewBlackNoto
+                android:id="@+id/textViewLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/login"
+                android:textColor="@color/color000000"
+                android:textSize="20sp"
+                android:layout_marginStart="36dp"/>
+
+            <xlab.world.xlab.utils.view.editText.EditTextRegularNoto
+                android:id="@+id/editTextMail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress|textNoSuggestions"
+                android:textColor="@color/color000000"
+                android:textSize="15sp"
+                android:maxLines="1"
+                android:hint="@string/email"
+                android:layout_marginStart="36dp"
+                android:layout_marginEnd="36dp"
+                android:layout_marginTop="62dp"/>
+
+            <xlab.world.xlab.utils.view.editText.EditTextRegularNoto
+                android:id="@+id/editTextPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword|textNoSuggestions"
+                android:textColor="@color/color000000"
+                android:textSize="15sp"
+                android:maxLines="1"
+                android:imeOptions="actionDone"
+                android:hint="@string/password"
+                android:layout_marginStart="36dp"
+                android:layout_marginEnd="36dp"
+                android:layout_marginTop="20.5dp"/>
+
+            <LinearLayout
+                android:id="@+id/facebookBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="41.5dp"
+                android:layout_marginStart="29dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/facebook_black"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"/>
+
+                <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login_facebook"
+                    android:textColor="@color/color000000"
+                    android:textSize="13sp"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/kakaoBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="29dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/kakaotalk_black"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"/>
+
+                <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login_kakao"
+                    android:textColor="@color/color000000"
+                    android:textSize="13sp"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/registerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:layout_gravity="bottom">
+
+        <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+            android:id="@+id/registerBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/register"
+            android:textColor="@color/color000000"
+            android:textSize="14sp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="11dp"
+            android:paddingBottom="14dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="12dp"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+            android:id="@+id/guestBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/look_around"
+            android:textColor="@color/color000000"
+            android:textSize="14sp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="11dp"
+            android:paddingBottom="14dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="12dp" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/layoutPopUp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorFFFFFF"
+        android:layout_gravity="bottom">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/colorC1C1C1"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+            android:id="@+id/passwordResetBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/password_reset"
+            android:textSize="14sp"
+            android:textColor="@color/color000000"
+            android:paddingTop="16dp"
+            android:paddingBottom="14dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+            android:id="@+id/loginBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/login"
+            android:textSize="14sp"
+            android:textColor="@color/colorBFBFBF"
+            android:enabled="false"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="24dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</FrameLayout>

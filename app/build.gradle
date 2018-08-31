@@ -1,0 +1,93 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "xlab.world.xlab"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0-rc02'
+    implementation "com.android.support:design:$rootProject.androidDesignVersion"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // Facebook
+    implementation "com.facebook.android:facebook-android-sdk:$rootProject.facebookSdkVersion"
+    implementation "com.facebook.android:facebook-share:$rootProject.facebookSdkVersion"
+    implementation "com.facebook.android:facebook-applinks:$rootProject.facebookSdkVersion"
+
+    // Kakao
+    implementation group: 'com.kakao.sdk', name: 'usermgmt', version: "$rootProject.kakaoSdkVersion"
+    implementation group: 'com.kakao.sdk', name: 'kakaostory', version: "$rootProject.kakaoSdkVersion"
+    implementation group: 'com.kakao.sdk', name: 'kakaolink', version: "$rootProject.kakaoSdkVersion"
+
+    // koin
+    implementation "org.koin:koin-android:$rootProject.koinVersion"
+    implementation "org.koin:koin-android-architecture:$rootProject.koinVersion"
+
+    // rx
+    implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxJavaVersion"
+    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxAndroidVersion"
+
+    // viewModel and liveData
+    implementation "android.arch.lifecycle:extensions:$rootProject.androidArchitectureVersion"
+    annotationProcessor "android.arch.lifecycle:compiler:$rootProject.androidArchitectureVersion"
+    testImplementation "android.arch.core:core-testing:$rootProject.androidArchitectureVersion"
+
+    // networking
+    implementation "com.squareup.okhttp3:okhttp:$rootProject.okhttp3Version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.okhttp3Version"
+    implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofit2Version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.retrofit2Version"
+    implementation "com.squareup.retrofit2:converter-gson:$rootProject.retrofit2Version"
+
+    // gson
+    implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
+
+    // glide
+    implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
+    annotationProcessor "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
+
+    // image filter
+    implementation "jp.co.cyberagent.android.gpuimage:gpuimage-library:$rootProject.gpuimageVersion"
+
+    // image handle
+    implementation "com.github.chrisbanes:PhotoView:$rootProject.photoViewVersion"
+
+    // csv file read
+    implementation "com.opencsv:opencsv:$rootProject.opencsvVersion"
+
+    // fcm
+    implementation "com.google.firebase:firebase-core:$rootProject.firebaseCoreVersion"
+    implementation "com.google.firebase:firebase-messaging:$rootProject.firebaseMessagingVersion"
+}

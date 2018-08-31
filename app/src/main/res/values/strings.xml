@@ -1,0 +1,706 @@
+<resources>
+    <!--TODO: API KEY-->
+    <string name="app_name">xlab</string>
+    <string name="app_api_key">AIzaSyAPzZWCFiKVJ2yURnTLBz4o83NhBjzp4vU</string>
+    <string name="facebook_app_id">1866904940202203</string>
+    <string name="fb_login_protocol_scheme">fb1866904940202203</string>
+    <string name="facebooklink_host">facebooklink</string>
+    <string name="kakao_app_key">8d0e39e1ae18515c069718283b53cb7e</string>
+    <string name="kakao_scheme">kakao8d0e39e1ae18515c069718283b53cb7e</string>
+    <string name="kakaolink_host">kakaolink</string>
+
+    <!-- TODO: Email Template -->
+    <string name="cs_mail">cs@xlab.io</string>
+    <string name="mail_subject">문의 및 의견 메일입니다.</string>
+    <string name="mail_content1">-------------------------------------------------"\n"</string>
+    <string name="mail_content2">회원 이메일 주소 : </string>
+    <string name="mail_content3">OS 버전 : </string>
+    <string name="mail_content4">앱 버전 : </string>
+    <string name="mail_content5">기기 정보 : </string>
+
+    <!-- TODO: Post Type -->
+    <string name="picture">사진</string>
+    <string name="youtube_link">유튜브 링크</string>
+    <string name="youtube_video_id">유튜브 영상 아이디</string>
+
+    <!-- TODO: Share -->
+    <string name="copy_link">링크복사</string>
+    <string name="copy_link_success">링크가 복사되었습니다</string>
+
+    <!--TODO: Register/ Login-->
+    <string name="login">로그인</string>
+    <string name="email">이메일</string>
+    <string name="nick_name">닉네임</string>
+    <string name="password">비밀번호</string>
+    <string name="password_reset">비밀번호 재설정</string>
+    <string name="register">회원가입</string>
+    <string name="look_around">둘러보기</string>
+    <string name="register_nick_name">닉네임 설정</string>
+    <string name="reset_password_email">이메일 인증</string>
+    <string name="request_confirm">인증요청</string>
+    <string name="re_request_confirm">재요청</string>
+    <string name="confirm_code_hint">인증번호 6자리</string>
+    <string name="end_issue_timer">인증 요청시간을 초과하었습니다</string>
+    <string name="login_facebook">페이스북으로</string>
+    <string name="login_kakao">카카오톡으로</string>
+    <string name="used_mail">이미 사용중인 이메일입니다.</string>
+    <string name="used_nick">이미 사용중인 닉네임입니다.</string>
+    <string name="confirm_password_text">영문+숫자</string>
+    <string name="confirm_password_length">・6"-"20글자</string>
+    <string name="confirm_nick_length">3"-"10글자</string>
+    <string name="finish">완료</string>
+    <string name="okay">확인</string>
+
+    <string name="agreement">가입 시 이용약관 및 개인정보 취급방침에 동의합니다.</string>
+
+    <!--TODO: Login Fail-->
+    <string name="login_fail_no_mail">등록되지 않은 이메일입니다.</string>
+    <string name="login_fail_password">비밀번호가 일치하지 않습니다.</string>
+    <string name="login_fail_wrong_mail">이메일 형식을 확인해 주세요.</string>
+
+    <!-- TODO: OnBoarding -->
+    <string name="skip_onBoarding">건너뛰기</string>
+    <string name="end_onBoarding">시작하기</string>
+    <string name="onBoarding1">반려동물을 추가하면"\n"슬랩이 더 똑똑해져요</string>
+    <string name="onBoarding2">하단의 버튼을 누르면"\n"나와 비슷한 사람들이 사용한 제품의"\n"인기율이 나타나요</string>
+    <string name="onBoarding3">사용한 제품을 평가하면"\n"관심있을 제품을 소개해드려요</string>
+
+    <!--TODO: Main-->
+    <string name="main_fragment_all">전체</string>
+    <string name="main_fragment_explore">탐색</string>
+    <string name="following">팔로잉</string>
+    <string name="main_fragment_item">제품</string>
+    <string name="no_following_user">아직 팔로우한 회원이 없어요</string>
+    <string name="do_follow">팔로우 하기</string>
+    <string name="question_match_toast">반려동물을 추가하면"\n"제품을 소개해드립니다</string>
+    <string name="is_login_service">로그인하시겠어요?</string>
+    <string name="is_login_service2">슬랩의 모든 서비스를 이용할 수 있습니다</string>
+    <string name="is_add_topic">반려동물을 추가하시겠어요?</string>
+    <string name="is_add_topic2">관심있을 제품을 소개해드립니다</string>
+    <string name="can_use_after_login">로그인 후 이용할 수 있습니다</string>
+    <string name="no_following_post">업로드된 포스트가 아직 없어요</string>
+    <string name="go_login">로그인 하기</string>
+
+    <!--TODO: Camera Tab-->
+    <string name="camera_fragment_library">라이브러리</string>
+    <string name="camera_fragment_cam">카메라</string>
+    <string name="next">다음</string>
+    <string name="image_all">모든 사진</string>
+
+    <!--TODO: Profile-->
+    <string name="follower">팔로워</string>
+    <string name="profile_tab_album">Album</string>
+    <string name="profile_tab_pet">Pet</string>
+    <string name="topic_add">토픽추가</string>
+    <string name="no_upload_post">업로드한 포스트가 없어요</string>
+    <string name="no_upload_post_my">일상을 공유해보세요</string>
+    <string name="no_used_item">평가한 제품이 없어요</string>
+    <string name="no_used_item_my">사용해본 제품을 평가해보세요</string>
+    <string name="upload_post">포스트 업로드</string>
+    <string name="share">공유</string>
+    <string name="report">신고</string>
+    <string name="save_post">저장한 포스트</string>
+    <string name="pet_item">제품</string>
+    <string name="more_item">더보기</string>
+    <string name="is_report_user">신고하시겠어요?</string>
+    <string name="is_report_user2">검토 후 해당 계정이용이 정지됩니다.</string>
+    <string name="success_report">신고가 완료되었습니다</string>
+
+    <!--TODO: Profile Edit-->
+    <string name="profile_edit_title">프로필 편집</string>
+    <string name="save">저장</string>
+    <string name="cancel">취소</string>
+    <string name="introduction">소개</string>
+    <string name="introduction_hint">100자 이내</string>
+    <string name="profile_detail">세부정보</string>
+    <string name="profile_detail_text">입력할수록 더욱 정확한 정보와 제품을"\n"소개받을 수 있어요</string>
+    <string name="gender">성별</string>
+    <string name="male">남성</string>
+    <string name="female">여성</string>
+    <string name="etc">기타</string>
+    <string name="male_en">male</string>
+    <string name="female_en">female</string>
+    <string name="etc_en">etc</string>
+    <string name="none_type">미입력</string>
+    <string name="locale">지역</string>
+    <string name="birth">출생연도</string>
+    <string name="birth_hint">YYYY</string>
+    <string name="birth_confirm">출생연도를 다시 확인해주세요.</string>
+    <string name="is_cancel">취소하시겠어요?</string>
+    <string name="is_cancel2">입력한 내용이 저장되지 않습니다.</string>
+
+    <!--TODO: Setting-->
+    <string name="setting_title">설정</string>
+    <string name="topic_setting">토픽 설정</string>
+    <string name="liked_post">좋아한 포스트</string>
+    <string name="notice">공지사항</string>
+    <string name="version">버전</string>
+    <string name="update">업데이트</string>
+    <string name="policy">약관 및 정책</string>
+    <string name="suggestion">의견 보내기</string>
+    <string name="logout">로그아웃</string>
+    <string name="logout_message">로그아웃 하시겠어요?</string>
+    <string name="withdraw">회원탈퇴</string>
+    <string name="topic">토픽</string>
+    <string name="old_password">기존"\n"비밀번호 입력</string>
+    <string name="new_password">새로운"\n"비밀번호 설정</string>
+    <string name="wrong_password">비밀번호가 일치하지 않습니다</string>
+    <string name="success_change_password">비밀번호 재설정이 완료되었습니다</string>
+    <string name="account">계정</string>
+    <string name="shopping">쇼핑</string>
+    <string name="support">지원</string>
+    <string name="change_shop_account">쇼핑 정보 수정</string>
+    <string name="push_receive">푸시 알림 수신</string>
+
+    <!-- TODO: Withdraw -->
+    <string name="withdraw_title">탈퇴하려는 이유는"\n"무엇인가요?</string>
+    <string name="withdraw_reason1">자주 사용하지 않아서</string>
+    <string name="withdraw_reason2">회원 혜택이 부족해서</string>
+    <string name="withdraw_reason3">불만, 불편 사항 응대에 늦어서</string>
+    <string name="withdraw_reason4">시스템 오류가 잦아서</string>
+    <string name="withdraw_more_info">회원탈퇴 시 지금까지 기록한 모든 내용이 삭제되며,"\n"3개월 동안 해당 이메일로 재가입할 수 없습니다.</string>
+    <string name="withdraw_agree">위 내용에 동의합니다</string>
+    <string name="withdraw_reason_hint">사유 입력</string>
+    <string name="withdraw_button">탈퇴하기</string>
+    <string name="withdraw_success">회원탈퇴가 완료되었습니다</string>
+
+    <!--TODO: Following-->
+    <string name="recommend_user">추천회원</string>
+
+    <!--TODO: Topic-->
+    <string name="add">추가</string>
+    <string name="no_topic">반려동물을 추가하고 제품을 소개받아보세요</string>
+    <string name="add_topic">반려동물 추가하기</string>
+
+    <!--TODO: Topic Pet-->
+    <string name="topic_pet_add">Pet 추가</string>
+    <string name="topic_pet_edit">Pet 편집</string>
+    <string name="topic_color">토픽 색상</string>
+    <string name="pet_type">종류</string>
+    <string name="dog">강아지</string>
+    <string name="cat">고양이</string>
+    <string name="dog_en">dog</string>
+    <string name="cat_en">cat</string>
+    <string name="pet_name">이름</string>
+    <string name="pet_name_hint">이름입력</string>
+    <string name="pet_female">암컷</string>
+    <string name="pet_male">수컷</string>
+    <string name="pet_neutered">중성화 여부</string>
+    <string name="pet_neutered_ok">•" "중성화</string>
+    <string name="pet_breed">품종</string>
+    <string name="pet_breed_select">품종 선택</string>
+    <string name="pet_age">나이</string>
+    <string name="pet_birth">생년"\n"월일</string>
+    <string name="pet_birth_hint">YYYY-MM-DD</string>
+    <string name="confirm_pet_birth">날짜를 다시 확인해주세요</string>
+    <string name="pet_weight">몸무게</string>
+    <string name="weight">무게</string>
+    <string name="weight_hint">0.0 kg</string>
+    <string name="weight_unit">kg</string>
+    <string name="pet_hair_type">털 타입</string>
+    <string name="pet_short_hair">단모</string>
+    <string name="pet_long_hair">중/장모</string>
+    <string name="pet_curly_hair">곱슬</string>
+    <string name="pet_hair_color">털 색상 • 복수 선택 가능</string>
+    <string name="search">검색</string>
+    <string name="breed_mix_kor">믹스견</string>
+    <string name="breed_mix_en">MIX</string>
+    <string name="delete_topic">토픽 삭제</string>
+    <string name="is_delete_topic">토픽을 삭제하시겠어요?</string>
+
+    <!-- TODO: Filter name -->
+    <string name="filter_original">Original</string>
+    <string name="filter_haze">Haze</string>
+    <string name="filter_gamma">Gamma</string>
+    <string name="filter_contrast">Contrast</string>
+    <string name="filter_exposure">Exposure</string>
+    <string name="filter_levels">Levels" "Min</string>
+    <string name="filter_sepia">Sepia</string>
+    <string name="filter_gray">Gray" "scale</string>
+    <string name="filter_vignette">Vignette</string>
+
+    <string name="auto_fix">Autofix</string>
+    <string name="bw">Min/Max Color Intensity</string>
+    <string name="brightness">Brightness</string>
+    <string name="contrast">Contrast</string>
+    <string name="cross_process">Cross Process</string>
+    <string name="documentary">Documentary</string>
+    <string name="duo_tone">Duo Tone</string>
+    <string name="fill_light">Fill Light</string>
+    <string name="fish_eye">Fish Eye</string>
+    <string name="flip_vert">Flip Vertical</string>
+    <string name="flip_hor">Flip Horizontal</string>
+    <string name="grain">Grain</string>
+    <string name="gray_scale">Grayscale</string>
+    <string name="lomoish">Lomoish</string>
+    <string name="negative">Negative</string>
+    <string name="posterize">Posterize</string>
+    <string name="rotate">Rotate</string>
+    <string name="saturate">Saturate</string>
+    <string name="sepia">Sepia</string>
+    <string name="sharpen">Sharpen</string>
+    <string name="temperature">Temperature</string>
+    <string name="tint">Tint</string>
+    <string name="vignette">Vignette</string>
+
+    <!-- TODO: Post -->
+    <string name="tag_item">제품 태그</string>
+    <string name="used_item">사용한 제품</string>
+    <string name="content_hint">내용 입력</string>
+    <string name="save_post_message">저장되었습니다</string>
+    <string name="save_cancel_post_message">저장이 취소되었습니다</string>
+    <string name="is_delete_post">해당 게시물을 삭제하시겠어요?</string>
+    <string name="is_delete_post2">다시 복구할 수 없습니다.</string>
+    <string name="no_save_post">저장한 포스트가 없어요</string>
+
+    <!-- TODO: Comment-->
+    <string name="comment">댓글</string>
+    <string name="input_comment">댓글 입력</string>
+    <string name="edit">수정</string>
+    <string name="delete">삭제</string>
+
+    <!-- TODO: Search-->
+    <string name="recent_search">최근 검색어</string>
+    <string name="post">포스트</string>
+    <string name="user">사람</string>
+    <string name="recommend_keyword">추천키워드</string>
+
+    <!-- TODO: Shop-->
+    <string name="all_category">전체 카테고리</string>
+    <string name="category">카테고리</string>
+    <string name="living">Living</string>
+    <string name="fashion">Fashion</string>
+    <string name="food">Food</string>
+    <string name="search_item">제품 검색</string>
+    <string name="group">분류</string>
+    <string name="price">가격</string>
+    <string name="recommend">추천</string>
+    <string name="matching_unit">"%"</string>
+
+    <!-- TODO: Item Detail -->
+    <string name="goods_detail">제품 상세</string>
+    <string name="matching_rating">인기율</string>
+    <string name="item_rating">제품 평가하기</string>
+    <string name="recommend_rating">사용해본 제품을 평가해보세요</string>
+    <string name="not_enough_stats">평가 데이터가 아직 부족합니다</string>
+    <string name="rating_good">좋아요</string>
+    <string name="rating_soso">보통이에요</string>
+    <string name="rating_bad">싫어요</string>
+    <string name="item_info">제품정보</string>
+    <string name="stats">통계</string>
+    <string name="used_user">제품 사용자</string>
+    <string name="stats_text">가 만족합니다</string>
+    <string name="item_detail">상세정보</string>
+    <string name="delivery_free_price">무료배송</string>
+    <string name="delivery_default_price">2,500원</string>
+    <string name="delivery_allow_num_price1">3,000원</string>
+    <string name="delivery_allow_num_price2">5,000원</string>
+    <string name="item_info_necessary">필수 표기 정보</string>
+    <string name="item_info_delivery">배송" • "교환" • "환불 안내</string>
+    <string name="item_info_inquiry">제품 문의</string>
+    <string name="item_post_user">이 제품을 사용하는 사람들</string>
+    <string name="item_post_tag">태그된 포스트</string>
+    <string name="is_rating_cancel">평가를 취소하시겠어요?</string>
+    <string name="is_rating_cancel2">변경사항이 프로필에 반영됩니다.</string>
+    <string name="price_unit">원</string>
+    <string name="add_cart">카트담기</string>
+    <string name="buy_now">바로구매</string>
+    <string name="buy">구매하기</string>
+    <string name="soldOut">입고예정</string>
+
+    <!-- TODO: Necessary Info -->
+    <string name="model_name">품명 및 모델명</string>
+    <string name="long_necessary">법에 의한 인증 허가등을 받았음을 확인할 수 있는 경우 그에 대한 사항</string>
+    <string name="long_necessary_answer">인증대상아님</string>
+    <string name="origin">제조국(원산지)</string>
+    <string name="maker">제조자(수입자)</string>
+    <string name="call_number">소비자 상담"\n"관련 전화번호</string>
+    <string name="about_goods">상품관련</string>
+    <string name="esc_company">(주)이에쓰씨컴퍼니</string>
+    <string name="esc_company_num">1544"-"7867</string>
+    <string name="about_service">서비스관련</string>
+    <string name="petxlab_company">(주)펫슬랩</string>
+    <string name="xlab_company">슬랩</string>
+    <string name="xlab_company_num">02"-"2088"-"4866</string>
+    <string name="xlab_cs_num">070"-"4616"-"2740</string>
+
+    <!-- TODO: Delivery Info -->
+    <string name="delivery">배송 안내</string>
+    <string name="delivery_way">배송방법</string>
+    <string name="delivery_way_info">택배/소포/등기</string>
+    <string name="delivery_region">배송지역</string>
+    <string name="delivery_region_info">국내배송</string>
+    <string name="delivery_company">택배사</string>
+    <string name="holapet_delivery_company_info">CJ대한통운</string>
+    <string name="xlab_delivery_company_info">로젠택배</string>
+    <string name="delivery_day">배송완료일수</string>
+    <string name="delivery_day_info">3일 정도 소요</string>
+    <string name="delivery_cost">추가배송비</string>
+    <string name="delivery_cost_info">도서산간 지역"\n"(업체 직배송 제품이나 상품 종류에 따라 배송비가 추가될 수 있음)</string>
+    <string name="return_address_title">반품주소</string>
+    <string name="return_name">반품지명</string>
+    <string name="holapet_return_name">올라펫샵</string>
+    <string name="xlab_return_name">부명펫</string>
+    <string name="return_address">반품주소</string>
+    <string name="holapet_return_address">경기도 화성시 팔탄면 버들로 1362번길 10"-"12</string>
+    <string name="xlab_return_address">경기도 남양주시 진건읍 경춘북로 664"-"14 3","4동</string>
+    <string name="return_phone">반품연락처</string>
+    <string name="holapet_return_phone">1544"-"7867</string>
+    <string name="xlab_return__phone">031"-"594"-"9916" / "9919</string>
+    <string name="return_delivery_company">반품택배사</string>
+    <string name="holapet_return_delivery_company">CJ대한통운</string>
+    <string name="xlab_return_delivery_company">로젠택배</string>
+    <string name="exchange_info">교환/반품/환불 안내</string>
+    <string name="holapet_return_info1">• 상품 수령일 포함 7일 이내에 신청 가능"\n"• 7일 이후 상품의 문제를 발견한 경우 고객센터 문의(전화 1544"-"7867 또는 카카오톡 @올라펫샵 )"\n"• 고객의 단순 변심시, 배송비를 택배 상자 안에 동봉하거나 올라펫샵 계좌를 통해 사전 입금해야함"\n"• 상품 불량/파손 또는 오배송시 추가배송비 없음"\n"• 교환/환불이 되지 않는 경우</string>
+    <string name="holapet_return_info2">"-" 소비자의 책임 있는 사유로 상품 등이 멸실/훼손된 경우(단, 상품 확인을 위한 포장 훼손 제외)"\n""-" 소비자의 사용/소비에 의해 상품 등의 가치가 현저히 감소한 경우"\n""-" 시간의 경과에 의해 재판매가 곤란할 정도로 상품 가치가 현저히 감소한 경우"\n""-" 복제가 가능한 상품 등의 포장을 훼손한 경우"\n""-" 판매/생산방식의 특성상, 교환/반품 시 판매자에게 회복할 수 없는 손해가 발생하는 경우(주문접수 후 개별생산, 맞춤제작 등)</string>
+    <string name="xlab_return_info1">• 상품 수령일 포함 7일 이내에 신청 가능"\n"• 7일 이후 상품의 문제를 발견한 경우 고객센터 문의(전화 1544"-"7867 또는 카카오톡 @올라펫샵 )"\n"• 고객의 단순 변심시, 배송비를 택배 상자 안에 동봉하거나 올라펫샵 계좌를 통해 사전 입금해야함"\n"• 상품 불량/파손 또는 오배송시 추가배송비 없음"\n"• 교환/환불이 되지 않는 경우</string>
+    <string name="xlab_return_info2">"-" 소비자의 책임 있는 사유로 상품 등이 멸실/훼손된 경우(단, 상품 확인을 위한 포장 훼손 제외)"\n""-" 소비자의 사용/소비에 의해 상품 등의 가치가 현저히 감소한 경우"\n""-" 시간의 경과에 의해 재판매가 곤란할 정도로 상품 가치가 현저히 감소한 경우"\n""-" 복제가 가능한 상품 등의 포장을 훼손한 경우"\n""-" 판매/생산방식의 특성상, 교환/반품 시 판매자에게 회복할 수 없는 손해가 발생하는 경우(주문접수 후 개별생산, 맞춤제작 등)</string>
+    <string name="exchange_process">교환/반품 과정</string>
+    <string name="exchange_process_step1">• STEP1</string>
+    <string name="exchange_process_step1_content">- 쇼핑정보에서 교환/반품 신청"\n"- 구매확정 후 교환/반품 접수는 카카오톡 (@올라펫샵)을 통해 접수</string>
+    <string name="exchange_process_step2">• STEP2</string>
+    <string name="exchange_process_step2_content">- 상품 재포장과 메모(성함/연락처/사유 등) + 추가배송비 동봉</string>
+    <string name="exchange_process_step3">• STEP3</string>
+    <string name="exchange_process_step3_content">- 상품 수거(해당 택배기사님)"\n"- 반송장번호 보관</string>
+    <string name="exchange_process_step4">• STEP4</string>
+    <string name="exchange_process_step4_content">- 교환/반품 상품를 판매자가 확인한 후 처리 완료</string>
+
+    <!-- TODO: Inquiry Info -->
+    <string name="inquiry_time1">평일 10:00 "-" 17:00</string>
+    <string name="inquiry_time2">토/일/공휴일 휴무</string>
+    <string name="inquiry_info">상품판매자인 ‘올라펫샵’에 문의가 요청됩니다</string>
+    <string name="call">전화</string>
+    <string name="holapet_shop">올라펫샵</string>
+    <string name="kakao">카카오톡</string>
+    <string name="holapet_kakao_id">"@"올라펫샵</string>
+    <string name="xlab_kakao_id">"@"xlab</string>
+    <string name="inquiry_under1">사업자정보확인</string>
+    <string name="inquiry_under2">개인정보취급방침</string>
+    <string name="inquiry_under3">이용약관</string>
+
+    <!-- TODO: My Shopping -->
+    <string name="my_shopping">나의 쇼핑</string>
+    <string name="register_shop_info">쇼핑 정보 등록</string>
+    <string name="edit_shop_info">쇼핑 정보 수정</string>
+    <string name="recent_view_goods">최근 본 제품</string>
+    <string name="complete_payment">결제대기/완료</string>
+    <string name="delivery_status">배송중/완료</string>
+    <string name="exchange_cancel">취소/교환/반품</string>
+    <string name="refund">환불</string>
+    <string name="order_list">주문내역</string>
+    <string name="is_history_delete">해당 내역을 삭제하시겠어요?</string>
+    <string name="is_history_delete2">다시 복구할 수 없습니다.</string>
+    <string name="is_order_cancel">주문을 취소하시겠어요?</string>
+
+    <!-- TODO: Edit Shop Info -->
+    <string name="success_change_shop_info">쇼핑 정보가 수정되었습니다</string>
+    <string name="phone_number">휴대폰번호</string>
+    <string name="change">변경</string>
+    <string name="phone_number_hint1">000</string>
+    <string name="phone_number_hint2">0000</string>
+    <string name="email_hint">이메일주소</string>
+    <string name="address">주소</string>
+    <string name="find_address">주소찾기</string>
+    <string name="zone_code">우편번호</string>
+
+    <!-- TODO: Buying -->
+    <string name="order_pay">주문/결제</string>
+    <string name="orderer">주문자</string>
+    <string name="phone">휴대폰</string>
+    <string name="sms_agree">배송정보 SMS 수신동의</string>
+    <string name="deliver_place">배송지</string>
+    <string name="deliver_name">수령인</string>
+    <string name="deliver_place_choice">배송지 선택</string>
+    <string name="deliver_place_list">배송지 목록</string>
+    <string name="phone_number1">연락처1</string>
+    <string name="phone_number2">연락처2"\n"(선택)</string>
+    <string name="deliver_request">배송시 요청사항</string>
+    <string name="deliver_request1">부재시 경비실에 맡겨주세요.</string>
+    <string name="deliver_request2">배송 전에 미리 연락 주세요.</string>
+    <string name="deliver_request3">부재시 전화주세요.</string>
+    <string name="deliver_request4">직접입력</string>
+    <string name="buying_price">결제 금액</string>
+    <string name="order_goods_num">주문 상품 수</string>
+    <string name="total_order_price">총 제품금액</string>
+    <string name="total_deliver_price">총 배송비</string>
+    <string name="total_pay_price">최종 결제금액</string>
+    <string name="payment_choice">결제 방식</string>
+    <string name="payment_credit">신용카드</string>
+    <string name="payment_without_bankbook">무통장 입금</string>
+    <string name="payment_account_transfer">계좌이체</string>
+    <string name="payment_virtual_account">가상계좌</string>
+    <string name="payment_phone">휴대폰 결제</string>
+    <string name="payment_naver">네이버페이</string>
+    <string name="escrow_request">에스크로 (결제대금예치) 신청</string>
+    <string name="agree_payment">위 상품의 구매조건, 결제, 주문 정보 확인 및 결제진행 동의</string>
+    <string name="buying_button">결제하기</string>
+    <string name="buying_unit">건</string>
+    <string name="receipt_publication">영수증/계산서 발행</string>
+    <string name="cash_receipt">현금영수증</string>
+    <string name="income_tax">소득공제용</string>
+    <string name="expense_proof">지출증빙용</string>
+    <string name="tax_invoice">세금계산서</string>
+    <string name="business_number">사업자번호</string>
+    <string name="business_number_hint">-없이 입력</string>
+    <string name="company_name">회사명</string>
+    <string name="ceo_name">대표자명</string>
+    <string name="business_condition">업태</string>
+    <string name="business_type">종목</string>
+    <string name="exist_empty_field">입력하지 않은 항목이 있습니다</string>
+    <string name="payment_no_agree">결제 진행 동의가 필요합니다</string>
+
+    <!-- TODO: Complete Order & Payment -->
+    <string name="complete_payment_title">결제가"\n"완료되었습니다</string>
+    <string name="complete_order_title">주문이"\n"완료되었습니다</string>
+    <string name="complete_order_sub_title">하단 내용을 확인하시고 입금해주세요.</string>
+    <string name="order_number">주문번호</string>
+    <string name="order_goods_name">주문상품</string>
+    <string name="payment_plan">결제방식</string>
+    <string name="continue_shopping">쇼핑계속하기</string>
+
+    <!-- TODO: Recent Deliver Place -->
+    <string name="recent_deliver_place">최근"\n"배송지</string>
+    <string name="connect_number">연락처</string>
+
+    <!-- TODO: Buy Goods Option Dialog -->
+    <string name="total_str">총" "</string>
+    <string name="goods_unit">개</string>
+    <string name="goods_buy_number_str">수량</string>
+
+    <!-- TODO: Order State -->
+    <string name="call_inquiry">전화문의</string>
+    <string name="kakao_inquiry">카카오톡문의</string>
+    <string name="stand_by_deposit">입금대기</string>
+    <string name="ready_goods">상품준비중</string>
+    <string name="delivering">배송중</string>
+    <string name="complete_delivery">배송완료</string>
+    <string name="decide_buy">구매확정</string>
+    <string name="accept_change">교환접수</string>
+    <string name="re_delivery">재배송중</string>
+    <string name="complete_change">교환완료</string>
+    <string name="accept_return">반품접수</string>
+    <string name="complete_return">반품회수완료</string>
+    <string name="accept_refund">환불접수</string>
+    <string name="complete_refund">환불완료</string>
+
+    <!-- TODO: Order Step -->
+    <string name="order_step_order_cancel">주문취소</string>
+    <string name="order_step_request_refund">환불신청</string>
+    <string name="order_step_request_change">교환신청</string>
+    <string name="order_step_check_delivery">배송조회</string>
+    <string name="order_step_check_receipt">수취확인</string>
+    <string name="order_step_request_return">반품신청</string>
+    <string name="order_step_goods_assessment">제품평가</string>
+    <string name="order_step_change_detail">교환상세</string>
+    <string name="order_step_check_re_delivery">재배송조회</string>
+    <string name="order_step_return_detail">반품상세</string>
+    <string name="order_step_refund_detail">환불상세</string>
+    <string name="order_step_cancel_auto">자동취소</string>
+    <string name="order_step_cancel_sold_out">품절취소</string>
+    <string name="order_step_cancel_admin">관리자취소</string>
+    <string name="order_step_cancel_customer">고객요청취소</string>
+
+    <!-- TODO: Order Step -->
+    <string name="goods_rating_title">제품을 평가해주세요</string>
+    <string name="rating_success">평가한 내역이 저장되었습니다.</string>
+    <string name="reason">사유</string>
+    <string name="reason_select">사유선택</string>
+    <string name="detail_reason">상세사유</string>
+    <string name="goods_refund_info">환불정보</string>
+    <string name="approval_reason">승인사유</string>
+    <string name="refuse_reason">거절사유</string>
+    <string name="bank">은행</string>
+    <string name="bank_select">은행선택</string>
+    <string name="bank_account_num">계좌번호</string>
+    <string name="account_holder">예금주</string>
+    <string name="goods_change_reason">교환사유</string>
+    <string name="goods_select">제품 선택</string>
+    <string name="goods_return_reason">반품사유</string>
+    <string name="goods_refund_reason">환불사유</string>
+    <string name="goods_return_process">진행상태</string>
+    <string name="cancel_detail">취소상세</string>
+    <string name="goods_cancel_reason">취소사유</string>
+    <string name="request_cancel_toast">해당 주문이 취소되었습니다</string>
+    <string name="is_decide_buy">구매확정 처리를 하시겠어요?</string>
+    <string name="decide_buy_toast">구매확정 처리되었습니다</string>
+    <string name="is_check_receipt">수취확인 처리를 하시겠어요?</string>
+    <string name="check_receipt_toast">수취확인 처리되었습니다</string>
+    <string name="refund_info_title">환불내역</string>
+    <string name="payment_type">결제수단</string>
+    <string name="refund_price">환불금액</string>
+    <string name="refund_guide">환불안내</string>
+    <string name="refund_guide_content">"-" 환불은 환불 승인일로부터 2영업일 이내에 이루어지며, 신용카드 결제는 즉시 결제 승인취소 처리가 됩니다."\n-" 배송준비중 상태에서는 이미 상품이 발송된 경우 발송된 상품의 왕복 배송비는 구매자가 부담합니다.</string>
+    <string name="memo">메모</string>
+
+    <!-- TODO: Order List -->
+    <string name="delivery_place_info">배송지정보</string>
+    <string name="delivery_memo">배송메모</string>
+    <string name="payment_info">결제정보</string>
+    <string name="deposit_price">입금금액</string>
+    <string name="deposit_bank">입금은행</string>
+    <string name="deposit_account">입금계좌</string>
+    <string name="deposit_account_name">예금주</string>
+    <string name="deposit_name">입금자명</string>
+    <string name="goods_inquiry">상품문의</string>
+
+    <!-- TODO: Deliver Price Info -->
+    <string name="deliver_price_title">배송비 안내</string>
+    <string name="deliver_price_main">3만원 이상 주문시"\n"배송비 무료</string>
+    <string name="deliver_price_info1">• 닥터독 상품 제외</string>
+    <string name="deliver_price_info2">• 지역에 따라 배송비가 추가될 수 있습니다.</string>
+
+    <!-- TODO: My Cart -->
+    <string name="my_cart_title">카트</string>
+    <string name="select_all">전체 선택</string>
+    <string name="payment_price">결제금액</string>
+    <string name="no_cart">카트에 담긴 제품이 없습니다</string>
+    <string name="goods">제품</string>
+    <string name="cart_delivery">배송</string>
+    <string name="plus_unit">"+"</string>
+    <string name="xlab_delivery">슬랩 배송</string>
+    <string name="other_delivery">타 업체 배송</string>
+
+    <!-- TODO: Item Sort -->
+    <string name="sort_match">인기율순</string>
+    <string name="sort_down_price">낮은가격순</string>
+    <string name="sort_up_price">높은가격순</string>
+
+    <!-- TODO: Notification -->
+    <string name="notification">알림</string>
+    <string name="social">소셜</string>
+    <string name="no_notification">새로운 소식이 아직 없어요</string>
+    <string name="noti_social_like_post">님이 회원님의 포스트를 좋아합니다.</string>
+    <string name="noti_social_post_comment">님이 댓글을 남겼습니다.</string>
+    <string name="noti_social_follow">님이 회원님을 팔로우합니다.</string>
+    <string name="noti_social_tag">님이 회원님을 태그했습니다.</string>
+    <string name="noti_shop_lead_decide">제품은 잘 받으셨나요?</string>
+    <string name="noti_shop_lead_decide2">2일 후에 자동으로 구매확정됩니다.</string>
+    <string name="noti_shop_lead_rating">구매하신 제품이 어땠나요?</string>
+    <string name="noti_shop_lead_rating2">평가하면 다음 제품 추천시 참고할게요.</string>
+
+    <!-- TODO: Navigation-->
+    <string name="home">Home</string>
+
+    <!-- TODO: price filter range-->
+    <string name="price_range1">1만원 미만</string>
+    <string name="price_range2">1~3만원</string>
+    <string name="price_range3">3~5만원</string>
+    <string name="price_range4">5~10만원</string>
+    <string name="price_range5">10만원 이상</string>
+
+    <array name="priceFilterRangeList">
+        <item>@string/price_range1</item>
+        <item>@string/price_range2</item>
+        <item>@string/price_range3</item>
+        <item>@string/price_range4</item>
+        <item>@string/price_range5</item>
+    </array>
+
+    <!-- TODO: return reason array-->
+    <string name="return_reason1">구매의사취소</string>
+    <string name="return_reason2">색상 및 사이즈 변경</string>
+    <string name="return_reason3">배송지연</string>
+    <string name="return_reason4">배송누락</string>
+    <string name="return_reason5">상품파손 및 불량</string>
+    <string name="return_reason6">상품정보상이</string>
+    <string name="return_reason7">오배송</string>
+    <string name="return_reason8">상품불만족</string>
+    <string name="return_reason9">기타</string>
+
+    <array name="returnReasonArray">
+        <item>@string/return_reason1</item>
+        <item>@string/return_reason2</item>
+        <item>@string/return_reason3</item>
+        <item>@string/return_reason4</item>
+        <item>@string/return_reason5</item>
+        <item>@string/return_reason6</item>
+        <item>@string/return_reason7</item>
+        <item>@string/return_reason8</item>
+        <item>@string/return_reason9</item>
+    </array>
+
+    <array name="changeReasonArray">
+        <item>@string/return_reason2</item>
+        <item>@string/return_reason5</item>
+        <item>@string/return_reason7</item>
+        <item>@string/return_reason9</item>
+    </array>
+
+    <array name="refundReasonArray">
+        <item>@string/return_reason1</item>
+        <item>@string/return_reason3</item>
+        <item>@string/return_reason4</item>
+        <item>@string/return_reason5</item>
+        <item>@string/return_reason6</item>
+        <item>@string/return_reason7</item>
+        <item>@string/return_reason8</item>
+        <item>@string/return_reason9</item>
+    </array>
+
+    <!-- TODO: bank array-->
+    <string name="bank1">NH농협은행</string>
+    <string name="bank2">KB국민은행</string>
+    <string name="bank3">신한은행</string>
+    <string name="bank4">우리은행</string>
+    <string name="bank5">하나은행</string>
+    <string name="bank6">IBK기업은행</string>
+    <string name="bank7">외환은행</string>
+    <string name="bank8">SC제일은행</string>
+    <string name="bank9">한국씨티은행</string>
+    <string name="bank10">KDB산업은행</string>
+    <string name="bank11">새마을금고</string>
+    <string name="bank12">대구은행</string>
+    <string name="bank13">광주은행</string>
+    <string name="bank14">우체국</string>
+    <string name="bank15">신협</string>
+    <string name="bank16">전북은행</string>
+    <string name="bank17">경남은행</string>
+    <string name="bank18">부산은행</string>
+    <string name="bank19">수협</string>
+    <string name="bank20">제주은행</string>
+    <string name="bank21">케이뱅크</string>
+    <string name="bank22">카카오뱅크</string>
+    <string name="bank23">서울상호저축은행</string>
+    <string name="bank24">솔로몬저축은행</string>
+    <string name="bank25">신민상호저축은행</string>
+    <string name="bank26">제일상호저축은행</string>
+    <string name="bank27">토마토상호저축은행</string>
+    <string name="bank28">푸른상호저축은행</string>
+    <string name="bank29">한국진흥경기상호저축은행</string>
+    <string name="bank30">현대스위스상호저축은행</string>
+    <string name="bank31">HK상호저축은행</string>
+
+    <array name="bankArray">
+        <item>@string/bank1</item>
+        <item>@string/bank2</item>
+        <item>@string/bank3</item>
+        <item>@string/bank4</item>
+        <item>@string/bank5</item>
+        <item>@string/bank6</item>
+        <item>@string/bank7</item>
+        <item>@string/bank8</item>
+        <item>@string/bank9</item>
+        <item>@string/bank10</item>
+        <item>@string/bank11</item>
+        <item>@string/bank12</item>
+        <item>@string/bank13</item>
+        <item>@string/bank14</item>
+        <item>@string/bank15</item>
+        <item>@string/bank16</item>
+        <item>@string/bank17</item>
+        <item>@string/bank18</item>
+        <item>@string/bank19</item>
+        <item>@string/bank20</item>
+        <item>@string/bank21</item>
+        <item>@string/bank22</item>
+        <item>@string/bank23</item>
+        <item>@string/bank24</item>
+        <item>@string/bank25</item>
+        <item>@string/bank26</item>
+        <item>@string/bank27</item>
+        <item>@string/bank28</item>
+        <item>@string/bank29</item>
+        <item>@string/bank30</item>
+        <item>@string/bank31</item>
+    </array>
+</resources>
