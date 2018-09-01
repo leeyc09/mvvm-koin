@@ -3,13 +3,14 @@ package xlab.world.xlab.view.login
 import android.arch.lifecycle.MutableLiveData
 import xlab.world.xlab.data.request.ReqLoginData
 import xlab.world.xlab.data.response.ResErrorData
-import xlab.world.xlab.server.ApiUserProvider
+import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.SocialAuth
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 import xlab.world.xlab.server.errorHandle
+import java.net.HttpURLConnection
 
 
 class LoginViewModel(private val apiUser: ApiUserProvider,
@@ -23,18 +24,17 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
         uiData.value = UIModel(isLoading = true)
         launch {
             // request login api
-            apiUser.requestLogin(reqLoginData = ReqLoginData(
-                    type = loginType,
-                    email = email,
-                    password = password,
-                    socialToken = socialToken,
-                    fcmToken = ""))
-                    .with(scheduler)
-                    .subscribe({
-                        requestLoginEvent.postValue(RequestLoginEvent(successData = true))
-                    }, { error ->
-                        requestLoginEvent.postValue(RequestLoginEvent(error = errorHandle<ResErrorData>(error)))
-                    })
+            val reqLoginData = ReqLoginData(type = loginType, email = email, password = password, socialToken = socialToken, fcmToken = "")
+            apiUser.requestLogin(scheduler = scheduler, reqLoginData = reqLoginData,
+                    responseData = { _ ->
+                        requestLoginEvent.postValue(RequestLoginEvent(successLogin = true))
+                    }, errorData = { errorData ->
+                requestLoginEvent.postValue(RequestLoginEvent(successLogin = false))
+                errorData?.let {
+                    if (errorData.errorCode == HttpURLConnection.HTTP_BAD_REQUEST)
+                        uiData.value = UIModel(isLoading = false, toastMessage = errorData.message)
+                }
+            })
         }
     }
     fun requestFacebookLogin() {
@@ -61,6 +61,6 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     }
 }
 
-data class RequestLoginEvent(val successData: Any? = null, val error: ResErrorData? = null)
+data class RequestLoginEvent(val successLogin: Boolean? = null)
 data class SocialLoginEvent(val facebookToken: String? = null, val kakaoToken: String? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null)

@@ -117,12 +117,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         // 로그인 이벤트 observe
         loginViewModel.requestLoginEvent.observe(this, android.arch.lifecycle.Observer { requestLoginEvent ->
             requestLoginEvent?.let { _ ->
-                requestLoginEvent.successData?.let { successData ->
-                    PrintLog.d("login", "success")
-                }
-                requestLoginEvent.error?.let { error ->
-                    if (error.errorCode == HttpURLConnection.HTTP_BAD_REQUEST)
-                        defaultToast.showToast(error.message!!)
+                requestLoginEvent.successLogin?.let { successLogin ->
+                    PrintLog.d("login", successLogin.toString())
                 }
             }
         })

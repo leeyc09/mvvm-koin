@@ -14,6 +14,8 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import xlab.world.xlab.server.*
 import xlab.world.xlab.server.`interface`.IUserRequest
+import xlab.world.xlab.server.provider.ApiUser
+import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.support.SocialAuth
 import java.util.concurrent.TimeUnit
 
@@ -61,14 +63,13 @@ fun createOkHttpClient(): OkHttpClient {
             .build()
 }
 inline fun <reified T> createRetrofit(client: OkHttpClient, baseUrl: String): T {
-    val retrofit = Retrofit.Builder()
+    return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
-
-    return retrofit.create(T::class.java)
+            .create(T::class.java)
 }
 
 /**
