@@ -16,12 +16,14 @@ import xlab.world.xlab.R
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.rx.argument
 import xlab.world.xlab.utils.support.AppConstants.FACEBOOK_LOGIN
+import xlab.world.xlab.utils.support.AppConstants.KAKAO_LOGIN
 import xlab.world.xlab.utils.support.AppConstants.LOCAL_LOGIN
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SocialAuth
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.IntentPassName
+import java.net.HttpURLConnection
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
 
@@ -41,43 +43,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
 
         onBindEvent()
 
-//        loadKoinModules(listOf(remoteModule))
-
-//        btn.setOnClickListener {
-//            loginViewModel.requestLogin(apiUser = apiUser, email = getEmailText(), password = getPasswordText())
-//        }
-
-        loginViewModel.requestLoginEvent.observe(this, android.arch.lifecycle.Observer { requestLoginEvent ->
-            requestLoginEvent?.let { _ ->
-                requestLoginEvent.successData?.let { successData ->
-
-                }
-                requestLoginEvent.error?.let { error ->
-
-                }
-            }
-        })
-
-        loginViewModel.socialLoginEvent.observe(this, android.arch.lifecycle.Observer { socialLoginEvent ->
-            socialLoginEvent?.let { _ ->
-                socialLoginEvent.facebookToken?.let { facebookToken ->
-                    loginViewModel.requestLogin(loginType = FACEBOOK_LOGIN, socialToken = facebookToken)
-                }
-                socialLoginEvent.kakaoToken?.let {
-                }
-            }
-        })
-
-        loginViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
-            uiData?.let { _ ->
-                uiData.isLoading?.let {
-                    PrintLog.d("isLoading", it.toString())
-                }
-                uiData.toastMessage?.let {
-                    defaultToast.showToast(it)
-                }
-            }
-        })
+        observeViewModel()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -147,6 +113,46 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         }
     }
 
+    private fun observeViewModel() {
+        // 로그인 이벤트 observe
+        loginViewModel.requestLoginEvent.observe(this, android.arch.lifecycle.Observer { requestLoginEvent ->
+            requestLoginEvent?.let { _ ->
+                requestLoginEvent.successData?.let { successData ->
+                    PrintLog.d("login", "success")
+                }
+                requestLoginEvent.error?.let { error ->
+                    if (error.errorCode == HttpURLConnection.HTTP_BAD_REQUEST)
+                        defaultToast.showToast(error.message!!)
+                }
+            }
+        })
+
+        // 소셜 이벤트 observe
+        loginViewModel.socialLoginEvent.observe(this, android.arch.lifecycle.Observer { socialLoginEvent ->
+            socialLoginEvent?.let { _ ->
+                socialLoginEvent.facebookToken?.let { facebookToken ->
+                    loginViewModel.requestLogin(loginType = FACEBOOK_LOGIN, socialToken = facebookToken)
+                }
+                socialLoginEvent.kakaoToken?.let { kakaoToken ->
+                    loginViewModel.requestLogin(loginType = KAKAO_LOGIN, socialToken = kakaoToken)
+                }
+            }
+        })
+
+        // UI 이벤트 observe
+        loginViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.isLoading?.let {
+                    PrintLog.d("isLoading", it.toString())
+                }
+                uiData.toastMessage?.let {
+                    PrintLog.d("toastMessage", it)
+                    defaultToast.showToast(it)
+                }
+            }
+        })
+    }
+
     override fun onClick(v: View?) {
         v?.let {
             when (v.id) {
@@ -157,9 +163,10 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 R.id.facebookBtn -> { // 페이스북 로그인 버튼
                     originFacebookBtn.performClick()
                     loginViewModel.requestFacebookLogin()
-//                    facebookLogin()
                 }
                 R.id.kakaoBtn -> { // 카카오 로그인 버튼
+                    originKakaoBtn.performClick()
+                    loginViewModel.requestKakaoLogin()
 //                    kakaoLogin()
                 }
                 R.id.registerBtn -> { // 회원가입 버튼

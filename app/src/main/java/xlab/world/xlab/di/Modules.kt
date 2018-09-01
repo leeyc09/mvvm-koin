@@ -12,9 +12,7 @@ import org.koin.dsl.module.applicationContext
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import xlab.world.xlab.server.ApiURL
-import xlab.world.xlab.server.ApiUserProvider
-import xlab.world.xlab.server.ApiUser
+import xlab.world.xlab.server.*
 import xlab.world.xlab.server.`interface`.IUserRequest
 import xlab.world.xlab.utils.support.SocialAuth
 import java.util.concurrent.TimeUnit
@@ -25,10 +23,8 @@ import java.util.concurrent.TimeUnit
 val baseModule: Module = applicationContext {
     // provided rx scheduler
     bean { ApplicationSchedulerProvider() as SchedulerProvider }
-
     // provided social auth
     bean { SocialAuth() }
-
     // ViewModel for Login View
     viewModel { LoginViewModel(apiUser = get(), socialAuth = get(), scheduler = get()) }
 }
@@ -71,6 +67,7 @@ inline fun <reified T> createRetrofit(client: OkHttpClient, baseUrl: String): T 
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
+
     return retrofit.create(T::class.java)
 }
 
