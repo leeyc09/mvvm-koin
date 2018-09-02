@@ -203,7 +203,7 @@
             android:layout_height="wrap_content"
             android:text="@string/login"
             android:textSize="14sp"
-            android:textColor="@color/colorBFBFBF"
+            android:textColor="@color/text_enable_bfbfbf_601ec7"
             android:enabled="false"
             android:paddingTop="14dp"
             android:paddingBottom="14dp"

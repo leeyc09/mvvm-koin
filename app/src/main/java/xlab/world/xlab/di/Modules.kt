@@ -17,6 +17,7 @@ import xlab.world.xlab.server.`interface`.IUserRequest
 import xlab.world.xlab.server.provider.ApiUser
 import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.support.SocialAuth
+import xlab.world.xlab.utils.support.ViewFunction
 import java.util.concurrent.TimeUnit
 
 /**
@@ -29,6 +30,11 @@ val baseModule: Module = applicationContext {
     bean { SocialAuth() }
     // ViewModel for Login View
     viewModel { LoginViewModel(apiUser = get(), socialAuth = get(), scheduler = get()) }
+}
+
+val utilModule: Module = applicationContext {
+    // provided view function
+    bean { ViewFunction() }
 }
 
 val remoteModule: Module = applicationContext {
@@ -75,4 +81,4 @@ inline fun <reified T> createRetrofit(client: OkHttpClient, baseUrl: String): T 
 /**
  * Module list
  */
-val appModule = listOf(baseModule, remoteModule)
+val appModule = listOf(baseModule, utilModule, remoteModule)

@@ -1,15 +1,15 @@
 package xlab.world.xlab.view.login
 
 import android.arch.lifecycle.MutableLiveData
+import io.reactivex.Observable
 import xlab.world.xlab.data.request.ReqLoginData
-import xlab.world.xlab.data.response.ResErrorData
 import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
+import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SocialAuth
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
-import xlab.world.xlab.server.errorHandle
 import java.net.HttpURLConnection
 
 
@@ -39,28 +39,54 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     }
     fun requestFacebookLogin() {
         uiData.value = UIModel(isLoading = true)
-        // 페이스북 토큰 요청
-        socialAuth.getFacebookToken( { facebookToken ->
-            socialLoginEvent.value = SocialLoginEvent(facebookToken = facebookToken)
-            uiData.value = UIModel(isLoading = false)
-        }, { errorMsg ->
-            socialAuth.facebookLogout()
-            uiData.value = UIModel(isLoading = false, toastMessage = errorMsg)
-        })
+        launch {
+            Observable.create<String> {
+                // 페이스북 토큰 요청
+                socialAuth.getFacebookToken( { facebookToken ->
+                    it.onNext(facebookToken)
+                    it.onComplete()
+                }, { errorMsg ->
+                    it.tryOnError(Throwable(errorMsg))
+                })
+            }.with(scheduler).subscribe ({ facebookToken ->
+                socialLoginEvent.value = SocialLoginEvent(facebookToken = facebookToken)
+                uiData.value = UIModel(isLoading = false)
+            }, { error ->
+                socialAuth.facebookLogout()
+                uiData.value = UIModel(isLoading = false, toastMessage = error.message)
+            })
+        }
     }
     fun requestKakaoLogin() {
         uiData.value = UIModel(isLoading = true)
-        // 카카오 토큰 요청
-        socialAuth.getKakaoToken( { kakaoToken ->
-            socialLoginEvent.value = SocialLoginEvent(kakaoToken = kakaoToken)
-            uiData.value = UIModel(isLoading = false)
-        }, { errorMsg ->
-            socialAuth.kakaoLogout()
-            uiData.value = UIModel(isLoading = false, toastMessage = errorMsg)
-        })
+        launch {
+           Observable.create<String> {
+                // 카카오 토큰 요청
+                socialAuth.getKakaoToken( { kakaoToken ->
+                    it.onNext(kakaoToken)
+                    it.onComplete()
+                }, { errorMsg ->
+                    it.tryOnError(Throwable(errorMsg))
+                })
+            }.with(scheduler).subscribe ({ kakaoToken ->
+                socialLoginEvent.value = SocialLoginEvent(kakaoToken = kakaoToken)
+                uiData.value = UIModel(isLoading = false)
+            }, { error ->
+                socialAuth.kakaoLogout()
+                uiData.value = UIModel(isLoading = false, toastMessage = error.message)
+            })
+        }
+    }
+    fun isLoginEnable(email: String, password: String) {
+        launch {
+            Observable.create<Boolean> {
+                it.onNext(email.isNotEmpty() && password.isNotEmpty())
+                it.onComplete()
+            }.with(scheduler).subscribe{ isEnable -> uiData.value = UIModel(isLoginEnable = isEnable) }
+        }
     }
 }
 
 data class RequestLoginEvent(val successLogin: Boolean? = null)
 data class SocialLoginEvent(val facebookToken: String? = null, val kakaoToken: String? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null)
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val isLoginEnable: Boolean? = null)

@@ -11,7 +11,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 
-object ViewFunction {
+class ViewFunction {
     // recyclerView 더 스크롤 가능 여부 판단
     fun isScrolledRecyclerView(layoutManager: LinearLayoutManager, isLoading: Boolean, total: Int, isScrolled: (Boolean) -> Unit) {
         val visibleItemCount = layoutManager.childCount
