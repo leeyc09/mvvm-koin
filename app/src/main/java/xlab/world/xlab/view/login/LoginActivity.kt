@@ -20,16 +20,17 @@ import xlab.world.xlab.utils.support.AppConstants.FACEBOOK_LOGIN
 import xlab.world.xlab.utils.support.AppConstants.KAKAO_LOGIN
 import xlab.world.xlab.utils.support.AppConstants.LOCAL_LOGIN
 import xlab.world.xlab.utils.support.PrintLog
+import xlab.world.xlab.utils.support.RequestCodeData
 import xlab.world.xlab.utils.support.SocialAuth
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.IntentPassName
+import xlab.world.xlab.view.register.LocalRegisterActivity
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
-
     private val loginViewModel: LoginViewModel by viewModel()
     private val socialAuth: SocialAuth by inject()
-    private val viewFuncion: ViewFunction by inject()
+    private val viewFunction: ViewFunction by inject()
 
     private val isComeOtherActivity: Boolean? by argument(IntentPassName.IS_COME_OTHER_ACTIVITY, true)
 
@@ -104,34 +105,34 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         mainLayout.setOnTouchListener(this) // 키보드 숨기기
 
         // 키보드 보일경우 비밀번호 변경, 로그인 버튼 활성화 이벤트
-        viewFuncion.showUpKeyboardLayout(mainLayout) { visibility ->
+        viewFunction.showUpKeyboardLayout(mainLayout) { visibility ->
             registerLayout.visibility =
                     if (visibility == View.VISIBLE) View.INVISIBLE
                     else View.VISIBLE
             layoutPopUp.visibility = visibility
         }
         // 이메일, 패스워드 지우기 이미지 활성화 이벤트
-        viewFuncion.onFocusChange(editTextMail) { hasFocus ->
+        viewFunction.onFocusChange(editTextMail) { hasFocus ->
             editTextMail.setCompoundDrawablesWithIntrinsicBounds(0,0,
                     if (hasFocus) R.drawable.textdelete_black
                     else 0,0)
         }
-        viewFuncion.onFocusChange(editTextPassword) { hasFocus ->
+        viewFunction.onFocusChange(editTextPassword) { hasFocus ->
             editTextPassword.setCompoundDrawablesWithIntrinsicBounds(0,0,
                     if (hasFocus) R.drawable.textdelete_black
                     else 0,0)
         }
 
         // 이메일, 패스워드 입력 이벤트
-        viewFuncion.onTextChange(editTextMail) { _ ->
+        viewFunction.onTextChange(editTextMail) { _ ->
             loginViewModel.isLoginEnable(email = getEmailText(), password = getPasswordText())
         }
-        viewFuncion.onTextChange(editTextPassword) { _ ->
+        viewFunction.onTextChange(editTextPassword) { _ ->
             loginViewModel.isLoginEnable(email = getEmailText(), password = getPasswordText())
         }
 
         // 패스워드 입력시 앤터 누르면 로그인 이벤트
-        viewFuncion.onKeyboardActionTouch(editTextPassword, EditorInfo.IME_ACTION_DONE) { isTouch ->
+        viewFunction.onKeyboardActionTouch(editTextPassword, EditorInfo.IME_ACTION_DONE) { isTouch ->
             if (isTouch && loginBtn.isEnabled)
                 loginBtn.performClick()
         }
@@ -190,10 +191,14 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 R.id.kakaoBtn -> { // 카카오 로그인 버튼
                     originKakaoBtn.performClick()
                     loginViewModel.requestKakaoLogin()
-//                    kakaoLogin()
                 }
                 R.id.registerBtn -> { // 회원가입 버튼
-//                    register()
+                    // clear mail and password
+                    editTextMail.text?.clear()
+                    editTextPassword.text?.clear()
+                    // move to register activity
+                    val intent = LocalRegisterActivity.newIntent(this)
+                    startActivityForResult(intent, RequestCodeData.REGISTER_USER)
                 }
                 R.id.guestBtn -> { // 둘러보기(게스트 모드)
 //                    guestLogin()
@@ -202,7 +207,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                     loginViewModel.requestLogin(loginType = LOCAL_LOGIN,
                             email = getEmailText(),
                             password = getPasswordText())
-//                    localLogin()
                 }
                 R.id.passwordResetBtn -> { // 비밀번호 재설정
 //                    resetPassword()
@@ -216,7 +220,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
             when (v.id) {
                 R.id.editTextMail, // 이메일, 패스워드 텍스트 지우기
                 R.id.editTextPassword -> {
-                    viewFuncion.onDrawableTouch(v as EditText, event!!) { isTouch ->
+                    viewFunction.onDrawableTouch(v as EditText, event!!) { isTouch ->
                         if (isTouch) {
                             v.setText("")
                             v.performClick()
@@ -225,7 +229,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 }
                 R.id.mainLayout -> { // 키보드 숨기기
                     if (layoutPopUp.visibility == View.VISIBLE) {
-                        viewFuncion.hideKeyboard(this, v)
+                        viewFunction.hideKeyboard(this, v)
                     }
                 }
             }

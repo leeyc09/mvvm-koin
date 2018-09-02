@@ -1,11 +1,15 @@
 package xlab.world.xlab.view.login
 
 import android.arch.lifecycle.MutableLiveData
+import android.util.Patterns
 import io.reactivex.Observable
+import xlab.world.xlab.R
 import xlab.world.xlab.data.request.ReqLoginData
 import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
+import xlab.world.xlab.utils.support.AppConstants
+import xlab.world.xlab.utils.support.MessageConstants
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SocialAuth
 import xlab.world.xlab.view.AbstractViewModel
@@ -22,6 +26,12 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
 
     fun requestLogin(loginType: Int, email: String = "", password: String = "", socialToken: String = "") {
         uiData.value = UIModel(isLoading = true)
+        if (loginType == AppConstants.LOCAL_LOGIN) { // 로컬 로그인 요청일 경우 -> 이메일 정규식 확인
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                uiData.value = UIModel(isLoading = false, toastMessage = MessageConstants.LOGIN_WRONG_EMAIL_PATTERN)
+                return
+            }
+        }
         launch {
             // request login api
             val reqLoginData = ReqLoginData(type = loginType, email = email, password = password, socialToken = socialToken, fcmToken = "")

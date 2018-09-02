@@ -41,7 +41,7 @@
         android:enabled="false"
         android:text="@string/okay"
         android:textSize="14sp"
-        android:textColor="@color/text_enable_bfbfbf_5300ed"
+        android:textColor="@color/enable_bfbfbf_5300ed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

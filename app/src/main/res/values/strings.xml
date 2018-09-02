@@ -56,7 +56,6 @@
     <!--TODO: Login Fail-->
     <string name="login_fail_no_mail">등록되지 않은 이메일입니다.</string>
     <string name="login_fail_password">비밀번호가 일치하지 않습니다.</string>
-    <string name="login_fail_wrong_mail">이메일 형식을 확인해 주세요.</string>
 
     <!-- TODO: OnBoarding -->
     <string name="skip_onBoarding">건너뛰기</string>

@@ -18,6 +18,7 @@ import xlab.world.xlab.server.provider.ApiUser
 import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.support.SocialAuth
 import xlab.world.xlab.utils.support.ViewFunction
+import xlab.world.xlab.view.register.RegisterViewModel
 import java.util.concurrent.TimeUnit
 
 /**
@@ -30,6 +31,8 @@ val baseModule: Module = applicationContext {
     bean { SocialAuth() }
     // ViewModel for Login View
     viewModel { LoginViewModel(apiUser = get(), socialAuth = get(), scheduler = get()) }
+    // ViewModel for Register View
+    viewModel { RegisterViewModel(apiUser = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
