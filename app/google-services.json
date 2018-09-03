@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "397250148069",
+    "firebase_url": "https://xlab-6a710.firebaseio.com",
+    "project_id": "xlab-6a710",
+    "storage_bucket": "xlab-6a710.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:397250148069:android:d90548d8abcfc21b",
+        "android_client_info": {
+          "package_name": "xlab.world.xlab"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "397250148069-s52r378mtbgemg2un7lkas702ivu4ain.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "xlab.world.xlab",
+            "certificate_hash": "9f1373f10d5e36e5f8901cbf8e73d1f8a6fefd43"
+          }
+        },
+        {
+          "client_id": "397250148069-21kncvuqdj0b9b61e2eqcd45tepve2f4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjlEp3i5JcaYsvuH-dSGh4NcmMGpanro8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "397250148069-21kncvuqdj0b9b61e2eqcd45tepve2f4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

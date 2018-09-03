@@ -33,9 +33,9 @@ class ViewFunction {
     }
 
     // 키보드 숨기기
-    fun hideKeyboard(context: Context, v: View) {
+    fun hideKeyboard(context: Context, view: View) {
         val inputMethodManager = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     // 키보드 visible 상태 판단

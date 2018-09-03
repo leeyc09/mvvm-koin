@@ -16,6 +16,12 @@ class LocalRegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_local_register)
+
+//        onSetup()
+//
+//        onBindEvent()
+//
+//        observeViewModel()
     }
 
     companion object {

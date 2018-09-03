@@ -46,17 +46,40 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
+
+        <!-- TODO: Service -->
+        <service android:name=".utils.fcm.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- TODO: Activities -->
         <activity
-            android:name=".view.login.LoginActivity"
+            android:name=".view.preload.PreloadActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/customNoActionBarTheme"
-            android:windowSoftInputMode="adjustResize">
+            android:theme="@style/customNoActionBarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/kakao_scheme"
+                    android:host="@string/kakaolink_host" />
+            </intent-filter>
         </activity>
+        <activity
+            android:name=".view.login.LoginActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".view.register.LocalRegisterActivity"
             android:screenOrientation="portrait"
