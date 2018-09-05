@@ -16,6 +16,7 @@ import xlab.world.xlab.server.*
 import xlab.world.xlab.server.`interface`.IUserRequest
 import xlab.world.xlab.server.provider.ApiUser
 import xlab.world.xlab.server.provider.ApiUserProvider
+import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.preload.PreloadViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
@@ -35,6 +36,8 @@ val baseModule: Module = applicationContext {
     bean { SPHelper(context = get()) }
     // provided pet information
     bean { PetInfo(context = get()) }
+    // provided font color span
+    bean { FontColorSpan(context = get()) }
     // ViewModel for PreLoad
     viewModel { PreloadViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Login View

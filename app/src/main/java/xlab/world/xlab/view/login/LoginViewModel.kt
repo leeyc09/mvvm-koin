@@ -14,7 +14,6 @@ import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 import java.net.HttpURLConnection
 
-
 class LoginViewModel(private val apiUser: ApiUserProvider,
                      private val networkCheck: NetworkCheck,
                      private val scheduler: SchedulerProvider): AbstractViewModel() {

@@ -9,14 +9,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import org.koin.android.architecture.ext.viewModel
+import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.utils.font.CustomFont
+import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.span.FontForegroundColorSpan
 
 class OnBoardingFragment: Fragment() {
+    private val onBoardingViewModel: OnBoardingViewModel by viewModel()
+    private val fontColorSpan: FontColorSpan by inject()
 
-    private lateinit var boldBlackFont: FontForegroundColorSpan
-    private lateinit var regularBlackFont: FontForegroundColorSpan
+    private lateinit var textView: TextView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val layout = when (getIndex()) {
@@ -30,35 +34,32 @@ class OnBoardingFragment: Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        boldBlackFont = FontForegroundColorSpan(
-                ResourcesCompat.getColor(resources, R.color.color000000, null),
-                CustomFont.getTypeface(CustomFont.notoSansCJKkrBold, context!!)!!)
-        regularBlackFont = FontForegroundColorSpan(
-                ResourcesCompat.getColor(resources, R.color.color000000, null),
-                CustomFont.getTypeface(CustomFont.notoSansCJKkrRegular, context!!)!!)
+        onSetup(view)
 
-        val textStr = SpannableString(getContent())
-        when (getIndex()){
-            0 -> {
-                textStr.setSpan(boldBlackFont, 0, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                textStr.setSpan(regularBlackFont, 8, textStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-            1 -> {
-                textStr.setSpan(regularBlackFont, 0, 12, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                textStr.setSpan(boldBlackFont, 12, 30, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                textStr.setSpan(regularBlackFont, 30, textStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-            2 -> {
-                textStr.setSpan(boldBlackFont, 0, 10, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                textStr.setSpan(regularBlackFont, 10, textStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-        }
-
-        view.findViewById<TextView>(R.id.textView).setText(textStr, TextView.BufferType.SPANNABLE)
+        observeViewModel()
     }
 
-    private fun getIndex(): Int? = arguments?.getInt("index")
-    private fun getContent(): String? = arguments?.getString("content")
+    private fun onSetup(rootView: View) {
+        // textView 바인드
+        textView = rootView.findViewById(R.id.textView)
+
+        onBoardingViewModel.contentTextSet(content = getContent(), index = getIndex(),
+                boldFont = fontColorSpan.notoBold000000, regularFont = fontColorSpan.notoRegular000000)
+    }
+
+    private fun observeViewModel() {
+        // UI 이벤트 observe
+        onBoardingViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.contentStr?.let {
+                    textView.setText(it, TextView.BufferType.SPANNABLE)
+                }
+            }
+        })
+    }
+
+    private fun getIndex(): Int = arguments?.getInt("index") ?: 0
+    private fun getContent(): String = arguments?.getString("content") ?: ""
 
     companion object {
         fun newFragment(content: String, index: Int): OnBoardingFragment {
