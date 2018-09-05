@@ -10,11 +10,13 @@ import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.BuildConfig
 import xlab.world.xlab.R
+import xlab.world.xlab.utils.support.PetInfo
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.login.LoginActivity
+import xlab.world.xlab.view.main.MainActivity
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
@@ -56,10 +58,7 @@ class PreloadActivity: AppCompatActivity() {
         PrintLog.d("accessToken", spHelper.accessToken)
         // 저장된 로그인 기록이 없는 경우 -> 로그인 화면으로
         if(spHelper.accessToken == "") {
-            spHelper.logout()
-            val intent = LoginActivity.newIntent(context = this, isComePreLoadActivity = true, linkData = null)
-            startActivity(intent)
-            finish()
+            runLoginActivity()
         } else {
             preLoadViewModel.checkValidToken(authorization = spHelper.authorization, fcmToken = spHelper.fcmToken)
         }
@@ -74,13 +73,18 @@ class PreloadActivity: AppCompatActivity() {
         preLoadViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
-                    if (it)
+                    if (it && !progressDialog.isShowing) {
+                        PrintLog.d("progress", "show")
                         progressDialog.show()
-                    else
+                    }
+                    else if (!it && progressDialog.isShowing) {
+                        PrintLog.d("progress", "dismiss")
                         progressDialog.dismiss()
+                    }
                 }
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
+                    runLoginActivity()
                 }
             }
         })
@@ -88,7 +92,7 @@ class PreloadActivity: AppCompatActivity() {
         // access token 체크 이벤트 observe
         preLoadViewModel.checkValidTokenEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { checkValidTokenEvent ->
             checkValidTokenEvent?.let { _ ->
-                checkValidTokenEvent.loginData?.let { loginData ->
+                checkValidTokenEvent.loginData?.let { loginData -> // 로그인 성공
                     spHelper.login(accessToken = loginData.accessToken,
                             userType = loginData.loginType,
                             userId = loginData.userID,
@@ -96,18 +100,35 @@ class PreloadActivity: AppCompatActivity() {
                             userLevel = loginData.userLevel,
                             userEmail = loginData.email,
                             push = loginData.isPushAlarmOn)
+                    runMainActivity()
                 }
-                checkValidTokenEvent.isExpireToken?.let {
-                    if (it)
-                        PrintLog.d("checkValidTokenEvent", "isExpireToken")
-                    else {
-                        PrintLog.d("checkValidTokenEvent", "other error")
+                checkValidTokenEvent.isExpireToken?.let { // access token 만료 -> 토큰 갱신 시도
+                    if (it) {
+                        preLoadViewModel.generateNewToken(authorization = spHelper.authorization)
                     }
+                    else {
+                        runLoginActivity()
+                    }
+                }
+            }
+        })
+
+        // 토큰 갱신 이벤트 observe
+        preLoadViewModel.generateTokenEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { generateTokenEvent ->
+            generateTokenEvent?.let { _ ->
+                generateTokenEvent.newAccessToken?.let { // 새로운 토큰 저장소에 저장
+                    spHelper.accessToken = it
+                    finish()
+                    startActivity(intent)
+                }
+                generateTokenEvent.isFailGenerateToken?.let {
+                    runLoginActivity()
                 }
             }
         })
     }
 
+    // 앱 정보 출
     private fun printAppInfo() {
         val tag = "AppInfo"
         PrintLog.d("packageName", packageName, tag)
@@ -126,5 +147,20 @@ class PreloadActivity: AppCompatActivity() {
         }
         PrintLog.d("App Version Code", BuildConfig.VERSION_CODE.toString(), tag)
         PrintLog.d("App Version Name", BuildConfig.VERSION_NAME, tag)
+    }
+
+    // 로그인 화면 실행
+    private fun runLoginActivity() {
+        spHelper.logout()
+        val intent = LoginActivity.newIntent(context = this, isComePreLoadActivity = true, linkData = linkData)
+        startActivity(intent)
+        finish()
+    }
+
+    // 메인 화면 실행
+    private fun runMainActivity() {
+        val intent = MainActivity.newIntent(context = this, linkData = linkData)
+        startActivity(intent)
+        finish()
     }
 }

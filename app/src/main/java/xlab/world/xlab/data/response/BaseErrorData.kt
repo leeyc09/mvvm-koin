@@ -1,3 +1,5 @@
 package xlab.world.xlab.data.response
 
-open class BaseErrorData(var errorCode: Int)
+import java.io.Serializable
+
+open class BaseErrorData(var errorCode: Int): Serializable

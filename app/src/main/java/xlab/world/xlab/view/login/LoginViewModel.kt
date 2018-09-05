@@ -16,13 +16,13 @@ import java.net.HttpURLConnection
 
 
 class LoginViewModel(private val apiUser: ApiUserProvider,
-                     private val socialAuth: SocialAuth,
                      private val networkCheck: NetworkCheck,
                      private val scheduler: SchedulerProvider): AbstractViewModel() {
     val requestLoginEvent = SingleLiveEvent<RequestLoginEvent>()
     val socialLoginEvent = SingleLiveEvent<SocialLoginEvent>()
     val uiData = MutableLiveData<UIModel>()
 
+    // 로그인 요청
     fun requestLogin(loginType: Int, email: String = "", password: String = "", socialToken: String = "", fcmToken: String = "") {
         if (loginType == AppConstants.LOCAL_LOGIN) { // 로컬 로그인 요청일 경우 -> 이메일 정규식 확인
             if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -53,7 +53,8 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             })
         }
     }
-    fun requestFacebookLogin() {
+    // 페이스북 로그인 요청
+    fun requestFacebookLogin(socialAuth: SocialAuth) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
@@ -79,7 +80,8 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             })
         }
     }
-    fun requestKakaoLogin() {
+    // 카카오 로그인 요청
+    fun requestKakaoLogin(socialAuth: SocialAuth) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
@@ -105,6 +107,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             })
         }
     }
+    // 로그인 버튼 활성화
     fun isLoginEnable(email: String, password: String) {
         launch {
             Observable.create<Boolean> {

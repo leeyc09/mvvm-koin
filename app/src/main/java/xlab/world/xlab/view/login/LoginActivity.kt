@@ -151,9 +151,9 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         loginViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
-                    if (it)
+                    if (it && !progressDialog.isShowing)
                         progressDialog.show()
-                    else
+                    else if (!it && progressDialog.isShowing)
                         progressDialog.dismiss()
                 }
                 uiData.toastMessage?.let {
@@ -202,11 +202,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 }
                 R.id.facebookBtn -> { // 페이스북 로그인 버튼
                     originFacebookBtn.performClick()
-                    loginViewModel.requestFacebookLogin()
+                    loginViewModel.requestFacebookLogin(socialAuth)
                 }
                 R.id.kakaoBtn -> { // 카카오 로그인 버튼
                     originKakaoBtn.performClick()
-                    loginViewModel.requestKakaoLogin()
+                    loginViewModel.requestKakaoLogin(socialAuth)
                 }
                 R.id.registerBtn -> { // 회원가입 버튼
                     // clear mail and password

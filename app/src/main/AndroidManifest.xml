@@ -65,16 +65,21 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="@string/kakao_scheme"
-                    android:host="@string/kakaolink_host" />
+                <data
+                    android:host="@string/kakaolink_host"
+                    android:scheme="@string/kakao_scheme" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".view.onBoarding.OnBoardingActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
         <activity
             android:name=".view.login.LoginActivity"
             android:screenOrientation="portrait"
@@ -85,6 +90,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".view.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
     </application>
 
 </manifest>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.onBoarding.OnBoardingActivity">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tabLayoutDot"/>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabLayoutDot"
+        android:layout_width="wrap_content"
+        android:layout_height="4dp"
+        app:tabGravity="center"
+        app:tabMode="fixed"
+        app:tabMaxWidth="4dp"
+        app:tabBackground="@drawable/dot_indicator_selector"
+        app:tabIndicatorHeight="0dp"
+        app:tabPaddingStart="4dp"
+        app:tabPaddingEnd="4dp"
+        android:foregroundGravity="center_horizontal"
+        android:layout_marginBottom="23dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <FrameLayout
+        android:id="@+id/bottomLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+            android:id="@+id/skipBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/skip_onBoarding"
+            android:textSize="13sp"
+            android:textColor="@color/colorA4A4A4"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="11dp"
+            android:paddingBottom="11dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="25dp"
+            android:layout_gravity="end" />
+
+        <LinearLayout
+            android:id="@+id/startBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="bottom">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/colorD8D8D8" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/end_onBoarding"
+                android:textSize="14sp"
+                android:textColor="@color/color5300ED"
+                android:gravity="center"
+                android:paddingTop="14.5dp"
+                android:paddingBottom="17dp"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</android.support.constraint.ConstraintLayout>

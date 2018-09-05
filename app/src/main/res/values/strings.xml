@@ -18,6 +18,13 @@
     <string name="mail_content4">앱 버전 : </string>
     <string name="mail_content5">기기 정보 : </string>
 
+    <!-- TODO: OnBoarding -->
+    <string name="skip_onBoarding">건너뛰기</string>
+    <string name="end_onBoarding">시작하기</string>
+    <string name="onBoarding1">반려동물을 추가하면"\n"슬랩이 더 똑똑해져요</string>
+    <string name="onBoarding2">하단의 버튼을 누르면"\n"나와 비슷한 사람들이 사용한 제품의"\n"인기율이 나타나요</string>
+    <string name="onBoarding3">사용한 제품을 평가하면"\n"관심있을 제품을 소개해드려요</string>
+
     <!-- TODO: Post Type -->
     <string name="picture">사진</string>
     <string name="youtube_link">유튜브 링크</string>
@@ -56,13 +63,6 @@
     <!--TODO: Login Fail-->
     <string name="login_fail_no_mail">등록되지 않은 이메일입니다.</string>
     <string name="login_fail_password">비밀번호가 일치하지 않습니다.</string>
-
-    <!-- TODO: OnBoarding -->
-    <string name="skip_onBoarding">건너뛰기</string>
-    <string name="end_onBoarding">시작하기</string>
-    <string name="onBoarding1">반려동물을 추가하면"\n"슬랩이 더 똑똑해져요</string>
-    <string name="onBoarding2">하단의 버튼을 누르면"\n"나와 비슷한 사람들이 사용한 제품의"\n"인기율이 나타나요</string>
-    <string name="onBoarding3">사용한 제품을 평가하면"\n"관심있을 제품을 소개해드려요</string>
 
     <!--TODO: Main-->
     <string name="main_fragment_all">전체</string>

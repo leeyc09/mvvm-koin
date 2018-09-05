@@ -4,6 +4,7 @@ import android.app.Application
 import com.kakao.auth.*
 import xlab.world.xlab.di.appModule
 import org.koin.android.ext.android.startKoin
+import org.koin.log.EmptyLogger
 
 class GlobalApplication: Application() {
     override fun onCreate() {
@@ -12,7 +13,7 @@ class GlobalApplication: Application() {
         KakaoSDK.init(KakaoSDKAdapter())
 
         // start koin
-        startKoin(this, appModule)
+        startKoin(this, appModule, logger = EmptyLogger())
     }
 
     companion object {

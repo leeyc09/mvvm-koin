@@ -16,10 +16,7 @@ import xlab.world.xlab.server.*
 import xlab.world.xlab.server.`interface`.IUserRequest
 import xlab.world.xlab.server.provider.ApiUser
 import xlab.world.xlab.server.provider.ApiUserProvider
-import xlab.world.xlab.utils.support.NetworkCheck
-import xlab.world.xlab.utils.support.SPHelper
-import xlab.world.xlab.utils.support.SocialAuth
-import xlab.world.xlab.utils.support.ViewFunction
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.preload.PreloadViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
 import java.util.concurrent.TimeUnit
@@ -36,10 +33,12 @@ val baseModule: Module = applicationContext {
     bean { SocialAuth() }
     // provided shared preference
     bean { SPHelper(context = get()) }
+    // provided pet information
+    bean { PetInfo(context = get()) }
     // ViewModel for PreLoad
     viewModel { PreloadViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Login View
-    viewModel { LoginViewModel(apiUser = get(), socialAuth = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { LoginViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Register View
     viewModel { RegisterViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
 }
@@ -53,13 +52,15 @@ val remoteModule: Module = applicationContext {
     // provided web components
     bean { createOkHttpClient() }
     // user api interface
-    bean { createRetrofit<IUserRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL) } //XLAB_API_URL_SSL
+    bean { createRetrofit<IUserRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL_SSL) } //XLAB_API_URL_SSL
     // user api implement
     bean { ApiUser(iUserRequest = get()) as ApiUserProvider }
 }
 
 fun createOkHttpClient(): OkHttpClient {
     val httpClient: OkHttpClient.Builder = OkHttpClient.Builder()
+            .followRedirects(false)
+            .followSslRedirects(false)
 
     httpClient.addInterceptor { chain ->
         val original: Request = chain.request()
