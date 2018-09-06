@@ -10,7 +10,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
-import com.facebook.login.Login
 import com.kakao.auth.Session
 import kotlinx.android.synthetic.main.action_bar_default.*
 import kotlinx.android.synthetic.main.activity_login.*
@@ -159,7 +158,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
-                uiData.isLoginEnable?.let {
+                uiData.isLoginBtnEnable?.let {
                     loginBtn.isEnabled = it
                 }
             }
@@ -245,9 +244,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                     }
                 }
                 R.id.mainLayout -> { // 키보드 숨기기
-                    if (layoutPopUp.visibility == View.VISIBLE) {
-                        viewFunction.hideKeyboard(context = this, view = v)
-                    }
+                    viewFunction.hideKeyboard(context = this, view = v)
                 }
             }
         }

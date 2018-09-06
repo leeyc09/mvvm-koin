@@ -17,6 +17,7 @@ import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
+import xlab.world.xlab.view.onBoarding.OnBoardingActivity
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
@@ -55,6 +56,12 @@ class PreloadActivity: AppCompatActivity() {
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
+        // onBoarding 화면 본적 없는 경우 -> onBoarding 화면으로
+        if(!spHelper.onBoard) {
+            runOnBoardingActivity()
+            return
+        }
+
         PrintLog.d("accessToken", spHelper.accessToken)
         // 저장된 로그인 기록이 없는 경우 -> 로그인 화면으로
         if(spHelper.accessToken == "") {
@@ -73,14 +80,10 @@ class PreloadActivity: AppCompatActivity() {
         preLoadViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
-                    if (it && !progressDialog.isShowing) {
-                        PrintLog.d("progress", "show")
+                    if (it && !progressDialog.isShowing)
                         progressDialog.show()
-                    }
-                    else if (!it && progressDialog.isShowing) {
-                        PrintLog.d("progress", "dismiss")
+                    else if (!it && progressDialog.isShowing)
                         progressDialog.dismiss()
-                    }
                 }
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
@@ -147,6 +150,14 @@ class PreloadActivity: AppCompatActivity() {
         }
         PrintLog.d("App Version Code", BuildConfig.VERSION_CODE.toString(), tag)
         PrintLog.d("App Version Name", BuildConfig.VERSION_NAME, tag)
+    }
+
+    // onBoarding 화면 실행
+    private fun runOnBoardingActivity() {
+        spHelper.logout()
+        val intent = OnBoardingActivity.newIntent(context = this)
+        startActivity(intent)
+        finish()
     }
 
     // 로그인 화면 실행

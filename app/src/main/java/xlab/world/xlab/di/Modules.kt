@@ -18,6 +18,7 @@ import xlab.world.xlab.server.provider.ApiUser
 import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
+import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
 import xlab.world.xlab.view.preload.PreloadViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
 import java.util.concurrent.TimeUnit
@@ -38,12 +39,18 @@ val baseModule: Module = applicationContext {
     bean { PetInfo(context = get()) }
     // provided font color span
     bean { FontColorSpan(context = get()) }
-    // ViewModel for PreLoad
+    // provided letter or digit input filter
+    bean { LetterOrDigitInputFilter() }
+    // provided data regex
+    bean { DataRegex() }
+    // ViewModel for OnBoarding View
+    viewModel { OnBoardingViewModel(scheduler = get()) }
+    // ViewModel for PreLoad View
     viewModel { PreloadViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Login View
-    viewModel { LoginViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { LoginViewModel(apiUser = get(), dataRegex = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Register View
-    viewModel { RegisterViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { RegisterViewModel(apiUser = get(), dataRegex = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
@@ -55,7 +62,7 @@ val remoteModule: Module = applicationContext {
     // provided web components
     bean { createOkHttpClient() }
     // user api interface
-    bean { createRetrofit<IUserRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL_SSL) } //XLAB_API_URL_SSL
+    bean { createRetrofit<IUserRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL) } //XLAB_API_URL_SSL
     // user api implement
     bean { ApiUser(iUserRequest = get()) as ApiUserProvider }
 }

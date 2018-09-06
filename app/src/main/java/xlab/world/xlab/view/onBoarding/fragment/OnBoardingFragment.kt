@@ -2,9 +2,6 @@ package xlab.world.xlab.view.onBoarding.fragment
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.content.res.ResourcesCompat
-import android.text.Spannable
-import android.text.SpannableString
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,9 +9,8 @@ import android.widget.TextView
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
-import xlab.world.xlab.utils.font.CustomFont
 import xlab.world.xlab.utils.font.FontColorSpan
-import xlab.world.xlab.utils.span.FontForegroundColorSpan
+import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
 
 class OnBoardingFragment: Fragment() {
     private val onBoardingViewModel: OnBoardingViewModel by viewModel()
@@ -43,7 +39,7 @@ class OnBoardingFragment: Fragment() {
         // textView 바인드
         textView = rootView.findViewById(R.id.textView)
 
-        onBoardingViewModel.contentTextSet(content = getContent(), index = getIndex(),
+        onBoardingViewModel.contentTextSet(index = getIndex(),
                 boldFont = fontColorSpan.notoBold000000, regularFont = fontColorSpan.notoRegular000000)
     }
 
@@ -59,14 +55,12 @@ class OnBoardingFragment: Fragment() {
     }
 
     private fun getIndex(): Int = arguments?.getInt("index") ?: 0
-    private fun getContent(): String = arguments?.getString("content") ?: ""
 
     companion object {
-        fun newFragment(content: String, index: Int): OnBoardingFragment {
+        fun newFragment(index: Int): OnBoardingFragment {
             val fragment = OnBoardingFragment()
 
             val args = Bundle()
-            args.putString("content", content)
             args.putInt("index", index)
             fragment.arguments = args
 

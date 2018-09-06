@@ -1,9 +1,7 @@
 package xlab.world.xlab.view.login
 
 import android.arch.lifecycle.MutableLiveData
-import android.util.Patterns
 import io.reactivex.Observable
-import xlab.world.xlab.R
 import xlab.world.xlab.data.request.ReqLoginData
 import xlab.world.xlab.data.response.ResLoginData
 import xlab.world.xlab.server.provider.ApiUserProvider
@@ -15,6 +13,7 @@ import xlab.world.xlab.view.SingleLiveEvent
 import java.net.HttpURLConnection
 
 class LoginViewModel(private val apiUser: ApiUserProvider,
+                     private val dataRegex: DataRegex,
                      private val networkCheck: NetworkCheck,
                      private val scheduler: SchedulerProvider): AbstractViewModel() {
     val requestLoginEvent = SingleLiveEvent<RequestLoginEvent>()
@@ -24,7 +23,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     // 로그인 요청
     fun requestLogin(loginType: Int, email: String = "", password: String = "", socialToken: String = "", fcmToken: String = "") {
         if (loginType == AppConstants.LOCAL_LOGIN) { // 로컬 로그인 요청일 경우 -> 이메일 정규식 확인
-            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            if (!dataRegex.emailRegex(email)) {
                 uiData.value = UIModel(toastMessage = MessageConstants.LOGIN_WRONG_EMAIL_PATTERN)
                 return
             }
@@ -38,17 +37,18 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
         uiData.value = UIModel(isLoading = true)
         launch {
             // request login api
-            val reqLoginData = ReqLoginData(type = loginType, email = email, password = password, socialToken = socialToken, fcmToken = fcmToken)
+            val reqLoginData = ReqLoginData(loginType = loginType, email = email, password = password, socialToken = socialToken, fcmToken = fcmToken)
             apiUser.requestLogin(scheduler = scheduler, reqLoginData = reqLoginData,
                     responseData = { loginData ->
                         requestLoginEvent.postValue(RequestLoginEvent(loginData = loginData))
                         uiData.value = UIModel(isLoading = false)
-                    }, errorData = { errorData ->
-                uiData.value = UIModel(isLoading = false)
-                errorData?.let {
-                    if (errorData.errorCode == HttpURLConnection.HTTP_BAD_REQUEST)
-                        uiData.value = UIModel(toastMessage = errorData.message)
-                }
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            if (errorData.errorCode == HttpURLConnection.HTTP_BAD_REQUEST)
+                                uiData.value = UIModel(toastMessage = errorData.message)
+                        }
             })
         }
     }
@@ -112,11 +112,11 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             Observable.create<Boolean> {
                 it.onNext(email.isNotEmpty() && password.isNotEmpty())
                 it.onComplete()
-            }.with(scheduler).subscribe{ isEnable -> uiData.value = UIModel(isLoginEnable = isEnable) }
+            }.with(scheduler).subscribe{ isEnable -> uiData.value = UIModel(isLoginBtnEnable = isEnable) }
         }
     }
 }
 
 data class RequestLoginEvent(val loginData: ResLoginData? = null)
 data class SocialLoginEvent(val facebookToken: String? = null, val kakaoToken: String? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val isLoginEnable: Boolean? = null)
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val isLoginBtnEnable: Boolean? = null)

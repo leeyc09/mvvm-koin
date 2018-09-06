@@ -3,13 +3,18 @@ package xlab.world.xlab.utils.support
 import android.app.Activity
 import android.content.Context
 import android.graphics.Rect
+import android.support.design.widget.TabLayout
+import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import kotlinx.android.synthetic.main.activity_on_boarding.*
 
 class ViewFunction {
     // recyclerView 더 스크롤 가능 여부 판단
@@ -36,6 +41,12 @@ class ViewFunction {
     fun hideKeyboard(context: Context, view: View) {
         val inputMethodManager = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    // 키보드 보이기
+    fun showKeyboard(context: Context) {
+        val inputMethodManager = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     }
 
     // 키보드 visible 상태 판단
@@ -108,5 +119,26 @@ class ViewFunction {
             }
         }
         isTouch(false)
+    }
+
+    // view pager page 변경 판단
+    fun onViewPagerChangePosition(viewPager: ViewPager, position: (Int) -> Unit) {
+        viewPager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {}
+            override fun onPageScrolled(index: Int, positionOffset: Float, positionOffsetPixels: Int) {}
+            override fun onPageSelected(index: Int) {
+                position(index)
+            }
+        })
+    }
+
+    // dot indicator 세팅
+    fun setDotIndicator(tabLayoutDot: TabLayout, marginDIP: Int) {
+        for (i in 0 until tabLayoutDot.tabCount) {
+            val tab: View = (tabLayoutDot.getChildAt(0) as ViewGroup).getChildAt(i)
+            val params = tab.layoutParams as ViewGroup.MarginLayoutParams
+            params.setMargins(marginDIP, 0, marginDIP, 0)
+            tab.requestLayout()
+        }
     }
 }

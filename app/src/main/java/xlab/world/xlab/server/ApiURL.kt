@@ -25,8 +25,8 @@ object ApiURL {
     const val GODO_GOODS_DETIAL_CD = "$GODO_GOODS/view_cd.php"
 
     // TODO: xlab api server url
-//    const val XLAB_API_DOMEN = "192.168.1.11:8080"
-    const val XLAB_API_DOMEN = "xlab.io"
+    const val XLAB_API_DOMEN = "192.168.1.11:8080"
+//    const val XLAB_API_DOMEN = "xlab.io"
     const val XLAB_API_URL = "$MAIN_SCHEME://$XLAB_API_DOMEN"
     const val XLAB_API_URL_SSL = "$MAIN_SCHEME_SSL://$XLAB_API_DOMEN"
 

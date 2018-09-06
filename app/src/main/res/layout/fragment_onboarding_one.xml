@@ -17,11 +17,10 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/textView"/>
 
-    <xlab.world.xlab.utils.textView.TextViewRegularNoto
+    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/onBoarding1"
         android:textSize="14sp"
         android:textColor="@color/color000000"
         android:gravity="center"
