@@ -16,24 +16,27 @@ import kotlinx.android.synthetic.main.activity_login.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
-import xlab.world.xlab.utils.rx.argument
+import xlab.world.xlab.data.response.ResUserLoginData
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.support.AppConstants.FACEBOOK_LOGIN
 import xlab.world.xlab.utils.support.AppConstants.KAKAO_LOGIN
 import xlab.world.xlab.utils.support.AppConstants.LOCAL_LOGIN
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
-import xlab.world.xlab.view.IntentPassName
+import xlab.world.xlab.utils.support.IntentPassName
+import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.register.LocalRegisterActivity
+import xlab.world.xlab.view.register.SocialRegisterActivity
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
     private val loginViewModel: LoginViewModel by viewModel()
-    private val socialAuth: SocialAuth by inject()
     private val viewFunction: ViewFunction by inject()
     private val spHelper: SPHelper by inject()
 
-    private val isComePreLoadActivity: Boolean? by argument(IntentPassName.IS_COME_PRELOAD_ACTIVITY, true)
+    private var isComePreLoadActivity: Boolean = true
     private var linkData: Uri? = null
+
+    private val socialAuth: SocialAuth = SocialAuth()
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
@@ -55,6 +58,37 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
+        PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
+
+        when (resultCode) {
+            Activity.RESULT_OK -> {
+                when (requestCode) {
+                    RequestCodeData.REGISTER_USER -> { // 회원가입 성공
+                        if (isComePreLoadActivity) { // 앱 실행으로 로그인 화면 온 경우
+                            rootLayout.visibility = View.INVISIBLE
+                            val accessToken = data?.let {
+                                data.getStringExtra(IntentPassName.ACCESS_TOKEN)
+                            } ?: ""
+                            spHelper.accessToken = accessToken
+                            loginViewModel.requestLoginByAccessToken(authorization = spHelper.authorization, fcmToken = spHelper.fcmToken)
+                        } else { // 다른 화면에서 로그인 화면으로 온 경우
+                            setResult(ResultCodeData.LOGIN_SUCCESS)
+                            finish()
+                        }
+                    }
+                }
+            }
+            Activity.RESULT_CANCELED -> {
+                when (requestCode) {
+                    RequestCodeData.REGISTER_USER -> { // 회원가입 취소
+                        // 페이스북, 카카오 로그아웃
+                        socialAuth.facebookLogout()
+                        socialAuth.kakaoLogout()
+                    }
+                }
+            }
+        }
 
         // Call facebook login callback manager
         if (socialAuth.facebookCallbackManager != null)
@@ -66,22 +100,19 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
     }
 
     private fun onSetup() {
+        isComePreLoadActivity = intent.getBooleanExtra(IntentPassName.IS_COME_PRELOAD_ACTIVITY, true)
         linkData = intent.data
 
-        if (isComePreLoadActivity == null) {
-            actionBackBtn.visibility = View.INVISIBLE
-            guestBtn.visibility = View.VISIBLE
-        } else {
-            // 앱 실행으로 로그인 화면으로 온 경우 -> 뒤로가기 비활성화, 둘러보기 활성화
-            // 다른 화면에서 로그인 화면으로 온 경우 -> 뒤로가기 버튼 활성화, 둘러보기 비활성화
-            actionBackBtn.visibility =
-                    if (isComePreLoadActivity!!) View.INVISIBLE
-                    else View.VISIBLE
+        // 앱 실행으로 로그인 화면으로 온 경우 -> 뒤로가기 비활성화, 둘러보기 활성화
+        // 다른 화면에서 로그인 화면으로 온 경우 -> 뒤로가기 버튼 활성화, 둘러보기 비활성화
+        actionBackBtn.visibility =
+                if (isComePreLoadActivity) View.INVISIBLE
+                else View.VISIBLE
 
-            guestBtn.visibility =
-                    if (isComePreLoadActivity!!) View.VISIBLE
-                    else View.INVISIBLE
-        }
+        guestBtn.visibility =
+                if (isComePreLoadActivity) View.VISIBLE
+                else View.INVISIBLE
+
         // 타이틀, 확인 버튼 비활성화
         actionBarTitle.visibility = View.GONE
         actionBtn.visibility = View.GONE
@@ -164,10 +195,10 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
             }
         })
 
-        // 로그인 이벤트 observe
-        loginViewModel.requestLoginEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { requestLoginEvent ->
-            requestLoginEvent?.let { _ ->
-                requestLoginEvent.loginData?.let { loginData ->
+        // access token 로그인 시도 이벤트 observe
+        loginViewModel.requestLoginByAccessToken.observe(owner = this, observer = android.arch.lifecycle.Observer { checkValidTokenEvent ->
+            checkValidTokenEvent?.let { _ ->
+                checkValidTokenEvent.loginData?.let { loginData -> // 로그인 성공
                     spHelper.login(accessToken = loginData.accessToken,
                             userType = loginData.loginType,
                             userId = loginData.userID,
@@ -175,18 +206,34 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                             userLevel = loginData.userLevel,
                             userEmail = loginData.email,
                             push = loginData.isPushAlarmOn)
+                    runMainActivity()
+                }
+                checkValidTokenEvent.isExpireToken?.let { // access token 만료
                 }
             }
         })
 
-        // 소셜 이벤트 observe
-        loginViewModel.socialLoginEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { socialLoginEvent ->
-            socialLoginEvent?.let { _ ->
-                socialLoginEvent.facebookToken?.let { facebookToken ->
-                    loginViewModel.requestLogin(loginType = FACEBOOK_LOGIN, socialToken = facebookToken, fcmToken = spHelper.fcmToken)
+        // 로그인 이벤트 observe
+        loginViewModel.requestLoginEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { requestLoginEvent ->
+            requestLoginEvent?.let { _ ->
+                requestLoginEvent.loginData?.let { loginData ->
+                    if (loginData.needRegisterSocial) { // 소셜 회원가입 필요
+                        runSocialRegisterActivity(loginData)
+                    } else {
+                        spHelper.login(accessToken = loginData.accessToken,
+                                userType = loginData.loginType,
+                                userId = loginData.userID,
+                                socialId = loginData.socialID,
+                                userLevel = loginData.userLevel,
+                                userEmail = loginData.email,
+                                push = loginData.isPushAlarmOn)
+                    }
                 }
-                socialLoginEvent.kakaoToken?.let { kakaoToken ->
-                    loginViewModel.requestLogin(loginType = KAKAO_LOGIN, socialToken = kakaoToken, fcmToken = spHelper.fcmToken)
+                requestLoginEvent.isLoginFail?.let {
+                    if (it) {
+                        socialAuth.facebookLogout()
+                        socialAuth.kakaoLogout()
+                    }
                 }
             }
         })
@@ -201,19 +248,27 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 }
                 R.id.facebookBtn -> { // 페이스북 로그인 버튼
                     originFacebookBtn.performClick()
-                    loginViewModel.requestFacebookLogin(socialAuth)
+                    // 페이스북 토큰 요청
+                    socialAuth.getFacebookToken( { facebookToken ->
+                        loginViewModel.requestLogin(loginType = FACEBOOK_LOGIN, socialToken = facebookToken, fcmToken = spHelper.fcmToken)
+                    }, { _ ->
+                        socialAuth.facebookLogout()
+                    })
                 }
                 R.id.kakaoBtn -> { // 카카오 로그인 버튼
                     originKakaoBtn.performClick()
-                    loginViewModel.requestKakaoLogin(socialAuth)
+                    // 카카오 토큰 요청
+                    socialAuth.getKakaoToken( { kakaoToken ->
+                        loginViewModel.requestLogin(loginType = KAKAO_LOGIN, socialToken = kakaoToken, fcmToken = spHelper.fcmToken)
+                    }, { _ ->
+                        socialAuth.kakaoLogout()
+                    })
                 }
                 R.id.registerBtn -> { // 회원가입 버튼
                     // clear mail and password
                     editTextMail.text?.clear()
                     editTextPassword.text?.clear()
-                    // move to register activity
-                    val intent = LocalRegisterActivity.newIntent(context = this)
-                    startActivityForResult(intent, RequestCodeData.REGISTER_USER)
+                    runLocalRegisterActivity()
                 }
                 R.id.guestBtn -> { // 둘러보기(게스트 모드)
 //                    guestLogin()
@@ -253,6 +308,26 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
 
     private fun getEmailText() = editTextMail.text?.trim().toString()
     private fun getPasswordText() = editTextPassword.text?.trim().toString()
+
+    // local 회원가입 화면 실행
+    private fun runLocalRegisterActivity() {
+        val intent = LocalRegisterActivity.newIntent(context = this)
+        startActivityForResult(intent, RequestCodeData.REGISTER_USER)
+    }
+
+    // social 회원가입 화면 실행
+    private fun runSocialRegisterActivity(userData: ResUserLoginData) {
+        val intent = SocialRegisterActivity.newIntent(context = this, userData = userData)
+        startActivityForResult(intent, RequestCodeData.REGISTER_USER)
+    }
+
+
+    // 메인 화면 실행
+    private fun runMainActivity() {
+        val intent = MainActivity.newIntent(context = this, linkData = linkData)
+        startActivity(intent)
+        finish()
+    }
 
     companion object {
         fun newIntent(context: Context, isComePreLoadActivity: Boolean, linkData: Uri?): Intent {

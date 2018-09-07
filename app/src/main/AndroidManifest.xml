@@ -91,6 +91,11 @@
             android:theme="@style/customNoActionBarTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".view.register.SocialRegisterActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".view.main.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />

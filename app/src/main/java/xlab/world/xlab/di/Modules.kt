@@ -19,7 +19,6 @@ import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
-import xlab.world.xlab.view.preload.PreloadViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
 import java.util.concurrent.TimeUnit
 
@@ -31,8 +30,6 @@ val baseModule: Module = applicationContext {
     bean { ApplicationSchedulerProvider() as SchedulerProvider }
     // provided network check
     bean { NetworkCheck(context = get()) }
-    // provided social auth
-    bean { SocialAuth() }
     // provided shared preference
     bean { SPHelper(context = get()) }
     // provided pet information
@@ -46,7 +43,7 @@ val baseModule: Module = applicationContext {
     // ViewModel for OnBoarding View
     viewModel { OnBoardingViewModel(scheduler = get()) }
     // ViewModel for PreLoad View
-    viewModel { PreloadViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
+//    viewModel { PreloadViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Login View
     viewModel { LoginViewModel(apiUser = get(), dataRegex = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Register View

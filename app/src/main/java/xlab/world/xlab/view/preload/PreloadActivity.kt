@@ -3,26 +3,24 @@ package xlab.world.xlab.view.preload
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Base64
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.BuildConfig
-import xlab.world.xlab.R
-import xlab.world.xlab.utils.support.PetInfo
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.login.LoginActivity
+import xlab.world.xlab.view.login.LoginViewModel
 import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 class PreloadActivity: AppCompatActivity() {
-    private val preLoadViewModel: PreloadViewModel by viewModel()
+    private val loginViewModel: LoginViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
     private var linkData: Uri? = null
@@ -67,7 +65,7 @@ class PreloadActivity: AppCompatActivity() {
         if(spHelper.accessToken == "") {
             runLoginActivity()
         } else {
-            preLoadViewModel.checkValidToken(authorization = spHelper.authorization, fcmToken = spHelper.fcmToken)
+            loginViewModel.requestLoginByAccessToken(authorization = spHelper.authorization, fcmToken = spHelper.fcmToken)
         }
     }
 
@@ -77,7 +75,7 @@ class PreloadActivity: AppCompatActivity() {
 
     private fun observeViewModel() {
         // UI 이벤트 observe
-        preLoadViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+        loginViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
                     if (it && !progressDialog.isShowing)
@@ -92,8 +90,8 @@ class PreloadActivity: AppCompatActivity() {
             }
         })
 
-        // access token 체크 이벤트 observe
-        preLoadViewModel.checkValidTokenEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { checkValidTokenEvent ->
+        // access token 로그인 시도 이벤트 observe
+        loginViewModel.requestLoginByAccessToken.observe(owner = this, observer = android.arch.lifecycle.Observer { checkValidTokenEvent ->
             checkValidTokenEvent?.let { _ ->
                 checkValidTokenEvent.loginData?.let { loginData -> // 로그인 성공
                     spHelper.login(accessToken = loginData.accessToken,
@@ -107,7 +105,7 @@ class PreloadActivity: AppCompatActivity() {
                 }
                 checkValidTokenEvent.isExpireToken?.let { // access token 만료 -> 토큰 갱신 시도
                     if (it) {
-                        preLoadViewModel.generateNewToken(authorization = spHelper.authorization)
+                        loginViewModel.generateNewToken(authorization = spHelper.authorization)
                     }
                     else {
                         runLoginActivity()
@@ -117,7 +115,7 @@ class PreloadActivity: AppCompatActivity() {
         })
 
         // 토큰 갱신 이벤트 observe
-        preLoadViewModel.generateTokenEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { generateTokenEvent ->
+        loginViewModel.generateTokenEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { generateTokenEvent ->
             generateTokenEvent?.let { _ ->
                 generateTokenEvent.newAccessToken?.let { // 새로운 토큰 저장소에 저장
                     spHelper.accessToken = it

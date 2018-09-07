@@ -16,7 +16,7 @@ interface ApiUserProvider {
 
     // refresh token 가져오기
     fun getRefreshToken(scheduler: SchedulerProvider, authorization: String,
-                        responseData: (ResRefreshTokenData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+                        responseData: (ResGetRefreshTokenData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
     // access token 갱신
     fun generateToken(scheduler: SchedulerProvider, authorization: String,
@@ -24,11 +24,11 @@ interface ApiUserProvider {
 
     // login 요청
     fun requestLogin(scheduler: SchedulerProvider, reqLoginData: ReqLoginData,
-                     responseData: (ResLoginData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+                     responseData: (ResUserLoginData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
     // register 요청
     fun requestRegister(scheduler: SchedulerProvider, reqRegisterData: ReqRegisterData,
-                        responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+                        responseData: (ResUserRegisterData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
@@ -44,7 +44,7 @@ class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
     }
 
     override fun getRefreshToken(scheduler: SchedulerProvider, authorization: String,
-                                 responseData: (ResRefreshTokenData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+                                 responseData: (ResGetRefreshTokenData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserRequest.getRefreshToken(authorization = authorization)
                 .with(scheduler)
                 .subscribe({
@@ -66,7 +66,7 @@ class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
     }
 
     override fun requestLogin(scheduler: SchedulerProvider, reqLoginData: ReqLoginData,
-                              responseData: (ResLoginData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+                              responseData: (ResUserLoginData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserRequest.login(reqLoginData = reqLoginData, type = reqLoginData.loginType)
                 .with(scheduler)
                 .subscribe({
@@ -77,7 +77,7 @@ class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
     }
 
     override fun requestRegister(scheduler: SchedulerProvider, reqRegisterData: ReqRegisterData,
-                                 responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+                                 responseData: (ResUserRegisterData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserRequest.register(reqRegisterData = reqRegisterData)
                 .with(scheduler)
                 .subscribe({

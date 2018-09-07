@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.register.SocialRegisterActivity"
+    android:id="@+id/mainLayout">
+
+    <WebView
+        android:visibility="gone"
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        android:overScrollMode="never"/>
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include
+                android:id="@+id/actionBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                layout="@layout/action_bar_default"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewBlackNoto
+                android:id="@+id/textViewNickName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/register_nick_name"
+                android:textColor="@color/color000000"
+                android:textSize="20sp"
+                app:layout_constraintTop_toBottomOf="@id/actionBar"
+                android:layout_marginStart="36dp"
+                android:layout_marginEnd="36dp"
+                android:layout_marginTop="7dp"/>
+
+            <xlab.world.xlab.utils.view.editText.EditTextRegularNoto
+                android:id="@+id/editTextNick"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="text|textNoSuggestions"
+                android:textColor="@color/color000000"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:imeOptions="actionDone"
+                android:hint="@string/nick_name"
+                app:layout_constraintTop_toBottomOf="@id/textViewNickName"
+                app:layout_constraintStart_toStartOf="@id/textViewNickName"
+                app:layout_constraintEnd_toEndOf="@id/textViewNickName"
+                android:layout_marginTop="95dp"/>
+
+            <LinearLayout
+                android:id="@+id/confirmNickLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/editTextNick"
+                app:layout_constraintStart_toStartOf="@id/editTextNick"
+                app:layout_constraintEnd_toEndOf="@id/editTextNick"
+                android:visibility="invisible">
+
+                <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                    android:id="@+id/textViewConfirmNick"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/confirm_nick_length"
+                    android:textSize="12sp"
+                    android:textColor="@color/select_de5359_000000"/>
+
+            </LinearLayout>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:id="@+id/textViewAgreement"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/color6D6D6D"
+                app:layout_constraintTop_toBottomOf="@id/confirmNickLayout"
+                app:layout_constraintStart_toStartOf="@id/confirmNickLayout"
+                app:layout_constraintEnd_toEndOf="@id/confirmNickLayout"
+                android:layout_marginTop="37dp"
+                android:paddingBottom="70dp"/>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/layoutPopUp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorFFFFFF"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/colorC1C1C1"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+            android:id="@+id/finishBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/finish"
+            android:textSize="14sp"
+            android:textColor="@color/enable_bfbfbf_601ec7"
+            android:enabled="false"
+            android:paddingTop="16dp"
+            android:paddingBottom="15dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -26,14 +26,14 @@
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <include
                 android:id="@+id/actionBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                layout="@layout/action_bar_default"/>
+                layout="@layout/action_bar_default"
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <xlab.world.xlab.utils.view.textView.TextViewBlackNoto
                 android:id="@+id/textViewLogin"
@@ -196,8 +196,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
-            android:background="@color/colorC1C1C1"
-            app:layout_constraintTop_toTopOf="parent"/>
+            android:background="@color/colorC1C1C1"/>
 
         <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
             android:id="@+id/finishBtn"

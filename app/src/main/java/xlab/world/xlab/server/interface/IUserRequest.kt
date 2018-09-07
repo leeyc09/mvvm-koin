@@ -17,15 +17,15 @@ interface IUserRequest {
                         @Query("fcmToken") fcmToken: String): Observable<ResCheckValidTokenData>
 
     @GET(ApiURL.USER_REFRESH_TOKEN)
-    fun getRefreshToken(@Header("Authorization") authorization: String): Observable<ResRefreshTokenData>
+    fun getRefreshToken(@Header("Authorization") authorization: String): Observable<ResGetRefreshTokenData>
 
     @POST(ApiURL.GENERATE_TOKEN)
     fun generateToken(@Header("Authorization") authorization: String): Observable<ResGenerateTokenData>
 
     @POST(ApiURL.USER_LOGIN)
     fun login(@Body reqLoginData: ReqLoginData,
-              @Query("type") type: Int): Observable<ResLoginData>
+              @Query("type") type: Int): Observable<ResUserLoginData>
 
     @POST(ApiURL.USER_REGISTER)
-    fun register(@Body reqRegisterData: ReqRegisterData): Observable<ResMessageData>
+    fun register(@Body reqRegisterData: ReqRegisterData): Observable<ResUserRegisterData>
 }

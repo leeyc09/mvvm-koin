@@ -119,9 +119,10 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
         uiData.value = UIModel(isLoading = true)
         val reqRegisterData = ReqRegisterData(loginType = loginType, email = email, password = password, nickName = nickName, socialID = socialId)
         apiUser.requestRegister(scheduler = scheduler, reqRegisterData = reqRegisterData,
-                responseData = { _ ->
+                responseData = {
                     PrintLog.d("requestRegister", "success", tag)
-                    requestRegisterEvent.postValue(RequestRegisterEvent(registerSuccess = true))
+                    PrintLog.d("access token", it.accessToken, tag)
+                    requestRegisterEvent.postValue(RequestRegisterEvent(accessToken = it.accessToken))
                     uiData.value = UIModel(isLoading = false)
                 },
                 errorData = { errorData ->
@@ -154,7 +155,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
     }
 }
 
-data class RequestRegisterEvent(val registerSuccess: Boolean? = null)
+data class RequestRegisterEvent(val accessToken: String? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val agreementStr: SpannableString? = null, val isRegisterBtnEnable: Boolean? = null,
                    val emailRegex: Boolean? = null, val passwordLengthRegex: Boolean? = null,

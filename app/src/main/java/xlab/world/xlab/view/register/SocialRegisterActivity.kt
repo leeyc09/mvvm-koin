@@ -14,24 +14,26 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import kotlinx.android.synthetic.main.action_bar_default.*
-import kotlinx.android.synthetic.main.activity_local_register.*
+import kotlinx.android.synthetic.main.activity_social_register.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
-import xlab.world.xlab.utils.support.AppConstants
+import xlab.world.xlab.data.response.ResUserLoginData
+import xlab.world.xlab.utils.support.IntentPassName
 import xlab.world.xlab.utils.support.LetterOrDigitInputFilter
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
-import xlab.world.xlab.utils.support.IntentPassName
 
-class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
+class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
     private val registerViewModel: RegisterViewModel by viewModel()
     private val viewFunction: ViewFunction by inject()
     private val letterOrDigitInputFilter: LetterOrDigitInputFilter by inject()
 
     private var resultCode = Activity.RESULT_CANCELED
+
+    private lateinit var userData: ResUserLoginData
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
@@ -64,7 +66,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_local_register)
+        setContentView(R.layout.activity_social_register)
 
         onSetup()
 
@@ -84,6 +86,8 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
     }
 
     private fun onSetup() {
+        userData = intent.getSerializableExtra(IntentPassName.USER_LOGIN_DATA) as ResUserLoginData
+
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
@@ -103,34 +107,18 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
     private fun onBindEvent() {
         actionBackBtn.setOnClickListener(this) // 뒤로가기
         finishBtn.setOnClickListener(this) // 회원가입 완료 버튼
-        editTextMail.setOnTouchListener(this) // 메일 지우기
         editTextNick.setOnTouchListener(this) // 닉네임 지우기
-        scrollView.setOnTouchListener(this) // 키보드 숨기기
 
-        // 이메일, 닉네임 지우기 이미지 활성화 이벤트
-        viewFunction.onFocusChange(editText = editTextMail) { hasFocus ->
-            editTextMail.setCompoundDrawablesWithIntrinsicBounds(0,0,
-                    if (hasFocus) R.drawable.textdelete_black
-                    else 0,0)
-        }
+        // 닉네임 지우기 이미지 활성화 이벤트
         viewFunction.onFocusChange(editText = editTextNick) { hasFocus ->
             editTextNick.setCompoundDrawablesWithIntrinsicBounds(0,0,
                     if (hasFocus) R.drawable.textdelete_black
                     else 0,0)
         }
 
-        // 이메일, 패스워드, 닉네임 입력 이벤트
-        viewFunction.onTextChange(editText = editTextMail) { _ ->
-            registerViewModel.emailRegexCheck(email = getEmailText())
-            registerViewModel.inputDataRegex(email = getEmailText(), password = getPasswordText(), nickName = getNickNameText())
-        }
-        viewFunction.onTextChange(editText = editTextPassword) { _ ->
-            registerViewModel.passwordRegexCheck(password = getPasswordText())
-            registerViewModel.inputDataRegex(email = getEmailText(), password = getPasswordText(), nickName = getNickNameText())
-        }
+        // 닉네임 입력 이벤트
         viewFunction.onTextChange(editText = editTextNick) { _ ->
             registerViewModel.nickNameRegexCheck(nickName = getNickNameText())
-            registerViewModel.inputDataRegex(email = getEmailText(), password = getPasswordText(), nickName = getNickNameText())
         }
     }
 
@@ -150,32 +138,13 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
                 uiData.agreementStr?.let {
                     textViewAgreement.setText(it, TextView.BufferType.SPANNABLE)
                 }
-                uiData.emailRegexText?.let {
-                    textViewConfirmMail.setText(it, TextView.BufferType.SPANNABLE)
-                }
                 uiData.nickNameRegexText?.let {
                     textViewConfirmNick.setText(it, TextView.BufferType.SPANNABLE)
-                }
-                uiData.isRegisterBtnEnable?.let {
-                    finishBtn.isEnabled = it
-                }
-                uiData.emailRegex?.let {
-                    if (it)
-                        confirmMailLayout.visibility = View.INVISIBLE
-                    else
-                        confirmMailLayout.visibility = View.VISIBLE
-                }
-                uiData.passwordLengthRegex?.let {
-                    confirmPasswordLayout.visibility = View.VISIBLE
-                    textViewConfirmPasswordLength.isSelected = it
-                }
-                uiData.passwordTextRegex?.let {
-                    confirmPasswordLayout.visibility = View.VISIBLE
-                    textViewConfirmPasswordText.isSelected = it
                 }
                 uiData.nickNameRegex?.let {
                     confirmNickLayout.visibility = View.VISIBLE
                     textViewConfirmNick.isSelected = it
+                    finishBtn.isEnabled = it
                 }
             }
         })
@@ -201,8 +170,8 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
                 }
                 R.id.finishBtn -> { // 회원가입 완료 버튼
                     viewFunction.hideKeyboard(context = this, view = v)
-                    registerViewModel.requestRegister(loginType = AppConstants.LOCAL_LOGIN, email = getEmailText(),
-                            password = getPasswordText(), nickName = getNickNameText(), socialId = "")
+                    registerViewModel.requestRegister(loginType = userData.loginType, email = userData.email,
+                            password = "", nickName = getNickNameText(), socialId = userData.socialID)
                 }
             }
         }
@@ -211,8 +180,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         v?.let {
             when (v.id) {
-                R.id.editTextMail,
-                R.id.editTextNick -> { // 메일, 닉네임 지우기
+                R.id.editTextNick -> { // 닉네임 지우기
                     viewFunction.onDrawableTouch(v as EditText, event!!) { isTouch ->
                         if (isTouch) {
                             v.setText("")
@@ -228,13 +196,14 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
         return false
     }
 
-    private fun getEmailText() = editTextMail.text?.trim().toString()
-    private fun getPasswordText() = editTextPassword.text?.trim().toString()
     private fun getNickNameText() = editTextNick.text?.trim().toString()
 
     companion object {
-        fun newIntent(context: Context): Intent {
-            return Intent(context, LocalRegisterActivity::class.java)
+        fun newIntent(context: Context, userData: ResUserLoginData): Intent {
+            val intent = Intent(context, SocialRegisterActivity::class.java)
+            intent.putExtra(IntentPassName.USER_LOGIN_DATA, userData)
+
+            return intent
         }
     }
 }
