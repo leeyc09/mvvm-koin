@@ -38,7 +38,6 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
             }
         }
     }
-
     // 가입 요청 정보 정규식 체크
     fun inputDataRegex(email: String = "", password: String = "", nickName: String = "") {
         launch {
@@ -54,7 +53,6 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
             }
         }
     }
-
     // 이메일 체크
     fun emailRegexCheck(email: String) {
         launch {
@@ -74,7 +72,6 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
             }
         }
     }
-
     // 비밀번호 체크
     fun passwordRegexCheck(password: String) {
         launch {
@@ -87,7 +84,6 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
             }
         }
     }
-
     // 닉네임 체크
     fun nickNameRegexCheck(nickName: String) {
         launch {
@@ -107,7 +103,6 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
             }
         }
     }
-
     // 회원 가입 요청
     fun requestRegister(loginType: Int, email: String, password: String, nickName: String, socialId: String) {
         // 네트워크 연결 확인

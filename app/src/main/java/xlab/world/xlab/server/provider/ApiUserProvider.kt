@@ -1,7 +1,9 @@
 package xlab.world.xlab.server.provider
 
 import io.reactivex.disposables.Disposable
+import xlab.world.xlab.data.request.ReqConfirmEmailData
 import xlab.world.xlab.data.request.ReqLoginData
+import xlab.world.xlab.data.request.ReqNewPasswordData
 import xlab.world.xlab.data.request.ReqRegisterData
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.`interface`.IUserRequest
@@ -29,6 +31,18 @@ interface ApiUserProvider {
     // register 요청
     fun requestRegister(scheduler: SchedulerProvider, reqRegisterData: ReqRegisterData,
                         responseData: (ResUserRegisterData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // email 인증 요청
+    fun requestConfirmEmail(scheduler: SchedulerProvider, reqConfirmEmailData: ReqConfirmEmailData,
+                            responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // email code 인증 요청
+    fun requestConfirmEmailCode(scheduler: SchedulerProvider, reqConfirmEmailData: ReqConfirmEmailData,
+                                responseData: (ResConfirmEmailCodeData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // change password 요청
+    fun requestChangePassword(scheduler: SchedulerProvider, authorization: String, reqNewPasswordData: ReqNewPasswordData,
+                              responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
@@ -79,6 +93,39 @@ class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
     override fun requestRegister(scheduler: SchedulerProvider, reqRegisterData: ReqRegisterData,
                                  responseData: (ResUserRegisterData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserRequest.register(reqRegisterData = reqRegisterData)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestConfirmEmail(scheduler: SchedulerProvider, reqConfirmEmailData: ReqConfirmEmailData,
+                                     responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.confirmEmail(reqConfirmEmailData = reqConfirmEmailData)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestConfirmEmailCode(scheduler: SchedulerProvider, reqConfirmEmailData: ReqConfirmEmailData,
+                                         responseData: (ResConfirmEmailCodeData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.confirmEmailCode(reqConfirmEmailData = reqConfirmEmailData)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestChangePassword(scheduler: SchedulerProvider, authorization: String, reqNewPasswordData: ReqNewPasswordData,
+                                       responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.changePassword(authorization = authorization, reqPasswordData = reqNewPasswordData)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

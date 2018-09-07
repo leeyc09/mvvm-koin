@@ -15,4 +15,6 @@ object MessageConstants {
 
     const val DUPLICATE_EMAIL = "이미 사용중인 이메일입니다."
     const val DUPLICATE_NICK = "이미 사용중인 닉네임입니다."
+
+    const val COMPLETE_CHANGE_PASSWORD = "비밀번호 재설정이 완료되었습니다"
 }

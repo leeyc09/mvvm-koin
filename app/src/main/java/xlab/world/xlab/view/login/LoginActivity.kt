@@ -27,6 +27,7 @@ import xlab.world.xlab.utils.support.IntentPassName
 import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.register.LocalRegisterActivity
 import xlab.world.xlab.view.register.SocialRegisterActivity
+import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
     private val loginViewModel: LoginViewModel by viewModel()
@@ -50,6 +51,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         onBindEvent()
 
         observeViewModel()
+    }
+
+    override fun onPause() {
+        viewFunction.hideKeyboard(context = this, view = mainLayout)
+        super.onPause()
     }
 
     override fun onBackPressed() {
@@ -196,7 +202,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         })
 
         // access token 로그인 시도 이벤트 observe
-        loginViewModel.requestLoginByAccessToken.observe(owner = this, observer = android.arch.lifecycle.Observer { checkValidTokenEvent ->
+        loginViewModel.requestLoginByAccessTokenEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { checkValidTokenEvent ->
             checkValidTokenEvent?.let { _ ->
                 checkValidTokenEvent.loginData?.let { loginData -> // 로그인 성공
                     spHelper.login(accessToken = loginData.accessToken,
@@ -227,6 +233,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                                 userLevel = loginData.userLevel,
                                 userEmail = loginData.email,
                                 push = loginData.isPushAlarmOn)
+                        runMainActivity()
                     }
                 }
                 requestLoginEvent.isLoginFail?.let {
@@ -280,7 +287,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                             fcmToken = spHelper.fcmToken)
                 }
                 R.id.passwordResetBtn -> { // 비밀번호 재설정
-//                    resetPassword()
+                    runResetPasswordActivity(getEmailText())
                 }
             }
         }
@@ -321,6 +328,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         startActivityForResult(intent, RequestCodeData.REGISTER_USER)
     }
 
+    // reset password 화면 실행
+    private fun runResetPasswordActivity(email: String) {
+        val intent = ResetPasswordActivity.newIntent(context = this, email = email)
+        startActivity(intent)
+    }
 
     // 메인 화면 실행
     private fun runMainActivity() {

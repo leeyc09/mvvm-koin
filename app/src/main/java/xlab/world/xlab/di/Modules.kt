@@ -20,6 +20,7 @@ import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
+import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
 import java.util.concurrent.TimeUnit
 
 /**
@@ -42,12 +43,12 @@ val baseModule: Module = applicationContext {
     bean { DataRegex() }
     // ViewModel for OnBoarding View
     viewModel { OnBoardingViewModel(scheduler = get()) }
-    // ViewModel for PreLoad View
-//    viewModel { PreloadViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Login View
     viewModel { LoginViewModel(apiUser = get(), dataRegex = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Register View
     viewModel { RegisterViewModel(apiUser = get(), dataRegex = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for reset password
+    viewModel { ResetPasswordViewModel(apiUser = get(), dataRegex = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

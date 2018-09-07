@@ -96,6 +96,11 @@
             android:theme="@style/customNoActionBarTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".view.resetPassword.ResetPasswordActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".view.main.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />

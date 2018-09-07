@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.resetPassword.ResetPasswordActivity">
+
+    <xlab.world.xlab.utils.view.textView.TextViewBlackNoto
+        android:id="@+id/textViewConfirmMail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/reset_password_email"
+        android:textColor="@color/color000000"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="20sp"
+        android:layout_marginTop="7dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginEnd="36dp"/>
+
+    <LinearLayout
+        android:id="@+id/emailLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="@id/textViewConfirmMail"
+        app:layout_constraintEnd_toEndOf="@id/textViewConfirmMail"
+        app:layout_constraintTop_toBottomOf="@id/textViewConfirmMail"
+        android:layout_marginTop="93dp"
+        android:gravity="center">
+
+        <xlab.world.xlab.utils.view.editText.EditTextRegularNoto
+            android:id="@+id/editTextMail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3.5"
+            android:inputType="textEmailAddress|textNoSuggestions"
+            android:textColor="@color/color000000"
+            android:textColorHint="@color/check_a4a4a4_000000"
+            android:textSize="15sp"
+            android:maxLines="1"
+            android:hint="@string/email"
+            android:imeOptions="actionDone"
+            android:layout_marginEnd="8dp"/>
+
+        <FrameLayout
+            android:id="@+id/confirmRequestBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/mail_request_box"
+            android:paddingStart="9dp"
+            android:paddingEnd="9dp"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
+            android:layout_gravity="center">
+
+            <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+                android:id="@+id/textViewMailRequest"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/request_confirm"
+                android:textColor="@color/color000000"
+                android:textSize="12sp"
+                android:gravity="center"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+                android:visibility="invisible"
+                android:id="@+id/textViewMailReRequest"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/re_request_confirm"
+                android:textColor="@color/color000000"
+                android:textSize="12sp"
+                android:gravity="center"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/confirmCodeLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="@id/emailLayout"
+        app:layout_constraintEnd_toEndOf="@id/emailLayout"
+        app:layout_constraintTop_toBottomOf="@id/emailLayout"
+        android:layout_marginTop="23.5dp"
+        android:gravity="center">
+
+        <xlab.world.xlab.utils.view.editText.EditTextRegularNoto
+            android:id="@+id/editTextCode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3.5"
+            android:inputType="text|textNoSuggestions"
+            android:textColor="@color/color000000"
+            android:textColorHint="@color/check_a4a4a4_000000"
+            android:textSize="15sp"
+            android:maxLines="1"
+            android:hint="@string/confirm_code_hint"
+            android:imeOptions="actionDone"
+            android:layout_marginEnd="8dp"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+            android:id="@+id/textViewTimer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="13sp"
+            android:textColor="@color/colorDE5359"
+            android:text="10:00"
+            android:gravity="center"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorFFFFFF"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/colorC1C1C1"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+            android:id="@+id/nextBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/next"
+            android:textSize="14sp"
+            android:textColor="@color/enable_bfbfbf_601ec7"
+            android:enabled="false"
+            android:paddingTop="16dp"
+            android:paddingBottom="15dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

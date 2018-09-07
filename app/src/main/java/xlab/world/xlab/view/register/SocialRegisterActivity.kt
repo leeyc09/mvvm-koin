@@ -109,6 +109,11 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         finishBtn.setOnClickListener(this) // 회원가입 완료 버튼
         editTextNick.setOnTouchListener(this) // 닉네임 지우기
 
+        // 키보드 보일때만 완료 버튼 보이기
+        viewFunction.showUpKeyboardLayout(mainLayout) { visibility ->
+            layoutPopUp.visibility = visibility
+        }
+
         // 닉네임 지우기 이미지 활성화 이벤트
         viewFunction.onFocusChange(editText = editTextNick) { hasFocus ->
             editTextNick.setCompoundDrawablesWithIntrinsicBounds(0,0,

@@ -20,7 +20,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
 
     val tag = "Login"
 
-    val requestLoginByAccessToken = SingleLiveEvent<RequestLoginByAccessToken>()
+    val requestLoginByAccessTokenEvent = SingleLiveEvent<RequestLoginByAccessTokenEvent>()
     val generateTokenEvent = SingleLiveEvent<GenerateTokenEvent>()
     val requestLoginEvent = SingleLiveEvent<RequestLoginEvent>()
     val uiData = MutableLiveData<UIModel>()
@@ -40,7 +40,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             apiUser.checkValidToken(scheduler = scheduler, authorization = authorization, fcmToken = fcmToken,
                     responseData = { loginData -> // 만료 안된경우 -> 로그인데이터 받아옴
                         PrintLog.d("checkValidToken success", loginData.toString(), tag)
-                        requestLoginByAccessToken.postValue(RequestLoginByAccessToken(loginData = loginData))
+                        requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(loginData = loginData))
                         uiData.value = UIModel(isLoading = false)
                     }, errorData = { errorData ->
                 uiData.value = UIModel(isLoading = false)
@@ -49,11 +49,11 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                     PrintLog.d("checkValidToken fail", errorMessage.toString(), tag)
                     if (errorMessage.size > 1) {
                         if (errorMessage[1] == ApiCallBackConstants.TOKEN_EXPIRE) // 만료 에러 callback message
-                            requestLoginByAccessToken.postValue(RequestLoginByAccessToken(isExpireToken = true))
+                            requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(isExpireToken = true))
                         else
-                            requestLoginByAccessToken.postValue(RequestLoginByAccessToken(isExpireToken = false))
+                            requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(isExpireToken = false))
                     } else {
-                        requestLoginByAccessToken.postValue(RequestLoginByAccessToken(isExpireToken = false))
+                        requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(isExpireToken = false))
                     }
                 }
             })
@@ -97,16 +97,16 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     }
     // 로그인 요청
     fun requestLogin(loginType: Int, email: String = "", password: String = "", socialToken: String = "", fcmToken: String = "") {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
+            return
+        }
         if (loginType == AppConstants.LOCAL_LOGIN) { // 로컬 로그인 요청일 경우 -> 이메일 정규식 확인
             if (!dataRegex.emailRegex(email)) {
                 uiData.value = UIModel(toastMessage = MessageConstants.LOGIN_WRONG_EMAIL_PATTERN)
                 return
             }
-        }
-        // 네트워크 연결 확인
-        if (!networkCheck.isNetworkConnected()) {
-            uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
-            return
         }
 
         uiData.value = UIModel(isLoading = true)
@@ -143,7 +143,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     }
 }
 
-data class RequestLoginByAccessToken(val loginData: ResCheckValidTokenData? = null, val isExpireToken: Boolean? = null)
+data class RequestLoginByAccessTokenEvent(val loginData: ResCheckValidTokenData? = null, val isExpireToken: Boolean? = null)
 data class GenerateTokenEvent(val newAccessToken: String? = null, val isFailGenerateToken: Boolean? = null)
 data class RequestLoginEvent(val loginData: ResUserLoginData? = null, val isLoginFail: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val isLoginBtnEnable: Boolean? = null)

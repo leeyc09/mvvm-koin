@@ -91,7 +91,7 @@ class PreloadActivity: AppCompatActivity() {
         })
 
         // access token 로그인 시도 이벤트 observe
-        loginViewModel.requestLoginByAccessToken.observe(owner = this, observer = android.arch.lifecycle.Observer { checkValidTokenEvent ->
+        loginViewModel.requestLoginByAccessTokenEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { checkValidTokenEvent ->
             checkValidTokenEvent?.let { _ ->
                 checkValidTokenEvent.loginData?.let { loginData -> // 로그인 성공
                     spHelper.login(accessToken = loginData.accessToken,
