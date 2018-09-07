@@ -37,24 +37,24 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
     fun requestConfirmEmail(email: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
+            uiData.postValue(UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT))
             return
         }
         if (!dataRegex.emailRegex(email)) { // 이메일 정규식 확인
-            uiData.value = UIModel(toastMessage = MessageConstants.LOGIN_WRONG_EMAIL_PATTERN)
+            uiData.postValue(UIModel(toastMessage = MessageConstants.LOGIN_WRONG_EMAIL_PATTERN))
             return
         }
 
-        uiData.value = UIModel(isLoading = true)
+        uiData.postValue(UIModel(isLoading = true))
         launch {
             val reqConfirmEmailData = ReqConfirmEmailData(email = email, code = "")
             apiUser.requestConfirmEmail(scheduler = scheduler, reqConfirmEmailData = reqConfirmEmailData,
                     responseData = {
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.postValue(UIModel(isLoading = false))
                         requestConfirmEmailEvent.postValue(RequestConfirmEmailEvent(isSuccess = true))
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.postValue(UIModel(isLoading = false))
                         requestConfirmEmailEvent.postValue(RequestConfirmEmailEvent(isSuccess = false))
                         errorData?.let {
                             val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
@@ -105,20 +105,20 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
     fun requestConfirmCode(email: String, code: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
+            uiData.postValue(UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT))
             return
         }
-        uiData.value = UIModel(isLoading = true)
+        uiData.postValue(UIModel(isLoading = true))
         launch {
             val reqConfirmEmailData = ReqConfirmEmailData(email = email, code = code)
             apiUser.requestConfirmEmailCode(scheduler = scheduler, reqConfirmEmailData = reqConfirmEmailData,
                     responseData = {
                         PrintLog.d("requestConfirmEmail success", it.accessToken, tag)
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.postValue(UIModel(isLoading = false))
                         requestConfirmCodeEvent.postValue(RequestConfirmCodeEvent(accessToken = it.accessToken))
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.postValue(UIModel(isLoading = false))
                         requestConfirmCodeEvent.postValue(RequestConfirmCodeEvent(accessToken = ""))
                         errorData?.let {
                             val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
@@ -133,22 +133,22 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
     fun requestChangePassword(authorization: String, password: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
+            uiData.postValue(UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT))
             return
         }
 
-        uiData.value = UIModel(isLoading = true)
+        uiData.postValue(UIModel(isLoading = true))
         launch {
             val reqNewPasswordData = ReqNewPasswordData(password = password)
             apiUser.requestChangePassword(scheduler = scheduler, authorization = authorization, reqNewPasswordData = reqNewPasswordData,
                     responseData = {
                         PrintLog.d("requestChangePassword success", "", tag)
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.postValue(UIModel(isLoading = false))
                         uiData.postValue(UIModel(toastMessage = MessageConstants.COMPLETE_CHANGE_PASSWORD))
                         requestChangePasswordEvent.postValue(RequestChangePasswordEvent(isSuccess = true))
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.postValue(UIModel(isLoading = false))
                         errorData?.let {
                             PrintLog.d("requestChangePassword fail", errorData.message, tag)
                             uiData.postValue(UIModel(toastMessage = errorData.message))

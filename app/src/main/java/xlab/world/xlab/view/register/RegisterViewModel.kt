@@ -34,7 +34,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onNext(agreementStr)
                 it.onComplete()
             }.with(scheduler).subscribe { agreementStr ->
-                uiData.value = UIModel(agreementStr = agreementStr)
+                uiData.postValue(UIModel(agreementStr = agreementStr))
             }
         }
     }
@@ -49,7 +49,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onComplete()
             }.with(scheduler).subscribe { isEnable ->
                 PrintLog.d("inputDataRegex", isEnable.toString(), tag)
-                uiData.value = UIModel(isRegisterBtnEnable = isEnable)
+                uiData.postValue(UIModel(isRegisterBtnEnable = isEnable))
             }
         }
     }
@@ -68,7 +68,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onComplete()
             }.with(scheduler).subscribe { isEnable ->
                 PrintLog.d("emailRegexCheck", isEnable.toString(), tag)
-                uiData.value = UIModel(emailRegex = isEnable)
+                uiData.postValue(UIModel(emailRegex = isEnable))
             }
         }
     }
@@ -80,7 +80,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onComplete()
             }.with(scheduler).subscribe { isEnable ->
                 PrintLog.d("emailRegexCheck", isEnable.toString(), tag)
-                uiData.value = UIModel(passwordLengthRegex = isEnable[0], passwordTextRegex = isEnable[1])
+                uiData.postValue(UIModel(passwordLengthRegex = isEnable[0], passwordTextRegex = isEnable[1]))
             }
         }
     }
@@ -99,7 +99,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onComplete()
             }.with(scheduler).subscribe { isEnable ->
                 PrintLog.d("emailRegexCheck", isEnable.toString(), tag)
-                uiData.value = UIModel(nickNameRegex = isEnable)
+                uiData.postValue(UIModel(nickNameRegex = isEnable))
             }
         }
     }
@@ -107,21 +107,21 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
     fun requestRegister(loginType: Int, email: String, password: String, nickName: String, socialId: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
+            uiData.postValue(UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT))
             return
         }
 
-        uiData.value = UIModel(isLoading = true)
+        uiData.postValue(UIModel(isLoading = true))
         val reqRegisterData = ReqRegisterData(loginType = loginType, email = email, password = password, nickName = nickName, socialID = socialId)
         apiUser.requestRegister(scheduler = scheduler, reqRegisterData = reqRegisterData,
                 responseData = {
                     PrintLog.d("requestRegister", "success", tag)
                     PrintLog.d("access token", it.accessToken, tag)
                     requestRegisterEvent.postValue(RequestRegisterEvent(accessToken = it.accessToken))
-                    uiData.value = UIModel(isLoading = false)
+                    uiData.postValue(UIModel(isLoading = false))
                 },
                 errorData = { errorData ->
-                    uiData.value = UIModel(isLoading = false, isRegisterBtnEnable = false)
+                    uiData.postValue(UIModel(isLoading = false, isRegisterBtnEnable = false))
                     errorData?.let {
                         val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
                         PrintLog.d("requestRegister fail", errorData.message, tag)

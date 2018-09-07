@@ -18,13 +18,9 @@ import kotlinx.android.synthetic.main.activity_local_register.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
-import xlab.world.xlab.utils.support.AppConstants
-import xlab.world.xlab.utils.support.LetterOrDigitInputFilter
-import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.ViewFunction
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
-import xlab.world.xlab.utils.support.IntentPassName
 
 class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
     private val registerViewModel: RegisterViewModel by viewModel()
