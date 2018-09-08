@@ -13,6 +13,7 @@ import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
+import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.view.login.LoginActivity
@@ -20,13 +21,14 @@ import xlab.world.xlab.view.onBoarding.fragment.OnBoardingFragment
 
 class OnBoardingActivity : AppCompatActivity(), View.OnClickListener {
 
+    private val viewFunction: ViewFunction by inject()
+    private val spHelper: SPHelper by inject()
+    private val runActivity: RunActivity by inject()
+
     private lateinit var viewPagerAdapter: ViewStatePagerAdapter
     private lateinit var firstFragment: OnBoardingFragment
     private lateinit var secondFragment: OnBoardingFragment
     private lateinit var thirdFragment: OnBoardingFragment
-
-    private val viewFunction: ViewFunction by inject()
-    private val spHelper: SPHelper by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,19 +87,13 @@ class OnBoardingActivity : AppCompatActivity(), View.OnClickListener {
                 R.id.skipBtn -> { // 건너뛰기
                     viewPager.currentItem = viewPagerAdapter.count - 1
                 }
-                R.id.startBtn -> { // 시작하기
-                    runLoginActivity()
+                R.id.startBtn -> { // 시작하기 -> 로그인 화면
+                    spHelper.onBoard = true
+                    runActivity.loginActivity(context = this, isComePreLoadActivity = true, linkData = null)
+                    finish()
                 }
             }
         }
-    }
-
-    // 로그인 화면 실행
-    private fun runLoginActivity() {
-        spHelper.onBoard = true
-        val intent = LoginActivity.newIntent(context = this, isComePreLoadActivity = true, linkData = null)
-        startActivity(intent)
-        finish()
     }
 
     companion object {

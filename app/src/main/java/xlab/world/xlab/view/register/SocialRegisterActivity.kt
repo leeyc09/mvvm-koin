@@ -19,10 +19,7 @@ import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.data.response.ResUserLoginData
-import xlab.world.xlab.utils.support.IntentPassName
-import xlab.world.xlab.utils.support.LetterOrDigitInputFilter
-import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.ViewFunction
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 
@@ -30,6 +27,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
     private val registerViewModel: RegisterViewModel by viewModel()
     private val viewFunction: ViewFunction by inject()
     private val letterOrDigitInputFilter: LetterOrDigitInputFilter by inject()
+    private val runActivity: RunActivity by inject()
 
     private var resultCode = Activity.RESULT_CANCELED
 
@@ -41,9 +39,8 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
     private val clickPolicy1 = object: ClickableSpan() {
         override fun onClick(widget: View?) {
             PrintLog.d("click", "policy1")
-//            val intent = DefaultWebViewActivity.newIntent(this@RegisterActivity,
-//                    pageTitle = resources.getString(R.string.inquiry_under3), webUrl = SupportData.LOCAL_HTML_URL + "clause.html", zoomControl = true)
-//            startActivity(intent)
+            runActivity.defaultWebViewActivity(context = this@SocialRegisterActivity, pageTitle = getString(R.string.inquiry_under3),
+                    webUrl =  AppConstants.LOCAL_HTML_URL + "clause.html", zoomControl = true)
         }
 
         override fun updateDrawState(ds: TextPaint) {
@@ -53,10 +50,8 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
     }
     private val clickPolicy2 = object: ClickableSpan() {
         override fun onClick(widget: View?) {
-            PrintLog.d("click", "policy2")
-//            val intent = DefaultWebViewActivity.newIntent(this@RegisterActivity,
-//                    pageTitle = resources.getString(R.string.inquiry_under2), webUrl = SupportData.LOCAL_HTML_URL + "personalInfo.html", zoomControl = true)
-//            startActivity(intent)
+            runActivity.defaultWebViewActivity(context = this@SocialRegisterActivity, pageTitle = getString(R.string.inquiry_under2),
+                    webUrl =  AppConstants.LOCAL_HTML_URL + "personalInfo.html", zoomControl = true)
         }
 
         override fun updateDrawState(ds: TextPaint) {

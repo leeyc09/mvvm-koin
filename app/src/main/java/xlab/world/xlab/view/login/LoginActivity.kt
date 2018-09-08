@@ -33,6 +33,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
     private val loginViewModel: LoginViewModel by viewModel()
     private val viewFunction: ViewFunction by inject()
     private val spHelper: SPHelper by inject()
+    private val runActivity: RunActivity by inject()
 
     private var isComePreLoadActivity: Boolean = true
     private var linkData: Uri? = null
@@ -212,7 +213,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                             userLevel = loginData.userLevel,
                             userEmail = loginData.email,
                             push = loginData.isPushAlarmOn)
-                    runMainActivity()
+                    runActivity.mainActivity(context = this, linkData = null)
+                    finish()
                 }
                 checkValidTokenEvent.isExpireToken?.let { // access token 만료
                 }
@@ -224,7 +226,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
             requestLoginEvent?.let { _ ->
                 requestLoginEvent.loginData?.let { loginData ->
                     if (loginData.needRegisterSocial) { // 소셜 회원가입 필요
-                        runSocialRegisterActivity(loginData)
+                        runActivity.socialRegisterActivity(context = this, userData = loginData)
                     } else {
                         spHelper.login(accessToken = loginData.accessToken,
                                 userType = loginData.loginType,
@@ -233,7 +235,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                                 userLevel = loginData.userLevel,
                                 userEmail = loginData.email,
                                 push = loginData.isPushAlarmOn)
-                        runMainActivity()
+                        runActivity.mainActivity(context = this, linkData = null)
+                        finish()
                     }
                 }
                 requestLoginEvent.isLoginFail?.let {
@@ -275,10 +278,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                     // clear mail and password
                     editTextMail.text?.clear()
                     editTextPassword.text?.clear()
-                    runLocalRegisterActivity()
+                    runActivity.localRegisterActivity(context = this)
                 }
                 R.id.guestBtn -> { // 둘러보기(게스트 모드)
-//                    guestLogin()
+                    runActivity.mainActivity(context = this, linkData = linkData)
+                    finish()
                 }
                 R.id.loginBtn -> { // 로컬 로그인 버튼
                     loginViewModel.requestLogin(loginType = LOCAL_LOGIN,
@@ -287,7 +291,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                             fcmToken = spHelper.fcmToken)
                 }
                 R.id.passwordResetBtn -> { // 비밀번호 재설정
-                    runResetPasswordActivity(getEmailText())
+                    runActivity.resetPasswordActivity(context = this, email = getEmailText())
                 }
             }
         }
@@ -315,31 +319,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
 
     private fun getEmailText() = editTextMail.text?.trim().toString()
     private fun getPasswordText() = editTextPassword.text?.trim().toString()
-
-    // local 회원가입 화면 실행
-    private fun runLocalRegisterActivity() {
-        val intent = LocalRegisterActivity.newIntent(context = this)
-        startActivityForResult(intent, RequestCodeData.REGISTER_USER)
-    }
-
-    // social 회원가입 화면 실행
-    private fun runSocialRegisterActivity(userData: ResUserLoginData) {
-        val intent = SocialRegisterActivity.newIntent(context = this, userData = userData)
-        startActivityForResult(intent, RequestCodeData.REGISTER_USER)
-    }
-
-    // reset password 화면 실행
-    private fun runResetPasswordActivity(email: String) {
-        val intent = ResetPasswordActivity.newIntent(context = this, email = email)
-        startActivity(intent)
-    }
-
-    // 메인 화면 실행
-    private fun runMainActivity() {
-        val intent = MainActivity.newIntent(context = this, linkData = linkData)
-        startActivity(intent)
-        finish()
-    }
 
     companion object {
         fun newIntent(context: Context, isComePreLoadActivity: Boolean, linkData: Uri?): Intent {

@@ -26,6 +26,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
     private val registerViewModel: RegisterViewModel by viewModel()
     private val viewFunction: ViewFunction by inject()
     private val letterOrDigitInputFilter: LetterOrDigitInputFilter by inject()
+    private val runActivity: RunActivity by inject()
 
     private var resultCode = Activity.RESULT_CANCELED
 
@@ -34,10 +35,8 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
 
     private val clickPolicy1 = object: ClickableSpan() {
         override fun onClick(widget: View?) {
-            PrintLog.d("click", "policy1")
-//            val intent = DefaultWebViewActivity.newIntent(this@RegisterActivity,
-//                    pageTitle = resources.getString(R.string.inquiry_under3), webUrl = SupportData.LOCAL_HTML_URL + "clause.html", zoomControl = true)
-//            startActivity(intent)
+            runActivity.defaultWebViewActivity(context = this@LocalRegisterActivity, pageTitle = getString(R.string.inquiry_under3),
+                    webUrl =  AppConstants.LOCAL_HTML_URL + "clause.html", zoomControl = true)
         }
 
         override fun updateDrawState(ds: TextPaint) {
@@ -47,10 +46,8 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
     }
     private val clickPolicy2 = object: ClickableSpan() {
         override fun onClick(widget: View?) {
-            PrintLog.d("click", "policy2")
-//            val intent = DefaultWebViewActivity.newIntent(this@RegisterActivity,
-//                    pageTitle = resources.getString(R.string.inquiry_under2), webUrl = SupportData.LOCAL_HTML_URL + "personalInfo.html", zoomControl = true)
-//            startActivity(intent)
+            runActivity.defaultWebViewActivity(context = this@LocalRegisterActivity, pageTitle = getString(R.string.inquiry_under2),
+                    webUrl =  AppConstants.LOCAL_HTML_URL + "personalInfo.html", zoomControl = true)
         }
 
         override fun updateDrawState(ds: TextPaint) {

@@ -81,6 +81,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
         <activity
+            android:name=".view.webView.DefaultWebViewActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
             android:name=".view.login.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme"

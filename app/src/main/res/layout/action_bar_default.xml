@@ -21,7 +21,6 @@
         android:padding="10dp"
         android:src="@drawable/arrow_back_black"/>
 
-
     <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
         android:id="@+id/actionBarTitle"
         android:layout_width="wrap_content"

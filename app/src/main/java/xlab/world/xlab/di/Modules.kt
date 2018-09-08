@@ -41,6 +41,8 @@ val baseModule: Module = applicationContext {
     bean { LetterOrDigitInputFilter() }
     // provided data regex
     bean { DataRegex() }
+    // provided run activity
+    bean { RunActivity() }
     // ViewModel for OnBoarding View
     viewModel { OnBoardingViewModel(scheduler = get()) }
     // ViewModel for Login View
@@ -60,43 +62,9 @@ val remoteModule: Module = applicationContext {
     // provided web components
     bean { createOkHttpClient() }
     // user api interface
-    bean { createRetrofit<IUserRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL) } //XLAB_API_URL_SSL
+    bean { createRetrofit<IUserRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL_SSL) }
     // user api implement
     bean { ApiUser(iUserRequest = get()) as ApiUserProvider }
-}
-
-fun createOkHttpClient(): OkHttpClient {
-    val httpClient: OkHttpClient.Builder = OkHttpClient.Builder()
-            .followRedirects(false)
-            .followSslRedirects(false)
-
-    httpClient.addInterceptor { chain ->
-        val original: Request = chain.request()
-        val request: Request = original.newBuilder()
-                .header("Host", "app.host")
-                .header("Content-Type", "application/json")
-                .method(original.method(), original.body())
-                .build()
-        chain.proceed(request)
-    }
-
-    val interceptor = HttpLoggingInterceptor()
-    interceptor.level = HttpLoggingInterceptor.Level.BODY
-
-    return httpClient
-            .connectTimeout(60L, TimeUnit.SECONDS)
-            .readTimeout(60L, TimeUnit.SECONDS)
-            .addInterceptor(interceptor)
-            .build()
-}
-inline fun <reified T> createRetrofit(client: OkHttpClient, baseUrl: String): T {
-    return Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
-            .build()
-            .create(T::class.java)
 }
 
 /**

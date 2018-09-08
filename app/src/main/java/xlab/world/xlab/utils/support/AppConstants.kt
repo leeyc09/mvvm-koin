@@ -1,6 +1,8 @@
 package xlab.world.xlab.utils.support
 
 object AppConstants {
+    const val LOCAL_HTML_URL = "file:///android_asset/html/"
+
     // user login type
     const val LOCAL_LOGIN = 0
     const val FACEBOOK_LOGIN = 1

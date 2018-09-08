@@ -17,18 +17,14 @@ object CustomFont {
     private val fontCache = HashMap<String, Typeface>()
 
     fun getTypeface(fontName: String, context: Context): Typeface?{
-        var typeface: Typeface? = fontCache[fontName]
-
-        if (typeface == null) {
+        return fontCache[fontName] ?: let {
             try {
-                typeface = Typeface.createFromAsset(context.assets, fontName)
+                fontCache[fontName] = Typeface.createFromAsset(context.assets, fontName)
             } catch (e: Exception) {
                 return null
             }
-            fontCache[fontName] = typeface
+            fontCache[fontName]
         }
-
-        return typeface
     }
 
     fun replaceDefaultFont(context: Context, nameOffFontBeingReplaced: String, nameOffFontInAsset: String) {

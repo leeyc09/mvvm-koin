@@ -24,7 +24,7 @@ class SocialAuth {
 
     fun getKakaoToken(result:(String) -> Unit, error: (String) -> Unit) {
         PrintLog.d("function", "kakao login", tag)
-        if (kakaoCallbackManager == null) {
+        kakaoCallbackManager ?: let {
             kakaoCallbackManager = KakaoSessionCallback(result, error)
             Session.getCurrentSession()
             Session.getCurrentSession().addCallback(kakaoCallbackManager)

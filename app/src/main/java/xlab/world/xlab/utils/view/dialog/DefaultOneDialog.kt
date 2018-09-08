@@ -36,8 +36,7 @@ class DefaultOneDialog(context: Context,
         textViewMedium.setText(text, TextView.BufferType.SPANNABLE)
 
         // 버튼 터치 리스너 없으면 확인 버튼만 활성화
-        if (listener == null)
-            cancelBtn.visibility = View.GONE
+        listener?:let { cancelBtn.visibility = View.GONE }
     }
 
     private fun onBindEvent() {
