@@ -58,14 +58,14 @@ class OnBoardingActivity : AppCompatActivity(), View.OnClickListener {
         // link tab layout with view pager
         tabLayoutDot.setupWithViewPager(viewPager, true)
         val marginDIP = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, resources.displayMetrics).toInt()
-        viewFunction.setDotIndicator(tabLayoutDot, marginDIP)
+        viewFunction.setDotIndicator(tabLayoutDot = tabLayoutDot, marginDIP = marginDIP)
     }
 
     private fun onBindEvent() {
         skipBtn.setOnClickListener(this) // 건너뛰기
         startBtn.setOnClickListener(this) // 시작하기
 
-        viewFunction.onViewPagerChangePosition(viewPager) { position ->
+        viewFunction.onViewPagerChangePosition(viewPager = viewPager) { position ->
             // 마지막 페이지일 경우 시작하기 버튼 보여주기
             if (position == viewPagerAdapter.count - 1) {
                 skipBtn.visibility = View.INVISIBLE

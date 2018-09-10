@@ -76,7 +76,6 @@
                     android:id="@+id/textViewConfirmNick"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/confirm_nick_length"
                     android:textSize="12sp"
                     android:textColor="@color/select_de5359_000000"/>
 

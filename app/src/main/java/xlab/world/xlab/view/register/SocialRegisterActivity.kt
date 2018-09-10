@@ -105,7 +105,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         editTextNick.setOnTouchListener(this) // 닉네임 지우기
 
         // 키보드 보일때만 완료 버튼 보이기
-        viewFunction.showUpKeyboardLayout(mainLayout) { visibility ->
+        viewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
             layoutPopUp.visibility = visibility
         }
 

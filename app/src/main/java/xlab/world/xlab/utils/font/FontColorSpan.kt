@@ -6,12 +6,21 @@ import xlab.world.xlab.R
 import xlab.world.xlab.utils.span.FontForegroundColorSpan
 
 class FontColorSpan(context: Context) {
-
+    // Noto Bold
     val notoBold000000 = FontForegroundColorSpan(
-            ResourcesCompat.getColor(context.resources, R.color.color000000, null),
-            CustomFont.getTypeface(CustomFont.notoSansCJKkrBold, context)!!)
+            color = ResourcesCompat.getColor(context.resources, R.color.color000000, null),
+            typeFace =CustomFont.getTypeface(CustomFont.notoSansCJKkrBold, context)!!)
+    val notoBoldBFBFBF = FontForegroundColorSpan(
+            color = ResourcesCompat.getColor(context.resources, R.color.colorBFBFBF, null),
+            typeFace = CustomFont.getTypeface(CustomFont.notoSansCJKkrBold, context)!!)
 
+    // Noto Regular
     val notoRegular000000 = FontForegroundColorSpan(
-            ResourcesCompat.getColor(context.resources, R.color.color000000, null),
-            CustomFont.getTypeface(CustomFont.notoSansCJKkrRegular, context)!!)
+            color = ResourcesCompat.getColor(context.resources, R.color.color000000, null),
+            typeFace = CustomFont.getTypeface(CustomFont.notoSansCJKkrRegular, context)!!)
+
+    // Noto Medium
+    val notoMediumBFBFBF = FontForegroundColorSpan(
+            color = ResourcesCompat.getColor(context.resources, R.color.colorBFBFBF, null),
+            typeFace = CustomFont.getTypeface(CustomFont.notoSansCJKkrMedium, context)!!)
 }

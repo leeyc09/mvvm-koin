@@ -55,7 +55,7 @@
                     android:layout_marginEnd="8dp"/>
 
                 <android.support.v4.view.ViewPager
-                    android:id="@+id/mainViewPager"
+                    android:id="@+id/viewPager"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
 
@@ -64,5 +64,14 @@
         </android.support.v4.widget.NestedScrollView>
 
     </android.support.design.widget.CoordinatorLayout>
+
+    <!-- TODO: Match Button -->
+    <include
+        android:id="@+id/matchBtnLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/match_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

@@ -1,11 +1,14 @@
 package xlab.world.xlab.server
 
+import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import xlab.world.xlab.data.response.BaseErrorData
 import java.util.concurrent.TimeUnit
 
 fun createOkHttpClient(): OkHttpClient {
@@ -41,4 +44,18 @@ inline fun <reified T> createRetrofit(client: OkHttpClient, baseUrl: String): T 
             .client(client)
             .build()
             .create(T::class.java)
+}
+
+inline fun <reified T>errorHandle(error: Throwable): T? {
+    return if (error is HttpException) {
+        try {
+            val errorData = Gson().fromJson<T>(error.response().errorBody()?.charStream(), T::class.java)
+            (errorData as BaseErrorData).errorCode = error.code()
+            errorData
+        } catch (e: Exception) {
+            null
+        }
+    } else {
+        null
+    }
 }

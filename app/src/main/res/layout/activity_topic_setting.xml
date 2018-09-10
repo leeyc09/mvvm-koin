@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.topicSetting.TopicSettingActivity">
+
+    <!--TODO: Action Bar-->
+    <include
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/action_bar_default"/>
+
+    <android.support.constraint.ConstraintLayout
+        android:visibility="gone"
+        android:id="@+id/textLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/actionBar"
+        android:layout_marginTop="16dp">
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/topic"
+            android:textSize="13sp"
+            android:textColor="@color/colorBFBFBF"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="20dp"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/popularity_rate"
+            android:textSize="13sp"
+            android:textColor="@color/colorBFBFBF"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="20dp"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/textLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="10dp"/>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/noTopicLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/actionBar"
+        android:layout_marginTop="223dp">
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/suggest_add_topic"
+            android:textSize="13sp"
+            android:textColor="@color/color000000" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_topic"
+                android:textSize="12sp"
+                android:textColor="@color/colorA4A4A4"/>
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/arrow_see_more"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

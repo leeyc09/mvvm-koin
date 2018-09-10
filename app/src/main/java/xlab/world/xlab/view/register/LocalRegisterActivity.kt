@@ -101,7 +101,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
         scrollView.setOnTouchListener(this) // 키보드 숨기기
 
         // 키보드 보일때만 완료 버튼 보이기
-        viewFunction.showUpKeyboardLayout(mainLayout) { visibility ->
+        viewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
             layoutPopUp.visibility = visibility
         }
 

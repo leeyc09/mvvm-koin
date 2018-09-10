@@ -108,6 +108,10 @@
             android:name=".view.main.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.topicSetting.TopicSettingActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
     </application>
 
 </manifest>

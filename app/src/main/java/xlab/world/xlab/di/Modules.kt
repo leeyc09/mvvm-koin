@@ -13,14 +13,19 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import xlab.world.xlab.server.*
+import xlab.world.xlab.server.`interface`.IPetRequest
 import xlab.world.xlab.server.`interface`.IUserRequest
+import xlab.world.xlab.server.provider.ApiPet
+import xlab.world.xlab.server.provider.ApiPetProvider
 import xlab.world.xlab.server.provider.ApiUser
 import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
+import xlab.world.xlab.view.main.MainViewModel
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
 import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
+import xlab.world.xlab.view.topicSetting.TopicSettingViewModel
 import java.util.concurrent.TimeUnit
 
 /**
@@ -51,6 +56,10 @@ val baseModule: Module = applicationContext {
     viewModel { RegisterViewModel(apiUser = get(), dataRegex = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for reset password
     viewModel { ResetPasswordViewModel(apiUser = get(), dataRegex = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for main
+    viewModel { MainViewModel(networkCheck = get(), scheduler = get()) }
+    // ViewModel for Topic Setting
+    viewModel { TopicSettingViewModel(apiPet = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
@@ -61,10 +70,16 @@ val utilModule: Module = applicationContext {
 val remoteModule: Module = applicationContext {
     // provided web components
     bean { createOkHttpClient() }
+
     // user api interface
-    bean { createRetrofit<IUserRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL_SSL) }
+    bean { createRetrofit<IUserRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL) }
     // user api implement
     bean { ApiUser(iUserRequest = get()) as ApiUserProvider }
+
+    // pet api interface
+    bean { createRetrofit<IPetRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL) }
+    // pet api implement
+    bean { ApiPet(iPetRequest = get()) as ApiPetProvider }
 }
 
 /**

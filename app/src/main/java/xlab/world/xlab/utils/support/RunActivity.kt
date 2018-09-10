@@ -2,13 +2,16 @@ package xlab.world.xlab.utils.support
 
 import android.app.Activity
 import android.net.Uri
+import xlab.world.xlab.R
 import xlab.world.xlab.data.response.ResUserLoginData
+import xlab.world.xlab.utils.view.dialog.DefaultDialog
 import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
 import xlab.world.xlab.view.register.LocalRegisterActivity
 import xlab.world.xlab.view.register.SocialRegisterActivity
 import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
+import xlab.world.xlab.view.topicSetting.TopicSettingActivity
 import xlab.world.xlab.view.webView.DefaultWebViewActivity
 
 class RunActivity {
@@ -45,5 +48,28 @@ class RunActivity {
     fun mainActivity(context: Activity, linkData: Uri?) {
         val intent = MainActivity.newIntent(context = context, linkData = linkData)
         context.startActivity(intent)
+    }
+
+    fun topicSettingActivity(context: Activity, isGuest: Boolean) {
+        val loginDialog = createLoginDialog(context = context)
+        if (isGuest) {
+            loginDialog.show()
+            return
+        }
+
+        val intent = TopicSettingActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.TOPIC_SETTING)
+    }
+
+    private fun createLoginDialog(context: Activity): DefaultDialog {
+        return DefaultDialog(context = context,
+                textBold = context.getString(R.string.login_dialog),
+                textRegular = context.getString(R.string.login_dialog2),
+                listener = object: DefaultDialog.Listener {
+                    override fun onOkayTouch(tag: Any?) {
+                        val intent = LoginActivity.newIntent(context = context, isComePreLoadActivity = false, linkData = null)
+                        context.startActivityForResult(intent, RequestCodeData.LOGIN_USER)
+                    }
+                })
     }
 }
