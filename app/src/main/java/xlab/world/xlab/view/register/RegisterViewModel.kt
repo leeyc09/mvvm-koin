@@ -34,7 +34,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onNext(agreementStr)
                 it.onComplete()
             }.with(scheduler).subscribe { agreementStr ->
-                uiData.postValue(UIModel(agreementStr = agreementStr))
+                uiData.value = UIModel(agreementStr = agreementStr)
             }
         }
     }
@@ -49,26 +49,24 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onComplete()
             }.with(scheduler).subscribe { isEnable ->
                 PrintLog.d("inputDataRegex", isEnable.toString(), tag)
-                uiData.postValue(UIModel(isRegisterBtnEnable = isEnable))
+                uiData.value = UIModel(isRegisterBtnEnable = isEnable)
             }
         }
     }
     // 이메일 체크
     fun emailRegexCheck(email: String) {
         launch {
-            Observable.create<Boolean> {
+            Observable.create<RegexResultData> {
                 val emailRegex = dataRegex.emailRegex(email)
                 val emailRegexText =
                         if (!emailRegex) MessageConstants.EMAIL_REGEX_TEXT
                         else null
 
-                uiData.postValue(UIModel(emailRegexText = emailRegexText))
-
-                it.onNext(emailRegex)
+                it.onNext(RegexResultData(text = emailRegexText, result = emailRegex))
                 it.onComplete()
-            }.with(scheduler).subscribe { isEnable ->
-                PrintLog.d("emailRegexCheck", isEnable.toString(), tag)
-                uiData.postValue(UIModel(emailRegex = isEnable))
+            }.with(scheduler).subscribe { resultData ->
+                PrintLog.d("emailRegexCheck", resultData.result.toString(), tag)
+                uiData.value = UIModel(emailRegexText = resultData.text, emailRegex = resultData.result)
             }
         }
     }
@@ -80,26 +78,24 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onComplete()
             }.with(scheduler).subscribe { isEnable ->
                 PrintLog.d("emailRegexCheck", isEnable.toString(), tag)
-                uiData.postValue(UIModel(passwordLengthRegex = isEnable[0], passwordTextRegex = isEnable[1]))
+                uiData.value = UIModel(passwordLengthRegex = isEnable[0], passwordTextRegex = isEnable[1])
             }
         }
     }
     // 닉네임 체크
     fun nickNameRegexCheck(nickName: String) {
         launch {
-            Observable.create<Boolean> {
+            Observable.create<RegexResultData> {
                 val nickNameRegex = dataRegex.nickNameRegex(nickName)
                 val nickNameRegexText =
                         if (!nickNameRegex) MessageConstants.NICK_LENGTH_REGEX_TEXT
                         else null
 
-                uiData.postValue(UIModel(nickNameRegexText = nickNameRegexText))
-
-                it.onNext(nickNameRegex)
+                it.onNext(RegexResultData(text = nickNameRegexText, result = nickNameRegex))
                 it.onComplete()
-            }.with(scheduler).subscribe { isEnable ->
-                PrintLog.d("emailRegexCheck", isEnable.toString(), tag)
-                uiData.postValue(UIModel(nickNameRegex = isEnable))
+            }.with(scheduler).subscribe { resultData ->
+                PrintLog.d("emailRegexCheck", resultData.result.toString(), tag)
+                uiData.value = UIModel(nickNameRegexText = resultData.text, nickNameRegex = resultData.result)
             }
         }
     }
@@ -107,21 +103,21 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
     fun requestRegister(loginType: Int, email: String, password: String, nickName: String, socialId: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT))
+            uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
             return
         }
 
-        uiData.postValue(UIModel(isLoading = true))
+        uiData.value = UIModel(isLoading = true)
         val reqRegisterData = ReqRegisterData(loginType = loginType, email = email, password = password, nickName = nickName, socialID = socialId)
         apiUser.requestRegister(scheduler = scheduler, reqRegisterData = reqRegisterData,
                 responseData = {
                     PrintLog.d("requestRegister", "success", tag)
                     PrintLog.d("access token", it.accessToken, tag)
                     requestRegisterEvent.postValue(RequestRegisterEvent(accessToken = it.accessToken))
-                    uiData.postValue(UIModel(isLoading = false))
+                    uiData.value = UIModel(isLoading = false)
                 },
                 errorData = { errorData ->
-                    uiData.postValue(UIModel(isLoading = false, isRegisterBtnEnable = false))
+                    uiData.value = UIModel(isLoading = false, isRegisterBtnEnable = false)
                     errorData?.let {
                         val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
                         PrintLog.d("requestRegister fail", errorData.message, tag)
@@ -130,15 +126,15 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                             if(errorMessage[1].contains(ApiCallBackConstants.EXIST_USER_DATA)) {
                                 val duplicateError = errorMessage[1].replace(ApiCallBackConstants.EXIST_USER_DATA, "").trim().split("__")
                                 if (duplicateError.size > 1) { // 이메일, 닉네임 중복
-                                    uiData.postValue(UIModel(emailRegex = false, nickNameRegex = false,
-                                            emailRegexText = MessageConstants.DUPLICATE_EMAIL, nickNameRegexText = MessageConstants.DUPLICATE_NICK))
+                                    uiData.value = UIModel(emailRegex = false, nickNameRegex = false,
+                                            emailRegexText = MessageConstants.DUPLICATE_EMAIL, nickNameRegexText = MessageConstants.DUPLICATE_NICK)
                                 } else { // 이메일, 닉네임 둘 중 하나 중복
                                     when (duplicateError[0].trim()) {
                                         ApiCallBackConstants.EMAIL_DUPLICATE_CHAR -> { // 이메일 중복
-                                            uiData.postValue(UIModel(emailRegex = false, emailRegexText = MessageConstants.DUPLICATE_EMAIL))
+                                            uiData.value = UIModel(emailRegex = false, emailRegexText = MessageConstants.DUPLICATE_EMAIL)
                                         }
                                         ApiCallBackConstants.NICK_NAME_DUPLICATE_CHAR -> { // 닉네임 중복
-                                            uiData.postValue(UIModel(nickNameRegex = false, nickNameRegexText = MessageConstants.DUPLICATE_NICK))
+                                            uiData.value = UIModel(nickNameRegex = false, nickNameRegexText = MessageConstants.DUPLICATE_NICK)
                                         }
                                     }
                                 }
@@ -150,6 +146,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
     }
 }
 
+class RegexResultData(val text: String? = null, val result: Boolean? = null)
 data class RequestRegisterEvent(val accessToken: String? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val agreementStr: SpannableString? = null, val isRegisterBtnEnable: Boolean? = null,

@@ -49,7 +49,7 @@ class OnBoardingViewModel(private val scheduler: SchedulerProvider): AbstractVie
                 it.onNext(spannableString)
                 it.onComplete()
             }.with(scheduler).subscribe { contentStr ->
-                uiData.postValue(UIModel(contentStr = contentStr))
+                uiData.value = UIModel(contentStr = contentStr)
             }
         }
     }

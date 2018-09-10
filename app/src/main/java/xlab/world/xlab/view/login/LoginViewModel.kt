@@ -34,16 +34,16 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             return
         }
 
-        uiData.postValue(UIModel(isLoading = true))
+        uiData.value = UIModel(isLoading = true)
         launch {
             // access token 만료 확인
             apiUser.checkValidToken(scheduler = scheduler, authorization = authorization, fcmToken = fcmToken,
                     responseData = { loginData -> // 만료 안된경우 -> 로그인데이터 받아옴
                         PrintLog.d("checkValidToken success", loginData.toString(), tag)
                         requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(loginData = loginData))
-                        uiData.postValue(UIModel(isLoading = false))
+                        uiData.value = UIModel(isLoading = false)
                     }, errorData = { errorData ->
-                uiData.postValue(UIModel(isLoading = false))
+                uiData.value = UIModel(isLoading = false)
                 errorData?.let {
                     val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
                     PrintLog.d("checkValidToken fail", errorMessage.toString(), tag)
@@ -63,10 +63,10 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     fun generateNewToken(authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT))
+            uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
             return
         }
-        uiData.postValue(UIModel(isLoading = true))
+        uiData.value = UIModel(isLoading = true)
         launch {
             // refresh token 받기
             apiUser.getRefreshToken(scheduler = scheduler, authorization = authorization,
@@ -75,14 +75,14 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                         apiUser.generateToken(scheduler = scheduler, authorization = refreshTokenData.refreshToken,
                                 responseData = { newTokenData ->
                                     PrintLog.d("generateToken success", newTokenData.accessToken, tag)
-                                    uiData.postValue(UIModel(isLoading = false))
+                                    uiData.value = UIModel(isLoading = false)
                                     generateTokenEvent.postValue(GenerateTokenEvent(newAccessToken = newTokenData.accessToken))
                                 },
                                 errorData = { errorData ->
                                     errorData?.let {
                                         PrintLog.d("generateToken fail", errorData.message, tag)
                                     }
-                                    uiData.postValue(UIModel(isLoading = false))
+                                    uiData.value = UIModel(isLoading = false)
                                     generateTokenEvent.postValue(GenerateTokenEvent(isFailGenerateToken = true))
                                 })
                     },
@@ -90,7 +90,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                         errorData?.let {
                             PrintLog.d("getRefreshToken fail", errorData.message, tag)
                         }
-                        uiData.postValue(UIModel(isLoading = false))
+                        uiData.value = UIModel(isLoading = false)
                         generateTokenEvent.postValue(GenerateTokenEvent(isFailGenerateToken = true))
                     })
         }
@@ -99,17 +99,17 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     fun requestLogin(loginType: Int, email: String = "", password: String = "", socialToken: String = "", fcmToken: String = "") {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT))
+            uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
             return
         }
         if (loginType == AppConstants.LOCAL_LOGIN) { // 로컬 로그인 요청일 경우 -> 이메일 정규식 확인
             if (!dataRegex.emailRegex(email)) {
-                uiData.postValue(UIModel(toastMessage = MessageConstants.LOGIN_WRONG_EMAIL_PATTERN))
+                uiData.value = UIModel(toastMessage = MessageConstants.LOGIN_WRONG_EMAIL_PATTERN)
                 return
             }
         }
 
-        uiData.postValue(UIModel(isLoading = true))
+        uiData.value = UIModel(isLoading = true)
         launch {
             // request login api
             val reqLoginData = ReqLoginData(loginType = loginType, email = email, password = password, socialToken = socialToken, fcmToken = fcmToken)
@@ -118,15 +118,15 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                         loginData.needRegisterSocial = loginData.message != ApiCallBackConstants.SUCCESS_LOGIN
                         PrintLog.d("requestLogin success", loginData.toString(), tag)
                         requestLoginEvent.postValue(RequestLoginEvent(loginData = loginData))
-                        uiData.postValue(UIModel(isLoading = false))
+                        uiData.value = UIModel(isLoading = false)
                     },
                     errorData = { errorData ->
-                        uiData.postValue(UIModel(isLoading = false))
+                        uiData.value = UIModel(isLoading = false)
                         requestLoginEvent.postValue(RequestLoginEvent(isLoginFail = true))
                         errorData?.let {
                             PrintLog.d("requestLogin fail", errorData.message, tag)
                             if (errorData.errorCode == HttpURLConnection.HTTP_BAD_REQUEST)
-                                uiData.postValue(UIModel(toastMessage = errorData.message))
+                                uiData.value = UIModel(toastMessage = errorData.message)
                         }
             })
         }
@@ -138,7 +138,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             Observable.create<Boolean> {
                 it.onNext(email.isNotEmpty() && password.isNotEmpty())
                 it.onComplete()
-            }.with(scheduler).subscribe{ isEnable -> uiData.postValue(UIModel(isLoginBtnEnable = isEnable)) }
+            }.with(scheduler).subscribe{ isEnable -> uiData.value = UIModel(isLoginBtnEnable = isEnable) }
         }
     }
 }

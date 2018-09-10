@@ -218,9 +218,9 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
                         }
                     }
                 }
-                R.id.scrollView -> { // 키보드 숨기기
-                    viewFunction.hideKeyboard(context = this, view = v)
-                }
+//                R.id.scrollView -> { // 키보드 숨기기
+//                    viewFunction.hideKeyboard(context = this, view = v)
+//                }
             }
         }
         return false
