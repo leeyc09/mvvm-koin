@@ -21,7 +21,6 @@ import xlab.world.xlab.view.resetPassword.fragment.NewPasswordFragment
 
 class ResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
     private val resetPasswordViewModel: ResetPasswordViewModel by viewModel()
-    private val viewFunction: ViewFunction by inject()
     private val spHelper: SPHelper by inject()
 
     private var initEmail: String = ""

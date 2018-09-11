@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xlab.world.xlab.utils.view.cardView.SquareCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardElevation="0dp"
+    app:cardCornerRadius="0dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:id="@+id/mainLayout">
+
+    <ImageView
+        android:id="@+id/imageViewGoodsThumb"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerInside"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBlack03"/>
+
+    <ImageView
+        android:id="@+id/imageViewGoodsTag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/product_20"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="4dp"/>
+
+    <LinearLayout
+        android:id="@+id/percentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom">
+
+        <LinearLayout
+            android:id="@+id/matchBarLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="97"
+            android:orientation="horizontal"
+            android:background="@color/colorDE5359"
+            android:paddingEnd="5dp"
+            android:paddingStart="0dp"
+            android:gravity="end">
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                android:id="@+id/textViewMatchValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="97"
+                android:textSize="14sp"
+                android:textColor="@color/color000000"
+                android:gravity="end"/>
+            <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/matching_unit"
+                android:textSize="12sp"
+                android:textColor="@color/color000000"
+                android:gravity="end"/>
+
+        </LinearLayout>
+        <View
+            android:id="@+id/percentEmptyLayout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="3"/>
+    </LinearLayout>
+
+</xlab.world.xlab.utils.view.cardView.SquareCardView>

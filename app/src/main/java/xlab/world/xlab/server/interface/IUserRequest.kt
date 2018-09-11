@@ -9,9 +9,6 @@ import xlab.world.xlab.data.request.ReqNewPasswordData
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.ApiURL
 
-/**
- * Created by kdu01 on 2018-01-26.
- */
 interface IUserRequest {
 
     @POST(ApiURL.CHECK_VALID_TOKEN)

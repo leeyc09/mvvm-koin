@@ -15,7 +15,6 @@ import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
 class RegisterViewModel(private val apiUser: ApiUserProvider,
-                        private val dataRegex: DataRegex,
                         private val networkCheck: NetworkCheck,
                         private val scheduler: SchedulerProvider): AbstractViewModel() {
     private val tag = "Register"
@@ -42,10 +41,10 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
     fun inputDataRegex(email: String = "", password: String = "", nickName: String = "") {
         launch {
             Observable.create<Boolean> {
-                it.onNext(dataRegex.emailRegex(email) &&
-                        dataRegex.passwordLengthRegex(password)&&
-                        dataRegex.passwordTextRegex(password)&&
-                        dataRegex.nickNameRegex(nickName))
+                it.onNext(DataRegex.emailRegex(email) &&
+                        DataRegex.passwordLengthRegex(password)&&
+                        DataRegex.passwordTextRegex(password)&&
+                        DataRegex.nickNameRegex(nickName))
                 it.onComplete()
             }.with(scheduler).subscribe { isEnable ->
                 PrintLog.d("inputDataRegex", isEnable.toString(), tag)
@@ -57,7 +56,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
     fun emailRegexCheck(email: String) {
         launch {
             Observable.create<RegexResultData> {
-                val emailRegex = dataRegex.emailRegex(email)
+                val emailRegex = DataRegex.emailRegex(email)
                 val emailRegexText =
                         if (!emailRegex) MessageConstants.EMAIL_REGEX_TEXT
                         else null
@@ -74,7 +73,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
     fun passwordRegexCheck(password: String) {
         launch {
             Observable.create<ArrayList<Boolean>> {
-                it.onNext(arrayListOf(dataRegex.passwordLengthRegex(password), dataRegex.passwordTextRegex(password)))
+                it.onNext(arrayListOf(DataRegex.passwordLengthRegex(password), DataRegex.passwordTextRegex(password)))
                 it.onComplete()
             }.with(scheduler).subscribe { isEnable ->
                 PrintLog.d("emailRegexCheck", isEnable.toString(), tag)
@@ -86,7 +85,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
     fun nickNameRegexCheck(nickName: String) {
         launch {
             Observable.create<RegexResultData> {
-                val nickNameRegex = dataRegex.nickNameRegex(nickName)
+                val nickNameRegex = DataRegex.nickNameRegex(nickName)
                 val nickNameRegexText =
                         if (!nickNameRegex) MessageConstants.NICK_LENGTH_REGEX_TEXT
                         else null

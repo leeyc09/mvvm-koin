@@ -1,46 +1,181 @@
 package xlab.world.xlab.view.main.fragment
 
-import android.graphics.Color
+import android.app.Activity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_feed_following.*
+import org.koin.android.architecture.ext.viewModel
+import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
+import xlab.world.xlab.utils.listener.DefaultListener
+import xlab.world.xlab.utils.support.RunActivity
+import xlab.world.xlab.utils.support.SPHelper
+import xlab.world.xlab.utils.support.ViewFunction
+import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
+import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.main.MainViewModel
 
-class FeedFollowingFragment: Fragment() {
+class FeedFollowingFragment: Fragment(), View.OnClickListener {
+    private val mainViewModel: MainViewModel by viewModel()
+    private val spHelper: SPHelper by inject()
+
+    private var noProgressDialog = false
+    private var needInitData
+        get() = arguments?.getBoolean("needInitData") ?: true
+        set(value) {
+            val args = Bundle()
+            args.putBoolean("needInitData", value)
+            arguments = args
+        }
+
+    private var defaultToast: DefaultToast? = null
+    private var progressDialog: DefaultProgressDialog? = null
+
+    private var defaultListener: DefaultListener? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_feed_following, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        onSetup(view)
+        onSetup()
 
         onBindEvent()
 
         observeViewModel()
     }
 
-    private fun onSetup(rootView: View) {
-        mainLayout.setBackgroundColor(Color.GREEN)
+    private fun onSetup() {
+        // Toast, Dialog 초기화
+        defaultToast = defaultToast ?: DefaultToast(context = context!!)
+        progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
+
+        defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
+
+        if (needInitData)
+            mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1)
+        else
+            setLayoutVisibility()
     }
 
     private fun onBindEvent() {
+        noFollowLayout.setOnClickListener(this) // 팔로우 하기
+        noLoginLayout.setOnClickListener(this) // 로그인 하기
 
+        swipeRefreshLayout.setOnRefreshListener {
+            noProgressDialog = true
+            mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1)
+        }
+
+        ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
+//            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = allFeedAdapter!!.dataLoading, total = allFeedAdapter!!.dataTotal) { _ ->
+//                mainViewModel.loadAllFeedData(authorization = spHelper.authorization, page = allFeedAdapter!!.dataNextPage, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+//            }
+        }
     }
 
     private fun observeViewModel() {
+        // UI 이벤트 observe
+        mainViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.isLoading?.let {
+                    if (!noProgressDialog) {
+                        if (it && !progressDialog!!.isShowing)
+                            progressDialog!!.show()
+                        else if (!it && progressDialog!!.isShowing)
+                            progressDialog!!.dismiss()
+                    }
+                }
+                uiData.toastMessage?.let {
+                    defaultToast?.showToast(message = it)
+                }
+                uiData.guestMode?.let {
+                    setBundleVisibilityData(listVisibility = View.GONE,
+                            noFollowVisibility = View.GONE,
+                            noLoginVisibility = View.VISIBLE,
+                            noPostVisibility = View.GONE)
+                }
+                uiData.noFollowing?.let {
+                    setBundleVisibilityData(listVisibility = View.GONE,
+                            noFollowVisibility = View.VISIBLE,
+                            noLoginVisibility = View.GONE,
+                            noPostVisibility = View.GONE)
+                }
+            }
+        })
+
+        // load following feed 이벤트 observe
+        mainViewModel.loadFollowingFeedDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadFollowingFeedDataEvent ->
+            loadFollowingFeedDataEvent?.let { _ ->
+                loadFollowingFeedDataEvent.isLoading?.let {
+//                    allFeedAdapter?.dataLoading = it
+                    swipeRefreshLayout.isRefreshing = false
+                    noProgressDialog = false
+                    needInitData = false
+                }
+            }
+        })
+    }
+
+    override fun onClick(v: View?) {
+        v?.let {
+            when (v.id) {
+                R.id.noFollowLayout -> { // 팔로우 하기
+//                    val intent = RecommendUserActivity.newIntent(activity)
+//                    activity.startActivityForResult(intent, RequestCodeData.PROFILE)
+                }
+                R.id.noLoginLayout -> { // 로그인 하기
+                    RunActivity.loginActivity(context = context as Activity, isComePreLoadActivity = false, linkData = null)
+                }
+            }
+        }
     }
 
     fun scrollToTop() {
         recyclerView.scrollToPosition(0)
     }
 
+    fun reloadFeedData() {
+        context?.let {
+            mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1)
+        } ?:let { needInitData = true }
+    }
+
+    private fun setLayoutVisibility() {
+        recyclerView?.visibility = getBundleListVisibility()
+        noFollowLayout?.visibility = getBundleNoFollowVisibility()
+        noLoginLayout?.visibility = getBundleNoLoginVisibility()
+        noPostLayout?.visibility = getBundleNoPostVisibility()
+    }
+
+    private fun getBundleListVisibility(): Int = arguments?.getInt("listVisibility") ?: View.VISIBLE
+    private fun getBundleNoFollowVisibility(): Int = arguments?.getInt("noFollowVisibility") ?: View.GONE
+    private fun getBundleNoLoginVisibility(): Int = arguments?.getInt("noLoginVisibility") ?: View.GONE
+    private fun getBundleNoPostVisibility(): Int = arguments?.getInt("noPostVisibility") ?: View.GONE
+
+    private fun setBundleVisibilityData(listVisibility: Int, noFollowVisibility: Int, noLoginVisibility: Int, noPostVisibility: Int) {
+        val args = Bundle()
+        args.putInt("listVisibility", listVisibility)
+        args.putInt("noFollowVisibility", noFollowVisibility)
+        args.putInt("noLoginVisibility", noLoginVisibility)
+        args.putInt("noPostVisibility", noPostVisibility)
+        arguments = args
+
+        setLayoutVisibility()
+    }
+
     companion object {
         fun newFragment(): FeedFollowingFragment {
-            return FeedFollowingFragment()
+            val fragment = FeedFollowingFragment()
+
+            val args = Bundle()
+            args.putBoolean("needInitData", true)
+            fragment.arguments = args
+
+            return fragment
         }
     }
 }

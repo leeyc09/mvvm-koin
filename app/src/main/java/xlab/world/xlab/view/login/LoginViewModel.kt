@@ -14,7 +14,6 @@ import xlab.world.xlab.view.SingleLiveEvent
 import java.net.HttpURLConnection
 
 class LoginViewModel(private val apiUser: ApiUserProvider,
-                     private val dataRegex: DataRegex,
                      private val networkCheck: NetworkCheck,
                      private val scheduler: SchedulerProvider): AbstractViewModel() {
 
@@ -103,7 +102,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             return
         }
         if (loginType == AppConstants.LOCAL_LOGIN) { // 로컬 로그인 요청일 경우 -> 이메일 정규식 확인
-            if (!dataRegex.emailRegex(email)) {
+            if (!DataRegex.emailRegex(email)) {
                 uiData.value = UIModel(toastMessage = MessageConstants.LOGIN_WRONG_EMAIL_PATTERN)
                 return
             }

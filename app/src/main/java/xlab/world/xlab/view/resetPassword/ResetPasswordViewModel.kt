@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 
 class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
-                             private val dataRegex: DataRegex,
                              private val networkCheck: NetworkCheck,
                              private val scheduler: SchedulerProvider): AbstractViewModel() {
     val tag = "ResetPassword"
@@ -40,7 +39,7 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
             uiData.postValue(UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT))
             return
         }
-        if (!dataRegex.emailRegex(email)) { // 이메일 정규식 확인
+        if (!DataRegex.emailRegex(email)) { // 이메일 정규식 확인
             uiData.postValue(UIModel(toastMessage = MessageConstants.LOGIN_WRONG_EMAIL_PATTERN))
             return
         }

@@ -14,11 +14,9 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import xlab.world.xlab.server.*
 import xlab.world.xlab.server.`interface`.IPetRequest
+import xlab.world.xlab.server.`interface`.IPostRequest
 import xlab.world.xlab.server.`interface`.IUserRequest
-import xlab.world.xlab.server.provider.ApiPet
-import xlab.world.xlab.server.provider.ApiPetProvider
-import xlab.world.xlab.server.provider.ApiUser
-import xlab.world.xlab.server.provider.ApiUserProvider
+import xlab.world.xlab.server.provider.*
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.main.MainViewModel
@@ -34,6 +32,21 @@ import java.util.concurrent.TimeUnit
 val baseModule: Module = applicationContext {
     // provided rx scheduler
     bean { ApplicationSchedulerProvider() as SchedulerProvider }
+    // ViewModel for OnBoarding View
+    viewModel { OnBoardingViewModel(scheduler = get()) }
+    // ViewModel for Login View
+    viewModel { LoginViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Register View
+    viewModel { RegisterViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for reset password
+    viewModel { ResetPasswordViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for main
+    viewModel { MainViewModel(apiPost = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Topic Setting
+    viewModel { TopicSettingViewModel(apiPet = get(), networkCheck = get(), scheduler = get()) }
+}
+
+val utilModule: Module = applicationContext {
     // provided network check
     bean { NetworkCheck(context = get()) }
     // provided shared preference
@@ -44,27 +57,6 @@ val baseModule: Module = applicationContext {
     bean { FontColorSpan(context = get()) }
     // provided letter or digit input filter
     bean { LetterOrDigitInputFilter() }
-    // provided data regex
-    bean { DataRegex() }
-    // provided run activity
-    bean { RunActivity() }
-    // ViewModel for OnBoarding View
-    viewModel { OnBoardingViewModel(scheduler = get()) }
-    // ViewModel for Login View
-    viewModel { LoginViewModel(apiUser = get(), dataRegex = get(), networkCheck = get(), scheduler = get()) }
-    // ViewModel for Register View
-    viewModel { RegisterViewModel(apiUser = get(), dataRegex = get(), networkCheck = get(), scheduler = get()) }
-    // ViewModel for reset password
-    viewModel { ResetPasswordViewModel(apiUser = get(), dataRegex = get(), networkCheck = get(), scheduler = get()) }
-    // ViewModel for main
-    viewModel { MainViewModel(networkCheck = get(), scheduler = get()) }
-    // ViewModel for Topic Setting
-    viewModel { TopicSettingViewModel(apiPet = get(), networkCheck = get(), scheduler = get()) }
-}
-
-val utilModule: Module = applicationContext {
-    // provided view function
-    bean { ViewFunction() }
 }
 
 val remoteModule: Module = applicationContext {
@@ -80,6 +72,11 @@ val remoteModule: Module = applicationContext {
     bean { createRetrofit<IPetRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL) }
     // pet api implement
     bean { ApiPet(iPetRequest = get()) as ApiPetProvider }
+
+    // post api interface
+    bean { createRetrofit<IPostRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL) }
+    // post api implement
+    bean { ApiPost(iPostRequest = get()) as ApiPostProvider }
 }
 
 /**

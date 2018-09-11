@@ -18,43 +18,22 @@ import kotlinx.android.synthetic.main.activity_local_register.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
+import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 
 class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
     private val registerViewModel: RegisterViewModel by viewModel()
-    private val viewFunction: ViewFunction by inject()
     private val letterOrDigitInputFilter: LetterOrDigitInputFilter by inject()
-    private val runActivity: RunActivity by inject()
 
     private var resultCode = Activity.RESULT_CANCELED
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
 
-    private val clickPolicy1 = object: ClickableSpan() {
-        override fun onClick(widget: View?) {
-            runActivity.defaultWebViewActivity(context = this@LocalRegisterActivity, pageTitle = getString(R.string.inquiry_under3),
-                    webUrl =  AppConstants.LOCAL_HTML_URL + "clause.html", zoomControl = true)
-        }
+    private lateinit var defaultListener: DefaultListener
 
-        override fun updateDrawState(ds: TextPaint) {
-            super.updateDrawState(ds)
-            ds.color = ResourcesCompat.getColor(resources, R.color.color6D6D6D, null)
-        }
-    }
-    private val clickPolicy2 = object: ClickableSpan() {
-        override fun onClick(widget: View?) {
-            runActivity.defaultWebViewActivity(context = this@LocalRegisterActivity, pageTitle = getString(R.string.inquiry_under2),
-                    webUrl =  AppConstants.LOCAL_HTML_URL + "personalInfo.html", zoomControl = true)
-        }
-
-        override fun updateDrawState(ds: TextPaint) {
-            super.updateDrawState(ds)
-            ds.color = ResourcesCompat.getColor(resources, R.color.color6D6D6D, null)
-        }
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_local_register)
@@ -68,7 +47,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
 
     override fun onPause() {
         // 엑티비티 멈출때 키보드 숨기
-        viewFunction.hideKeyboard(context = this, view = mainLayout)
+        ViewFunction.hideKeyboard(context = this, view = mainLayout)
         super.onPause()
     }
 
@@ -81,6 +60,9 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
+        // Listener 초기화
+        defaultListener = DefaultListener(context = this)
+
         actionBarTitle.visibility = View.GONE
         actionBtn.visibility = View.GONE
 
@@ -90,7 +72,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
         // 닉네임 숫자 or 문자만 가능하게
         editTextNick.filters = arrayOf(letterOrDigitInputFilter)
 
-        registerViewModel.contentTextSet(policy1 = clickPolicy1, policy2 = clickPolicy2)
+        registerViewModel.contentTextSet(policy1 = defaultListener.clausePolicyListener, policy2 = defaultListener.personalInfoPolicyListener)
     }
 
     private fun onBindEvent() {
@@ -101,32 +83,32 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
         scrollView.setOnTouchListener(this) // 키보드 숨기기
 
         // 키보드 보일때만 완료 버튼 보이기
-        viewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
+        ViewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
             layoutPopUp.visibility = visibility
         }
 
         // 이메일, 닉네임 지우기 이미지 활성화 이벤트
-        viewFunction.onFocusChange(editText = editTextMail) { hasFocus ->
+        ViewFunction.onFocusChange(editText = editTextMail) { hasFocus ->
             editTextMail.setCompoundDrawablesWithIntrinsicBounds(0,0,
                     if (hasFocus) R.drawable.textdelete_black
                     else 0,0)
         }
-        viewFunction.onFocusChange(editText = editTextNick) { hasFocus ->
+        ViewFunction.onFocusChange(editText = editTextNick) { hasFocus ->
             editTextNick.setCompoundDrawablesWithIntrinsicBounds(0,0,
                     if (hasFocus) R.drawable.textdelete_black
                     else 0,0)
         }
 
         // 이메일, 패스워드, 닉네임 입력 이벤트
-        viewFunction.onTextChange(editText = editTextMail) { _ ->
+        ViewFunction.onTextChange(editText = editTextMail) { _ ->
             registerViewModel.emailRegexCheck(email = getEmailText())
             registerViewModel.inputDataRegex(email = getEmailText(), password = getPasswordText(), nickName = getNickNameText())
         }
-        viewFunction.onTextChange(editText = editTextPassword) { _ ->
+        ViewFunction.onTextChange(editText = editTextPassword) { _ ->
             registerViewModel.passwordRegexCheck(password = getPasswordText())
             registerViewModel.inputDataRegex(email = getEmailText(), password = getPasswordText(), nickName = getNickNameText())
         }
-        viewFunction.onTextChange(editText = editTextNick) { _ ->
+        ViewFunction.onTextChange(editText = editTextNick) { _ ->
             registerViewModel.nickNameRegexCheck(nickName = getNickNameText())
             registerViewModel.inputDataRegex(email = getEmailText(), password = getPasswordText(), nickName = getNickNameText())
         }
@@ -198,7 +180,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
                     finish()
                 }
                 R.id.finishBtn -> { // 회원가입 완료 버튼
-                    viewFunction.hideKeyboard(context = this, view = v)
+                    ViewFunction.hideKeyboard(context = this, view = v)
                     registerViewModel.requestRegister(loginType = AppConstants.LOCAL_LOGIN, email = getEmailText(),
                             password = getPasswordText(), nickName = getNickNameText(), socialId = "")
                 }
@@ -211,7 +193,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
             when (v.id) {
                 R.id.editTextMail,
                 R.id.editTextNick -> { // 메일, 닉네임 지우기
-                    viewFunction.onDrawableTouch(v as EditText, event!!) { isTouch ->
+                    ViewFunction.onDrawableTouch(v as EditText, event!!) { isTouch ->
                         if (isTouch) {
                             v.setText("")
                             v.performClick()
@@ -219,7 +201,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
                     }
                 }
 //                R.id.scrollView -> { // 키보드 숨기기
-//                    viewFunction.hideKeyboard(context = this, view = v)
+//                    ViewFunction.hideKeyboard(context = this, view = v)
 //                }
             }
         }

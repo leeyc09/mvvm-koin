@@ -2,15 +2,16 @@ package xlab.world.xlab.utils.support
 
 import android.util.Patterns
 
-class DataRegex {
+object DataRegex {
     private val regexNum = Regex("""\d+""") // for number format check
     private val regexEn = Regex("[a-zA-Z]") // for alphabet format check
     private val regexMail = Patterns.EMAIL_ADDRESS // for mail format check
-    private val passwordMinLength = 6
-    private val passwordMaxLength = 20
 
-    private val nickNameMinLength = 3
-    private val nickNameMaxLength = 10
+    private const val passwordMinLength = 6
+    private const val passwordMaxLength = 20
+
+    private const val nickNameMinLength = 3
+    private const val nickNameMaxLength = 10
 
     // 이메일 정규식
     fun emailRegex(email: String): Boolean {

@@ -13,6 +13,6 @@ data class ResUserPetsData(@SerializedName("message") val message: String,
                         @SerializedName("type") val type: String,
                         @SerializedName("breed") val breed: String,
                         @SerializedName("profileImg") val image: String,
-                        @SerializedName("isHidden") var isHidden: Boolean): Serializable
+                        @SerializedName("isHidden") val isHidden: Boolean): Serializable
 
 }

@@ -93,4 +93,7 @@ dependencies {
     // fcm
     implementation "com.google.firebase:firebase-core:$rootProject.firebaseCoreVersion"
     implementation "com.google.firebase:firebase-messaging:$rootProject.firebaseMessagingVersion"
+
+    // youtube
+    implementation files('libs/YouTubeAndroidPlayerApi.jar.jar')
 }

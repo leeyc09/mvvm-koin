@@ -31,9 +31,7 @@ import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
     private val loginViewModel: LoginViewModel by viewModel()
-    private val viewFunction: ViewFunction by inject()
     private val spHelper: SPHelper by inject()
-    private val runActivity: RunActivity by inject()
 
     private var isComePreLoadActivity: Boolean = true
     private var linkData: Uri? = null
@@ -55,7 +53,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
     }
 
     override fun onPause() {
-        viewFunction.hideKeyboard(context = this, view = mainLayout)
+        ViewFunction.hideKeyboard(context = this, view = mainLayout)
         super.onPause()
     }
 
@@ -72,17 +70,12 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
             Activity.RESULT_OK -> {
                 when (requestCode) {
                     RequestCodeData.REGISTER_USER -> { // 회원가입 성공
-                        if (isComePreLoadActivity) { // 앱 실행으로 로그인 화면 온 경우
-                            rootLayout.visibility = View.INVISIBLE
-                            val accessToken = data?.let {
-                                data.getStringExtra(IntentPassName.ACCESS_TOKEN)
-                            } ?: ""
-                            spHelper.accessToken = accessToken
-                            loginViewModel.requestLoginByAccessToken(authorization = spHelper.authorization, fcmToken = spHelper.fcmToken)
-                        } else { // 다른 화면에서 로그인 화면으로 온 경우
-                            setResult(ResultCodeData.LOGIN_SUCCESS)
-                            finish()
-                        }
+                        rootLayout.visibility = View.INVISIBLE
+                        val accessToken = data?.let {
+                            data.getStringExtra(IntentPassName.ACCESS_TOKEN)
+                        } ?: ""
+                        spHelper.accessToken = accessToken
+                        loginViewModel.requestLoginByAccessToken(authorization = spHelper.authorization, fcmToken = spHelper.fcmToken)
                     }
                 }
             }
@@ -150,34 +143,34 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         mainLayout.setOnTouchListener(this) // 키보드 숨기기
 
         // 키보드 보일경우 비밀번호 변경, 로그인 버튼 활성화 이벤트
-        viewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
+        ViewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
             registerLayout.visibility =
                     if (visibility == View.VISIBLE) View.INVISIBLE
                     else View.VISIBLE
             layoutPopUp.visibility = visibility
         }
         // 이메일, 패스워드 지우기 이미지 활성화 이벤트
-        viewFunction.onFocusChange(editText = editTextMail) { hasFocus ->
+        ViewFunction.onFocusChange(editText = editTextMail) { hasFocus ->
             editTextMail.setCompoundDrawablesWithIntrinsicBounds(0,0,
                     if (hasFocus) R.drawable.textdelete_black
                     else 0,0)
         }
-        viewFunction.onFocusChange(editText = editTextPassword) { hasFocus ->
+        ViewFunction.onFocusChange(editText = editTextPassword) { hasFocus ->
             editTextPassword.setCompoundDrawablesWithIntrinsicBounds(0,0,
                     if (hasFocus) R.drawable.textdelete_black
                     else 0,0)
         }
 
         // 이메일, 패스워드 입력 이벤트
-        viewFunction.onTextChange(editText = editTextMail) { _ ->
+        ViewFunction.onTextChange(editText = editTextMail) { _ ->
             loginViewModel.isLoginEnable(email = getEmailText(), password = getPasswordText())
         }
-        viewFunction.onTextChange(editText = editTextPassword) { _ ->
+        ViewFunction.onTextChange(editText = editTextPassword) { _ ->
             loginViewModel.isLoginEnable(email = getEmailText(), password = getPasswordText())
         }
 
         // 패스워드 입력시 앤터 누르면 로그인 이벤트
-        viewFunction.onKeyboardActionTouch(editText = editTextPassword, putActionID = EditorInfo.IME_ACTION_DONE) { isTouch ->
+        ViewFunction.onKeyboardActionTouch(editText = editTextPassword, putActionID = EditorInfo.IME_ACTION_DONE) { isTouch ->
             if (isTouch && loginBtn.isEnabled)
                 loginBtn.performClick()
         }
@@ -206,15 +199,13 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         loginViewModel.requestLoginByAccessTokenEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { checkValidTokenEvent ->
             checkValidTokenEvent?.let { _ ->
                 checkValidTokenEvent.loginData?.let { loginData -> // 로그인 성공
-                    spHelper.login(accessToken = loginData.accessToken,
+                    successLogin(accessToken = loginData.accessToken,
                             userType = loginData.loginType,
                             userId = loginData.userID,
                             socialId = loginData.socialID,
                             userLevel = loginData.userLevel,
                             userEmail = loginData.email,
                             push = loginData.isPushAlarmOn)
-                    runActivity.mainActivity(context = this, linkData = null)
-                    finish()
                 }
                 checkValidTokenEvent.isExpireToken?.let { // access token 만료
                 }
@@ -226,17 +217,15 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
             requestLoginEvent?.let { _ ->
                 requestLoginEvent.loginData?.let { loginData ->
                     if (loginData.needRegisterSocial) { // 소셜 회원가입 필요
-                        runActivity.socialRegisterActivity(context = this, userData = loginData)
+                        RunActivity.socialRegisterActivity(context = this, userData = loginData)
                     } else {
-                        spHelper.login(accessToken = loginData.accessToken,
+                        successLogin(accessToken = loginData.accessToken,
                                 userType = loginData.loginType,
                                 userId = loginData.userID,
                                 socialId = loginData.socialID,
                                 userLevel = loginData.userLevel,
                                 userEmail = loginData.email,
                                 push = loginData.isPushAlarmOn)
-                        runActivity.mainActivity(context = this, linkData = null)
-                        finish()
                     }
                 }
                 requestLoginEvent.isLoginFail?.let {
@@ -278,10 +267,10 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                     // clear mail and password
                     editTextMail.text?.clear()
                     editTextPassword.text?.clear()
-                    runActivity.localRegisterActivity(context = this)
+                    RunActivity.localRegisterActivity(context = this)
                 }
                 R.id.guestBtn -> { // 둘러보기(게스트 모드)
-                    runActivity.mainActivity(context = this, linkData = linkData)
+                    RunActivity.mainActivity(context = this, linkData = linkData)
                     finish()
                 }
                 R.id.loginBtn -> { // 로컬 로그인 버튼
@@ -291,7 +280,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                             fcmToken = spHelper.fcmToken)
                 }
                 R.id.passwordResetBtn -> { // 비밀번호 재설정
-                    runActivity.resetPasswordActivity(context = this, email = getEmailText())
+                    RunActivity.resetPasswordActivity(context = this, email = getEmailText())
                 }
             }
         }
@@ -302,7 +291,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
             when (v.id) {
                 R.id.editTextMail, // 이메일, 패스워드 텍스트 지우기
                 R.id.editTextPassword -> {
-                    viewFunction.onDrawableTouch(v as EditText, event!!) { isTouch ->
+                    ViewFunction.onDrawableTouch(v as EditText, event!!) { isTouch ->
                         if (isTouch) {
                             v.setText("")
                             v.performClick()
@@ -310,11 +299,29 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                     }
                 }
                 R.id.mainLayout -> { // 키보드 숨기기
-                    viewFunction.hideKeyboard(context = this, view = v)
+                    ViewFunction.hideKeyboard(context = this, view = v)
                 }
             }
         }
         return false
+    }
+
+    private fun successLogin(accessToken: String, userType: Int, userId: String, socialId: String,
+                             userLevel: Int, userEmail: String, push: Boolean) {
+        spHelper.login(accessToken = accessToken,
+                userType = userType,
+                userId = userId,
+                socialId = socialId,
+                userLevel = userLevel,
+                userEmail = userEmail,
+                push = push)
+
+        if (isComePreLoadActivity)  // 앱 실행으로 로그인 화면 온 경우
+            RunActivity.mainActivity(context = this, linkData = null)
+        else  // 다른 화면에서 로그인 화면으로 온 경우
+            setResult(ResultCodeData.LOGIN_SUCCESS)
+
+        finish()
     }
 
     private fun getEmailText() = editTextMail.text?.trim().toString()

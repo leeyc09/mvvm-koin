@@ -20,7 +20,6 @@ import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
 
 class NewPasswordFragment: Fragment(), View.OnClickListener {
     private val resetPasswordViewModel: ResetPasswordViewModel by viewModel()
-    private val viewFunction: ViewFunction by inject()
     private val dataRegex: DataRegex by inject()
     private val spHelper: SPHelper by inject()
 
@@ -51,7 +50,7 @@ class NewPasswordFragment: Fragment(), View.OnClickListener {
     private fun onBindEvent() {
         finishBtn.setOnClickListener(this) // 비밀번호 변경 완료버튼
 
-        viewFunction.onTextChange(editText = editTextPassword) { password ->
+        ViewFunction.onTextChange(editText = editTextPassword) { password ->
             textViewConfirmPasswordText.isSelected = dataRegex.passwordTextRegex(password = password)
             textViewConfirmPasswordLength.isSelected = dataRegex.passwordLengthRegex(password = password)
             finishBtn.isEnabled = textViewConfirmPasswordText.isSelected && textViewConfirmPasswordLength.isSelected

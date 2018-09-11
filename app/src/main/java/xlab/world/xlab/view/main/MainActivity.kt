@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
@@ -21,11 +22,10 @@ import xlab.world.xlab.view.main.fragment.FeedAllFragment
 import xlab.world.xlab.view.main.fragment.FeedExploreFragment
 import xlab.world.xlab.view.main.fragment.FeedFollowingFragment
 import xlab.world.xlab.view.main.fragment.FeedShopFragment
+import xlab.world.xlab.view.topicSetting.TopicSettingViewModel
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val fontColorSpan: FontColorSpan by inject()
-    private val viewFunction: ViewFunction by inject()
-    private val runActivity: RunActivity by inject()
     private val spHelper: SPHelper by inject()
 
     private var linkData: Uri? = null
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
     private val matchButtonListener = object: MatchButtonHelper.Listener {
         override fun onMatchSetting() {
-            runActivity.topicSettingActivity(context = this@MainActivity, isGuest = spHelper.accessToken.isEmpty())
+            RunActivity.topicSettingActivity(context = this@MainActivity, isGuest = spHelper.accessToken.isEmpty())
 
         }
         override fun isSelectedMatchBtn(isSelected: Boolean) {
@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     if (isSelected) View.VISIBLE // show match percent
                     else View.GONE // hide match percent
 
-//            allFragment.matchVisibleChange(matchVisibility)
+            feedAllFragment.matchVisibleChange(matchVisibility)
 //            shopFragment.matchVisibleChange(matchVisibility)
         }
     }
@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 //                }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-//                reloadAllData { max, current -> }
+                reloadAllData()
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
                 finish()
@@ -174,10 +174,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun onBindEvent() {
         // 키보드 보일때 매칭 버튼 안보이게
-        viewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
+        ViewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
         }
 
-        viewFunction.onViewPagerChangePosition(viewPager = viewPager) { position ->
+        ViewFunction.onViewPagerChangePosition(viewPager = viewPager) { position ->
             tabLayoutHelper.changeSelectedTab(selectIndex = position)
         }
     }
@@ -191,6 +191,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
             }
         }
+    }
+
+    private fun reloadAllData() {
+        feedAllFragment.reloadFeedData()
+        feedFollowingFragment.reloadFeedData()
     }
 
     companion object {

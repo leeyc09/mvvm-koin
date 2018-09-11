@@ -15,7 +15,7 @@ import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.TopicSettingAdapter
-import xlab.world.xlab.data.adapter.TopicSettingData
+import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
@@ -25,22 +25,20 @@ import xlab.world.xlab.utils.view.toast.DefaultToast
 class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
     private val topicSettingViewModel: TopicSettingViewModel by viewModel()
     private val spHelper: SPHelper by inject()
-    private val viewFunction: ViewFunction by inject()
 
     private var resultCode = Activity.RESULT_CANCELED
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
 
-    private lateinit var topicSettingData: TopicSettingData
     private lateinit var topicSettingAdapter: TopicSettingAdapter
 
     private val topicToggleListener = View.OnClickListener { view ->
         if (view.tag is Int) {
             val position = view.tag as Int
             topicSettingViewModel.changeTopicToggle(authorization = spHelper.authorization,
-                    petId = topicSettingData.items[position].topicId,
-                    position = position)
+                    position = position,
+                    topicData = topicSettingAdapter.getItem(position))
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,18 +65,23 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
         progressDialog = DefaultProgressDialog(context = this)
 
         // topic recycler view & adapter 초기화
-        topicSettingData = TopicSettingData()
-        topicSettingAdapter = TopicSettingAdapter(context = this, topicSettingData = topicSettingData, topicToggleListener = topicToggleListener)
+        topicSettingAdapter = TopicSettingAdapter(context = this, topicToggleListener = topicToggleListener)
         recyclerView.adapter = topicSettingAdapter
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(CustomItemDecoration(context = this, bottom = 10f))
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
-        topicSettingViewModel.loadUserPetList(userId = spHelper.userId, page = 1)
+        topicSettingViewModel.loadUserPetsData(userId = spHelper.userId, page = 1)
     }
 
     private fun onBindEvent() {
         actionBackBtn.setOnClickListener(this) // 뒤로가기
+
+        ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
+            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = topicSettingAdapter.dataLoading, total = topicSettingAdapter.dataTotal) { _ ->
+                topicSettingViewModel.loadUserPetsData(userId = spHelper.userId, page = topicSettingAdapter.dataNextPage)
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -95,7 +98,7 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
                     defaultToast.showToast(message = it)
                 }
                 uiData.petData?.let {
-                    if (it.nextPage <=2 ) { // 요청한 page => 첫페이지
+                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
                         if (it.items.isEmpty()) { // topic 없음
                             noTopicLayout.visibility = View.VISIBLE
                             textLayout.visibility = View.GONE
@@ -111,11 +114,19 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
                         topicSettingAdapter.addData(it)
                     }
                 }
-                uiData.topicToggleData?.let {
-                    topicSettingData.items[it.position].isHidden = it.result
-                    topicSettingAdapter.notifyItemChanged(it.position)
+                uiData.topicPosition?.let {
+                    topicSettingAdapter.notifyItemChanged(it)
                     if (resultCode == Activity.RESULT_CANCELED)
                         resultCode = Activity.RESULT_OK
+                }
+            }
+        })
+
+        // load user pet list 이벤트 observe
+        topicSettingViewModel.loadUserPetsListDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadUserPetListEvent ->
+            loadUserPetListEvent?.let { _ ->
+                loadUserPetListEvent.isLoading?.let {
+                    topicSettingAdapter.dataLoading = it
                 }
             }
         })

@@ -8,4 +8,6 @@ object ApiCallBackConstants {
     const val EXIST_USER_DATA = "incoming data is already existing "
     const val EMAIL_DUPLICATE_CHAR = "email_"
     const val NICK_NAME_DUPLICATE_CHAR = "_nickName"
+
+    const val N0_FOLLOWING_USER = "no following user"
 }

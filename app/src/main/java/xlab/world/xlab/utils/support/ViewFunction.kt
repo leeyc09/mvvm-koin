@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.TypedValue
@@ -16,27 +17,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import kotlinx.android.synthetic.main.activity_on_boarding.*
 
-class ViewFunction {
-    // recyclerView 더 스크롤 가능 여부 판단
-    fun isScrolledRecyclerView(layoutManager: LinearLayoutManager, isLoading: Boolean, total: Int, isScrolled: (Boolean) -> Unit) {
-        val visibleItemCount = layoutManager.childCount
-        val pastVisibleItems = layoutManager.findFirstVisibleItemPosition()
-        val listItemCount = layoutManager.itemCount
-
-        if (visibleItemCount + pastVisibleItems >= listItemCount && !isLoading) {
-            if (total < 0) // total 알수 없을 때, 스크롤 가능으로 판단
-                isScrolled(true)
-            else {
-                if (total > listItemCount) // total 보다 data count 작을 경우, 스크롤 가능
-                    isScrolled(true)
-                else
-                    isScrolled(false)
-            }
-        } else {
-            isScrolled(false)
-        }
-    }
-
+object ViewFunction {
     // 키보드 숨기기
     fun hideKeyboard(context: Context, view: View) {
         val inputMethodManager = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -130,6 +111,29 @@ class ViewFunction {
                 position(index)
             }
         })
+    }
+
+    // recycler view 스크롤 판단
+    fun onRecyclerViewScrolledDown(recyclerView: RecyclerView, isScrolled: (LinearLayoutManager) -> Unit) {
+        recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dx > 0 || dy > 0) {
+                    isScrolled(recyclerView.layoutManager as LinearLayoutManager)
+                }
+            }
+        })
+    }
+
+    // he function tell true or false recycler view scrolled bottom
+    fun isScrolledRecyclerView(layoutManager: LinearLayoutManager, isLoading: Boolean, total: Int, isScrolled: (Boolean) -> Unit) {
+        val visibleItemCount = layoutManager.childCount
+        val pastVisibleItems = layoutManager.findFirstVisibleItemPosition()
+        val listItemCount = layoutManager.itemCount
+
+        if (visibleItemCount + pastVisibleItems >= listItemCount && !isLoading) {
+            if (total < 0 || total > listItemCount)// total 알수 없을 때 or total 보다 data count 작을 경우 스크롤 가능으로 판단
+                isScrolled(true)
+        }
     }
 
     // dot indicator 세팅

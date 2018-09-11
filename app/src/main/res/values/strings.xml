@@ -30,9 +30,11 @@
     <string name="popularity_rate">인기율</string>
 
     <!-- TODO: Dialog Message -->
-    <string name="end_confirm_timer">인증 요청시간을 초과하었습니다</string>
-    <string name="login_dialog">로그인하시겠어요?</string>
-    <string name="login_dialog2">슬랩의 모든 서비스를 이용할 수 있습니다</string>
+    <string name="dial_end_confirm_timer">인증 요청시간을 초과하었습니다</string>
+    <string name="dial_login_dialog">로그인하시겠어요?</string>
+    <string name="dial_login_dialog2">슬랩의 모든 서비스를 이용할 수 있습니다</string>
+    <string name="dial_add_topic">반려동물을 추가하시겠어요?</string>
+    <string name="dial_add_topic2">관심있을 제품을 소개해드립니다</string>
 
     <!-- TODO: OnBoarding -->
     <string name="skip_onBoarding">건너뛰기</string>
@@ -60,8 +62,6 @@
     <string name="no_following_user">아직 팔로우한 회원이 없어요</string>
     <string name="do_follow">팔로우 하기</string>
     <string name="question_match_toast">반려동물을 추가하면"\n"제품을 소개해드립니다</string>
-    <string name="is_add_topic">반려동물을 추가하시겠어요?</string>
-    <string name="is_add_topic2">관심있을 제품을 소개해드립니다</string>
     <string name="can_use_after_login">로그인 후 이용할 수 있습니다</string>
     <string name="no_following_post">업로드된 포스트가 아직 없어요</string>
     <string name="go_login">로그인 하기</string>

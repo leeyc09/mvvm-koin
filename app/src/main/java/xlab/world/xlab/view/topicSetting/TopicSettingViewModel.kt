@@ -9,15 +9,17 @@ import xlab.world.xlab.utils.support.MessageConstants
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.view.AbstractViewModel
+import xlab.world.xlab.view.SingleLiveEvent
 
 class TopicSettingViewModel(private val apiPet: ApiPetProvider,
                             private val networkCheck: NetworkCheck,
                             private val scheduler: SchedulerProvider): AbstractViewModel() {
     val tag = "TopicSetting"
 
+    val loadUserPetsListDataEvent = SingleLiveEvent<LoadUserPetsListDataEvent>()
     val uiData = MutableLiveData<UIModel>()
 
-    fun loadUserPetList(userId: String, page: Int) {
+    fun loadUserPetsData(userId: String, page: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT))
@@ -25,11 +27,11 @@ class TopicSettingViewModel(private val apiPet: ApiPetProvider,
         }
 
         uiData.value = UIModel(isLoading = true)
+        loadUserPetsListDataEvent.value = LoadUserPetsListDataEvent(isLoading = true)
         launch {
             apiPet.getUserPetList(scheduler = scheduler, userId = userId, page = page,
                     responseData = {
-                        PrintLog.d("getUserPetList success", "", tag)
-                        val topicSettingData = TopicSettingData(nextPage = page + 1)
+                        val topicSettingData = TopicSettingData(total = it.total, nextPage = page + 1)
                         it.petsData?.forEach { petData ->
                             topicSettingData.items.add(TopicSettingListData(
                                     isHidden = petData.isHidden,
@@ -40,6 +42,7 @@ class TopicSettingViewModel(private val apiPet: ApiPetProvider,
                             ))
                         }
 
+                        PrintLog.d("getUserPetList success", topicSettingData.toString(), tag)
                         uiData.value = UIModel(isLoading = false, petData = topicSettingData)
                     },
                     errorData = { errorData ->
@@ -51,7 +54,7 @@ class TopicSettingViewModel(private val apiPet: ApiPetProvider,
         }
     }
 
-    fun changeTopicToggle(authorization: String, petId: String, position: Int) {
+    fun changeTopicToggle(authorization: String, position: Int, topicData: TopicSettingListData) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT))
@@ -60,9 +63,10 @@ class TopicSettingViewModel(private val apiPet: ApiPetProvider,
 
         uiData.value = UIModel(isLoading = true)
         launch {
-            apiPet.updateTopicHidden(scheduler = scheduler, authorization = authorization, petId = petId,
+            apiPet.updateTopicHidden(scheduler = scheduler, authorization = authorization, petId = topicData.topicId,
                     responseData = {
-                        uiData.value = UIModel(isLoading = false, topicToggleData = TopicToggleData(position = position, result = it.isHidden))
+                        topicData.isHidden = it.isHidden
+                        uiData.value = UIModel(isLoading = false, topicPosition = position)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
@@ -74,5 +78,6 @@ class TopicSettingViewModel(private val apiPet: ApiPetProvider,
     }
 }
 
-data class TopicToggleData(val position: Int, val result: Boolean)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val petData: TopicSettingData? = null, val topicToggleData: TopicToggleData? = null)
+data class LoadUserPetsListDataEvent(val isLoading: Boolean? = null)
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val petData: TopicSettingData? = null,
+                   val topicPosition: Int? = null)

@@ -19,15 +19,14 @@ import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.data.response.ResUserLoginData
+import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 
 class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
     private val registerViewModel: RegisterViewModel by viewModel()
-    private val viewFunction: ViewFunction by inject()
     private val letterOrDigitInputFilter: LetterOrDigitInputFilter by inject()
-    private val runActivity: RunActivity by inject()
 
     private var resultCode = Activity.RESULT_CANCELED
 
@@ -36,29 +35,8 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
 
-    private val clickPolicy1 = object: ClickableSpan() {
-        override fun onClick(widget: View?) {
-            PrintLog.d("click", "policy1")
-            runActivity.defaultWebViewActivity(context = this@SocialRegisterActivity, pageTitle = getString(R.string.inquiry_under3),
-                    webUrl =  AppConstants.LOCAL_HTML_URL + "clause.html", zoomControl = true)
-        }
+    private lateinit var defaultListener: DefaultListener
 
-        override fun updateDrawState(ds: TextPaint) {
-            super.updateDrawState(ds)
-            ds.color = ResourcesCompat.getColor(resources, R.color.color6D6D6D, null)
-        }
-    }
-    private val clickPolicy2 = object: ClickableSpan() {
-        override fun onClick(widget: View?) {
-            runActivity.defaultWebViewActivity(context = this@SocialRegisterActivity, pageTitle = getString(R.string.inquiry_under2),
-                    webUrl =  AppConstants.LOCAL_HTML_URL + "personalInfo.html", zoomControl = true)
-        }
-
-        override fun updateDrawState(ds: TextPaint) {
-            super.updateDrawState(ds)
-            ds.color = ResourcesCompat.getColor(resources, R.color.color6D6D6D, null)
-        }
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_social_register)
@@ -72,7 +50,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
 
     override fun onPause() {
         // 엑티비티 멈출때 키보드 숨기
-        viewFunction.hideKeyboard(context = this, view = mainLayout)
+        ViewFunction.hideKeyboard(context = this, view = mainLayout)
         super.onPause()
     }
 
@@ -87,6 +65,9 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
+        // listener 초기화
+        defaultListener = DefaultListener(context = this)
+
         actionBarTitle.visibility = View.GONE
         actionBtn.visibility = View.GONE
 
@@ -96,7 +77,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         // 닉네임 숫자 or 문자만 가능하게
         editTextNick.filters = arrayOf(letterOrDigitInputFilter)
 
-        registerViewModel.contentTextSet(policy1 = clickPolicy1, policy2 = clickPolicy2)
+        registerViewModel.contentTextSet(policy1 = defaultListener.clausePolicyListener, policy2 = defaultListener.personalInfoPolicyListener)
     }
 
     private fun onBindEvent() {
@@ -105,19 +86,19 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         editTextNick.setOnTouchListener(this) // 닉네임 지우기
 
         // 키보드 보일때만 완료 버튼 보이기
-        viewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
+        ViewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
             layoutPopUp.visibility = visibility
         }
 
         // 닉네임 지우기 이미지 활성화 이벤트
-        viewFunction.onFocusChange(editText = editTextNick) { hasFocus ->
+        ViewFunction.onFocusChange(editText = editTextNick) { hasFocus ->
             editTextNick.setCompoundDrawablesWithIntrinsicBounds(0,0,
                     if (hasFocus) R.drawable.textdelete_black
                     else 0,0)
         }
 
         // 닉네임 입력 이벤트
-        viewFunction.onTextChange(editText = editTextNick) { _ ->
+        ViewFunction.onTextChange(editText = editTextNick) { _ ->
             registerViewModel.nickNameRegexCheck(nickName = getNickNameText())
         }
     }
@@ -169,7 +150,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
                     finish()
                 }
                 R.id.finishBtn -> { // 회원가입 완료 버튼
-                    viewFunction.hideKeyboard(context = this, view = v)
+                    ViewFunction.hideKeyboard(context = this, view = v)
                     registerViewModel.requestRegister(loginType = userData.loginType, email = userData.email,
                             password = "", nickName = getNickNameText(), socialId = userData.socialID)
                 }
@@ -181,7 +162,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         v?.let {
             when (v.id) {
                 R.id.editTextNick -> { // 닉네임 지우기
-                    viewFunction.onDrawableTouch(v as EditText, event!!) { isTouch ->
+                    ViewFunction.onDrawableTouch(v as EditText, event!!) { isTouch ->
                         if (isTouch) {
                             v.setText("")
                             v.performClick()
@@ -189,7 +170,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
                     }
                 }
 //                R.id.scrollView -> { // 키보드 숨기기
-//                    viewFunction.hideKeyboard(context = this, view = v)
+//                    ViewFunction.hideKeyboard(context = this, view = v)
 //                }
             }
         }

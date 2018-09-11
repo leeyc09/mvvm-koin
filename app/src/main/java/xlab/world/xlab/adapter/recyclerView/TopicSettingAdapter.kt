@@ -17,18 +17,31 @@ import xlab.world.xlab.data.adapter.TopicSettingData
 import xlab.world.xlab.data.adapter.TopicSettingListData
 
 class TopicSettingAdapter(private val context: Context,
-                          private val topicSettingData: TopicSettingData,
                           private val topicToggleListener: View.OnClickListener) : RecyclerView.Adapter<TopicSettingAdapter.ViewHolder>() {
+
+    private val topicSettingData: TopicSettingData = TopicSettingData()
+    var dataLoading: Boolean
+        get() = this.topicSettingData.isLoading
+        set(value) { this.topicSettingData.isLoading = value }
+    var dataTotal: Int = -1
+        get() = this.topicSettingData.total
+    var dataNextPage: Int = 1
+        get() = this.topicSettingData.nextPage
 
     private val glideOption = RequestOptions()
             .circleCrop()
             .placeholder(R.drawable.profile_image_default)
             .error(R.drawable.profile_image_default)
 
+    fun getItem(position: Int): TopicSettingListData {
+        return topicSettingData.items[position]
+    }
+
     fun updateData(topicSettingData: TopicSettingData) {
         this.topicSettingData.items.clear()
         this.topicSettingData.items.addAll(topicSettingData.items)
 
+        this.topicSettingData.isLoading = false
         this.topicSettingData.total = topicSettingData.total
         this.topicSettingData.nextPage = 2
 
@@ -39,6 +52,7 @@ class TopicSettingAdapter(private val context: Context,
         val size: Int = itemCount
         this.topicSettingData.items.addAll(topicSettingData.items)
 
+        this.topicSettingData.isLoading = false
         this.topicSettingData.nextPage += 1
 
         notifyItemRangeChanged(size, itemCount)
@@ -52,11 +66,7 @@ class TopicSettingAdapter(private val context: Context,
 
     override
     fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (holder is ViewHolderBind) {
-            holder.display(item = topicSettingData.items[position],
-                    topicToggleListener = topicToggleListener,
-                    position = position)
-        }
+        holder.display(item = topicSettingData.items[position], position = position)
     }
 
     override
@@ -70,7 +80,7 @@ class TopicSettingAdapter(private val context: Context,
         private val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
         private val topicToggleBtn: ImageView = view.findViewById(R.id.topicToggleBtn)
 
-        override fun display(item: TopicSettingListData, topicToggleListener: View.OnClickListener, position: Int) {
+        override fun display(item: TopicSettingListData, position: Int) {
             // topic 이미지
             Glide.with(context)
                     .load(item.topicImage)
@@ -89,6 +99,6 @@ class TopicSettingAdapter(private val context: Context,
     }
 
     abstract class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        abstract fun display(item: TopicSettingListData, topicToggleListener: View.OnClickListener, position: Int)
+        abstract fun display(item: TopicSettingListData, position: Int)
     }
 }

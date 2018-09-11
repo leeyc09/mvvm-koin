@@ -10,7 +10,6 @@ import kotlinx.android.synthetic.main.fragment_email_confirm.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
-import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultOneDialog
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
@@ -20,7 +19,6 @@ import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
 
 class EmailConfirmFragment: Fragment(), View.OnClickListener {
     private val resetPasswordViewModel: ResetPasswordViewModel by viewModel()
-    private val viewFunction: ViewFunction by inject()
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
@@ -49,7 +47,7 @@ class EmailConfirmFragment: Fragment(), View.OnClickListener {
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = context!!)
         progressDialog = DefaultProgressDialog(context = context!!)
-        timeOverDialog = DefaultOneDialog(context = context!!, text = getString(R.string.end_confirm_timer), listener = null)
+        timeOverDialog = DefaultOneDialog(context = context!!, text = getString(R.string.dial_end_confirm_timer), listener = null)
     }
 
     private fun onBindEvent() {
@@ -57,7 +55,7 @@ class EmailConfirmFragment: Fragment(), View.OnClickListener {
         nextBtn.setOnClickListener(this) // 인증번호 확인 버튼
 
         // 다음버튼 활성화
-        viewFunction.onTextChange(editText = editTextCode) { code ->
+        ViewFunction.onTextChange(editText = editTextCode) { code ->
             nextBtn.isEnabled = code.length == 6
         }
     }

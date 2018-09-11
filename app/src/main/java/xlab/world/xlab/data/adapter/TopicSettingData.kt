@@ -4,4 +4,9 @@ import java.io.Serializable
 
 data class TopicSettingData(var total:Int = -1,
                             var nextPage: Int = 1,
-                            val items: ArrayList<TopicSettingListData> = ArrayList()): Serializable
+                            var isLoading: Boolean = true,
+                            val items: ArrayList<TopicSettingListData> = ArrayList()): Serializable {
+    override fun toString(): String {
+        return "total: $total / nextPage: $nextPage / isLoading: $isLoading / items.size: ${items.size}"
+    }
+}

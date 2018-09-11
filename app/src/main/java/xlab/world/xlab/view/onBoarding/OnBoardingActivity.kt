@@ -21,9 +21,7 @@ import xlab.world.xlab.view.onBoarding.fragment.OnBoardingFragment
 
 class OnBoardingActivity : AppCompatActivity(), View.OnClickListener {
 
-    private val viewFunction: ViewFunction by inject()
     private val spHelper: SPHelper by inject()
-    private val runActivity: RunActivity by inject()
 
     private lateinit var viewPagerAdapter: ViewStatePagerAdapter
     private lateinit var firstFragment: OnBoardingFragment
@@ -58,14 +56,14 @@ class OnBoardingActivity : AppCompatActivity(), View.OnClickListener {
         // link tab layout with view pager
         tabLayoutDot.setupWithViewPager(viewPager, true)
         val marginDIP = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, resources.displayMetrics).toInt()
-        viewFunction.setDotIndicator(tabLayoutDot = tabLayoutDot, marginDIP = marginDIP)
+        ViewFunction.setDotIndicator(tabLayoutDot = tabLayoutDot, marginDIP = marginDIP)
     }
 
     private fun onBindEvent() {
         skipBtn.setOnClickListener(this) // 건너뛰기
         startBtn.setOnClickListener(this) // 시작하기
 
-        viewFunction.onViewPagerChangePosition(viewPager = viewPager) { position ->
+        ViewFunction.onViewPagerChangePosition(viewPager = viewPager) { position ->
             // 마지막 페이지일 경우 시작하기 버튼 보여주기
             if (position == viewPagerAdapter.count - 1) {
                 skipBtn.visibility = View.INVISIBLE
@@ -89,7 +87,7 @@ class OnBoardingActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 R.id.startBtn -> { // 시작하기 -> 로그인 화면
                     spHelper.onBoard = true
-                    runActivity.loginActivity(context = this, isComePreLoadActivity = true, linkData = null)
+                    RunActivity.loginActivity(context = this, isComePreLoadActivity = true, linkData = null)
                     finish()
                 }
             }

@@ -16,4 +16,18 @@ object AppConstants {
     const val ADAPTER_HEADER = 0
     const val ADAPTER_CONTENT = 1
     const val ADAPTER_FOOTER = 2
+
+    // feed type
+    const val FEED_GOODS = 0
+    const val FEED_POST = 1
+    const val FEED_AD = 2
+
+    // post type
+    const val POSTS_IMAGE = 0
+    const val POSTS_VIDEO = 1
+    const val POSTS_YOUTUBE_LINK = 2
+
+    // tag sign
+    const val HASH_TAG_SIGN = '#'
+    const val USER_TAG_SIGN = '@'
 }
