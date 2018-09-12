@@ -22,6 +22,7 @@ import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.main.MainViewModel
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
+import xlab.world.xlab.view.postDetail.PostDetailViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
 import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
 import xlab.world.xlab.view.topicSetting.TopicSettingViewModel
@@ -30,24 +31,26 @@ import java.util.concurrent.TimeUnit
 /**
  *  Koin main module
  */
-val baseModule: Module = applicationContext {
-    // provided rx scheduler
-    bean { ApplicationSchedulerProvider() as SchedulerProvider }
+val viewModelModule: Module = applicationContext {
     // ViewModel for OnBoarding View
     viewModel { OnBoardingViewModel(scheduler = get()) }
     // ViewModel for Login View
     viewModel { LoginViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Register View
     viewModel { RegisterViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
-    // ViewModel for reset password
+    // ViewModel for Reset Password View
     viewModel { ResetPasswordViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
-    // ViewModel for main
+    // ViewModel for Main(Feed) View
     viewModel { MainViewModel(apiPost = get(), apiShop = get(), networkCheck = get(), scheduler = get()) }
-    // ViewModel for Topic Setting
+    // ViewModel for Topic Setting View
     viewModel { TopicSettingViewModel(apiPet = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Post Detail View
+    viewModel { PostDetailViewModel(apiPost = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
+    // provided rx scheduler
+    bean { ApplicationSchedulerProvider() as SchedulerProvider }
     // provided network check
     bean { NetworkCheck(context = get()) }
     // provided shared preference
@@ -89,4 +92,4 @@ val remoteModule: Module = applicationContext {
 /**
  * Module list
  */
-val appModule = listOf(baseModule, utilModule, remoteModule)
+val appModule = listOf(viewModelModule, utilModule, remoteModule)

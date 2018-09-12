@@ -2,6 +2,7 @@ package xlab.world.xlab.utils.view.dialog
 
 import android.app.Activity
 import xlab.world.xlab.R
+import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.RequestCodeData
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.view.login.LoginActivity
@@ -27,5 +28,14 @@ object DialogCreator {
                         RunActivity.petEditActivity(context = context, petPage = 1, petId = null)
                     }
                 })
+    }
+
+    fun postMoreDialog(context: Activity, firstText: String?, firstColor: Int?,
+                       secondText: String?, secondColor: Int?, listener: TwoSelectBottomDialog.Listener): TwoSelectBottomDialog {
+        val dialog = TwoSelectBottomDialog.newDialog(firstText = firstText, firstColor = firstColor,
+                secondText = secondText, secondColor = secondColor)
+        dialog.handle(listener = listener)
+
+        return dialog
     }
 }

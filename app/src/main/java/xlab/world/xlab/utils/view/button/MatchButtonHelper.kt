@@ -1,17 +1,25 @@
 package xlab.world.xlab.utils.view.button
 
+import android.app.Activity
 import android.content.Context
 import android.view.View
 import android.widget.*
+import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
+import xlab.world.xlab.utils.support.RunActivity
+import xlab.world.xlab.utils.support.SPHelper
+import xlab.world.xlab.utils.view.dialog.DialogCreator
 
 class MatchButtonHelper (rootView: View,
+                         private val context: Activity,
                          private var isMatchShow: Boolean,
                          private val listener: Listener): View.OnClickListener {
 
+    private val spHelper: SPHelper by context.inject()
+    private val loginDialog = DialogCreator.loginDialog(context = context)
+
     interface Listener {
-        fun onMatchSetting()
-        fun isSelectedMatchBtn(isSelected: Boolean)
+        fun matchVisibility(visibility: Int)
     }
 
     private lateinit var matchSettingBtn: FrameLayout
@@ -40,12 +48,19 @@ class MatchButtonHelper (rootView: View,
         v?.let {
             when (v.id) {
                 R.id.matchSettingBtn -> { // 매칭률 설정 버튼
-                    listener.onMatchSetting()
+                    if (spHelper.accessToken.isEmpty()) {
+                        loginDialog.show()
+                        return
+                    }
+                    RunActivity.topicSettingActivity(context = context)
                 }
                 R.id.matchBtn -> { // 매칭률 버튼
                     isMatchShow = !isMatchShow
                     matchButtonChange(isMatchShow)
-                    listener.isSelectedMatchBtn(matchSettingBtn.isSelected)
+                    listener.matchVisibility(
+                            if (matchSettingBtn.isSelected) View.VISIBLE // show match percent
+                            else View.GONE // hide match percent
+                    )
                 }
             }
         }

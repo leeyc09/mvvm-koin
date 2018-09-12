@@ -1,6 +1,7 @@
 package xlab.world.xlab.utils.listener
 
 import android.app.Activity
+import android.support.v4.app.FragmentManager
 import android.support.v4.content.res.ResourcesCompat
 import android.text.TextPaint
 import android.text.style.ClickableSpan
@@ -18,6 +19,8 @@ import xlab.world.xlab.utils.view.toast.DefaultToast
 class DefaultListener(private val context: Activity) {
 
     private val spHelper: SPHelper by context.inject()
+
+    private val suggestAddTopicDialog = DialogCreator.suggestAddTopicDialog(context = context)
 
     // 이용 약관 터치
     val clausePolicyListener = object: ClickableSpan() {
@@ -51,7 +54,7 @@ class DefaultListener(private val context: Activity) {
         if (spHelper.accessToken == "") { // guest mode
             defaultToast.showToast(context.resources.getString(R.string.question_match_toast))
         } else {
-            DialogCreator.suggestAddTopicDialog(context = context).show()
+            suggestAddTopicDialog.show()
         }
     }
 
@@ -96,7 +99,6 @@ class DefaultListener(private val context: Activity) {
             RunActivity.postDetailActivity(context = context, postId = view.tag as String, goComment = true)
         }
     }
-
 //    private val loginDialog = DefaultDialog(activity,
 //            activity.resources.getString(R.string.is_login_service),
 //            activity.resources.getString(R.string.is_login_service2),

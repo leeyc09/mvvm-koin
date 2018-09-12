@@ -189,7 +189,7 @@ class PostDetailAdapter(private val context: Context,
             } else {
                 moreBtn.visibility = View.VISIBLE
 
-                moreBtn.tag = position
+                moreBtn.tag = item.postId
                 moreBtn.setOnClickListener(moreListener)
             }
 

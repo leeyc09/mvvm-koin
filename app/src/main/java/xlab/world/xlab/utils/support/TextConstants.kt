@@ -25,4 +25,6 @@ object TextConstants {
     const val CATEGORY_LIVING_CODE = "PBA02"
     const val CATEGORY_FASHION_CODE = "PBA03"
     const val CATEGORY_FOOD_CODE = "PBA01"
+
+    const val NO_EXIST_POST = "존재하지 않는 포스트입니다"
 }

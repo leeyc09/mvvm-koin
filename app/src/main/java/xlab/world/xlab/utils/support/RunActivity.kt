@@ -7,6 +7,7 @@ import xlab.world.xlab.utils.view.dialog.DialogCreator
 import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
+import xlab.world.xlab.view.postDetail.PostDetailActivity
 import xlab.world.xlab.view.register.LocalRegisterActivity
 import xlab.world.xlab.view.register.SocialRegisterActivity
 import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
@@ -51,18 +52,14 @@ object RunActivity {
         context.startActivity(intent)
     }
 
-    fun topicSettingActivity(context: Activity, isGuest: Boolean) {
-        if (isGuest) {
-            DialogCreator.loginDialog(context = context).show()
-            return
-        }
-
+    fun topicSettingActivity(context: Activity) {
         val intent = TopicSettingActivity.newIntent(context = context)
         context.startActivityForResult(intent, RequestCodeData.TOPIC_SETTING)
     }
 
     fun postDetailActivity(context: Activity, postId: String, goComment: Boolean) {
-        PrintLog.d("Run", "PostDetail", tag)
+        val intent = PostDetailActivity.newIntent(context= context, postId = postId, goComment = goComment)
+        context.startActivityForResult(intent, RequestCodeData.POST_DETAIL)
     }
 
     fun postCommentActivity(context: Activity, postId: String) {

@@ -53,17 +53,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
     private val matchButtonListener = object: MatchButtonHelper.Listener {
-        override fun onMatchSetting() {
-            RunActivity.topicSettingActivity(context = this@MainActivity, isGuest = spHelper.accessToken.isEmpty())
-
-        }
-        override fun isSelectedMatchBtn(isSelected: Boolean) {
-            val matchVisibility =
-                    if (isSelected) View.VISIBLE // show match percent
-                    else View.GONE // hide match percent
-
-            feedAllFragment.matchVisibleChange(matchVisibility)
-            feedShopFragment.matchVisibleChange(matchVisibility)
+        override fun matchVisibility(visibility: Int) {
+            feedAllFragment.matchVisibleChange(visibility)
+            feedShopFragment.matchVisibleChange(visibility)
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,11 +80,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
         when (resultCode) {
             Activity.RESULT_OK -> {
-//                when (requestCode) {
+                when (requestCode) {
 //                    RequestCodeData.POST_COMMENT, // 댓글
-//                    RequestCodeData.POST_DETAIL -> {  // 포스트 상세
-//                        followingFragment.initFeedFollowingData {  }
-//                    }
+                    RequestCodeData.POST_DETAIL -> {  // 포스트 상세
+                        feedFollowingFragment.reloadFeedData()
+                    }
 //                    RequestCodeData.TOPIC_ADD, // 토픽 추가
 //                    RequestCodeData.COMBINATION_SEARCH , // 통합 검색
 //                    RequestCodeData.TAG_POST, // 포스트 태그 검색
@@ -110,7 +102,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 //                    }
 //                    RequestCodeData.POST_UPLOAD -> { // 포스트 업로드
 //                    }
-//                }
+                }
             }
             ResultCodeData.LOAD_OLD_DATA -> { // notification dot reload
 //                if (SPHelper(this).accessToken != "") {
@@ -165,13 +157,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 selectFont = fontColorSpan.notoBold000000,
                 unSelectFont = fontColorSpan.notoBoldBFBFBF,
                 extraData = null)
-        tabLayoutHelper.addTab(tabName = resources.getString(R.string.following), tabLayout = null, selectFont = null, unSelectFont = null, extraData = null)
-        tabLayoutHelper.addTab(tabName = resources.getString(R.string.explore), tabLayout = null, selectFont = null, unSelectFont = null, extraData = null)
-        tabLayoutHelper.addTab(tabName = resources.getString(R.string.shop), tabLayout = null, selectFont = null, unSelectFont = null, extraData = null)
+        tabLayoutHelper.addTab(tabName = getString(R.string.following), tabLayout = null, selectFont = null, unSelectFont = null, extraData = null)
+        tabLayoutHelper.addTab(tabName = getString(R.string.explore), tabLayout = null, selectFont = null, unSelectFont = null, extraData = null)
+        tabLayoutHelper.addTab(tabName = getString(R.string.shop), tabLayout = null, selectFont = null, unSelectFont = null, extraData = null)
         tabLayoutHelper.changeSelectedTab(selectIndex = 0)
 
         // match button 초기화
-        matchButtonHelper = MatchButtonHelper(rootView = matchBtnLayout,
+        matchButtonHelper = MatchButtonHelper(
+                context = this,
+                rootView = matchBtnLayout,
                 isMatchShow = true,
                 listener = matchButtonListener)
     }

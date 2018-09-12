@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/colorFFFFFF"
+    android:paddingTop="8dp">
+
+    <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+        android:id="@+id/firstBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:textColor="@color/color000000"
+        android:paddingTop="16.5dp"
+        android:paddingBottom="15.5dp"/>
+
+    <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+        android:id="@+id/secondBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:textColor="@color/colorDE5359"
+        android:paddingTop="16.5dp"
+        android:paddingBottom="15.5dp"/>
+    
+    <View
+        android:id="@+id/divideView"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/colorBFBFBF"
+        android:layout_marginTop="8dp"/>
+
+    <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+        android:id="@+id/cancelBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/cancel"
+        android:textSize="14sp"
+        android:textColor="@color/colorA4A4A4"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"/>
+
+</LinearLayout>

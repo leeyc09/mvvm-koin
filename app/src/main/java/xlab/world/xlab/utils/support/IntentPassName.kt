@@ -8,4 +8,6 @@ object IntentPassName {
     const val PAGE_TITLE = "PAGE_TITLE"
     const val WEB_URL = "WEB_URL"
     const val WEB_ZOOM_CONTROL = "WEB_ZOOM_CONTROL"
+    const val POST_ID = "POST_ID"
+    const val GO_COMMENT = "GO_COMMENT"
 }
