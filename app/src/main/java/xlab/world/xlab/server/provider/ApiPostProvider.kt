@@ -15,6 +15,10 @@ interface ApiPostProvider {
     // following feed 가져오기
     fun getFollowingFeed(scheduler: SchedulerProvider, authorization: String, page: Int,
                          responseData: (ResDetailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // explore feed 가져오기
+    fun getExploreFeed(scheduler: SchedulerProvider, authorization: String, page: Int,
+                       responseData: (ResFeedData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
@@ -32,6 +36,17 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun getFollowingFeed(scheduler: SchedulerProvider, authorization: String, page: Int,
                                   responseData: (ResDetailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.getFollowingFeed(authorization = authorization, page = page)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun getExploreFeed(scheduler: SchedulerProvider, authorization: String, page: Int,
+                                responseData: (ResFeedData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iPostRequest.getExploreFeed(authorization = authorization, page = page)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

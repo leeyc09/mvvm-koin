@@ -1,5 +1,7 @@
 package xlab.world.xlab.utils.support
 
+import java.text.DecimalFormat
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -57,5 +59,13 @@ object SupportData {
     fun countFormat(count: Int): String {
         return if (count < 1000) count.toString()
         else String.format("%.1fk", (count / 1000).toFloat()) // if count more than 1000, show ?k
+    }
+
+
+    // 원화 표기
+    fun applyPriceFormat(price: Int): String {
+        val priceFormat = NumberFormat.getInstance(Locale.KOREA) as DecimalFormat
+        priceFormat.applyPattern("#,###,###,###")
+        return priceFormat.format(price)
     }
 }

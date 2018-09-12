@@ -24,7 +24,7 @@ object DialogCreator {
                 textRegular = context.resources.getString(R.string.dial_add_topic2),
                 listener = object: DefaultDialog.Listener {
                     override fun onOkayTouch(tag: Any?) {
-                        RunActivity.PetEditActivity(context = context, petPage = 1, petId = null)
+                        RunActivity.petEditActivity(context = context, petPage = 1, petId = null)
                     }
                 })
     }

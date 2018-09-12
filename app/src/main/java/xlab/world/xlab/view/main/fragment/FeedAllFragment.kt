@@ -31,9 +31,12 @@ class FeedAllFragment: Fragment() {
     private var needInitData
         get() = arguments?.getBoolean("needInitData") ?: true
         set(value) {
-            val args = Bundle()
-            args.putBoolean("needInitData", value)
-            arguments = args
+            arguments?.putBoolean("needInitData", value)
+        }
+    private var matchVisibility
+        get() = arguments?.getInt("matchVisibility") ?: View.VISIBLE
+        set(value) {
+            arguments?.putInt("matchVisibility", value)
         }
 
     private var allFeedAdapter: AllFeedAdapter? = null
@@ -66,7 +69,8 @@ class FeedAllFragment: Fragment() {
         allFeedAdapter = allFeedAdapter ?: AllFeedAdapter(context = context!!,
                 postListener = defaultListener!!.postListener,
                 goodsListener = defaultListener!!.goodsListener,
-                questionListener = defaultListener!!.questionMatchListener)
+                questionListener = defaultListener!!.questionMatchListener,
+                matchVisible = matchVisibility)
         recyclerView.adapter = allFeedAdapter
         val gridLayoutManager = GridLayoutManager(context, 3, GridLayoutManager.VERTICAL, false)
         gridLayoutManager.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
@@ -146,7 +150,9 @@ class FeedAllFragment: Fragment() {
     }
 
     fun matchVisibleChange(visibility: Int) {
-        allFeedAdapter?.changeMatchVisible(visibility)
+        context?.let {
+            allFeedAdapter?.changeMatchVisible(visibility)
+        } ?:let { matchVisibility = visibility }
     }
 
     fun reloadFeedData() {
@@ -161,6 +167,7 @@ class FeedAllFragment: Fragment() {
 
             val args = Bundle()
             args.putBoolean("needInitData", true)
+            args.putInt("matchVisibility", View.VISIBLE)
             fragment.arguments = args
 
             return fragment

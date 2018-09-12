@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xlab.world.xlab.utils.view.cardView.SquareCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="88dp"
+    android:layout_height="match_parent"
+    app:cardElevation="0dp"
+    app:cardCornerRadius="0dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:id="@+id/mainLayout">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/goods_circle_overlay"/>
+
+</xlab.world.xlab.utils.view.cardView.SquareCardView>

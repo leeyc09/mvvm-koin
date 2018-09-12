@@ -15,6 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import xlab.world.xlab.server.*
 import xlab.world.xlab.server.`interface`.IPetRequest
 import xlab.world.xlab.server.`interface`.IPostRequest
+import xlab.world.xlab.server.`interface`.IShopRequest
 import xlab.world.xlab.server.`interface`.IUserRequest
 import xlab.world.xlab.server.provider.*
 import xlab.world.xlab.utils.font.FontColorSpan
@@ -41,7 +42,7 @@ val baseModule: Module = applicationContext {
     // ViewModel for reset password
     viewModel { ResetPasswordViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for main
-    viewModel { MainViewModel(apiPost = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { MainViewModel(apiPost = get(), apiShop = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Topic Setting
     viewModel { TopicSettingViewModel(apiPet = get(), networkCheck = get(), scheduler = get()) }
 }
@@ -59,24 +60,30 @@ val utilModule: Module = applicationContext {
     bean { LetterOrDigitInputFilter() }
 }
 
+const val xlabRemoteBaseUrl = ApiURL.XLAB_API_URL_SSL
 val remoteModule: Module = applicationContext {
     // provided web components
     bean { createOkHttpClient() }
 
     // user api interface
-    bean { createRetrofit<IUserRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL) }
+    bean { createRetrofit<IUserRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
     // user api implement
     bean { ApiUser(iUserRequest = get()) as ApiUserProvider }
 
     // pet api interface
-    bean { createRetrofit<IPetRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL) }
+    bean { createRetrofit<IPetRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
     // pet api implement
     bean { ApiPet(iPetRequest = get()) as ApiPetProvider }
 
     // post api interface
-    bean { createRetrofit<IPostRequest>(client = get(), baseUrl = ApiURL.XLAB_API_URL) }
+    bean { createRetrofit<IPostRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
     // post api implement
     bean { ApiPost(iPostRequest = get()) as ApiPostProvider }
+
+    // shop api interface
+    bean { createRetrofit<IShopRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
+    // shop api implement
+    bean { ApiShop(iShopRequest = get()) as ApiShopProvider }
 }
 
 /**

@@ -58,13 +58,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         }
         override fun isSelectedMatchBtn(isSelected: Boolean) {
-            PrintLog.d("matchButtonListener", "isSelectedMatchBtn: " + isSelected.toString(), "Main")
             val matchVisibility =
                     if (isSelected) View.VISIBLE // show match percent
                     else View.GONE // hide match percent
 
             feedAllFragment.matchVisibleChange(matchVisibility)
-//            shopFragment.matchVisibleChange(matchVisibility)
+            feedShopFragment.matchVisibleChange(matchVisibility)
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,6 +75,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         onBindEvent()
 
         observeViewModel()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        ViewFunction.hideKeyboard(context = this, view = mainLayout)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -179,6 +183,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         ViewFunction.onViewPagerChangePosition(viewPager = viewPager) { position ->
             tabLayoutHelper.changeSelectedTab(selectIndex = position)
+            ViewFunction.hideKeyboard(context = this, view = mainLayout)
         }
     }
 
@@ -196,6 +201,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private fun reloadAllData() {
         feedAllFragment.reloadFeedData()
         feedFollowingFragment.reloadFeedData()
+        feedExploreFragment.reloadFeedData()
+        feedShopFragment.reloadFeedData()
     }
 
     companion object {

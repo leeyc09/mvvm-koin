@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/colorFFFFFF"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:gravity="end"
+    android:paddingTop="28dp"
+    android:paddingBottom="16dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorF5F5F5"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/search"
+            android:layout_marginStart="20dp"/>
+
+        <xlab.world.xlab.utils.view.editText.EditTextMediumNoto
+            android:id="@+id/editTextSearch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="text|textNoSuggestions"
+            android:hint="@string/search_item"
+            android:textSize="15sp"
+            android:textColor="@color/color000000"
+            android:textColorHint="@color/colorBFBFBF"
+            android:imeOptions="actionDone"
+            android:maxLines="1"
+            android:background="@android:color/transparent"
+            android:layout_gravity="center_vertical"
+            android:paddingTop="13dp"
+            android:paddingBottom="13dp"
+            android:layout_marginStart="6dp"/>
+
+        <ImageView
+            android:id="@+id/searchDeleteBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/textdelete_black"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="15dp"
+            android:visibility="invisible"/>
+
+    </LinearLayout>
+
+</LinearLayout>

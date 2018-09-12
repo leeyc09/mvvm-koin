@@ -28,6 +28,7 @@
     <string name="topic">토픽</string>
     <string name="add">추가</string>
     <string name="popularity_rate">인기율</string>
+    <string name="category">카테고리</string>
 
     <!-- TODO: Dialog Message -->
     <string name="dial_end_confirm_timer">인증 요청시간을 초과하었습니다</string>
@@ -262,10 +263,6 @@
 
     <!-- TODO: Shop-->
     <string name="all_category">전체 카테고리</string>
-    <string name="category">카테고리</string>
-    <string name="living">Living</string>
-    <string name="fashion">Fashion</string>
-    <string name="food">Food</string>
     <string name="search_item">제품 검색</string>
     <string name="group">분류</string>
     <string name="price">가격</string>

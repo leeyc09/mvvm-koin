@@ -30,4 +30,9 @@ object AppConstants {
     // tag sign
     const val HASH_TAG_SIGN = '#'
     const val USER_TAG_SIGN = '@'
+
+    // goods sort type
+    const val SORT_MATCH = 1
+    const val SORT_DOWN_PRICE = 2
+    const val SORT_UP_PRICE = 3
 }

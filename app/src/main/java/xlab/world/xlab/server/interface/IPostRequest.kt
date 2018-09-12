@@ -15,4 +15,8 @@ interface IPostRequest {
     @GET(ApiURL.POSTS_FOLLOWING)
     fun getFollowingFeed(@Header("Authorization") authorization: String,
                          @Query("page") page: Int): Observable<ResDetailPostsData>
+
+    @GET(ApiURL.POSTS_EXPLORE)
+    fun getExploreFeed(@Header("Authorization") authorization: String,
+                       @Query("page") page: Int): Observable<ResFeedData>
 }

@@ -1,6 +1,6 @@
 package xlab.world.xlab.utils.support
 
-object MessageConstants {
+object TextConstants {
     const val LOGIN_WRONG_EMAIL_PATTERN = "이메일 형식을 확인해 주세요"
     const val CHECK_NETWORK_CONNECT = "인터넷 연결을 확인해주세요"
 
@@ -17,4 +17,12 @@ object MessageConstants {
     const val DUPLICATE_NICK = "이미 사용중인 닉네임입니다."
 
     const val COMPLETE_CHANGE_PASSWORD = "비밀번호 재설정이 완료되었습니다"
+
+    const val CATEGORY_LIVING = "Living"
+    const val CATEGORY_FASHION = "Fashion"
+    const val CATEGORY_FOOD = "Food"
+
+    const val CATEGORY_LIVING_CODE = "PBA02"
+    const val CATEGORY_FASHION_CODE = "PBA03"
+    const val CATEGORY_FOOD_CODE = "PBA01"
 }

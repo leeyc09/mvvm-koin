@@ -61,15 +61,31 @@ object RunActivity {
         context.startActivityForResult(intent, RequestCodeData.TOPIC_SETTING)
     }
 
-    fun PostDetailActivity(context: Activity, postId: String) {
+    fun postDetailActivity(context: Activity, postId: String, goComment: Boolean) {
         PrintLog.d("Run", "PostDetail", tag)
     }
 
-    fun GoodsDetailActivity(context: Activity, goodsCd: String) {
+    fun postCommentActivity(context: Activity, postId: String) {
+        PrintLog.d("Run", "PostComment", tag)
+    }
+
+    fun goodsDetailActivity(context: Activity, goodsCd: String) {
         PrintLog.d("Run", "GoodsDetail", tag)
     }
 
-    fun PetEditActivity(context: Activity, petPage: Int, petId: String?) {
+    fun petEditActivity(context: Activity, petPage: Int, petId: String?) {
         PrintLog.d("Run", "PetEdit", tag)
+    }
+
+    fun profileActivity(context: Activity, userId: String) {
+        PrintLog.d("Run", "Profile", tag)
+    }
+
+    fun hashTagPostActivity(context: Activity, hashTag: String) {
+        PrintLog.d("Run", "HashTagPost", tag)
+    }
+
+    fun searchGoodsActivity(context: Activity, searchText: String, searchCode: String) {
+        PrintLog.d("Run", "SearchGoods", tag)
     }
 }

@@ -1,13 +1,18 @@
 package xlab.world.xlab.adapter.recyclerView
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.support.constraint.ConstraintLayout
 import android.support.design.widget.TabLayout
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v4.view.ViewPager
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -17,24 +22,26 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.viewPager.ViewImagePagerAdapter
-import xlab.world.xlab.data.adapter.AllFeedData
-import xlab.world.xlab.data.adapter.AllFeedListData
-import xlab.world.xlab.data.adapter.PostDetailData
-import xlab.world.xlab.data.adapter.PostDetailListData
+import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.utils.font.CustomFont
 import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.SupportData
 import xlab.world.xlab.utils.support.ViewFunction
+import xlab.world.xlab.utils.view.hashTag.HashTagHelper
+import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import java.util.ArrayList
 
 class PostDetailAdapter(private val context: Context,
+                        private val changeViewTypeListener: View.OnClickListener?,
                         private val profileListener: View.OnClickListener?,
                         private val followListener: View.OnClickListener?,
                         private val moreListener: View.OnClickListener?,
                         private val likePostListener: View.OnClickListener,
                         private val commentsListener: View.OnClickListener,
                         private val savePostListener: View.OnClickListener,
-                        private val sharePostListener: View.OnClickListener) : RecyclerView.Adapter<PostDetailAdapter.ViewHolder>() {
+                        private val sharePostListener: View.OnClickListener,
+                        private val hashTagListener: HashTagHelper.ClickListener,
+                        private val goodsListener: View.OnClickListener) : RecyclerView.Adapter<PostDetailAdapter.ViewHolder>() {
 
     private val postDetailData: PostDetailData = PostDetailData()
     var dataLoading: Boolean
@@ -45,7 +52,7 @@ class PostDetailAdapter(private val context: Context,
     var dataNextPage: Int = 1
         get() = this.postDetailData.nextPage
 
-    private val contentLine = 7
+    private val contentMaxLine = 7
     private val profileGlideOption = RequestOptions().circleCrop()
             .placeholder(R.drawable.profile_img_44)
             .error(R.drawable.profile_img_44)
@@ -252,9 +259,97 @@ class PostDetailAdapter(private val context: Context,
             sharePostLayout.setOnClickListener(sharePostListener)
 
             // post 내용
-            if (item.content.isEmpty()) {
+            if (item.content.isEmpty()) { // 내용 없는 경우
                 textViewContent.visibility = View.GONE
+            } else {
+                textViewContent.visibility = View.VISIBLE
+
+                textViewContent.setText(item.content, TextView.BufferType.SPANNABLE)
+                textViewContent.post {
+                    val lineCnt = textViewContent.lineCount
+                    if (lineCnt > contentMaxLine) { // 내용 줄 길이가 n(7) 줄 이상일 경우
+                        if (!item.showAllContent) {
+                            item.hideContent = true // 더보기 처리 체크
+                            textViewContent.maxLines = contentMaxLine
+
+                            val start = textViewContent.layout.getLineEnd(contentMaxLine - 2)
+                            val end = textViewContent.layout.getLineEnd(contentMaxLine - 1)
+                            val maxLineText = textViewContent.text.toString().substring(start, end)
+                            val minusCnt =
+                                    if (maxLineText.length > 6) 7
+                                    else 3
+
+                            val endLineCharCnt = textViewContent.layout.getLineEnd(contentMaxLine - 1)
+                            item.content = textViewContent.text.subSequence(0, endLineCharCnt - minusCnt).toString() + "... 더보기"
+
+                            // 더보기 touch 이벤트
+                            setMoreContent(item)
+                        } else { // 내용 모두 보기 상태일 경우
+                            textViewContent.maxLines = Integer.MAX_VALUE
+                            item.content = item.contentOrigin
+                            textViewContent.setText(item.content, TextView.BufferType.SPANNABLE)
+                        }
+                    } else { // 내용 줄 길이가 n(7) 줄 이상이 아닌 경우
+                        if (!item.showAllContent && item.hideContent) { // 내용 모두 보기 상태 아니고 더보기 처리 된 경우
+                            // 더보기 touch 이벤트
+                            setMoreContent(item)
+                        } else {
+                            textViewContent.maxLines = Integer.MAX_VALUE
+                            item.content = item.contentOrigin
+                            textViewContent.setText(item.content, TextView.BufferType.SPANNABLE)
+                        }
+                    }
+                }
+                val hashTagHelper = HashTagHelper(
+                        hashTagCharsColor = hashTagCharsColor,
+                        hashTagCharsFont = hashTagCharsFont,
+                        onHashTagWritingListener = null,
+                        onHashTagClickListener = hashTagListener,
+                        additionalHashTagChar = additionalHashTagChar)
+                hashTagHelper.handle(textViewContent)
             }
+
+            // goods
+            if (item.goodsList.isEmpty()) {
+                goodsRecyclerView.visibility = View.GONE
+            } else {
+                goodsRecyclerView.visibility = View.VISIBLE
+                val goodsData = PostDetailGoodsData()
+                item.goodsList.forEach { goods ->
+                    goodsData.items.add(PostDetailGoodsListData(
+                            goodsCode = goods.code,
+                            imageURL = goods.image
+                    ))
+                }
+                val postDetailGoodsAdapter = PostDetailGoodsAdapter(context = context, goodsListener = goodsListener)
+                postDetailGoodsAdapter.updateData(goodsData)
+                goodsRecyclerView.adapter = postDetailGoodsAdapter
+                goodsRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                goodsRecyclerView.addItemDecoration(CustomItemDecoration(context = context, right = 0.5f))
+            }
+        }
+
+        private fun setMoreContent(item: PostDetailListData) {
+            val contentSpannableStr = SpannableString(item.content)
+            val moreListener = object: ClickableSpan() {
+                override fun onClick(widget: View?) {
+                    item.showAllContent = !item.showAllContent
+                    notifyItemChanged(position)
+                }
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.color = ResourcesCompat.getColor(context.resources, R.color.colorA4A4A4, null)
+                    ds.isUnderlineText = false
+                }
+            }
+            contentSpannableStr.setSpan(
+                    moreListener,
+                    contentSpannableStr.length - 3,
+                    contentSpannableStr.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            textViewContent.movementMethod = LinkMovementMethod.getInstance()
+            textViewContent.setText(contentSpannableStr, TextView.BufferType.SPANNABLE)
         }
     }
 

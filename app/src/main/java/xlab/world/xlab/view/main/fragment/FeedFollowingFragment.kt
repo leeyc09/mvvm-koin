@@ -3,6 +3,8 @@ package xlab.world.xlab.view.main.fragment
 import android.app.Activity
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.SimpleItemAnimator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +12,7 @@ import kotlinx.android.synthetic.main.fragment_feed_following.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
+import xlab.world.xlab.adapter.recyclerView.PostDetailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SPHelper
@@ -26,10 +29,10 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
     private var needInitData
         get() = arguments?.getBoolean("needInitData") ?: true
         set(value) {
-            val args = Bundle()
-            args.putBoolean("needInitData", value)
-            arguments = args
+            arguments?.putBoolean("needInitData", value)
         }
+
+    private var followingFeedAdapter: PostDetailAdapter? = null
 
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
@@ -55,6 +58,22 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
 
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
 
+        // following feed recycler view & adapter 초기화
+        followingFeedAdapter = followingFeedAdapter ?: PostDetailAdapter(context = context!!,
+                changeViewTypeListener = null,
+                profileListener = defaultListener!!.profileListener,
+                followListener = null,
+                moreListener = null,
+                likePostListener = View.OnClickListener {  },
+                commentsListener = defaultListener!!.commentsListener,
+                savePostListener = View.OnClickListener {  },
+                sharePostListener = View.OnClickListener {  },
+                hashTagListener = defaultListener!!.hashTagListener,
+                goodsListener = defaultListener!!.goodsListener)
+        recyclerView.adapter = followingFeedAdapter
+        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+
         if (needInitData)
             mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1)
         else
@@ -71,9 +90,9 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
-//            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = allFeedAdapter!!.dataLoading, total = allFeedAdapter!!.dataTotal) { _ ->
-//                mainViewModel.loadAllFeedData(authorization = spHelper.authorization, page = allFeedAdapter!!.dataNextPage, topicColorList = resources.getStringArray(R.array.topicColorStringList))
-//            }
+            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = followingFeedAdapter!!.dataLoading, total = followingFeedAdapter!!.dataTotal) { _ ->
+                mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = followingFeedAdapter!!.dataNextPage)
+            }
         }
     }
 
@@ -91,6 +110,22 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
                 }
                 uiData.toastMessage?.let {
                     defaultToast?.showToast(message = it)
+                }
+                uiData.followingFeedData?.let {
+                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
+                        // post 없으면 no post 띄우기
+                        setBundleVisibilityData(listVisibility =
+                        if (it.items.isEmpty()) View.GONE
+                        else View.VISIBLE,
+                                noFollowVisibility = View.GONE,
+                                noLoginVisibility = View.GONE,
+                                noPostVisibility =
+                                if (it.items.isEmpty()) View.VISIBLE
+                                else View.GONE)
+                        followingFeedAdapter?.updateData(it)
+                    }
+                    else
+                        followingFeedAdapter?.addData(it)
                 }
                 uiData.guestMode?.let {
                     setBundleVisibilityData(listVisibility = View.GONE,
@@ -111,7 +146,7 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
         mainViewModel.loadFollowingFeedDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadFollowingFeedDataEvent ->
             loadFollowingFeedDataEvent?.let { _ ->
                 loadFollowingFeedDataEvent.isLoading?.let {
-//                    allFeedAdapter?.dataLoading = it
+                    followingFeedAdapter?.dataLoading = it
                     swipeRefreshLayout.isRefreshing = false
                     noProgressDialog = false
                     needInitData = false
@@ -157,12 +192,10 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
     private fun getBundleNoPostVisibility(): Int = arguments?.getInt("noPostVisibility") ?: View.GONE
 
     private fun setBundleVisibilityData(listVisibility: Int, noFollowVisibility: Int, noLoginVisibility: Int, noPostVisibility: Int) {
-        val args = Bundle()
-        args.putInt("listVisibility", listVisibility)
-        args.putInt("noFollowVisibility", noFollowVisibility)
-        args.putInt("noLoginVisibility", noLoginVisibility)
-        args.putInt("noPostVisibility", noPostVisibility)
-        arguments = args
+        arguments?.putInt("listVisibility", listVisibility)
+        arguments?.putInt("noFollowVisibility", noFollowVisibility)
+        arguments?.putInt("noLoginVisibility", noLoginVisibility)
+        arguments?.putInt("noPostVisibility", noPostVisibility)
 
         setLayoutVisibility()
     }
@@ -173,6 +206,11 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
 
             val args = Bundle()
             args.putBoolean("needInitData", true)
+            args.putInt("listVisibility", View.VISIBLE)
+            args.putInt("noFollowVisibility", View.GONE)
+            args.putInt("noLoginVisibility", View.GONE)
+            args.putInt("noPostVisibility", View.GONE)
+
             fragment.arguments = args
 
             return fragment

@@ -5,7 +5,6 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ClickableSpan
 import io.reactivex.Observable
-import xlab.world.xlab.R
 import xlab.world.xlab.data.request.ReqRegisterData
 import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
@@ -26,7 +25,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
     fun contentTextSet(policy1: ClickableSpan, policy2: ClickableSpan) {
         launch {
             Observable.create<SpannableString> {
-                val agreementStr = SpannableString(MessageConstants.REGISTER_AGREEMENT)
+                val agreementStr = SpannableString(TextConstants.REGISTER_AGREEMENT)
                 agreementStr.setSpan(policy1, 5, 9, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 agreementStr.setSpan(policy2, 12, 21, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
@@ -58,7 +57,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
             Observable.create<RegexResultData> {
                 val emailRegex = DataRegex.emailRegex(email)
                 val emailRegexText =
-                        if (!emailRegex) MessageConstants.EMAIL_REGEX_TEXT
+                        if (!emailRegex) TextConstants.EMAIL_REGEX_TEXT
                         else null
 
                 it.onNext(RegexResultData(text = emailRegexText, result = emailRegex))
@@ -87,7 +86,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
             Observable.create<RegexResultData> {
                 val nickNameRegex = DataRegex.nickNameRegex(nickName)
                 val nickNameRegexText =
-                        if (!nickNameRegex) MessageConstants.NICK_LENGTH_REGEX_TEXT
+                        if (!nickNameRegex) TextConstants.NICK_LENGTH_REGEX_TEXT
                         else null
 
                 it.onNext(RegexResultData(text = nickNameRegexText, result = nickNameRegex))
@@ -102,7 +101,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
     fun requestRegister(loginType: Int, email: String, password: String, nickName: String, socialId: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
+            uiData.value = UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT)
             return
         }
 
@@ -126,14 +125,14 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                                 val duplicateError = errorMessage[1].replace(ApiCallBackConstants.EXIST_USER_DATA, "").trim().split("__")
                                 if (duplicateError.size > 1) { // 이메일, 닉네임 중복
                                     uiData.value = UIModel(emailRegex = false, nickNameRegex = false,
-                                            emailRegexText = MessageConstants.DUPLICATE_EMAIL, nickNameRegexText = MessageConstants.DUPLICATE_NICK)
+                                            emailRegexText = TextConstants.DUPLICATE_EMAIL, nickNameRegexText = TextConstants.DUPLICATE_NICK)
                                 } else { // 이메일, 닉네임 둘 중 하나 중복
                                     when (duplicateError[0].trim()) {
                                         ApiCallBackConstants.EMAIL_DUPLICATE_CHAR -> { // 이메일 중복
-                                            uiData.value = UIModel(emailRegex = false, emailRegexText = MessageConstants.DUPLICATE_EMAIL)
+                                            uiData.value = UIModel(emailRegex = false, emailRegexText = TextConstants.DUPLICATE_EMAIL)
                                         }
                                         ApiCallBackConstants.NICK_NAME_DUPLICATE_CHAR -> { // 닉네임 중복
-                                            uiData.value = UIModel(nickNameRegex = false, nickNameRegexText = MessageConstants.DUPLICATE_NICK)
+                                            uiData.value = UIModel(nickNameRegex = false, nickNameRegexText = TextConstants.DUPLICATE_NICK)
                                         }
                                     }
                                 }

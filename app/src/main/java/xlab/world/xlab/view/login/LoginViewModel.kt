@@ -29,7 +29,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     fun requestLoginByAccessToken(authorization: String, fcmToken: String = "") {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
             return
         }
 
@@ -62,7 +62,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     fun generateNewToken(authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
+            uiData.value = UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT)
             return
         }
         uiData.value = UIModel(isLoading = true)
@@ -98,12 +98,12 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     fun requestLogin(loginType: Int, email: String = "", password: String = "", socialToken: String = "", fcmToken: String = "") {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.value = UIModel(toastMessage = MessageConstants.CHECK_NETWORK_CONNECT)
+            uiData.value = UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT)
             return
         }
         if (loginType == AppConstants.LOCAL_LOGIN) { // 로컬 로그인 요청일 경우 -> 이메일 정규식 확인
             if (!DataRegex.emailRegex(email)) {
-                uiData.value = UIModel(toastMessage = MessageConstants.LOGIN_WRONG_EMAIL_PATTERN)
+                uiData.value = UIModel(toastMessage = TextConstants.LOGIN_WRONG_EMAIL_PATTERN)
                 return
             }
         }

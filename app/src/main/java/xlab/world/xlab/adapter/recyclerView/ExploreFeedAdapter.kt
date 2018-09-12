@@ -1,7 +1,6 @@
 package xlab.world.xlab.adapter.recyclerView
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.CardView
@@ -15,29 +14,23 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.google.android.youtube.player.YouTubeThumbnailView
-import kotlinx.android.synthetic.main.item_goods_thumb.view.*
 import xlab.world.xlab.R
-import xlab.world.xlab.data.adapter.AllFeedData
-import xlab.world.xlab.data.adapter.AllFeedListData
-import xlab.world.xlab.data.adapter.TopicSettingListData
+import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.SupportData
 
-class AllFeedAdapter(private val context: Context,
-                     private val postListener: View.OnClickListener,
-                     private val goodsListener: View.OnClickListener,
-                     private val questionListener: View.OnClickListener,
-                     private var matchVisible: Int) : RecyclerView.Adapter<AllFeedAdapter.ViewHolder>() {
+class ExploreFeedAdapter(private val context: Context,
+                         private val postListener: View.OnClickListener,
+                         private val goodsListener: View.OnClickListener) : RecyclerView.Adapter<ExploreFeedAdapter.ViewHolder>() {
 
-    private val allFeedData: AllFeedData = AllFeedData()
+    private val exploreFeedData: ExploreFeedData = ExploreFeedData()
     var dataLoading: Boolean
-        get() = this.allFeedData.isLoading
-        set(value) { this.allFeedData.isLoading = value }
+        get() = this.exploreFeedData.isLoading
+        set(value) { this.exploreFeedData.isLoading = value }
     var dataTotal: Int = -1
-        get() = this.allFeedData.total
+        get() = this.exploreFeedData.total
     var dataNextPage: Int = 1
-        get() = this.allFeedData.nextPage
+        get() = this.exploreFeedData.nextPage
 
     private val imagePlaceHolder = ColorDrawable(ResourcesCompat.getColor(context.resources, R.color.colorE2E2E2, null))
     private val glideOption = RequestOptions()
@@ -45,38 +38,29 @@ class AllFeedAdapter(private val context: Context,
             .placeholder(imagePlaceHolder)
             .error(imagePlaceHolder)
 
-    // goods feed 인기도 % visible 변경
-    fun changeMatchVisible(visibility: Int) {
-        matchVisible = visibility
-        for ((index, item) in allFeedData.items.withIndex()) {
-            if (item.dataType == AppConstants.FEED_GOODS)
-                notifyItemChanged(index)
-        }
-    }
+    fun updateData(exploreFeedData: ExploreFeedData) {
+        this.exploreFeedData.items.clear()
+        this.exploreFeedData.items.addAll(exploreFeedData.items)
 
-    fun updateData(allFeedData: AllFeedData) {
-        this.allFeedData.items.clear()
-        this.allFeedData.items.addAll(allFeedData.items)
-
-        this.allFeedData.isLoading = false
-        this.allFeedData.total = allFeedData.total
-        this.allFeedData.nextPage = 2
+        this.exploreFeedData.isLoading = false
+        this.exploreFeedData.total = exploreFeedData.total
+        this.exploreFeedData.nextPage = 2
 
         notifyDataSetChanged()
     }
 
-    fun addData(allFeedData: AllFeedData) {
+    fun addData(exploreFeedData: ExploreFeedData) {
         val size: Int = itemCount
-        this.allFeedData.items.addAll(allFeedData.items)
+        this.exploreFeedData.items.addAll(exploreFeedData.items)
 
-        this.allFeedData.isLoading = false
-        this.allFeedData.nextPage += 1
+        this.exploreFeedData.isLoading = false
+        this.exploreFeedData.nextPage += 1
 
         notifyItemRangeChanged(size, itemCount)
     }
 
     override fun getItemViewType(position: Int): Int {
-        return this.allFeedData.items[position].dataType
+        return this.exploreFeedData.items[position].dataType
     }
 
     override
@@ -95,12 +79,12 @@ class AllFeedAdapter(private val context: Context,
 
     override
     fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.display(item = allFeedData.items[position], position = position)
+        holder.display(item = exploreFeedData.items[position], position = position)
     }
 
     override
     fun getItemCount(): Int {
-        return allFeedData.items.size
+        return exploreFeedData.items.size
     }
 
     // posts view holder
@@ -109,7 +93,7 @@ class AllFeedAdapter(private val context: Context,
         private val imageViewPostsThumb: ImageView = view.findViewById(R.id.imageViewPostsThumb)
         private val imageViewVideoTag: ImageView = view.findViewById(R.id.imageViewVideoTag)
 
-        override fun display(item: AllFeedListData, position: Int) {
+        override fun display(item: ExploreFeedListData, position: Int) {
             // post type 이 video -> video tag 보여줌
             imageViewVideoTag.visibility =
                     if (item.postsType == AppConstants.POSTS_IMAGE) View.GONE
@@ -141,11 +125,8 @@ class AllFeedAdapter(private val context: Context,
         private val imageViewGoodsThumb: ImageView = view.findViewById(R.id.imageViewGoodsThumb)
         private val imageViewGoodsTag: ImageView = view.findViewById(R.id.imageViewGoodsTag)
         private val percentLayout: LinearLayout = view.findViewById(R.id.percentLayout)
-        private val matchBarLayout: LinearLayout = view.findViewById(R.id.matchBarLayout)
-        private val textViewMatchValue: TextView = view.findViewById(R.id.textViewMatchValue)
-        private val percentEmptyLayout: View = view.findViewById(R.id.percentEmptyLayout)
 
-        override fun display(item: AllFeedListData, position: Int) {
+        override fun display(item: ExploreFeedListData, position: Int) {
             // goods tag 이미지
             imageViewGoodsTag.visibility = View.VISIBLE
 
@@ -156,47 +137,15 @@ class AllFeedAdapter(private val context: Context,
                     .into(imageViewGoodsThumb)
 
             // 인기율 안보기 -> % 가림
-            if (matchVisible != View.VISIBLE) {
-                percentLayout.visibility = View.GONE
-            } else {
-                // guest or topic 없는 유저 -> question mark 보이기
-                if (item.showQuestionMark) {
-                    percentLayout.visibility = View.VISIBLE
-                    setPercentBar(percentValue = "? ", percentColor = item.matchColor, percentWeight = 90f)
+            percentLayout.visibility = View.GONE
 
-                    // ? 터치 이벤트
-                    matchBarLayout.setOnClickListener(questionListener)
-                } else {
-                    // 인기도 50 이하 -> % bar 안보이게
-                    if (item.matchingPercent < 50) {
-                        percentLayout.visibility = View.GONE
-                    } else {
-                        percentLayout.visibility = View.VISIBLE
-                        setPercentBar(percentValue = item.matchingPercent.toString(), percentColor = item.matchColor, percentWeight = item.matchingPercent.toFloat())
-                    }
-                }
-            }
             // goods 터치 이벤트
             mainLayout.tag = item.goodsCd
             mainLayout.setOnClickListener(goodsListener)
         }
-
-        private fun setPercentBar(percentValue: String, percentColor: Int, percentWeight: Float) {
-            // 인기도 & topic color 설정
-            textViewMatchValue.setText(percentValue, TextView.BufferType.SPANNABLE)
-            matchBarLayout.setBackgroundColor(percentColor)
-
-            // percent bar 길이 설정
-            val percentParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, percentWeight)
-            percentParams.gravity = Gravity.BOTTOM
-            val percentEmptyParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, (100f - percentWeight))
-            percentEmptyParams.gravity = Gravity.BOTTOM
-            matchBarLayout.layoutParams = percentParams
-            percentEmptyLayout.layoutParams = percentEmptyParams
-        }
     }
 
     abstract class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        abstract fun display(item: AllFeedListData, position: Int)
+        abstract fun display(item: ExploreFeedListData, position: Int)
     }
 }

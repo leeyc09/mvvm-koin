@@ -7,8 +7,7 @@ import io.reactivex.Observable
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.span.FontForegroundColorSpan
-import xlab.world.xlab.utils.support.MessageConstants
-import xlab.world.xlab.utils.support.PrintLog
+import xlab.world.xlab.utils.support.TextConstants
 import xlab.world.xlab.view.AbstractViewModel
 
 class OnBoardingViewModel(private val scheduler: SchedulerProvider): AbstractViewModel() {
@@ -23,20 +22,20 @@ class OnBoardingViewModel(private val scheduler: SchedulerProvider): AbstractVie
                 // 인덱스에 따른 내용 폰트 적용
                 val spannableString = when (index){
                     0 -> {
-                        val textStr = SpannableString(MessageConstants.ON_BOARDING_CONTENT1)
+                        val textStr = SpannableString(TextConstants.ON_BOARDING_CONTENT1)
                         textStr.setSpan(boldFont, 0, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         textStr.setSpan(regularFont, 8, textStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         textStr
                     }
                     1 -> {
-                        val textStr = SpannableString(MessageConstants.ON_BOARDING_CONTENT2)
+                        val textStr = SpannableString(TextConstants.ON_BOARDING_CONTENT2)
                         textStr.setSpan(regularFont, 0, 12, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         textStr.setSpan(boldFont, 12, 30, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         textStr.setSpan(regularFont, 30, textStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         textStr
                     }
                     2 -> {
-                        val textStr = SpannableString(MessageConstants.ON_BOARDING_CONTENT3)
+                        val textStr = SpannableString(TextConstants.ON_BOARDING_CONTENT3)
                         textStr.setSpan(boldFont, 0, 10, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         textStr.setSpan(regularFont, 10, textStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         textStr

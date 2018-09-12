@@ -76,6 +76,14 @@ class EmailConfirmFragment: Fragment(), View.OnClickListener {
                 uiData.timerText?.let {
                     textViewTimer.setText(it, TextView.BufferType.SPANNABLE)
                 }
+                uiData.isEndTimer?.let {
+                    if (it) {
+                        timeOverDialog.show()
+                        confirmCodeLayout.visibility = View.GONE
+                        textViewMailRequest.visibility = View.VISIBLE
+                        textViewMailReRequest.visibility = View.INVISIBLE
+                    }
+                }
             }
         })
 
@@ -97,20 +105,6 @@ class EmailConfirmFragment: Fragment(), View.OnClickListener {
 
                         // 타이머 종료
                         resetPasswordViewModel.stopTimer()
-                    }
-                }
-            }
-        })
-
-        // 타이머 Event
-        resetPasswordViewModel.timerEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { timerEvent ->
-            timerEvent?.let { _ ->
-                timerEvent.isEndTimer?.let {
-                    if (it) {
-                        timeOverDialog.show()
-                        confirmCodeLayout.visibility = View.GONE
-                        textViewMailRequest.visibility = View.VISIBLE
-                        textViewMailReRequest.visibility = View.INVISIBLE
                     }
                 }
             }

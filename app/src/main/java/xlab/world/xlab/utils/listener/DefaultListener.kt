@@ -12,6 +12,7 @@ import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.view.dialog.DefaultDialog
 import xlab.world.xlab.utils.view.dialog.DialogCreator
+import xlab.world.xlab.utils.view.hashTag.HashTagHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
 
 class DefaultListener(private val context: Activity) {
@@ -57,14 +58,42 @@ class DefaultListener(private val context: Activity) {
     // 포스트 디테일
     val postListener = View.OnClickListener { view ->
         if (view.tag is String) {
-            RunActivity.PostDetailActivity(context = context, postId = view.tag as String)
+            RunActivity.postDetailActivity(context = context, postId = view.tag as String, goComment = false)
         }
     }
 
     // 상품 상세
     val goodsListener = View.OnClickListener { view ->
         if (view.tag is String) {
-            RunActivity.GoodsDetailActivity(context = context, goodsCd = view.tag as String)
+            RunActivity.goodsDetailActivity(context = context, goodsCd = view.tag as String)
+        }
+    }
+
+    // 프로필 화면
+    val profileListener = View.OnClickListener { view ->
+        if (view.tag is String) {
+            RunActivity.profileActivity(context = context, userId = view.tag as String)
+        }
+    }
+
+    // 해시태그 포스트
+    val hashTagListener = object : HashTagHelper.ClickListener {
+        override fun onHashTagClicked(hashTag: String) {
+            RunActivity.hashTagPostActivity(context = context, hashTag = hashTag)
+        }
+    }
+
+    // 포스트 댓글
+    val commentsListener = View.OnClickListener { view ->
+        if (view.tag is String) {
+            RunActivity.postCommentActivity(context = context, postId = view.tag as String)
+        }
+    }
+
+    // 포스트 -> 포스트 댓글 바로가기
+    val commentsFromPostListener = View.OnClickListener { view ->
+        if (view.tag is String) {
+            RunActivity.postDetailActivity(context = context, postId = view.tag as String, goComment = true)
         }
     }
 
@@ -110,46 +139,7 @@ class DefaultListener(private val context: Activity) {
 //        }
 //    }
 //
-//    // 프로필 화면
-//    val profileListener = View.OnClickListener { view ->
-//        if (view.tag is String) {
-//            val userId = view.tag as String
-//            val intent = ProfileActivity.newIntent(activity, userId)
-//            activity.startActivityForResult(intent, RequestCodeData.PROFILE)
-//        }
-//    }
 //
-//    // 포스트 댓글
-//    val commentsListener = View.OnClickListener { view ->
-//        if (view.tag is String) {
-//            val postId = view.tag as String
-//
-//            val intent = CommentActivity.newIntent(activity, postId)
-//            activity.startActivityForResult(intent, RequestCodeData.POST_COMMENT)
-//        }
-//    }
-//
-//    // 포스트 -> 포스트 댓글 바로가기
-//    val commentsFromPostListener = View.OnClickListener { view ->
-//        if (view.tag is String) {
-//            val postId = view.tag as String
-//
-//            val intent = PostDetailActivity.newIntent(activity, postId, true)
-//            activity.startActivityForResult(intent, RequestCodeData.POST_DETAIL)
-//        }
-//    }
-//
-//    // 해시태그 포스트
-//    val hashTagListener = object : HashTagHelper.OnHashTagClickListener {
-//        override fun onHashTagClicked(hashTag: String) {
-//            XlabLog.d("touch hash tag", hashTag)
-//
-//            val intent = TagPostActivity.newIntent(activity, hashTag)
-//            activity.startActivityForResult(intent, RequestCodeData.TAG_POST)
-//        }
-//    }
-//
-
 //
 //    // 장바구니
 //    val myCartListener = View.OnClickListener {
