@@ -53,6 +53,35 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
         actionBackBtn.performClick()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
+        PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
+        when (resultCode) {
+            Activity.RESULT_OK -> {
+                if (this.resultCode == Activity.RESULT_CANCELED)
+                    this.resultCode = Activity.RESULT_OK
+                when (requestCode) {
+                    RequestCodeData.PROFILE, // 프로필
+                    RequestCodeData.POST_COMMENT, // 댓글
+                    RequestCodeData.POST_UPLOAD, // 포스트 수정
+                    RequestCodeData.TAG_POST, // 포스트 태그
+                    RequestCodeData.GOODS_DETAIL -> { // 상품 상세
+                        postDetailViewModel.loadPostDetail(authorization = spHelper.authorization, postId = postId, userId = spHelper.userId)
+                    }
+                }
+            }
+            ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
+                this.resultCode = ResultCodeData.LOGIN_SUCCESS
+                postDetailViewModel.loadPostDetail(authorization = spHelper.authorization, postId = postId, userId = spHelper.userId)
+            }
+            ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
+                setResult(ResultCodeData.LOGOUT_SUCCESS)
+                finish()
+            }
+        }
+    }
+
     private fun onSetup() {
         actionBarTitle.visibility = View.GONE
         actionBtn.visibility = View.GONE
@@ -77,19 +106,13 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 },
                 likePostEvent = { position ->
-                    PrintLog.d("postMore", "post like position: $position", "PostDetail")
-                    val item = postDetailAdapter.getItem(position)
-                    PrintLog.d("postMore", "post like status: ${item.isLike}", "PostDetail")
+                    postDetailViewModel.likePost(authorization = spHelper.authorization, position = position, postData = postDetailAdapter.getItem(position))
                 },
                 savePostEvent = { position ->
-                    PrintLog.d("postMore", "post save position: $position", "PostDetail")
-                    val item = postDetailAdapter.getItem(position)
-                    PrintLog.d("postMore", "post save status: ${item.isSave}", "PostDetail")
+                    postDetailViewModel.savePost(authorization = spHelper.authorization, position = position, postData = postDetailAdapter.getItem(position))
                 },
                 followUserEvent = { position ->
-                    PrintLog.d("postMore", "post user follow position: $position", "PostDetail")
-                    val item = postDetailAdapter.getItem(position)
-                    PrintLog.d("postMore", "post follow status: ${item.isFollowing}", "PostDetail")
+                    postDetailViewModel.userFollow(authorization = spHelper.authorization, position = position, postData = postDetailAdapter.getItem(position))
                 })
 
         postDetailAdapter = PostDetailAdapter(context = this,
@@ -128,7 +151,10 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
                     defaultToast.showToast(message = it)
                 }
                 uiData.postDetailData?.let {
-                    postDetailAdapter.updateData(it)
+                    postDetailAdapter.updateData(postDetailData = it)
+                }
+                uiData.postUpdatePosition?.let {
+                    postDetailAdapter.notifyItemChanged(it)
                 }
             }
         })

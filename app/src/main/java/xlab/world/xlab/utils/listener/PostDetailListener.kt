@@ -30,10 +30,6 @@ class PostDetailListener(context: Activity,
 
     private val postMoreDialog = DialogCreator.postMoreDialog(
             context = context,
-            firstText = context.getString(R.string.edit),
-            firstColor = ResourcesCompat.getColor(context.resources, R.color.color000000, null),
-            secondText = context.getString(R.string.delete),
-            secondColor = ResourcesCompat.getColor(context.resources, R.color.colorDE5359, null),
             listener = object: TwoSelectBottomDialog.Listener {
                 override fun onFirstBtnClick(tag: Any) {
                     if (tag is String) {

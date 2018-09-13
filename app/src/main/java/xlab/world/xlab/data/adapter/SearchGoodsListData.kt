@@ -12,10 +12,4 @@ data class SearchGoodsListData(val dataType: Int,
                                val brand: String,
                                var showQuestionMark: Boolean,
                                val matchingPercent: Int,
-                               val matchColor: Int): Serializable {
-    override fun toString(): String {
-        return "dataType: $dataType / sortType: $sortType / goodsCd: $goodsCd / " +
-                "imageURL: $imageURL / price: $price / title: $title / brand: $brand / " +
-                "showQuestionMark: $showQuestionMark / matchingPercent: $matchingPercent / matchColor: $matchColor"
-    }
-}
+                               val matchColor: Int): Serializable

@@ -1,6 +1,7 @@
 package xlab.world.xlab.utils.view.dialog
 
 import android.app.Activity
+import android.support.v4.content.res.ResourcesCompat
 import xlab.world.xlab.R
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.RequestCodeData
@@ -30,10 +31,24 @@ object DialogCreator {
                 })
     }
 
-    fun postMoreDialog(context: Activity, firstText: String?, firstColor: Int?,
-                       secondText: String?, secondColor: Int?, listener: TwoSelectBottomDialog.Listener): TwoSelectBottomDialog {
-        val dialog = TwoSelectBottomDialog.newDialog(firstText = firstText, firstColor = firstColor,
-                secondText = secondText, secondColor = secondColor)
+    fun postMoreDialog(context: Activity, listener: TwoSelectBottomDialog.Listener): TwoSelectBottomDialog {
+        val dialog = TwoSelectBottomDialog.newDialog(
+                firstText = context.getString(R.string.edit),
+                firstColor = ResourcesCompat.getColor(context.resources, R.color.color000000, null),
+                secondText = context.getString(R.string.delete),
+                secondColor = ResourcesCompat.getColor(context.resources, R.color.colorDE5359, null))
+
+        dialog.handle(listener = listener)
+
+        return dialog
+    }
+
+    fun commentDeleteDialog(context: Activity, listener: TwoSelectBottomDialog.Listener): TwoSelectBottomDialog {
+        val dialog = TwoSelectBottomDialog.newDialog(
+                firstText = context.getString(R.string.delete),
+                firstColor = ResourcesCompat.getColor(context.resources, R.color.colorDE5359, null),
+                secondText = null, secondColor = null)
+
         dialog.handle(listener = listener)
 
         return dialog

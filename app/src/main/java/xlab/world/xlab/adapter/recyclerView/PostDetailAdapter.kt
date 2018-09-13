@@ -322,7 +322,7 @@ class PostDetailAdapter(private val context: Context,
                     ))
                 }
                 val postDetailGoodsAdapter = PostDetailGoodsAdapter(context = context, goodsListener = goodsListener)
-                postDetailGoodsAdapter.updateData(goodsData)
+                postDetailGoodsAdapter.updateData(postDetailGoodsData = goodsData)
                 goodsRecyclerView.adapter = postDetailGoodsAdapter
                 goodsRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
                 goodsRecyclerView.addItemDecoration(CustomItemDecoration(context = context, right = 0.5f))

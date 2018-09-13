@@ -30,9 +30,9 @@ class PostDetailGoodsAdapter(private val context: Context,
             .placeholder(imagePlaceHolder)
             .error(imagePlaceHolder)
 
-    fun updateData(topicSettingData: PostDetailGoodsData) {
+    fun updateData(postDetailGoodsData: PostDetailGoodsData) {
         this.postDetailGoodsData.items.clear()
-        this.postDetailGoodsData.items.addAll(topicSettingData.items)
+        this.postDetailGoodsData.items.addAll(postDetailGoodsData.items)
 
         notifyDataSetChanged()
     }

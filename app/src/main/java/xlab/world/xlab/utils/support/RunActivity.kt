@@ -4,6 +4,7 @@ import android.app.Activity
 import android.net.Uri
 import xlab.world.xlab.data.response.ResUserLoginData
 import xlab.world.xlab.utils.view.dialog.DialogCreator
+import xlab.world.xlab.view.comment.CommentActivity
 import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
@@ -63,6 +64,8 @@ object RunActivity {
     }
 
     fun postCommentActivity(context: Activity, postId: String) {
+        val intent = CommentActivity.newIntent(context = context, postId = postId)
+        context.startActivityForResult(intent, RequestCodeData.POST_COMMENT)
         PrintLog.d("Run", "PostComment", tag)
     }
 

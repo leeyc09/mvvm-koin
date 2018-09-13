@@ -8,9 +8,4 @@ data class ExploreFeedListData(val dataType: Int,
                                val goodsCd: String = "",
                                val postId: String = "",
                                val postsType: Int = AppConstants.POSTS_IMAGE,
-                               val youTubeVideoID: String = ""): Serializable {
-    override fun toString(): String {
-        return "dataType: $dataType / imageURL: $imageURL / goodsCd: $goodsCd / " +
-                "postId: $postId / postsType: $postsType / youTubeVideoID: $youTubeVideoID"
-    }
-}
+                               val youTubeVideoID: String = ""): Serializable

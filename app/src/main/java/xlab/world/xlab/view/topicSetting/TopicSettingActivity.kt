@@ -108,10 +108,10 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
                             textLayout.visibility = View.VISIBLE
                             recyclerView.visibility = View.VISIBLE
                         }
-                        topicSettingAdapter.updateData(it)
+                        topicSettingAdapter.updateData(topicSettingData = it)
                     }
                     else {
-                        topicSettingAdapter.addData(it)
+                        topicSettingAdapter.addData(topicSettingData = it)
                     }
                 }
                 uiData.topicPosition?.let {

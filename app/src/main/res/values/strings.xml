@@ -248,7 +248,6 @@
     <string name="tag_item">제품 태그</string>
     <string name="used_item">사용한 제품</string>
     <string name="content_hint">내용 입력</string>
-    <string name="save_post_message">저장되었습니다</string>
     <string name="save_cancel_post_message">저장이 취소되었습니다</string>
     <string name="no_save_post">저장한 포스트가 없어요</string>
 

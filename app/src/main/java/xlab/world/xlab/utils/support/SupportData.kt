@@ -68,4 +68,9 @@ object SupportData {
         priceFormat.applyPattern("#,###,###,###")
         return priceFormat.format(price)
     }
+
+    // authorization 으로 guest 판단하기
+    fun isGuest(authorization: String): Boolean {
+        return authorization.replace("Bearer", "").trim().isEmpty()
+    }
 }

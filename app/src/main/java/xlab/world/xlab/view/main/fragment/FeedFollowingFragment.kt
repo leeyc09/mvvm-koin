@@ -122,10 +122,10 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
                                 noPostVisibility =
                                 if (it.items.isEmpty()) View.VISIBLE
                                 else View.GONE)
-                        followingFeedAdapter?.updateData(it)
+                        followingFeedAdapter?.updateData(postDetailData = it)
                     }
                     else
-                        followingFeedAdapter?.addData(it)
+                        followingFeedAdapter?.addData(postDetailData = it)
                 }
                 uiData.guestMode?.let {
                     setBundleVisibilityData(listVisibility = View.GONE,

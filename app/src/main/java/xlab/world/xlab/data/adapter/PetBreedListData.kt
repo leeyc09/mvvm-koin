@@ -9,7 +9,4 @@ data class PetBreedListData(var dataType: Int = AppConstants.ADAPTER_CONTENT,
                             val nameEn: String,
                             val hairType: ArrayList<String>,
                             val hairColor: ArrayList<String>,
-                            val size: ArrayList<String>): Serializable {
-    override
-    fun toString(): String = "$code $nameKor $nameEn $hairType $hairColor $size"
-}
+                            val size: ArrayList<String>): Serializable

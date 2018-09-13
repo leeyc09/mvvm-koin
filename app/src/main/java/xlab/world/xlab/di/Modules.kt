@@ -13,13 +13,11 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import xlab.world.xlab.server.*
-import xlab.world.xlab.server.`interface`.IPetRequest
-import xlab.world.xlab.server.`interface`.IPostRequest
-import xlab.world.xlab.server.`interface`.IShopRequest
-import xlab.world.xlab.server.`interface`.IUserRequest
+import xlab.world.xlab.server.`interface`.*
 import xlab.world.xlab.server.provider.*
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
+import xlab.world.xlab.view.comment.CommentViewModel
 import xlab.world.xlab.view.main.MainViewModel
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
@@ -45,7 +43,9 @@ val viewModelModule: Module = applicationContext {
     // ViewModel for Topic Setting View
     viewModel { TopicSettingViewModel(apiPet = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Post Detail View
-    viewModel { PostDetailViewModel(apiPost = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { PostDetailViewModel(apiPost = get(), apiUserActivity = get(), apiFollow = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Comment View
+    viewModel { CommentViewModel(apiPost = get(), apiComment = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
@@ -87,6 +87,21 @@ val remoteModule: Module = applicationContext {
     bean { createRetrofit<IShopRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
     // shop api implement
     bean { ApiShop(iShopRequest = get()) as ApiShopProvider }
+
+    // user activity api interface
+    bean { createRetrofit<IUserActivityRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
+    // user activity api implement
+    bean { ApiUserActivity(iUserActivityRequest = get()) as ApiUserActivityProvider }
+
+    // follow api interface
+    bean { createRetrofit<IFollowRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
+    // follow api implement
+    bean { ApiFollow(iFollowRequest = get()) as ApiFollowProvider }
+
+    // comment api interface
+    bean { createRetrofit<ICommentRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
+    // comment api implement
+    bean { ApiComment(iCommentRequest = get()) as ApiCommentProvider }
 }
 
 /**

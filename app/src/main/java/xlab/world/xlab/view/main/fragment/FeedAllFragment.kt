@@ -89,6 +89,8 @@ class FeedAllFragment: Fragment() {
 
         if (needInitData)
             mainViewModel.loadAllFeedData(authorization = spHelper.authorization, page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+        else
+            matchVisibleChange(matchVisibility)
     }
 
     private fun onBindEvent() {
@@ -121,9 +123,9 @@ class FeedAllFragment: Fragment() {
                 }
                 uiData.allFeedData?.let {
                     if (it.nextPage <= 2 )  // 요청한 page => 첫페이지
-                        allFeedAdapter?.updateData(it)
+                        allFeedAdapter?.updateData(allFeedData = it)
                     else
-                        allFeedAdapter?.addData(it)
+                        allFeedAdapter?.addData(allFeedData = it)
 
                     if (allFeedAdapter!!.itemCount < 18) {
                         mainViewModel.loadAllFeedData(authorization = spHelper.authorization, page = allFeedAdapter!!.dataNextPage, topicColorList = resources.getStringArray(R.array.topicColorStringList))
@@ -150,9 +152,10 @@ class FeedAllFragment: Fragment() {
     }
 
     fun matchVisibleChange(visibility: Int) {
+        matchVisibility = visibility
         context?.let {
             allFeedAdapter?.changeMatchVisible(visibility)
-        } ?:let { matchVisibility = visibility }
+        }
     }
 
     fun reloadFeedData() {

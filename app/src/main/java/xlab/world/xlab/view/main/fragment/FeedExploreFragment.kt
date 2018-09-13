@@ -114,9 +114,9 @@ class FeedExploreFragment: Fragment() {
                 }
                 uiData.exploreFeedData?.let {
                     if (it.nextPage <= 2 )  // 요청한 page => 첫페이지
-                        exploreFeedAdapter?.updateData(it)
+                        exploreFeedAdapter?.updateData(exploreFeedData = it)
                     else
-                        exploreFeedAdapter?.addData(it)
+                        exploreFeedAdapter?.addData(exploreFeedData = it)
 
                     if (exploreFeedAdapter!!.itemCount < 18) {
                         mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = exploreFeedAdapter!!.dataNextPage)

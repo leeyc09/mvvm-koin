@@ -83,7 +83,7 @@ class MainViewModel(private val apiPost: ApiPostProvider,
         }
 
         // login 확인
-        if (isGuest(authorization)) { // guest
+        if (SupportData.isGuest(authorization)) { // guest
             uiData.value = UIModel(guestMode = true)
             return
         }
@@ -234,10 +234,6 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                         }
                     })
         }
-    }
-
-    private fun isGuest(authorization: String): Boolean {
-        return authorization.replace("Bearer", "").trim().isEmpty()
     }
 
     private fun getPercentValueAndColor(topicColorList: Array<String>, matchData: ResFeedData.TopicMatch?): MatchData {

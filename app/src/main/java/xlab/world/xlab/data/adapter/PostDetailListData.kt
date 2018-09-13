@@ -28,4 +28,6 @@ data class PostDetailListData(val dataType: Int,
                               var isLike: Boolean,
                               var isSave: Boolean,
                               var hideContent: Boolean = false,
-                              val isMyPost: Boolean): Serializable
+                              val isMyPost: Boolean): Serializable {
+
+}

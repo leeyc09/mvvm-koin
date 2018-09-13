@@ -27,6 +27,10 @@ interface ApiPostProvider {
     // post 지우기
     fun postDelete(scheduler: SchedulerProvider, authorization: String, postId: String,
                    responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // my post 인지 확인하기
+    fun checkMyPost(scheduler: SchedulerProvider, authorization: String, postId: String,
+                   responseData: (ResCheckMyPostData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
@@ -77,6 +81,17 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun postDelete(scheduler: SchedulerProvider, authorization: String, postId: String,
                             responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.deletePost(authorization = authorization, postId = postId)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun checkMyPost(scheduler: SchedulerProvider, authorization: String, postId: String,
+                             responseData: (ResCheckMyPostData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iPostRequest.checkPostsMine(authorization = authorization, postId = postId)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

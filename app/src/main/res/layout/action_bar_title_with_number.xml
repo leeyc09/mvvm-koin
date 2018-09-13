@@ -20,12 +20,13 @@
         android:padding="10dp"
         android:src="@drawable/arrow_back_black"/>
 
+
     <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
         android:id="@+id/actionBarTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/app_name"
-        android:textSize="14sp"
+        android:textSize="15sp"
         android:textColor="@color/color000000"
         app:layout_constraintStart_toEndOf="@id/actionBackBtn"
         app:layout_constraintTop_toTopOf="parent"
@@ -33,18 +34,15 @@
         android:layout_marginStart="6dp"/>
 
     <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
-        android:id="@+id/actionBtn"
+        android:id="@+id/actionBarNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:enabled="false"
-        android:text="@string/okay"
-        android:textSize="14sp"
-        android:textColor="@color/enable_bfbfbf_5300ed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="0"
+        android:textSize="16sp"
+        android:textColor="@color/colorA4A4A4"
+        app:layout_constraintStart_toEndOf="@id/actionBarTitle"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.9834"
-        android:padding="10dp"/>
+        android:layout_marginStart="4dp"/>
 
 </android.support.constraint.ConstraintLayout>

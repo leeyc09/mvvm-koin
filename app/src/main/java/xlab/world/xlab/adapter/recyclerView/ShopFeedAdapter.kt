@@ -116,7 +116,7 @@ class ShopFeedAdapter(private val context: Context,
                     contentBottomMargin = 36f,
                     matchVisible = matchVisible)
             goodsRecyclerView.adapter = goodsAdapter
-            goodsAdapter.updateData(item.goodsData)
+            goodsAdapter.updateData(searchGoodsData = item.goodsData)
 
             if (goodsRecyclerView.layoutManager == null)
                 goodsRecyclerView.layoutManager = GridLayoutManager(context, 3, GridLayoutManager.VERTICAL, false)

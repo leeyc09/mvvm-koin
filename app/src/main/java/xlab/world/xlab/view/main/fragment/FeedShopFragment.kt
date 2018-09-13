@@ -97,6 +97,8 @@ class FeedShopFragment: Fragment() {
 
         if (needInitData)
             mainViewModel.loadShopFeedData(authorization = spHelper.authorization, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+        else
+            matchVisibleChange(matchVisibility)
     }
 
     private fun onBindEvent() {
@@ -122,7 +124,7 @@ class FeedShopFragment: Fragment() {
                     defaultToast?.showToast(message = it)
                 }
                 uiData.shopFeedData?.let {
-                    shopFeedAdapter?.updateData(it)
+                    shopFeedAdapter?.updateData(shopFeedData = it)
                     swipeRefreshLayout.isRefreshing = false
                     noProgressDialog = false
                     needInitData = false
@@ -136,9 +138,10 @@ class FeedShopFragment: Fragment() {
     }
 
     fun matchVisibleChange(visibility: Int) {
+        matchVisibility = visibility
         context?.let {
             shopFeedAdapter?.changeMatchVisible(visibility)
-        } ?:let { matchVisibility = visibility }
+        }
     }
 
     fun reloadFeedData() {

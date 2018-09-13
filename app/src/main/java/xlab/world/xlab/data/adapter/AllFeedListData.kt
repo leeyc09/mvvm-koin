@@ -11,10 +11,4 @@ data class AllFeedListData(val dataType: Int,
                            val matchColor: Int = 0,
                            val postId: String = "",
                            val postsType: Int = AppConstants.POSTS_IMAGE,
-                           val youTubeVideoID: String = ""): Serializable {
-    override fun toString(): String {
-        return "dataType: $dataType / imageURL: $imageURL / goodsCd: $goodsCd / " +
-                "showQuestionMark: $showQuestionMark / matchingPercent: $matchingPercent / matchColor: $matchColor / " +
-                "postId: $postId / postsType: $postsType / youTubeVideoID: $youTubeVideoID"
-    }
-}
+                           val youTubeVideoID: String = ""): Serializable
