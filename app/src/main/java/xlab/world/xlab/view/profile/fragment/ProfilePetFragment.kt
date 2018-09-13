@@ -148,9 +148,9 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
         }
     }
 
-    fun reloadFeedData() {
+    fun reloadPetUsedGoodsData() {
         context?.let {
-//            mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1)
+            profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1)
         } ?:let { needInitData = true }
     }
 
