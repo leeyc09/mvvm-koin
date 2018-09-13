@@ -84,7 +84,8 @@ class FeedAllFragment: Fragment() {
             }
         }
         recyclerView.layoutManager = gridLayoutManager
-        recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, offset = 0.5f))
+        if (recyclerView.itemDecorationCount < 1)
+            recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, offset = 0.5f))
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         if (needInitData)
@@ -122,14 +123,19 @@ class FeedAllFragment: Fragment() {
                     defaultToast?.showToast(message = it)
                 }
                 uiData.allFeedData?.let {
-                    if (it.nextPage <= 2 )  // 요청한 page => 첫페이지
+                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
                         allFeedAdapter?.updateData(allFeedData = it)
+                        swipeRefreshLayout.isRefreshing = false
+                    }
                     else
                         allFeedAdapter?.addData(allFeedData = it)
 
                     if (allFeedAdapter!!.itemCount < 18) {
                         mainViewModel.loadAllFeedData(authorization = spHelper.authorization, page = allFeedAdapter!!.dataNextPage, topicColorList = resources.getStringArray(R.array.topicColorStringList))
                     }
+
+                    if (noProgressDialog)
+                        noProgressDialog = false
                 }
             }
         })
@@ -139,8 +145,6 @@ class FeedAllFragment: Fragment() {
             loadAllFeedDataEvent?.let { _ ->
                 loadAllFeedDataEvent.isLoading?.let {
                     allFeedAdapter?.dataLoading = it
-                    swipeRefreshLayout.isRefreshing = false
-                    noProgressDialog = false
                     needInitData = false
                 }
             }

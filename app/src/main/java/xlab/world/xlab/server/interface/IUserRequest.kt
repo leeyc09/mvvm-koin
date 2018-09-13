@@ -37,4 +37,8 @@ interface IUserRequest {
     @POST(ApiURL.USER_CHANGE_PASSWORD)
     fun changePassword(@Header("Authorization") authorization: String,
                        @Body reqPasswordData: ReqNewPasswordData): Observable<ResMessageData>
+
+    @GET(ApiURL.USER_PROFILE_MAIN)
+    fun profileMain(@Header("Authorization") authorization: String,
+                    @Query("userId") userId: String): Observable<ResProfileMainData>
 }

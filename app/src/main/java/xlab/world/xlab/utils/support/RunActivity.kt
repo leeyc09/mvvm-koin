@@ -9,6 +9,7 @@ import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
+import xlab.world.xlab.view.profile.ProfileActivity
 import xlab.world.xlab.view.register.LocalRegisterActivity
 import xlab.world.xlab.view.register.SocialRegisterActivity
 import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
@@ -69,6 +70,15 @@ object RunActivity {
         PrintLog.d("Run", "PostComment", tag)
     }
 
+    fun profileActivity(context: Activity, userId: String) {
+        val intent = ProfileActivity.newIntent(context = context, userId = userId)
+        context.startActivityForResult(intent, RequestCodeData.PROFILE)
+    }
+
+    fun profileEditActivity(context: Activity) {
+        PrintLog.d("Run", "ProfileEdit", tag)
+    }
+
     fun goodsDetailActivity(context: Activity, goodsCd: String) {
         PrintLog.d("Run", "GoodsDetail", tag)
     }
@@ -77,15 +87,43 @@ object RunActivity {
         PrintLog.d("Run", "PetEdit", tag)
     }
 
-    fun profileActivity(context: Activity, userId: String) {
-        PrintLog.d("Run", "Profile", tag)
-    }
-
     fun hashTagPostActivity(context: Activity, hashTag: String) {
         PrintLog.d("Run", "HashTagPost", tag)
     }
 
     fun searchGoodsActivity(context: Activity, searchText: String, searchCode: String) {
         PrintLog.d("Run", "SearchGoods", tag)
+    }
+
+    fun searchActivity(context: Activity) {
+        PrintLog.d("Run", "Search", tag)
+    }
+
+    fun notificationActivity(context: Activity) {
+        PrintLog.d("Run", "Notification", tag)
+    }
+
+    fun postUploadActivity(context: Activity) {
+        PrintLog.d("Run", "PostUpload", tag)
+    }
+
+    fun savedPostActivity(context: Activity) {
+        PrintLog.d("Run", "SavedPost", tag)
+    }
+
+    fun myShoppingActivity(context: Activity) {
+        PrintLog.d("Run", "MyShopping", tag)
+    }
+
+    fun settingActivity(context: Activity) {
+        PrintLog.d("Run", "Setting", tag)
+    }
+
+    fun followerActivity(context: Activity, userId: String) {
+        PrintLog.d("Run", "Follower", tag)
+    }
+
+    fun followingActivity(context: Activity, userId: String) {
+        PrintLog.d("Run", "Following", tag)
     }
 }

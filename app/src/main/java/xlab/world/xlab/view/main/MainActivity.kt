@@ -7,6 +7,7 @@ import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import kotlinx.android.synthetic.main.action_bar_main.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
@@ -153,13 +154,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 listener = tabLayoutListener)
         tabLayoutHelper.handle(layout = tabLayout, viewPager = viewPager)
         tabLayoutHelper.addTab(tabName = resources.getString(R.string.all),
+                fontSize = null,
                 tabLayout = R.layout.tab_layout_feed_all,
                 selectFont = fontColorSpan.notoBold000000,
                 unSelectFont = fontColorSpan.notoBoldBFBFBF,
                 extraData = null)
-        tabLayoutHelper.addTab(tabName = getString(R.string.following), tabLayout = null, selectFont = null, unSelectFont = null, extraData = null)
-        tabLayoutHelper.addTab(tabName = getString(R.string.explore), tabLayout = null, selectFont = null, unSelectFont = null, extraData = null)
-        tabLayoutHelper.addTab(tabName = getString(R.string.shop), tabLayout = null, selectFont = null, unSelectFont = null, extraData = null)
+        tabLayoutHelper.addTab(tabName = getString(R.string.following), tabLayout = null, fontSize = null, selectFont = null, unSelectFont = null, extraData = null)
+        tabLayoutHelper.addTab(tabName = getString(R.string.explore), tabLayout = null, fontSize = null, selectFont = null, unSelectFont = null, extraData = null)
+        tabLayoutHelper.addTab(tabName = getString(R.string.shop), tabLayout = null, fontSize = null, selectFont = null, unSelectFont = null, extraData = null)
         tabLayoutHelper.changeSelectedTab(selectIndex = 0)
 
         // match button 초기화
@@ -171,6 +173,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onBindEvent() {
+        actionSearchBtn.setOnClickListener(this) // 통합 검색 버튼
+        actionUploadBtn.setOnClickListener(this) // 포스트 업로드 버튼
+        actionNotificationBtn.setOnClickListener(this) // 알림 버튼
+        actionProfileBtn.setOnClickListener(this) // 프로필 버튼
+
         // 키보드 보일때 매칭 버튼 안보이게
         ViewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
         }
@@ -187,7 +194,27 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         v?.let {
             when (v.id) {
+                R.id.actionSearchBtn -> { // 통합 검색 버튼
+                    RunActivity.searchActivity(context = this)
+                }
+                R.id.actionNotificationBtn -> { // 노티 버튼
+                    if (spHelper.accessToken.isEmpty()) // 게스트
+                        return
 
+                    RunActivity.notificationActivity(context = this)
+                }
+                R.id.actionUploadBtn -> { // 포스트 업로드 버튼
+                    if (spHelper.accessToken.isEmpty()) // 게스트
+                        return
+
+                    RunActivity.postUploadActivity(context = this)
+                }
+                R.id.actionProfileBtn -> { // 프로필 버튼
+                    if (spHelper.accessToken.isEmpty()) // 게스트
+                        return
+
+                    RunActivity.profileActivity(context = this, userId = spHelper.userId)
+                }
             }
         }
     }

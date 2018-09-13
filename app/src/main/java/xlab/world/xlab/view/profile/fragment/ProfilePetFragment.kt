@@ -1,4 +1,4 @@
-package xlab.world.xlab.view.main.fragment
+package xlab.world.xlab.view.profile.fragment
 
 import android.app.Activity
 import android.graphics.Color
@@ -9,23 +9,20 @@ import android.support.v7.widget.SimpleItemAnimator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.swipe_recycler_view.*
-import org.koin.android.architecture.ext.viewModel
+import kotlinx.android.synthetic.main.fragment_profile_pet.*
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
-import xlab.world.xlab.adapter.recyclerView.ExploreFeedAdapter
+import xlab.world.xlab.adapter.recyclerView.ProfileTopicGoodsAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.AppConstants
-import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
-import xlab.world.xlab.view.main.MainViewModel
+import xlab.world.xlab.view.profile.ProfileViewModel
 
-class FeedExploreFragment: Fragment() {
-    private val mainViewModel: MainViewModel by viewModel()
-    private val spHelper: SPHelper by inject()
+class ProfilePetFragment: Fragment(), View.OnClickListener {
+    private val profileViewModel: ProfileViewModel by inject()
 
     private var noProgressDialog = false
     private var needInitData
@@ -34,7 +31,7 @@ class FeedExploreFragment: Fragment() {
             arguments?.putBoolean("needInitData", value)
         }
 
-    private var exploreFeedAdapter: ExploreFeedAdapter? = null
+    private var profileTopicGoodsAdapter: ProfileTopicGoodsAdapter? = null
 
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
@@ -42,7 +39,7 @@ class FeedExploreFragment: Fragment() {
     private var defaultListener: DefaultListener? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.swipe_recycler_view, container, false)
+        return inflater.inflate(R.layout.fragment_profile_pet, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -60,47 +57,49 @@ class FeedExploreFragment: Fragment() {
 
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
 
-        // explore feed recycler view & adapter 초기화
-        exploreFeedAdapter = exploreFeedAdapter ?: ExploreFeedAdapter(context = context!!,
-                postListener = defaultListener!!.postListener,
+        // topic goods recycler view & adapter 초기화
+        profileTopicGoodsAdapter = profileTopicGoodsAdapter ?: ProfileTopicGoodsAdapter(context = context!!,
+                moreItemListener = null,
                 goodsListener = defaultListener!!.goodsListener)
-        recyclerView.adapter = exploreFeedAdapter
+        recyclerView.adapter = profileTopicGoodsAdapter
         val gridLayoutManager = GridLayoutManager(context, 3, GridLayoutManager.VERTICAL, false)
         gridLayoutManager.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when(exploreFeedAdapter!!.getItemViewType(position = position)) {
-                    AppConstants.FEED_GOODS,
-                    AppConstants.FEED_POST-> 1
-                    AppConstants.FEED_AD -> 3
+                return when(profileTopicGoodsAdapter!!.getItemViewType(position = position)) {
+                    AppConstants.ADAPTER_HEADER -> 3
+                    AppConstants.ADAPTER_CONTENT -> 1
                     else -> 1
                 }
             }
         }
         recyclerView.layoutManager = gridLayoutManager
         if (recyclerView.itemDecorationCount < 1)
-            recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, offset = 0.5f))
+            recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, offset = 0.5f), 0)
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
-        if (needInitData)
-            mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = 1)
+
+        if (needInitData) {
+            profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1)
+        } else
+            setLayoutVisibility()
     }
 
     private fun onBindEvent() {
         swipeRefreshLayout.setOnRefreshListener {
             noProgressDialog = true
-            mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = 1)
+            profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1)
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
-            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = exploreFeedAdapter!!.dataLoading, total = exploreFeedAdapter!!.dataTotal) { _ ->
-                mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = exploreFeedAdapter!!.dataNextPage)
+            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = profileTopicGoodsAdapter!!.dataLoading, total = profileTopicGoodsAdapter!!.dataTotal) { _ ->
+                profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = profileTopicGoodsAdapter!!.dataNextPage)
             }
         }
     }
 
     private fun observeViewModel() {
         // UI 이벤트 observe
-        mainViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+        profileViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
                     if (!noProgressDialog) {
@@ -111,19 +110,18 @@ class FeedExploreFragment: Fragment() {
                     }
                 }
                 uiData.toastMessage?.let {
-                    defaultToast?.showToast(message = it)
+                    defaultToast!!.showToast(message = it)
                 }
-                uiData.exploreFeedData?.let {
+                uiData.topicUsedGoodsData?.let {
                     if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        exploreFeedAdapter?.updateData(exploreFeedData = it)
+                        // used goods 없으면 no used goods 띄우기
+                        setBundleVisibilityData(noGoodsLayout = if (it.items.isEmpty()) View.VISIBLE else View.GONE)
+
+                        profileTopicGoodsAdapter?.updateData(profileTopicGoodsData = it)
                         swipeRefreshLayout.isRefreshing = false
                     }
                     else
-                        exploreFeedAdapter?.addData(exploreFeedData = it)
-
-                    if (exploreFeedAdapter!!.itemCount < 18) {
-                        mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = exploreFeedAdapter!!.dataNextPage)
-                    }
+                        profileTopicGoodsAdapter?.addData(profileTopicGoodsData = it)
 
                     if (noProgressDialog)
                         noProgressDialog = false
@@ -131,33 +129,52 @@ class FeedExploreFragment: Fragment() {
             }
         })
 
-        // load explore feed 이벤트 observe
-        mainViewModel.loadExploreFeedDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadExploreFeedDataEvent ->
-            loadExploreFeedDataEvent?.let { _ ->
-                loadExploreFeedDataEvent.isLoading?.let {
-                    exploreFeedAdapter?.dataLoading = it
+        // load topic used goods 이벤트 observe
+        profileViewModel.loadTopicUsedGoodsEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadTopicUsedGoodsEvent ->
+            loadTopicUsedGoodsEvent?.let { _ ->
+                loadTopicUsedGoodsEvent.status?.let { isLoading ->
+                    profileTopicGoodsAdapter?.dataLoading = isLoading
                     needInitData = false
                 }
             }
         })
     }
 
-    fun scrollToTop() {
-        recyclerView.scrollToPosition(0)
+    override fun onClick(v: View?) {
+        v?.let {
+            when (v.id) {
+
+            }
+        }
     }
 
     fun reloadFeedData() {
         context?.let {
-            mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = 1)
+//            mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1)
         } ?:let { needInitData = true }
     }
 
+    private fun setLayoutVisibility() {
+        noGoodsLayout?.visibility = getBundleNoGoodsVisibility()
+    }
+
+    private fun getBundleUserId(): String = arguments?.getString("userId") ?: ""
+    private fun getBundleNoGoodsVisibility(): Int = arguments?.getInt("noGoodsLayout") ?: View.INVISIBLE
+
+    private fun setBundleVisibilityData(noGoodsLayout: Int) {
+        arguments?.putInt("noGoodsLayout", noGoodsLayout)
+
+        setLayoutVisibility()
+    }
+
     companion object {
-        fun newFragment(): FeedExploreFragment {
-            val fragment = FeedExploreFragment()
+        fun newFragment(userId: String): ProfilePetFragment {
+            val fragment =  ProfilePetFragment()
 
             val args = Bundle()
+            args.putString("userId", userId)
             args.putBoolean("needInitData", true)
+            args.putInt("noGoodsLayout", View.INVISIBLE)
             fragment.arguments = args
 
             return fragment

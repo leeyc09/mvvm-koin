@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.profile.ProfileActivity"
+    android:id="@+id/mainLayout">
+
+    <include
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/action_bar_profile"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/actionBar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/collapsingToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
+                app:contentScrim="#FFFFFF"
+                app:statusBarScrim="@android:color/transparent"
+                app:expandedTitleTextAppearance="@android:color/transparent"
+                app:layout_scrollFlags="scroll|enterAlwaysCollapsed">
+
+                <!--TODO: Header -->
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:context="xlab.world.xlab.view.profile.ProfileActivity"
+                    android:background="@color/colorFFFFFF"
+                    android:id="@+id/headerLayout">
+
+                    <ImageView
+                        android:id="@+id/imageViewProfile"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="19dp"/>
+
+                    <ImageView
+                        android:id="@+id/followBtn"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:padding="10dp"
+                        android:src="@drawable/follow_button"
+                        app:layout_constraintEnd_toStartOf="@id/textViewNickName"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="6dp"/>
+
+                    <ImageView
+                        android:id="@+id/profileEditBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/edit"
+                        app:layout_constraintEnd_toEndOf="@id/imageViewProfile"
+                        app:layout_constraintBottom_toBottomOf="@id/imageViewProfile"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                        android:id="@+id/textViewNickName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="25sp"
+                        android:textColor="@color/color000000"
+                        android:lineSpacingExtra="-7.5sp"
+                        app:layout_constraintStart_toEndOf="@id/imageViewProfile"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/imageViewProfile"
+                        android:layout_marginStart="19dp"
+                        android:layout_marginEnd="20dp"/>
+
+                    <LinearLayout
+                        android:id="@+id/followerLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintStart_toStartOf="@id/textViewNickName"
+                        app:layout_constraintTop_toBottomOf="@id/textViewNickName"
+                        android:layout_marginTop="16dp">
+
+                        <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                            android:id="@+id/textViewFollowerNum"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="19sp"
+                            android:textColor="@color/color000000"/>
+
+                        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/follower"
+                            android:textSize="13sp"
+                            android:textColor="@color/colorA4A4A4"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/followingLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintStart_toEndOf="@id/followerLayout"
+                        app:layout_constraintTop_toTopOf="@id/followerLayout"
+                        android:layout_marginStart="20dp">
+
+                        <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                            android:id="@+id/textViewFollowingNum"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="19sp"
+                            android:textColor="@color/color000000"/>
+
+                        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/following"
+                            android:textSize="13sp"
+                            android:textColor="@color/colorA4A4A4"/>
+
+                    </LinearLayout>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+                        android:id="@+id/textViewIntroduction"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textColor="@color/color4A4A4A"
+                        app:layout_constraintStart_toStartOf="@id/textViewNickName"
+                        app:layout_constraintEnd_toEndOf="@id/textViewNickName"
+                        app:layout_constraintTop_toBottomOf="@id/followerLayout"
+                        android:layout_marginTop="17dp"
+                        android:paddingBottom="56dp"/>
+
+                </android.support.constraint.ConstraintLayout>
+
+            </android.support.design.widget.CollapsingToolbarLayout>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/topicToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:contentInsetStart="0dp"
+                android:background="@color/colorFFFFFF"
+                app:layout_collapseMode="pin"
+                app:layout_scrollFlags="scroll|enterAlways">
+
+                <!--TODO: TOPIC -->
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/topicRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:overScrollMode="never"
+                    android:visibility="visible"
+                    android:background="@color/colorFFFFFF"
+                    android:paddingBottom="15dp"/>
+
+            </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <!--TODO: Content-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@color/colorE2E2E2"/>
+
+                <FrameLayout
+                    android:id="@+id/tabLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"/>
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/viewPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    android:background="@color/colorFFFFFF"/>
+
+            </LinearLayout>
+
+        </android.support.v4.widget.NestedScrollView>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</android.support.constraint.ConstraintLayout>

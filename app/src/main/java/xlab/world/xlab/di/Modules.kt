@@ -21,6 +21,7 @@ import xlab.world.xlab.view.comment.CommentViewModel
 import xlab.world.xlab.view.main.MainViewModel
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
+import xlab.world.xlab.view.profile.ProfileViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
 import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
 import xlab.world.xlab.view.topicSetting.TopicSettingViewModel
@@ -46,6 +47,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { PostDetailViewModel(apiPost = get(), apiUserActivity = get(), apiFollow = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Comment View
     viewModel { CommentViewModel(apiPost = get(), apiComment = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Profile View
+    viewModel { ProfileViewModel(apiUser = get(), apiPet = get(), apiFollow = get(), apiPost = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

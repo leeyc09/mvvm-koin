@@ -325,7 +325,8 @@ class PostDetailAdapter(private val context: Context,
                 postDetailGoodsAdapter.updateData(postDetailGoodsData = goodsData)
                 goodsRecyclerView.adapter = postDetailGoodsAdapter
                 goodsRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-                goodsRecyclerView.addItemDecoration(CustomItemDecoration(context = context, right = 0.5f))
+                if (goodsRecyclerView.itemDecorationCount < 1)
+                    goodsRecyclerView.addItemDecoration(CustomItemDecoration(context = context, right = 0.5f))
             }
         }
 

@@ -114,28 +114,27 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
                 uiData.followingFeedData?.let {
                     if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
                         // post 없으면 no post 띄우기
-                        setBundleVisibilityData(listVisibility =
-                        if (it.items.isEmpty()) View.GONE
-                        else View.VISIBLE,
-                                noFollowVisibility = View.GONE,
+                        setBundleVisibilityData(noFollowVisibility = View.GONE,
                                 noLoginVisibility = View.GONE,
                                 noPostVisibility =
                                 if (it.items.isEmpty()) View.VISIBLE
                                 else View.GONE)
                         followingFeedAdapter?.updateData(postDetailData = it)
+                        swipeRefreshLayout.isRefreshing = false
                     }
                     else
                         followingFeedAdapter?.addData(postDetailData = it)
+
+                    if (noProgressDialog)
+                        noProgressDialog = false
                 }
                 uiData.guestMode?.let {
-                    setBundleVisibilityData(listVisibility = View.GONE,
-                            noFollowVisibility = View.GONE,
+                    setBundleVisibilityData(noFollowVisibility = View.GONE,
                             noLoginVisibility = View.VISIBLE,
                             noPostVisibility = View.GONE)
                 }
                 uiData.noFollowing?.let {
-                    setBundleVisibilityData(listVisibility = View.GONE,
-                            noFollowVisibility = View.VISIBLE,
+                    setBundleVisibilityData(noFollowVisibility = View.VISIBLE,
                             noLoginVisibility = View.GONE,
                             noPostVisibility = View.GONE)
                 }
@@ -147,8 +146,6 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
             loadFollowingFeedDataEvent?.let { _ ->
                 loadFollowingFeedDataEvent.isLoading?.let {
                     followingFeedAdapter?.dataLoading = it
-                    swipeRefreshLayout.isRefreshing = false
-                    noProgressDialog = false
                     needInitData = false
                 }
             }
@@ -180,19 +177,16 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
     }
 
     private fun setLayoutVisibility() {
-        recyclerView?.visibility = getBundleListVisibility()
         noFollowLayout?.visibility = getBundleNoFollowVisibility()
         noLoginLayout?.visibility = getBundleNoLoginVisibility()
         noPostLayout?.visibility = getBundleNoPostVisibility()
     }
 
-    private fun getBundleListVisibility(): Int = arguments?.getInt("listVisibility") ?: View.VISIBLE
     private fun getBundleNoFollowVisibility(): Int = arguments?.getInt("noFollowVisibility") ?: View.GONE
     private fun getBundleNoLoginVisibility(): Int = arguments?.getInt("noLoginVisibility") ?: View.GONE
     private fun getBundleNoPostVisibility(): Int = arguments?.getInt("noPostVisibility") ?: View.GONE
 
-    private fun setBundleVisibilityData(listVisibility: Int, noFollowVisibility: Int, noLoginVisibility: Int, noPostVisibility: Int) {
-        arguments?.putInt("listVisibility", listVisibility)
+    private fun setBundleVisibilityData(noFollowVisibility: Int, noLoginVisibility: Int, noPostVisibility: Int) {
         arguments?.putInt("noFollowVisibility", noFollowVisibility)
         arguments?.putInt("noLoginVisibility", noLoginVisibility)
         arguments?.putInt("noPostVisibility", noPostVisibility)
@@ -206,7 +200,6 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
 
             val args = Bundle()
             args.putBoolean("needInitData", true)
-            args.putInt("listVisibility", View.VISIBLE)
             args.putInt("noFollowVisibility", View.GONE)
             args.putInt("noLoginVisibility", View.GONE)
             args.putInt("noPostVisibility", View.GONE)

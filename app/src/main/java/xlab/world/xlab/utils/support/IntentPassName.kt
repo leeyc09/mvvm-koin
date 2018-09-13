@@ -10,4 +10,5 @@ object IntentPassName {
     const val WEB_ZOOM_CONTROL = "WEB_ZOOM_CONTROL"
     const val POST_ID = "POST_ID"
     const val GO_COMMENT = "GO_COMMENT"
+    const val USER_ID = "USER_ID"
 }

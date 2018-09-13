@@ -6,8 +6,10 @@ import android.os.Bundle
 import android.view.Window
 import kotlinx.android.synthetic.main.dialog_default_progress.*
 import xlab.world.xlab.R
+import xlab.world.xlab.utils.support.PrintLog
 
 class DefaultProgressDialog(context: Context): Dialog(context) {
+    private val tag = "Progress"
 
     override
     fun onCreate(savedInstanceState: Bundle?) {
@@ -31,4 +33,13 @@ class DefaultProgressDialog(context: Context): Dialog(context) {
         mainLayout.setOnClickListener {}
     }
 
+    override fun show() {
+        PrintLog.d("dialog", "show", tag)
+        super.show()
+    }
+
+    override fun dismiss() {
+        PrintLog.d("dialog", "dismiss", tag)
+        super.dismiss()
+    }
 }

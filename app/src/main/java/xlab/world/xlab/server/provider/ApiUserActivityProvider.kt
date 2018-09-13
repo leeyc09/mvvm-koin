@@ -16,6 +16,10 @@ interface ApiUserActivityProvider {
     // post save
     fun postSave(scheduler: SchedulerProvider, authorization: String, postId: String,
                  responseData: (ResLikeSavePostData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // topic 사용한 goods 요청
+    fun requestTopicUsedGoods(scheduler: SchedulerProvider, userId: String, goodsType: Int, page: Int,
+                              responseData: (ResUsedGoodsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiUserActivity(private val iUserActivityRequest: IUserActivityRequest): ApiUserActivityProvider {
@@ -33,6 +37,17 @@ class ApiUserActivity(private val iUserActivityRequest: IUserActivityRequest): A
     override fun postSave(scheduler: SchedulerProvider, authorization: String, postId: String,
                           responseData: (ResLikeSavePostData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserActivityRequest.savePost(authorization = authorization, postId = postId)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestTopicUsedGoods(scheduler: SchedulerProvider, userId: String, goodsType: Int, page: Int,
+                                       responseData: (ResUsedGoodsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserActivityRequest.getUsedGoods(userId = userId, goodsType = goodsType, page = page)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

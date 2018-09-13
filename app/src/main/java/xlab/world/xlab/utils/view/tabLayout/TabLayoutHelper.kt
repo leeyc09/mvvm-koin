@@ -62,14 +62,14 @@ class TabLayoutHelper(private val context: Context,
         })
     }
 
-    fun addTab(tabName: String, tabLayout: Int?,
+    fun addTab(tabName: String, tabLayout: Int?, fontSize: Float?,
                selectFont: FontForegroundColorSpan?, unSelectFont: FontForegroundColorSpan?,
                extraData: Any?): Boolean {
-        return createTab(tabName, tabLayout ?: defaultTabLayout,
-                selectFont ?: defaultSelectFont, unSelectFont ?: defaultUnSelectFont, extraData)
+        return createTab(tabName = tabName, tabLayout = tabLayout ?: defaultTabLayout, fontSize = fontSize,
+                selectFont = selectFont ?: defaultSelectFont, unSelectFont = unSelectFont ?: defaultUnSelectFont, extraData = extraData)
     }
 
-    private fun createTab(tabName: String, tabLayout: Int,
+    private fun createTab(tabName: String, tabLayout: Int, fontSize: Float?,
                           selectFont: FontForegroundColorSpan, unSelectFont: FontForegroundColorSpan,
                           extraData: Any?): Boolean {
         if (tabName.isEmpty()) {
@@ -81,6 +81,9 @@ class TabLayoutHelper(private val context: Context,
         tabView.tag = tabList.size
         val textView = tabView.findViewById<TextView>(R.id.textViewTabName)
         textView.setText(tabName, TextView.BufferType.SPANNABLE)
+        fontSize?.let {
+            textView.textSize = fontSize
+        }
 
         tabView.setOnClickListener(tabClickListener)
         viewGroup.addView(tabView)

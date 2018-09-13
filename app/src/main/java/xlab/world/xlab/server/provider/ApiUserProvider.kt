@@ -43,6 +43,10 @@ interface ApiUserProvider {
     // change password 요청
     fun requestChangePassword(scheduler: SchedulerProvider, authorization: String, reqNewPasswordData: ReqNewPasswordData,
                               responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // profile main data 요청
+    fun requestProfileMain(scheduler: SchedulerProvider, authorization: String, userId: String,
+                           responseData: (ResProfileMainData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
@@ -126,6 +130,17 @@ class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
     override fun requestChangePassword(scheduler: SchedulerProvider, authorization: String, reqNewPasswordData: ReqNewPasswordData,
                                        responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserRequest.changePassword(authorization = authorization, reqPasswordData = reqNewPasswordData)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestProfileMain(scheduler: SchedulerProvider, authorization: String, userId: String,
+                                    responseData: (ResProfileMainData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.profileMain(authorization = authorization, userId = userId)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

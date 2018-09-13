@@ -35,4 +35,11 @@ object AppConstants {
     const val SORT_MATCH = 1
     const val SORT_DOWN_PRICE = 2
     const val SORT_UP_PRICE = 3
+
+    // profile type
+    const val MY_PROFILE = 0
+    const val OTHER_PROFILE = 1
+
+    // used goods topic type
+    const val USED_GOODS_PET = 1
 }
