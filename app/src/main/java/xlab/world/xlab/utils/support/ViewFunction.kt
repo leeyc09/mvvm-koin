@@ -114,11 +114,11 @@ object ViewFunction {
     }
 
     // recycler view 스크롤 판단
-    fun onRecyclerViewScrolledDown(recyclerView: RecyclerView, isScrolled: (LinearLayoutManager) -> Unit) {
+    fun onRecyclerViewScrolledDown(recyclerView: RecyclerView, isScrolled: (RecyclerView.LayoutManager) -> Unit) {
         recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dx > 0 || dy > 0) {
-                    isScrolled(recyclerView.layoutManager as LinearLayoutManager)
+                    isScrolled(recyclerView.layoutManager)
                 }
             }
         })

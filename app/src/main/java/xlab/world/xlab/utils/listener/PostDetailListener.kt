@@ -13,7 +13,7 @@ import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
 class PostDetailListener(context: Activity,
                          private val isLogin: Boolean,
                          private val fragmentManager: FragmentManager,
-                         private val postMoreEvent: (Boolean?, Boolean?) -> Unit,
+                         private val postMoreEvent: (Int?, Int?) -> Unit,
                          private val likePostEvent: (Int) -> Unit,
                          private val savePostEvent: (Int) -> Unit,
                          private val followUserEvent: (Int) -> Unit) {
@@ -24,7 +24,10 @@ class PostDetailListener(context: Activity,
             textRegular = context.resources.getString(R.string.dial_delete_post2),
             listener = object: DefaultDialog.Listener {
                 override fun onOkayTouch(tag: Any?) {
-                    postMoreEvent(null, true)
+                    if (tag is Int) {
+                        PrintLog.d("postDelete", "position: $tag", "PostDetail")
+                        postMoreEvent(null, tag)
+                    }
                 }
             })
 
@@ -32,15 +35,14 @@ class PostDetailListener(context: Activity,
             context = context,
             listener = object: TwoSelectBottomDialog.Listener {
                 override fun onFirstBtnClick(tag: Any) {
-                    if (tag is String) {
-                        PrintLog.d("postMore", "first tag: $tag", "PostDetail")
-                        postMoreEvent(true, null)
+                    if (tag is Int) {
+                        PrintLog.d("postEdit", "position: $tag", "PostDetail")
+                        postMoreEvent(tag, null)
                     }
                 }
 
                 override fun onSecondBtnClick(tag: Any) {
-                    if (tag is String) {
-                        PrintLog.d("postMore", "second tag: $tag", "PostDetail")
+                    if (tag is Int) {
                         postDeleteDialog.show()
                     }
                 }
@@ -51,8 +53,8 @@ class PostDetailListener(context: Activity,
 
     // 포스트 ...
     val postMoreListener = View.OnClickListener { view ->
-        if (view.tag is String) {
-            postMoreDialog.setTag(view.tag as String)
+        if (view.tag is Int) {
+            postMoreDialog.setTag(view.tag as Int)
             postMoreDialog.show(fragmentManager, "postMoreDialog")
         }
     }

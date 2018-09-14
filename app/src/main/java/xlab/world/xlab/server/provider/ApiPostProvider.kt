@@ -31,6 +31,14 @@ interface ApiPostProvider {
     // my post 인지 확인하기
     fun checkMyPost(scheduler: SchedulerProvider, authorization: String, postId: String,
                    responseData: (ResCheckMyPostData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    //user posts thumbnail 가져오기
+    fun requestUserPostsThumbnail(scheduler: SchedulerProvider, userId: String, page: Int,
+                                  responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // user posts detail 가져오기
+    fun requestUserPostsDetail(scheduler: SchedulerProvider, authorization: String, userId: String, page: Int,
+                               responseData: (ResDetailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
@@ -92,6 +100,28 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun checkMyPost(scheduler: SchedulerProvider, authorization: String, postId: String,
                              responseData: (ResCheckMyPostData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.checkPostsMine(authorization = authorization, postId = postId)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestUserPostsThumbnail(scheduler: SchedulerProvider, userId: String, page: Int,
+                                           responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iPostRequest.getUserPostsThumb(userId = userId, page = page)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestUserPostsDetail(scheduler: SchedulerProvider, authorization: String, userId: String, page: Int,
+                                        responseData: (ResDetailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iPostRequest.getUserPostsDetail(authorization = authorization, userId = userId, page = page)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

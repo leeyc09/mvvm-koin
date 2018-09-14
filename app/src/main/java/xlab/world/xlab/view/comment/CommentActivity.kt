@@ -138,7 +138,7 @@ class CommentActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
-            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = commentAdapter.dataLoading, total = commentAdapter.dataTotal) { _ ->
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = commentAdapter.dataLoading, total = commentAdapter.dataTotal) { _ ->
                 commentViewModel.loadCommentData(postId = postId, page = commentAdapter.dataNextPage)
             }
         }

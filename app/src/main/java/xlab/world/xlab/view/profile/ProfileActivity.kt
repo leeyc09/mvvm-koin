@@ -160,7 +160,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         progressDialog = DefaultProgressDialog(context = this)
 
         // 프래그먼트 초기화
-        profileAlbumFragment = ProfileAlbumFragment.newFragment()
+        profileAlbumFragment = ProfileAlbumFragment.newFragment(userId = userId)
         profilePetFragment = ProfilePetFragment.newFragment(userId = userId)
 
         viewPagerAdapter = ViewStatePagerAdapter(supportFragmentManager)
@@ -205,7 +205,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         followingLayout.setOnClickListener(this) // 팔로잉
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = topicRecyclerView) {
-            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = profileTopicAdapter.dataLoading, total = profileTopicAdapter.dataTotal) { _ ->
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = profileTopicAdapter.dataLoading, total = profileTopicAdapter.dataTotal) { _ ->
                 profileViewModel.loadUserTopicData(userId = userId, page = profileTopicAdapter.dataNextPage, topicDataCount = profileTopicAdapter.itemCount, loginUserId = spHelper.userId)
             }
         }

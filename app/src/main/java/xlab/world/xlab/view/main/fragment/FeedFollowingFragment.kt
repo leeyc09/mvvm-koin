@@ -3,6 +3,7 @@ package xlab.world.xlab.view.main.fragment
 import android.app.Activity
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SimpleItemAnimator
 import android.view.LayoutInflater
@@ -14,18 +15,21 @@ import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.PostDetailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
+import xlab.world.xlab.utils.listener.PostDetailListener
+import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.main.MainViewModel
+import xlab.world.xlab.view.postDetail.PostDetailViewModel
 
 class FeedFollowingFragment: Fragment(), View.OnClickListener {
     private val mainViewModel: MainViewModel by viewModel()
+    private val postDetailViewModel: PostDetailViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
-    private var noProgressDialog = false
     private var needInitData
         get() = arguments?.getBoolean("needInitData") ?: true
         set(value) {
@@ -38,6 +42,7 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
     private var progressDialog: DefaultProgressDialog? = null
 
     private var defaultListener: DefaultListener? = null
+    private var postDetailListener: PostDetailListener? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_feed_following, container, false)
@@ -57,6 +62,17 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
 
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
+        postDetailListener = postDetailListener ?: PostDetailListener(context = context as Activity, isLogin = spHelper.accessToken.isNotEmpty(), fragmentManager = (context as AppCompatActivity).supportFragmentManager,
+                postMoreEvent = { _, _ ->},
+                likePostEvent = { position ->
+                    postDetailViewModel.likePost(authorization = spHelper.authorization, position = position, postData = followingFeedAdapter!!.getItem(position))
+                },
+                savePostEvent = { position ->
+                    postDetailViewModel.savePost(authorization = spHelper.authorization, position = position, postData = followingFeedAdapter!!.getItem(position))
+                },
+                followUserEvent = { position ->
+                    postDetailViewModel.userFollow(authorization = spHelper.authorization, position = position, postData = followingFeedAdapter!!.getItem(position))
+                })
 
         // following feed recycler view & adapter 초기화
         followingFeedAdapter = followingFeedAdapter ?: PostDetailAdapter(context = context!!,
@@ -64,9 +80,9 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
                 profileListener = defaultListener!!.profileListener,
                 followListener = null,
                 moreListener = null,
-                likePostListener = View.OnClickListener {  },
+                likePostListener = postDetailListener!!.likePostListener,
                 commentsListener = defaultListener!!.commentsListener,
-                savePostListener = View.OnClickListener {  },
+                savePostListener = postDetailListener!!.savePostListener,
                 sharePostListener = View.OnClickListener {  },
                 hashTagListener = defaultListener!!.hashTagListener,
                 goodsListener = defaultListener!!.goodsListener)
@@ -75,7 +91,7 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         if (needInitData)
-            mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1)
+            reloadFeedData()
         else
             setLayoutVisibility()
     }
@@ -85,28 +101,26 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
         noLoginLayout.setOnClickListener(this) // 로그인 하기
 
         swipeRefreshLayout.setOnRefreshListener {
-            noProgressDialog = true
-            mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1)
+            reloadFeedData(loadingBar = null)
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
-            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = followingFeedAdapter!!.dataLoading, total = followingFeedAdapter!!.dataTotal) { _ ->
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = followingFeedAdapter!!.dataLoading, total = followingFeedAdapter!!.dataTotal) { _ ->
                 mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = followingFeedAdapter!!.dataNextPage)
             }
         }
     }
 
     private fun observeViewModel() {
+        // TODO: main view model
         // UI 이벤트 observe
         mainViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
-                    if (!noProgressDialog) {
-                        if (it && !progressDialog!!.isShowing)
-                            progressDialog!!.show()
-                        else if (!it && progressDialog!!.isShowing)
-                            progressDialog!!.dismiss()
-                    }
+                    if (it && !progressDialog!!.isShowing)
+                        progressDialog!!.show()
+                    else if (!it && progressDialog!!.isShowing)
+                        progressDialog!!.dismiss()
                 }
                 uiData.toastMessage?.let {
                     defaultToast?.showToast(message = it)
@@ -124,9 +138,6 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
                     }
                     else
                         followingFeedAdapter?.addData(postDetailData = it)
-
-                    if (noProgressDialog)
-                        noProgressDialog = false
                 }
                 uiData.guestMode?.let {
                     setBundleVisibilityData(noFollowVisibility = View.GONE,
@@ -150,6 +161,25 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
                 }
             }
         })
+
+        // TODO: post detail view model
+        // UI 이벤트 observe
+        postDetailViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.isLoading?.let {
+                    if (it && !progressDialog!!.isShowing)
+                        progressDialog!!.show()
+                    else if (!it && progressDialog!!.isShowing)
+                        progressDialog!!.dismiss()
+                }
+                uiData.toastMessage?.let {
+                    defaultToast!!.showToast(message = it)
+                }
+                uiData.postUpdatePosition?.let {
+                    followingFeedAdapter?.notifyItemChanged(it)
+                }
+            }
+        })
     }
 
     override fun onClick(v: View?) {
@@ -170,9 +200,9 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
         recyclerView.scrollToPosition(0)
     }
 
-    fun reloadFeedData() {
+    fun reloadFeedData(loadingBar: Boolean? = true) {
         context?.let {
-            mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1)
+            mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 

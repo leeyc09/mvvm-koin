@@ -27,7 +27,6 @@ class FeedAllFragment: Fragment() {
     private val mainViewModel: MainViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
-    private var noProgressDialog = false
     private var needInitData
         get() = arguments?.getBoolean("needInitData") ?: true
         set(value) {
@@ -89,19 +88,18 @@ class FeedAllFragment: Fragment() {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         if (needInitData)
-            mainViewModel.loadAllFeedData(authorization = spHelper.authorization, page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+            reloadFeedData()
         else
             matchVisibleChange(matchVisibility)
     }
 
     private fun onBindEvent() {
         swipeRefreshLayout.setOnRefreshListener {
-            noProgressDialog = true
-            mainViewModel.loadAllFeedData(authorization = spHelper.authorization, page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+            reloadFeedData(loadingBar = null)
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
-            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = allFeedAdapter!!.dataLoading, total = allFeedAdapter!!.dataTotal) { _ ->
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = allFeedAdapter!!.dataLoading, total = allFeedAdapter!!.dataTotal) { _ ->
                 mainViewModel.loadAllFeedData(authorization = spHelper.authorization, page = allFeedAdapter!!.dataNextPage, topicColorList = resources.getStringArray(R.array.topicColorStringList))
             }
         }
@@ -112,12 +110,10 @@ class FeedAllFragment: Fragment() {
         mainViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
-                    if (!noProgressDialog) {
-                        if (it && !progressDialog!!.isShowing)
-                            progressDialog!!.show()
-                        else if (!it && progressDialog!!.isShowing)
-                            progressDialog!!.dismiss()
-                    }
+                    if (it && !progressDialog!!.isShowing)
+                        progressDialog!!.show()
+                    else if (!it && progressDialog!!.isShowing)
+                        progressDialog!!.dismiss()
                 }
                 uiData.toastMessage?.let {
                     defaultToast?.showToast(message = it)
@@ -133,9 +129,6 @@ class FeedAllFragment: Fragment() {
                     if (allFeedAdapter!!.itemCount < 18) {
                         mainViewModel.loadAllFeedData(authorization = spHelper.authorization, page = allFeedAdapter!!.dataNextPage, topicColorList = resources.getStringArray(R.array.topicColorStringList))
                     }
-
-                    if (noProgressDialog)
-                        noProgressDialog = false
                 }
             }
         })
@@ -162,9 +155,9 @@ class FeedAllFragment: Fragment() {
         }
     }
 
-    fun reloadFeedData() {
+    fun reloadFeedData(loadingBar: Boolean? = true) {
         context?.let {
-            mainViewModel.loadAllFeedData(authorization = spHelper.authorization, page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+            mainViewModel.loadAllFeedData(authorization = spHelper.authorization, page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList), loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 

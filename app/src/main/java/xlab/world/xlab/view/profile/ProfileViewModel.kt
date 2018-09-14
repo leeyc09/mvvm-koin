@@ -2,10 +2,7 @@ package xlab.world.xlab.view.profile
 
 import android.arch.lifecycle.MutableLiveData
 import io.reactivex.Observable
-import xlab.world.xlab.data.adapter.ProfileTopicData
-import xlab.world.xlab.data.adapter.ProfileTopicGoodsData
-import xlab.world.xlab.data.adapter.ProfileTopicGoodsListData
-import xlab.world.xlab.data.adapter.ProfileTopicListData
+import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.server.provider.*
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
@@ -28,6 +25,8 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
     val loadUserDataEvent = SingleLiveEvent<ProfileEvent>()
     val loadUserPetEvent = SingleLiveEvent<ProfileEvent>()
     val loadTopicUsedGoodsEvent = SingleLiveEvent<ProfileEvent>()
+    val loadUserPostsThumbDataEvent = SingleLiveEvent<ProfileEvent>()
+    val loadUserPostsDetailDataEvent = SingleLiveEvent<ProfileEvent>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setProfileType(profileUserId: String, loginUserId: String) {
@@ -116,14 +115,14 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         }
     }
 
-    fun loadTopicUsedGoodsData(userId: String, goodsType: Int, page: Int) {
+    fun loadTopicUsedGoodsData(userId: String, goodsType: Int, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
             return
         }
 
-        uiData.value = UIModel(isLoading = true)
+        uiData.value = UIModel(isLoading = loadingBar)
         loadTopicUsedGoodsEvent.postValue(ProfileEvent(status = true))
         launch {
             apiUserActivity.requestTopicUsedGoods(scheduler = scheduler, userId = userId, goodsType = goodsType, page = page,
@@ -145,12 +144,101 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                         }
 
                         PrintLog.d("requestTopicUsedGoods success", topicUsedGoodsData.toString(), tag)
-                        uiData.value = UIModel(isLoading = false, topicUsedGoodsData = topicUsedGoodsData)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, topicUsedGoodsData = topicUsedGoodsData)
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
                             PrintLog.d("requestTopicUsedGoods fail", errorData.message, tag)
+                        }
+                    })
+        }
+    }
+
+    fun loadUserPostsThumbData(userId: String, page:Int, loadingBar: Boolean? = true) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = loadingBar)
+        loadUserPostsThumbDataEvent.postValue(ProfileEvent(status = true))
+        launch {
+            apiPost.requestUserPostsThumbnail(scheduler = scheduler, userId = userId, page = page,
+                    responseData = {
+                        val postsThumbData = PostThumbnailData(total = it.total, nextPage = page + 1)
+
+
+                        // posts 있고 첫 페이지 경우 -> header 추가
+                        if (postsThumbData.items.isNotEmpty() && page == 1) {
+                            postsThumbData.items.add(0, PostThumbnailListData(dataType = AppConstants.ADAPTER_HEADER))
+                        }
+
+                        PrintLog.d("requestUserPostsThumbnail success", postsThumbData.toString(), tag)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, postsThumbData = postsThumbData)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
+                        errorData?.let {
+                            PrintLog.d("requestUserPostsThumbnail fail", errorData.message, tag)
+                        }
+                    })
+        }
+    }
+
+    fun loadUserPostsDetailData(authorization: String, userId: String, page: Int, loginUserId: String, loadingBar: Boolean? = true) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = loadingBar)
+        loadUserPostsDetailDataEvent.postValue(ProfileEvent(status = true))
+        launch {
+            apiPost.requestUserPostsDetail(scheduler = scheduler, authorization = authorization, userId = userId, page = page,
+                    responseData = {
+                        val postsDetailData = PostDetailData(total = it.total, nextPage = page + 1)
+                        it.postsData?.forEach { postsData ->
+                            postsDetailData.items.add(PostDetailListData(
+                                    dataType = AppConstants.ADAPTER_CONTENT,
+                                    postType = postsData.postType,
+                                    postId = postsData.id,
+                                    userId = postsData.userId,
+                                    userProfileURL = postsData.profileImg,
+                                    userNickName = postsData.nickName,
+                                    isFollowing = postsData.isFollowed,
+                                    imageURL = postsData.postFile,
+                                    youTubeVideoID = postsData.youTubeVideoID,
+                                    likeNum = postsData.likedCount,
+                                    commentsNum = postsData.commentCount,
+                                    content = postsData.content,
+                                    contentOrigin = postsData.content,
+                                    isLike = postsData.isLiked,
+                                    isSave = postsData.isSaved,
+                                    uploadYear = postsData.uploadYear,
+                                    uploadMonth = postsData.uploadMonth,
+                                    uploadDay = postsData.uploadDay,
+                                    uploadHour = postsData.uploadHour,
+                                    uploadMinute = postsData.uploadMinute,
+                                    goodsList = postsData.goods,
+                                    isMyPost = userId == loginUserId
+                            ))
+                        }
+
+                        // posts 있고 첫 페이지 경우 -> header 추가
+                        if (postsDetailData.items.isNotEmpty() && page == 1) {
+                            postsDetailData.items.add(0, PostDetailListData(dataType = AppConstants.ADAPTER_HEADER))
+                        }
+
+                        PrintLog.d("requestUserPostsDetail success", postsDetailData.toString(), tag)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, postsDetailData = postsDetailData)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
+                        errorData?.let {
+                            PrintLog.d("requestUserPostsDetail fail", errorData.message, tag)
                         }
                     })
         }
@@ -162,4 +250,5 @@ data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = n
                    val profileType: Int? = null, val topicData: ProfileTopicData? = null,
                    val profileImage: String? = null, val nickName: String? = null, val introduction: String? = null,
                    val followerCnt: Int? = null, val followingCnt: Int? = null, val followState: Boolean? = null,
-                   val topicUsedGoodsData: ProfileTopicGoodsData? = null)
+                   val topicUsedGoodsData: ProfileTopicGoodsData? = null,
+                   val postsThumbData: PostThumbnailData? = null, val postsDetailData: PostDetailData? = null)

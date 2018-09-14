@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_profile_pet.*
+import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.ProfileTopicGoodsAdapter
@@ -22,9 +23,8 @@ import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.profile.ProfileViewModel
 
 class ProfilePetFragment: Fragment(), View.OnClickListener {
-    private val profileViewModel: ProfileViewModel by inject()
+    private val profileViewModel: ProfileViewModel by viewModel()
 
-    private var noProgressDialog = false
     private var needInitData
         get() = arguments?.getBoolean("needInitData") ?: true
         set(value) {
@@ -74,24 +74,23 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
         }
         recyclerView.layoutManager = gridLayoutManager
         if (recyclerView.itemDecorationCount < 1)
-            recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, offset = 0.5f), 0)
+            recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, offset = 0.5f))
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
 
         if (needInitData) {
-            profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1)
+            reloadPetUsedGoodsData()
         } else
             setLayoutVisibility()
     }
 
     private fun onBindEvent() {
         swipeRefreshLayout.setOnRefreshListener {
-            noProgressDialog = true
-            profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1)
+            reloadPetUsedGoodsData(loadingBar = null)
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
-            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = profileTopicGoodsAdapter!!.dataLoading, total = profileTopicGoodsAdapter!!.dataTotal) { _ ->
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = profileTopicGoodsAdapter!!.dataLoading, total = profileTopicGoodsAdapter!!.dataTotal) { _ ->
                 profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = profileTopicGoodsAdapter!!.dataNextPage)
             }
         }
@@ -102,12 +101,10 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
         profileViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
-                    if (!noProgressDialog) {
-                        if (it && !progressDialog!!.isShowing)
-                            progressDialog!!.show()
-                        else if (!it && progressDialog!!.isShowing)
-                            progressDialog!!.dismiss()
-                    }
+                    if (it && !progressDialog!!.isShowing)
+                        progressDialog!!.show()
+                    else if (!it && progressDialog!!.isShowing)
+                        progressDialog!!.dismiss()
                 }
                 uiData.toastMessage?.let {
                     defaultToast!!.showToast(message = it)
@@ -122,9 +119,6 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
                     }
                     else
                         profileTopicGoodsAdapter?.addData(profileTopicGoodsData = it)
-
-                    if (noProgressDialog)
-                        noProgressDialog = false
                 }
             }
         })
@@ -148,9 +142,9 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
         }
     }
 
-    fun reloadPetUsedGoodsData() {
+    fun reloadPetUsedGoodsData(loadingBar: Boolean? = true) {
         context?.let {
-            profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1)
+            profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 

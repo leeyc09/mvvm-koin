@@ -27,7 +27,6 @@ class FeedExploreFragment: Fragment() {
     private val mainViewModel: MainViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
-    private var noProgressDialog = false
     private var needInitData
         get() = arguments?.getBoolean("needInitData") ?: true
         set(value) {
@@ -82,17 +81,16 @@ class FeedExploreFragment: Fragment() {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         if (needInitData)
-            mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = 1)
+            reloadFeedData()
     }
 
     private fun onBindEvent() {
         swipeRefreshLayout.setOnRefreshListener {
-            noProgressDialog = true
-            mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = 1)
+            reloadFeedData(loadingBar = null)
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
-            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = exploreFeedAdapter!!.dataLoading, total = exploreFeedAdapter!!.dataTotal) { _ ->
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = exploreFeedAdapter!!.dataLoading, total = exploreFeedAdapter!!.dataTotal) { _ ->
                 mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = exploreFeedAdapter!!.dataNextPage)
             }
         }
@@ -103,12 +101,10 @@ class FeedExploreFragment: Fragment() {
         mainViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
-                    if (!noProgressDialog) {
-                        if (it && !progressDialog!!.isShowing)
-                            progressDialog!!.show()
-                        else if (!it && progressDialog!!.isShowing)
-                            progressDialog!!.dismiss()
-                    }
+                    if (it && !progressDialog!!.isShowing)
+                        progressDialog!!.show()
+                    else if (!it && progressDialog!!.isShowing)
+                        progressDialog!!.dismiss()
                 }
                 uiData.toastMessage?.let {
                     defaultToast?.showToast(message = it)
@@ -124,9 +120,6 @@ class FeedExploreFragment: Fragment() {
                     if (exploreFeedAdapter!!.itemCount < 18) {
                         mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = exploreFeedAdapter!!.dataNextPage)
                     }
-
-                    if (noProgressDialog)
-                        noProgressDialog = false
                 }
             }
         })
@@ -146,9 +139,9 @@ class FeedExploreFragment: Fragment() {
         recyclerView.scrollToPosition(0)
     }
 
-    fun reloadFeedData() {
+    fun reloadFeedData(loadingBar: Boolean? = true) {
         context?.let {
-            mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = 1)
+            mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = 1, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 

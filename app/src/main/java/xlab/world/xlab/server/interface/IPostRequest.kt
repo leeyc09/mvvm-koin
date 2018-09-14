@@ -30,4 +30,13 @@ interface IPostRequest {
     @GET(ApiURL.POSTS_CHECK_MINE)
     fun checkPostsMine(@Header("Authorization") authorization: String,
                        @Query("postId") postId: String): Observable<ResCheckMyPostData>
+
+    @GET(ApiURL.POSTS_ALBUM)
+    fun getUserPostsThumb(@Query("userId") userId: String,
+                          @Query("page") page: Int): Observable<ResThumbnailPostsData>
+
+    @GET(ApiURL.POSTS_ALBUM_DETAIL)
+    fun getUserPostsDetail(@Header("Authorization") authorization: String,
+                           @Query("userId") userId: String,
+                           @Query("page") page: Int): Observable<ResDetailPostsData>
 }

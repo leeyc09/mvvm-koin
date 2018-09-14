@@ -78,7 +78,7 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
         actionBackBtn.setOnClickListener(this) // 뒤로가기
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
-            ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = topicSettingAdapter.dataLoading, total = topicSettingAdapter.dataTotal) { _ ->
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = topicSettingAdapter.dataLoading, total = topicSettingAdapter.dataTotal) { _ ->
                 topicSettingViewModel.loadUserPetsData(userId = spHelper.userId, page = topicSettingAdapter.dataNextPage)
             }
         }

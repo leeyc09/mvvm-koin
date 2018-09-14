@@ -97,11 +97,11 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
 
         defaultListener = DefaultListener(context = this)
         postDetailListener = PostDetailListener(context = this, isLogin = spHelper.accessToken.isNotEmpty(), fragmentManager = supportFragmentManager,
-                postMoreEvent = { edit, delete ->
-                    edit?.let {
+                postMoreEvent = { editPosition, deletePosition ->
+                    editPosition?.let { _ ->
                         PrintLog.d("postMore", "post edit", "PostDetail")
                     }
-                    delete?.let {
+                    deletePosition?.let { _ ->
                         postDetailViewModel.deletePost(authorization = spHelper.authorization, postId = postId)
                     }
                 },

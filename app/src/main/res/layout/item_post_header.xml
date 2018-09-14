@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@color/colorFFFFFF"
+    android:gravity="end">
+
+    <ImageView
+        android:id="@+id/gridThreeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/post_grid_3_button"
+        android:padding="12dp"
+        android:layout_marginEnd="4dp"/>
+
+    <ImageView
+        android:id="@+id/gridOneBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/post_grid_1_button"
+        android:padding="12dp"
+        android:layout_marginEnd="8dp"/>
+
+</LinearLayout>

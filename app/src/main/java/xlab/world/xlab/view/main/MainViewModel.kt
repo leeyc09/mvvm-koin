@@ -26,14 +26,14 @@ class MainViewModel(private val apiPost: ApiPostProvider,
     val loadExploreFeedDataEvent = SingleLiveEvent<LoadFeedDataEvent>()
     val uiData = MutableLiveData<UIModel>()
 
-    fun loadAllFeedData(authorization: String, page: Int, topicColorList: Array<String>) {
+    fun loadAllFeedData(authorization: String, page: Int, topicColorList: Array<String>, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
             return
         }
 
-        uiData.value = UIModel(isLoading = true)
+        uiData.value = UIModel(isLoading = loadingBar)
         loadAllFeedDataEvent.value = LoadFeedDataEvent(isLoading = true)
         launch {
             apiPost.getAllFeed(scheduler = scheduler, authorization = authorization, page = page,
@@ -64,10 +64,10 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                         }
 
                         PrintLog.d("getAllFeed success", allFeedData.toString(), tag)
-                        uiData.value = UIModel(isLoading = false, allFeedData = allFeedData)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, allFeedData = allFeedData)
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
                             PrintLog.d("getAllFeed fail", errorData.message, tag)
                         }
@@ -75,7 +75,7 @@ class MainViewModel(private val apiPost: ApiPostProvider,
         }
     }
 
-    fun loadFollowingFeedData(authorization: String, page: Int) {
+    fun loadFollowingFeedData(authorization: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
@@ -88,7 +88,7 @@ class MainViewModel(private val apiPost: ApiPostProvider,
             return
         }
 
-        uiData.value = UIModel(isLoading = true)
+        uiData.value = UIModel(isLoading = loadingBar)
         loadFollowingFeedDataEvent.value = LoadFeedDataEvent(isLoading = true)
         launch {
             apiPost.getFollowingFeed(scheduler = scheduler, authorization = authorization, page = page,
@@ -122,10 +122,10 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                         }
 
                         PrintLog.d("getFollowingFeed success", followingFeedData.toString(), tag)
-                        uiData.value = UIModel(isLoading = false, followingFeedData = followingFeedData)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, followingFeedData = followingFeedData)
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
                             PrintLog.d("getFollowingFeed fail", errorData.message, tag)
                             if (errorData.errorCode == HttpURLConnection.HTTP_BAD_REQUEST) {
@@ -141,14 +141,14 @@ class MainViewModel(private val apiPost: ApiPostProvider,
         }
     }
 
-    fun loadExploreFeedData(authorization: String, page: Int) {
+    fun loadExploreFeedData(authorization: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
             return
         }
 
-        uiData.value = UIModel(isLoading = true)
+        uiData.value = UIModel(isLoading = loadingBar)
         loadExploreFeedDataEvent.value = LoadFeedDataEvent(isLoading = true)
         launch {
             apiPost.getExploreFeed(scheduler = scheduler, authorization = authorization, page = page,
@@ -174,10 +174,10 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                         }
 
                         PrintLog.d("getExploreFeed success", exploreFeedData.toString(), tag)
-                        uiData.value = UIModel(isLoading = false, exploreFeedData = exploreFeedData)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, exploreFeedData = exploreFeedData)
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
                             PrintLog.d("getExploreFeed fail", errorData.message, tag)
                         }
@@ -185,14 +185,14 @@ class MainViewModel(private val apiPost: ApiPostProvider,
         }
     }
 
-    fun loadShopFeedData(authorization: String, topicColorList: Array<String>) {
+    fun loadShopFeedData(authorization: String, topicColorList: Array<String>, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
             return
         }
 
-        uiData.value = UIModel(isLoading = true)
+        uiData.value = UIModel(isLoading = loadingBar)
         launch {
             apiShop.getShopFeed(scheduler = scheduler, authorization = authorization,
                     responseData = {
@@ -225,10 +225,10 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                         ))
 
                         PrintLog.d("getShopFeed success", shopFeedData.toString(), tag)
-                        uiData.value = UIModel(isLoading = false, shopFeedData = shopFeedData)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, shopFeedData = shopFeedData)
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
                             PrintLog.d("getShopFeed fail", errorData.message, tag)
                         }

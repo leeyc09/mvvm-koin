@@ -28,7 +28,6 @@ class FeedShopFragment: Fragment() {
     private val mainViewModel: MainViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
-    private var noProgressDialog = false
     private var needInitData
         get() = arguments?.getBoolean("needInitData") ?: true
         set(value) {
@@ -96,15 +95,14 @@ class FeedShopFragment: Fragment() {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         if (needInitData)
-            mainViewModel.loadShopFeedData(authorization = spHelper.authorization, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+            reloadFeedData()
         else
             matchVisibleChange(matchVisibility)
     }
 
     private fun onBindEvent() {
         swipeRefreshLayout.setOnRefreshListener {
-            noProgressDialog = true
-            mainViewModel.loadShopFeedData(authorization = spHelper.authorization, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+            reloadFeedData(loadingBar = null)
         }
     }
 
@@ -113,12 +111,10 @@ class FeedShopFragment: Fragment() {
         mainViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
-                    if (!noProgressDialog) {
-                        if (it && !progressDialog!!.isShowing)
-                            progressDialog!!.show()
-                        else if (!it && progressDialog!!.isShowing)
-                            progressDialog!!.dismiss()
-                    }
+                    if (it && !progressDialog!!.isShowing)
+                        progressDialog!!.show()
+                    else if (!it && progressDialog!!.isShowing)
+                        progressDialog!!.dismiss()
                 }
                 uiData.toastMessage?.let {
                     defaultToast?.showToast(message = it)
@@ -126,7 +122,6 @@ class FeedShopFragment: Fragment() {
                 uiData.shopFeedData?.let {
                     shopFeedAdapter?.updateData(shopFeedData = it)
                     swipeRefreshLayout.isRefreshing = false
-                    noProgressDialog = false
                     needInitData = false
                 }
             }
@@ -144,9 +139,9 @@ class FeedShopFragment: Fragment() {
         }
     }
 
-    fun reloadFeedData() {
+    fun reloadFeedData(loadingBar: Boolean? = true) {
         context?.let {
-            mainViewModel.loadShopFeedData(authorization = spHelper.authorization, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+            mainViewModel.loadShopFeedData(authorization = spHelper.authorization, topicColorList = resources.getStringArray(R.array.topicColorStringList), loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 

@@ -96,8 +96,8 @@ class PostDetailAdapter(private val context: Context,
     override
     fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when(viewType) {
-//            AppConstants.ADAPTER_HEADER -> PostsViewHolderBind(LayoutInflater.from(parent.context)
-//                    .inflate(R.layout.item_posts_thumb, parent, false))
+            AppConstants.ADAPTER_HEADER -> HeaderViewHolderBind(LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_post_header, parent, false))
 
             AppConstants.ADAPTER_CONTENT -> ContentViewHolderBind(LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_post_detail, parent, false))
@@ -117,7 +117,20 @@ class PostDetailAdapter(private val context: Context,
         return postDetailData.items.size
     }
 
-    // View Holder for content
+    // header view holder
+    inner class HeaderViewHolderBind(view: View): ViewHolder(view) {
+        private val gridThreeBtn: ImageView = view.findViewById(R.id.gridThreeBtn)
+        private val gridOneBtn: ImageView = view.findViewById(R.id.gridOneBtn)
+        override fun display(item: PostDetailListData, position: Int) {
+            // post 썸네일로 보기 버튼만 활성화
+            gridThreeBtn.isEnabled = true
+            gridOneBtn.isEnabled = false
+
+            changeViewTypeListener?.let { gridThreeBtn.setOnClickListener(changeViewTypeListener)}
+        }
+    }
+
+    // content view holder
     inner class ContentViewHolderBind(view: View) : ViewHolder(view) {
         private val mainLayout: ScrollView = view.findViewById(R.id.mainLayout)
         // profile layout
@@ -189,7 +202,7 @@ class PostDetailAdapter(private val context: Context,
             } else {
                 moreBtn.visibility = View.VISIBLE
 
-                moreBtn.tag = item.postId
+                moreBtn.tag = position
                 moreBtn.setOnClickListener(moreListener)
             }
 
