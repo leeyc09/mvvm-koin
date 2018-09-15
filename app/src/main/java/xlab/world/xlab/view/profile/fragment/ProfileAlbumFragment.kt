@@ -92,9 +92,16 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
         changeViewTypeListener = changeViewTypeListener ?: View.OnClickListener { view ->
             if (recyclerView.layoutManager is GridLayoutManager) { // post thumbnail adapter
                 PrintLog.d("post view current type", "grid", profileViewModel.tag)
+                // 포스트 썸네일보기 -> 자세히 보기
+                recyclerView.adapter = postDetailAdapter
+                recyclerView.layoutManager = linearLayoutManager
             } else if (recyclerView.layoutManager is LinearLayoutManager) { // post detail adapter
                 PrintLog.d("post view current type", "linear", profileViewModel.tag)
+                // 포스트 자세히 보기 -> 썸네일 보기
+                recyclerView.adapter = postThumbnailAdapter
+                recyclerView.layoutManager = gridLayoutManager
             }
+            recyclerView.scrollToPosition(0)
         }
 
         // posts thumbnail, detail recycler view & adapter 초기화
@@ -112,7 +119,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                 sharePostListener = View.OnClickListener {  },
                 hashTagListener = defaultListener!!.hashTagListener,
                 goodsListener = defaultListener!!.goodsListener)
-        recyclerView.adapter = postDetailAdapter
+        recyclerView.adapter = postThumbnailAdapter
         gridLayoutManager?:let {
             gridLayoutManager = GridLayoutManager(context, 3, GridLayoutManager.VERTICAL, false)
             gridLayoutManager!!.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
@@ -126,26 +133,30 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
             }
         }
         linearLayoutManager = linearLayoutManager ?: LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        recyclerView.layoutManager = linearLayoutManager
+        recyclerView.layoutManager = gridLayoutManager
         if (recyclerView.itemDecorationCount < 1)
             recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, offset = 0.5f))
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         if (needInitData) {
+            profileViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = 1)
             profileViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = 1, loginUserId = spHelper.userId)
         }
     }
 
     private fun onBindEvent() {
-        noPostsLayout.setOnClickListener(this) // 포스트 업로
+        noPostsLayout.setOnClickListener(this) // 포스트 업로드
 
         swipeRefreshLayout.setOnRefreshListener {
+            profileViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = 1, loadingBar = null)
             profileViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = 1, loginUserId = spHelper.userId, loadingBar = null)
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             if (it is GridLayoutManager) { // post thumbnail adapter
-
+                ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = postThumbnailAdapter!!.dataLoading, total = postThumbnailAdapter!!.dataTotal) { _ ->
+                    profileViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = postThumbnailAdapter!!.dataNextPage)
+                }
             } else if (it is LinearLayoutManager) { // post detail adapter
                 ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = postDetailAdapter!!.dataLoading, total = postDetailAdapter!!.dataTotal) { _ ->
                     profileViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = postDetailAdapter!!.dataNextPage, loginUserId = spHelper.userId)
@@ -168,6 +179,18 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast?.showToast(message = it)
                 }
+                uiData.postsThumbData?.let {
+                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
+                        // post 없으면 no post 띄우기
+                        setBundleVisibilityData(noPostsLayout =
+                        if (it.items.isEmpty()) View.VISIBLE
+                        else View.GONE)
+                        postThumbnailAdapter?.updateData(postThumbnailData = it)
+                        swipeRefreshLayout.isRefreshing = false
+                    }
+                    else
+                        postThumbnailAdapter?.addData(postThumbnailData = it)
+                }
                 uiData.postsDetailData?.let {
                     if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
                         // post 없으면 no post 띄우기
@@ -179,6 +202,16 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                     }
                     else
                         postDetailAdapter?.addData(postDetailData = it)
+                }
+            }
+        })
+
+        // load user posts thumb 이벤트 observe
+        profileViewModel.loadUserPostsThumbDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadUserPostsThumbDataEvent ->
+            loadUserPostsThumbDataEvent?.let { _ ->
+                loadUserPostsThumbDataEvent.status?.let {
+                    postThumbnailAdapter?.dataLoading = it
+                    needInitData = false
                 }
             }
         })

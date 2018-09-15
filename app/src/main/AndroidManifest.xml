@@ -125,6 +125,11 @@
             android:name=".view.profile.ProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.profileEdit.ProfileEditActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

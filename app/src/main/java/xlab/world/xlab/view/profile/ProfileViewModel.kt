@@ -168,7 +168,15 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
             apiPost.requestUserPostsThumbnail(scheduler = scheduler, userId = userId, page = page,
                     responseData = {
                         val postsThumbData = PostThumbnailData(total = it.total, nextPage = page + 1)
-
+                        it.postsData?.forEach { postData ->
+                            postsThumbData.items.add(PostThumbnailListData(
+                                    dataType = AppConstants.ADAPTER_CONTENT,
+                                    postType = postData.postType,
+                                    postId = postData.id,
+                                    imageURL = postData.postFile.firstOrNull(),
+                                    youTubeVideoID = postData.youTubeVideoID
+                            ))
+                        }
 
                         // posts 있고 첫 페이지 경우 -> header 추가
                         if (postsThumbData.items.isNotEmpty() && page == 1) {

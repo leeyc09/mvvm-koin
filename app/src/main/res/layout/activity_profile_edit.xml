@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.profileEdit.ProfileEditActivity">
+
+    <include
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/action_bar_default"/>
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@id/actionBar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="60dp">
+
+            <android.support.constraint.Guideline
+                android:id="@+id/startGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.0555" />
+
+            <android.support.constraint.Guideline
+                android:id="@+id/endGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.9444" />
+
+            <FrameLayout
+                android:id="@+id/profileImageLayout"
+                android:layout_width="168dp"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="w, 1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="16dp">
+
+                <ImageView
+                    android:id="@+id/imageViewProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/profile_image_default"/>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/profile_image_edit_overlay"/>
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/photo"/>
+
+            </FrameLayout>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:id="@+id/textViewNickName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/nick_name"
+                android:textSize="14sp"
+                android:textColor="@color/colorA4A4A4"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintTop_toBottomOf="@id/profileImageLayout"
+                android:layout_marginStart="3dp"
+                android:layout_marginTop="36dp"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/layoutNick"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:hintEnabled="false"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintTop_toBottomOf="@id/textViewNickName">
+
+                <xlab.world.xlab.utils.view.editText.EditTextBoldNoto
+                    android:id="@+id/editTextNick"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/nick_name"
+                    android:imeOptions="actionNext"
+                    android:inputType="textNoSuggestions"
+                    android:maxLines="1"
+                    android:textColor="@color/color000000"
+                    android:textColorHint="@color/colorE2E2E2"
+                    android:textSize="17sp" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutConfirmNick"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintTop_toBottomOf="@id/layoutNick"
+                android:visibility="invisible">
+
+                <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                    android:id="@+id/textViewNickConfirm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/confirm_nick_length"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorDE5359"/>
+            </LinearLayout>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:id="@+id/textViewIntroduction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/introduction"
+                android:textSize="14sp"
+                android:textColor="@color/colorA4A4A4"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintTop_toBottomOf="@id/layoutConfirmNick"
+                android:layout_marginStart="3dp"
+                android:layout_marginTop="19dp"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                android:id="@+id/textViewIntroductionNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="100"
+                android:textSize="14sp"
+                android:textColor="@color/colorBFBFBF"
+                app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toTopOf="@id/textViewIntroduction" />
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/layoutIntroduction"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:hintEnabled="false"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintTop_toBottomOf="@id/textViewIntroduction">
+
+                <xlab.world.xlab.utils.view.editText.EditTextBoldNoto
+                    android:id="@+id/editTextIntroduction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textNoSuggestions|textMultiLine"
+                    android:scrollHorizontally="false"
+                    android:maxLength="100"
+                    android:textColor="@color/color000000"
+                    android:textColorHint="@color/colorE2E2E2"
+                    android:textSize="14sp"
+                    android:imeOptions="actionDone"
+                    android:hint="@string/introduction_hint"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <View
+                android:id="@+id/divideView"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:background="@color/colorF5F5F5"
+                app:layout_constraintTop_toBottomOf="@id/layoutIntroduction"
+                android:layout_marginTop="35dp"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+                android:id="@+id/textViewDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_detail"
+                android:textSize="19sp"
+                android:textColor="@color/color000000"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintTop_toBottomOf="@id/divideView"
+                android:layout_marginTop="24dp"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:id="@+id/textViewProfileDetail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_detail_text"
+                android:textSize="13sp"
+                android:textColor="@color/colorFFFFFF"
+                android:background="@color/color000000"
+                android:paddingStart="21dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textViewDetail"
+                android:layout_marginTop="26dp"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:id="@+id/textGender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/gender"
+                android:textSize="14sp"
+                android:textColor="@color/colorA4A4A4"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintTop_toBottomOf="@id/textViewProfileDetail"
+                android:layout_marginTop="16dp"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                android:id="@+id/textViewGender"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/none_type"
+                android:textSize="18sp"
+                android:textColor="@color/text_profile_selected_color"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toBottomOf="@id/textGender"
+                android:layout_marginTop="10dp"/>
+
+            <View
+                android:id="@+id/genderDivide"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/colorBFBFBF"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toBottomOf="@id/textViewGender"
+                android:layout_marginTop="4dp"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:visibility="gone"
+                android:id="@+id/textLocale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/locale"
+                android:textSize="14sp"
+                android:textColor="@color/colorA4A4A4"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintTop_toBottomOf="@id/genderDivide"
+                android:layout_marginTop="36dp"/>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/localLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toBottomOf="@id/textLocale"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                    android:id="@+id/textViewLocale"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/none_type"
+                    android:textSize="18sp"
+                    android:textColor="@color/text_profile_selected_color"
+                    android:layout_weight="1"/>
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/arrow_select_black"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+            <View
+                android:visibility="gone"
+                android:id="@+id/localDivide"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/colorBFBFBF"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toBottomOf="@id/localLayout"
+                android:layout_marginTop="4dp"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:id="@+id/textBirth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/birth"
+                android:textSize="14sp"
+                android:textColor="@color/colorA4A4A4"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintTop_toBottomOf="@id/localDivide"
+                android:layout_marginTop="36dp"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/layoutBirth"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:hintEnabled="false"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintTop_toBottomOf="@id/textBirth">
+
+                <xlab.world.xlab.utils.view.editText.EditTextBoldNoto
+                    android:id="@+id/editTextBirth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textNoSuggestions|numberDecimal"
+                    android:maxLength="4"
+                    android:textColor="@color/color000000"
+                    android:textColorHint="@color/colorE2E2E2"
+                    android:textSize="18sp"
+                    android:imeOptions="actionDone"
+                    android:hint="@string/none_type"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutConfirmBirth"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="@id/startGuideline"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintTop_toBottomOf="@id/layoutBirth"
+                android:visibility="invisible">
+
+                <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/birth_confirm"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorDE5359"/>
+            </LinearLayout>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>

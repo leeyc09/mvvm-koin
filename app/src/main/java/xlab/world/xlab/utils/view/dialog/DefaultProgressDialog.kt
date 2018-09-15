@@ -3,6 +3,7 @@ package xlab.world.xlab.utils.view.dialog
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.Window
 import kotlinx.android.synthetic.main.dialog_default_progress.*
 import xlab.world.xlab.R
@@ -36,6 +37,19 @@ class DefaultProgressDialog(context: Context): Dialog(context) {
     override fun show() {
         PrintLog.d("dialog", "show", tag)
         super.show()
+
+        // 5초 이상 로딩중이면 로딩바 사라지게
+        val toastCountDown = object: CountDownTimer(5000, 5000) {
+            override fun onTick(millisUntilFinished: Long) {
+            }
+            override fun onFinish() {
+                if (isShowing) {
+                    PrintLog.d("dialog", "dismiss time out", tag)
+                    dismiss()
+                }
+            }
+        }
+        toastCountDown.start()
     }
 
     override fun dismiss() {
