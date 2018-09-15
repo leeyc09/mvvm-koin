@@ -3,6 +3,10 @@ package xlab.world.xlab.utils.support
 object AppConstants {
     const val LOCAL_HTML_URL = "file:///android_asset/html/"
 
+    // permission request code
+    const val PERMISSION_REQUEST_CAMERA_CODE = 1
+    const val PERMISSION_REQUEST_GALLERY_CODE = 2
+
     // user login type
     const val LOCAL_LOGIN = 0
     const val FACEBOOK_LOGIN = 1

@@ -3,6 +3,9 @@
     package="xlab.world.xlab">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera2.full" />
 
     <application
         android:name=".GlobalApplication"
@@ -54,17 +57,22 @@
             </intent-filter>
         </service>
 
+        <!-- TODO: TEST ACTIVITY -->
+        <activity android:name=".TestActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <!-- TODO: Activities -->
         <activity
             android:name=".view.preload.PreloadActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
