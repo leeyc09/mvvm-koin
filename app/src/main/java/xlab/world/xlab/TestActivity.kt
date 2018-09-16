@@ -8,25 +8,26 @@ import android.util.Size
 import android.view.Surface
 import android.view.TextureView
 import kotlinx.android.synthetic.main.activity_test.*
+import org.koin.android.ext.android.inject
 import xlab.world.xlab.utils.support.AppConstants
+import xlab.world.xlab.utils.support.PermissionHelper
 import xlab.world.xlab.utils.support.PrintLog
 
 class TestActivity : AppCompatActivity(), CameraAPI.CameraInterface, TextureView.SurfaceTextureListener {
 
     private lateinit var camera: CameraAPI
-    private lateinit var xlabPermission: XlabPermission
+    private val permissionHelper: PermissionHelper by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
-        xlabPermission = XlabPermission(this)
 
         textureView.surfaceTextureListener = this
 
         camera = CameraAPI(cameraInterface = this)
 
-        if (!xlabPermission.hasPermission(xlabPermission.cameraPermissions)) { // check permission granted
-            xlabPermission.requestCameraPermissions() // request permission
+        if (!permissionHelper.hasPermission(this, permissionHelper.cameraPermissions)) { // check permission granted
+            permissionHelper.requestCameraPermissions(this) // request permission
         }
     }
 
@@ -35,7 +36,7 @@ class TestActivity : AppCompatActivity(), CameraAPI.CameraInterface, TextureView
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             AppConstants.PERMISSION_REQUEST_CAMERA_CODE -> {
-                if (xlabPermission.resultRequestPermissions(grantResults)) { // all permission grant
+                if (permissionHelper.resultRequestPermissions(grantResults)) { // all permission grant
                 } else {
                     PrintLog.d("onRequestPermissionsResult", "Permission Denied")
                 }

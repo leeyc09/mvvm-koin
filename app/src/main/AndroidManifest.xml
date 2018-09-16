@@ -58,21 +58,21 @@
         </service>
 
         <!-- TODO: TEST ACTIVITY -->
-        <activity android:name=".TestActivity"
+        <activity
+            android:name=".TestActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/customNoActionBarTheme" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/customNoActionBarTheme"></activity>
         <!-- TODO: Activities -->
         <activity
             android:name=".view.preload.PreloadActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -138,6 +138,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".view.follow.FollowerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
     </application>
 
 </manifest>

@@ -64,6 +64,8 @@ val utilModule: Module = applicationContext {
     bean { FontColorSpan(context = get()) }
     // provided letter or digit input filter
     bean { LetterOrDigitInputFilter() }
+    // provided permission checker
+    bean { PermissionHelper() }
 }
 
 const val xlabRemoteBaseUrl = ApiURL.XLAB_API_URL_SSL

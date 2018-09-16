@@ -84,6 +84,9 @@
     <string name="add_topic">반려동물 추가하기</string>
     <string name="topic_setting">토픽 설정</string>
 
+    <!-- TODO: Follow -->
+    <string name="no_follower_user">팔로워가 아직 없어요</string>
+
     <!-- TODO: Post Type -->
     <string name="youtube_link">유튜브 링크</string>
     <string name="youtube_video_id">유튜브 영상 아이디</string>
