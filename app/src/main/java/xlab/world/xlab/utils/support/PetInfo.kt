@@ -13,8 +13,8 @@ class PetInfo(context: Context) {
     private val tag = "PetInfo"
 
     // pet type
-    private val dog = "PAF01"
-    private val cat = "PAF02"
+    val dogCode = "PAF01"
+    val catCode = "PAF02"
     val petType = HashMap<String, String>() // code, name
 
     // pet gender type

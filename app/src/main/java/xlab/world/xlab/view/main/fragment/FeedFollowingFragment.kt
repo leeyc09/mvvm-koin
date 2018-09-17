@@ -16,6 +16,7 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.PostDetailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.listener.PostDetailListener
+import xlab.world.xlab.utils.listener.UserDefaultListener
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SPHelper
@@ -62,16 +63,13 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
 
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
-        postDetailListener = postDetailListener ?: PostDetailListener(context = context as Activity, isLogin = spHelper.accessToken.isNotEmpty(), fragmentManager = (context as AppCompatActivity).supportFragmentManager,
+        postDetailListener = postDetailListener ?: PostDetailListener(context = context as Activity, fragmentManager = (context as AppCompatActivity).supportFragmentManager,
                 postMoreEvent = { _, _ ->},
                 likePostEvent = { position ->
                     postDetailViewModel.likePost(authorization = spHelper.authorization, position = position, postData = followingFeedAdapter!!.getItem(position))
                 },
                 savePostEvent = { position ->
                     postDetailViewModel.savePost(authorization = spHelper.authorization, position = position, postData = followingFeedAdapter!!.getItem(position))
-                },
-                followUserEvent = { position ->
-                    postDetailViewModel.userFollow(authorization = spHelper.authorization, position = position, postData = followingFeedAdapter!!.getItem(position))
                 })
 
         // following feed recycler view & adapter 초기화

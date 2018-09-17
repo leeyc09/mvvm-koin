@@ -4,19 +4,21 @@ import android.app.Activity
 import android.support.v4.app.FragmentManager
 import android.support.v4.content.res.ResourcesCompat
 import android.view.View
+import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.utils.support.PrintLog
+import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.view.dialog.DefaultDialog
 import xlab.world.xlab.utils.view.dialog.DialogCreator
 import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
 
 class PostDetailListener(context: Activity,
-                         private val isLogin: Boolean,
                          private val fragmentManager: FragmentManager,
                          private val postMoreEvent: (Int?, Int?) -> Unit,
                          private val likePostEvent: (Int) -> Unit,
-                         private val savePostEvent: (Int) -> Unit,
-                         private val followUserEvent: (Int) -> Unit) {
+                         private val savePostEvent: (Int) -> Unit) {
+
+    private val spHelper: SPHelper by context.inject()
 
     private val postDeleteDialog = DefaultDialog(
             context = context,
@@ -61,7 +63,7 @@ class PostDetailListener(context: Activity,
 
     // 포스트 like
     val likePostListener = View.OnClickListener { view ->
-        if (!isLogin) {
+        if (spHelper.accessToken.isEmpty()) {
             loginDialog.show()
         } else {
             if (view.tag is Int)
@@ -71,21 +73,11 @@ class PostDetailListener(context: Activity,
 
     // 포스트 save
     val savePostListener = View.OnClickListener { view ->
-        if (!isLogin) {
+        if (spHelper.accessToken.isEmpty()) {
             loginDialog.show()
         } else {
             if (view.tag is Int)
                 savePostEvent(view.tag as Int)
-        }
-    }
-
-    // 포스트 user follow
-    val followListener = View.OnClickListener { view ->
-        if (!isLogin) {
-            loginDialog.show()
-        } else {
-            if (view.tag is Int)
-                followUserEvent(view.tag as Int)
         }
     }
 }

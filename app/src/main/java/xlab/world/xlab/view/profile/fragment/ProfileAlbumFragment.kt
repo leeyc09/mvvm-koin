@@ -20,6 +20,7 @@ import xlab.world.xlab.adapter.recyclerView.PostDetailAdapter
 import xlab.world.xlab.adapter.recyclerView.PostThumbnailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.listener.PostDetailListener
+import xlab.world.xlab.utils.listener.UserDefaultListener
 import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SPHelper
@@ -73,7 +74,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
 
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
-        postDetailListener = postDetailListener ?: PostDetailListener(context = context as Activity, isLogin = spHelper.accessToken.isNotEmpty(), fragmentManager = (context as AppCompatActivity).supportFragmentManager,
+        postDetailListener = postDetailListener ?: PostDetailListener(context = context as Activity, fragmentManager = (context as AppCompatActivity).supportFragmentManager,
                 postMoreEvent = { editPosition, deletePosition ->
                     editPosition?.let {
                         PrintLog.d("postMore", "post edit", profileViewModel.tag)
@@ -87,8 +88,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                 },
                 savePostEvent = { position ->
                     postDetailViewModel.savePost(authorization = spHelper.authorization, position = position, postData = postDetailAdapter!!.getItem(position))
-                },
-                followUserEvent = {})
+                })
         changeViewTypeListener = changeViewTypeListener ?: View.OnClickListener { view ->
             if (recyclerView.layoutManager is GridLayoutManager) { // post thumbnail adapter
                 PrintLog.d("post view current type", "grid", profileViewModel.tag)

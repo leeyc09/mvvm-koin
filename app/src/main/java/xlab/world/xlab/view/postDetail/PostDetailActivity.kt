@@ -17,6 +17,7 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.PostDetailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.listener.PostDetailListener
+import xlab.world.xlab.utils.listener.UserDefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.dialog.DialogCreator
@@ -34,6 +35,7 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
+    private lateinit var userDefaultListener: UserDefaultListener
 
     private lateinit var defaultListener: DefaultListener
     private lateinit var postDetailListener: PostDetailListener
@@ -96,7 +98,7 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
         progressDialog = DefaultProgressDialog(context = this)
 
         defaultListener = DefaultListener(context = this)
-        postDetailListener = PostDetailListener(context = this, isLogin = spHelper.accessToken.isNotEmpty(), fragmentManager = supportFragmentManager,
+        postDetailListener = PostDetailListener(context = this, fragmentManager = supportFragmentManager,
                 postMoreEvent = { editPosition, deletePosition ->
                     editPosition?.let { _ ->
                         PrintLog.d("postMore", "post edit", "PostDetail")
@@ -110,7 +112,8 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
                 },
                 savePostEvent = { position ->
                     postDetailViewModel.savePost(authorization = spHelper.authorization, position = position, postData = postDetailAdapter.getItem(position))
-                },
+                })
+        userDefaultListener = UserDefaultListener(context = this,
                 followUserEvent = { position ->
                     postDetailViewModel.userFollow(authorization = spHelper.authorization, position = position, postData = postDetailAdapter.getItem(position))
                 })
@@ -118,7 +121,7 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
         postDetailAdapter = PostDetailAdapter(context = this,
                 changeViewTypeListener = null,
                 profileListener = defaultListener.profileListener,
-                followListener = postDetailListener.followListener,
+                followListener = userDefaultListener.followListener,
                 moreListener = postDetailListener.postMoreListener,
                 likePostListener = postDetailListener.likePostListener,
                 commentsListener = defaultListener.commentsListener,

@@ -5,6 +5,7 @@ import android.net.Uri
 import xlab.world.xlab.data.response.ResUserLoginData
 import xlab.world.xlab.utils.view.dialog.DialogCreator
 import xlab.world.xlab.view.comment.CommentActivity
+import xlab.world.xlab.view.follow.FollowerActivity
 import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
@@ -120,7 +121,8 @@ object RunActivity {
     }
 
     fun followerActivity(context: Activity, userId: String) {
-        PrintLog.d("Run", "Follower", tag)
+        val intent = FollowerActivity.newIntent(context = context, userId = userId)
+        context.startActivityForResult(intent, RequestCodeData.FOLLOW)
     }
 
     fun followingActivity(context: Activity, userId: String) {

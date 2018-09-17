@@ -162,7 +162,7 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
 
         uiData.value = UIModel(isLoading = true)
         launch {
-            apiFollow.follow(scheduler = scheduler, authorization = authorization, userId = postData.userId,
+            apiFollow.requestFollow(scheduler = scheduler, authorization = authorization, userId = postData.userId,
                     responseData = {
                         PrintLog.d("follow success", it.status.toString(), tag)
                         postData.isFollowing = it.status

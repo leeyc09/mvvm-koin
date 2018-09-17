@@ -18,6 +18,7 @@ import xlab.world.xlab.server.provider.*
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.comment.CommentViewModel
+import xlab.world.xlab.view.follow.FollowViewModel
 import xlab.world.xlab.view.main.MainViewModel
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
@@ -49,6 +50,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { CommentViewModel(apiPost = get(), apiComment = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Profile View
     viewModel { ProfileViewModel(apiUser = get(), apiPet = get(), apiFollow = get(), apiPost = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for follow View
+    viewModel { FollowViewModel(apiFollow = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

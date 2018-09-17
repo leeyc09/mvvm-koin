@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorFFFFFF"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
+    android:orientation="horizontal"
+    android:gravity="end"
+    android:id="@+id/mainLayout">
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginEnd="4dp">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/profileBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp">
+
+            <ImageView
+                android:id="@+id/imageViewProfile"
+                android:layout_width="44dp"
+                android:layout_height="44dp"/>
+
+            <android.support.constraint.Guideline
+                android:id="@+id/centerGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                android:id="@+id/textViewNick"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/nick_name"
+                android:textSize="15sp"
+                android:textColor="@color/color000000"
+                android:singleLine="true"
+                android:ellipsize="end"
+                app:layout_constraintStart_toEndOf="@id/imageViewProfile"
+                app:layout_constraintEnd_toStartOf="@id/imageViewFollowing"
+                app:layout_constraintBottom_toBottomOf="@id/centerGuideline"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="4dp"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:id="@+id/textViewTopic"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/topic"
+                android:textSize="12sp"
+                android:textColor="@color/colorA4A4A4"
+                android:singleLine="true"
+                android:ellipsize="end"
+                app:layout_constraintStart_toEndOf="@id/imageViewProfile"
+                app:layout_constraintEnd_toStartOf="@id/imageViewFollowing"
+                app:layout_constraintTop_toTopOf="@id/centerGuideline"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="4dp"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                android:id="@+id/textViewCenterNick"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/nick_name"
+                android:textSize="15sp"
+                android:textColor="@color/color000000"
+                android:singleLine="true"
+                android:ellipsize="end"
+                app:layout_constraintStart_toEndOf="@id/imageViewProfile"
+                app:layout_constraintEnd_toStartOf="@id/imageViewFollowing"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="4dp"/>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/followBtn"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:padding="10dp"
+        android:src="@drawable/follow_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="10dp"/>
+
+</LinearLayout>
