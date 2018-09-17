@@ -1,6 +1,7 @@
 package xlab.world.xlab.utils.support
 
 import android.util.Patterns
+import java.util.*
 
 object DataRegex {
     private val regexNum = Regex("""\d+""") // for number format check
@@ -12,6 +13,8 @@ object DataRegex {
 
     private const val nickNameMinLength = 3
     private const val nickNameMaxLength = 10
+
+    private const val birthYearMin = 1920
 
     // 이메일 정규식
     fun emailRegex(email: String): Boolean {
@@ -37,5 +40,10 @@ object DataRegex {
     // 닉네임 정규식
     fun nickNameRegex(nickName: String): Boolean {
         return (nickName.length in nickNameMinLength..nickNameMaxLength)
+    }
+
+    // 생년월일 정규식
+    fun birthRegex(birth: Int): Boolean {
+        return (birth in birthYearMin..Calendar.getInstance().get(Calendar.YEAR))
     }
 }

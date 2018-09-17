@@ -43,6 +43,7 @@ object RequestCodeData {
     const val GOODS_RATING = 610
     const val COMPLETE_BUYING = 611
 
+    const val GALLARY_IMAGE_SELECT = 700
     const val COMBINATION_SEARCH = 800
     const val NOTIFICATION = 900
 }

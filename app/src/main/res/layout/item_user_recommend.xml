@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="104dp"
+    android:layout_height="122dp"
+    android:background="@color/colorFFFFFF"
+    android:id="@+id/mainLayout">
+
+    <ImageView
+        android:id="@+id/imageViewProfile"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"/>
+
+    <ImageView
+        android:id="@+id/followBtn"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:src="@drawable/follow_button"
+        android:layout_gravity="end"
+        android:padding="10dp"/>
+
+    <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+        android:id="@+id/textViewNick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/color000000"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:layout_marginTop="94dp"
+        android:layout_gravity="center_horizontal"/>
+
+</FrameLayout>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/colorFFFFFF">
+
+    <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+        android:id="@+id/maleBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="1"
+        android:text="@string/male"
+        android:textSize="14sp"
+        android:textColor="@color/color000000"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:paddingTop="17dp"
+        android:paddingBottom="16dp"/>
+
+    <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+        android:id="@+id/femleBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="0"
+        android:text="@string/female"
+        android:textSize="14sp"
+        android:textColor="@color/color000000"
+        android:gravity="center"
+        android:paddingTop="17dp"
+        android:paddingBottom="16dp"/>
+
+    <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+        android:id="@+id/etcBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:tag="2"
+        android:text="@string/etc"
+        android:textSize="14sp"
+        android:textColor="@color/color000000"
+        android:gravity="center"
+        android:paddingTop="17dp"
+        android:paddingBottom="16dp"/>
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/colorBFBFBF"
+        android:layout_marginTop="8dp"/>
+
+    <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+        android:id="@+id/cancelBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/cancel"
+        android:textSize="14sp"
+        android:textColor="@color/colorA4A4A4"
+        android:gravity="center"
+        android:paddingTop="17dp"
+        android:paddingBottom="16dp"/>
+
+</LinearLayout>

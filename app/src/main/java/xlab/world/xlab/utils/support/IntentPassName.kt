@@ -11,4 +11,5 @@ object IntentPassName {
     const val POST_ID = "POST_ID"
     const val GO_COMMENT = "GO_COMMENT"
     const val USER_ID = "USER_ID"
+    const val WITH_CIRCLE_OVERLAY = "WITH_CIRCLE_OVERLAY"
 }

@@ -47,6 +47,15 @@ interface ApiUserProvider {
     // profile main data 요청
     fun requestProfileMain(scheduler: SchedulerProvider, authorization: String, userId: String,
                            responseData: (ResProfileMainData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // profile edit data 요청
+    fun requestProfileEdit(scheduler: SchedulerProvider, authorization: String,
+                           responseData: (ResProfileEditData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // recommend user data 요청
+    fun requestRecommendUser(scheduler: SchedulerProvider, authorization: String, page: Int,
+                             responseData: (ResUserDefaultData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
 }
 
 class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
@@ -141,6 +150,28 @@ class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
     override fun requestProfileMain(scheduler: SchedulerProvider, authorization: String, userId: String,
                                     responseData: (ResProfileMainData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserRequest.profileMain(authorization = authorization, userId = userId)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestProfileEdit(scheduler: SchedulerProvider, authorization: String,
+                                    responseData: (ResProfileEditData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.profileEdit(authorization = authorization)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestRecommendUser(scheduler: SchedulerProvider, authorization: String, page: Int,
+                                      responseData: (ResUserDefaultData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.getRecommendUser(authorization = authorization, page = page)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

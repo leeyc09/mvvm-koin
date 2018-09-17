@@ -35,6 +35,10 @@ object AppConstants {
     const val HASH_TAG_SIGN = '#'
     const val USER_TAG_SIGN = '@'
 
+    // gallery adapter type
+    const val GALLERY_ONE = 0
+    const val GALLERY_MANY = 1
+
     // goods sort type
     const val SORT_MATCH = 1
     const val SORT_DOWN_PRICE = 2

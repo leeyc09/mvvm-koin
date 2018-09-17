@@ -19,10 +19,12 @@ import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.comment.CommentViewModel
 import xlab.world.xlab.view.follow.FollowViewModel
+import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
 import xlab.world.xlab.view.main.MainViewModel
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
 import xlab.world.xlab.view.profile.ProfileViewModel
+import xlab.world.xlab.view.profileEdit.ProfileEditViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
 import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
 import xlab.world.xlab.view.topicSetting.TopicSettingViewModel
@@ -50,8 +52,12 @@ val viewModelModule: Module = applicationContext {
     viewModel { CommentViewModel(apiPost = get(), apiComment = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Profile View
     viewModel { ProfileViewModel(apiUser = get(), apiPet = get(), apiFollow = get(), apiPost = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Profile Edit View
+    viewModel { ProfileEditViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for follow View
-    viewModel { FollowViewModel(apiFollow = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { FollowViewModel(apiFollow = get(), apiUser = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Gallery Image Select View
+    viewModel { GalleryImageSelectViewModel(scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

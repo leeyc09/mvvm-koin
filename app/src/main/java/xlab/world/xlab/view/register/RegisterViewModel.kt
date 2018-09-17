@@ -75,7 +75,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onNext(arrayListOf(DataRegex.passwordLengthRegex(password), DataRegex.passwordTextRegex(password)))
                 it.onComplete()
             }.with(scheduler).subscribe { isEnable ->
-                PrintLog.d("emailRegexCheck", isEnable.toString(), tag)
+                PrintLog.d("passwordRegexCheck", isEnable.toString(), tag)
                 uiData.value = UIModel(passwordLengthRegex = isEnable[0], passwordTextRegex = isEnable[1])
             }
         }
@@ -85,14 +85,12 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
         launch {
             Observable.create<RegexResultData> {
                 val nickNameRegex = DataRegex.nickNameRegex(nickName)
-                val nickNameRegexText =
-                        if (!nickNameRegex) TextConstants.NICK_LENGTH_REGEX_TEXT
-                        else null
+                val nickNameRegexText = TextConstants.NICK_LENGTH_REGEX_TEXT
 
                 it.onNext(RegexResultData(text = nickNameRegexText, result = nickNameRegex))
                 it.onComplete()
             }.with(scheduler).subscribe { resultData ->
-                PrintLog.d("emailRegexCheck", resultData.result.toString(), tag)
+                PrintLog.d("nickRegexCheck", resultData.result.toString(), tag)
                 uiData.value = UIModel(nickNameRegexText = resultData.text, nickNameRegex = resultData.result)
             }
         }

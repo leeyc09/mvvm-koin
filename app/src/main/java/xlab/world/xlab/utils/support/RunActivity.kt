@@ -3,14 +3,16 @@ package xlab.world.xlab.utils.support
 import android.app.Activity
 import android.net.Uri
 import xlab.world.xlab.data.response.ResUserLoginData
-import xlab.world.xlab.utils.view.dialog.DialogCreator
 import xlab.world.xlab.view.comment.CommentActivity
 import xlab.world.xlab.view.follow.FollowerActivity
+import xlab.world.xlab.view.follow.FollowingActivity
+import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectActivity
 import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
 import xlab.world.xlab.view.profile.ProfileActivity
+import xlab.world.xlab.view.profileEdit.ProfileEditActivity
 import xlab.world.xlab.view.register.LocalRegisterActivity
 import xlab.world.xlab.view.register.SocialRegisterActivity
 import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
@@ -77,7 +79,13 @@ object RunActivity {
     }
 
     fun profileEditActivity(context: Activity) {
-        PrintLog.d("Run", "ProfileEdit", tag)
+        val intent = ProfileEditActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.PROFILE_EDIT)
+    }
+
+    fun galleryImageSelectActivity(context: Activity, withOverlay: Boolean) {
+        val intent = GalleryImageSelectActivity.newIntent(context = context, withOverlay = withOverlay)
+        context.startActivityForResult(intent, RequestCodeData.PROFILE_EDIT)
     }
 
     fun goodsDetailActivity(context: Activity, goodsCd: String) {
@@ -126,6 +134,7 @@ object RunActivity {
     }
 
     fun followingActivity(context: Activity, userId: String) {
-        PrintLog.d("Run", "Following", tag)
+        val intent = FollowingActivity.newIntent(context = context, userId = userId)
+        context.startActivityForResult(intent, RequestCodeData.FOLLOW)
     }
 }

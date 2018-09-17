@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xlab.world.xlab.utils.view.cardView.SquareCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardElevation="0dp"
+    app:cardCornerRadius="0dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:id="@+id/mainLayout">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="center"/>
+
+    <ImageView
+        android:id="@+id/overlayFilter"
+        android:src="@color/colorWhite50"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <ImageView
+        android:id="@+id/selectedFilter"
+        android:src="@drawable/gallery_select_box"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</xlab.world.xlab.utils.view.cardView.SquareCardView>

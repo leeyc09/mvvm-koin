@@ -198,16 +198,14 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
 
-        <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+        <ImageView
             android:id="@+id/loginBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/login"
-            android:textSize="14sp"
-            android:textColor="@color/enable_bfbfbf_601ec7"
+            android:src="@drawable/okay_button"
             android:enabled="false"
-            android:paddingTop="14dp"
-            android:paddingBottom="14dp"
+            android:paddingTop="13dp"
+            android:paddingBottom="13dp"
             android:paddingEnd="20dp"
             android:paddingStart="24dp"
             app:layout_constraintTop_toTopOf="parent"

@@ -24,11 +24,8 @@ class PostDetailGoodsAdapter(private val context: Context,
 
     private val postDetailGoodsData: PostDetailGoodsData = PostDetailGoodsData()
 
-    private val imagePlaceHolder = ColorDrawable(ResourcesCompat.getColor(context.resources, R.color.colorE2E2E2, null))
     private val glideOption = RequestOptions()
             .circleCrop()
-            .placeholder(imagePlaceHolder)
-            .error(imagePlaceHolder)
 
     fun updateData(postDetailGoodsData: PostDetailGoodsData) {
         this.postDetailGoodsData.items.clear()

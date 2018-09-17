@@ -110,18 +110,16 @@
             android:layout_height="0.5dp"
             android:background="@color/colorC1C1C1"/>
 
-        <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+        <ImageView
             android:id="@+id/finishBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/finish"
-            android:textSize="14sp"
-            android:textColor="@color/enable_bfbfbf_601ec7"
+            android:src="@drawable/okay_button"
             android:enabled="false"
-            android:paddingTop="16dp"
-            android:paddingBottom="15dp"
-            android:paddingStart="32dp"
-            android:paddingEnd="32dp"
+            android:paddingTop="11.5dp"
+            android:paddingBottom="12dp"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
             android:layout_gravity="center"/>
 
     </LinearLayout>

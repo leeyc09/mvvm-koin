@@ -127,6 +127,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         // 페이스북, 카카오 로그아웃
         socialAuth.facebookLogout()
         socialAuth.kakaoLogout()
+
+        loginViewModel.isLoginEnable(email = getEmailText(), password = getPasswordText())
     }
 
     private fun onBindEvent() {

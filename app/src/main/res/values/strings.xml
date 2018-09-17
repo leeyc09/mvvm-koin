@@ -121,7 +121,7 @@
     <string name="success_report">신고가 완료되었습니다</string>
 
     <!--TODO: Profile Edit-->
-    <string name="profile_edit_title">프로필 편집</string>
+    <string name="profile_edit">프로필 편집</string>
     <string name="introduction">소개</string>
     <string name="introduction_hint">100자 이내</string>
     <string name="profile_detail">세부정보</string>

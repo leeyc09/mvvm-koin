@@ -73,6 +73,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
         editTextNick.filters = arrayOf(letterOrDigitInputFilter)
 
         registerViewModel.contentTextSet(policy1 = defaultListener.clausePolicyListener, policy2 = defaultListener.personalInfoPolicyListener)
+        registerViewModel.inputDataRegex(email = getEmailText(), password = getPasswordText(), nickName = getNickNameText())
     }
 
     private fun onBindEvent() {

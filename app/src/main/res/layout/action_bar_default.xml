@@ -32,14 +32,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginStart="6dp"/>
 
-    <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+    <ImageView
         android:id="@+id/actionBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/okay_button"
         android:enabled="false"
-        android:text="@string/okay"
-        android:textSize="14sp"
-        android:textColor="@color/enable_bfbfbf_5300ed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

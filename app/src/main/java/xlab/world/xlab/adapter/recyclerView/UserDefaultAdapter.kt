@@ -45,20 +45,20 @@ class UserDefaultAdapter(private val context: Context,
         return userDefaultData.items[position]
     }
 
-    fun updateData(topicSettingData: UserDefaultData) {
+    fun updateData(userDefaultData: UserDefaultData) {
         this.userDefaultData.items.clear()
-        this.userDefaultData.items.addAll(topicSettingData.items)
+        this.userDefaultData.items.addAll(userDefaultData.items)
 
         this.userDefaultData.isLoading = false
-        this.userDefaultData.total = topicSettingData.total
+        this.userDefaultData.total = userDefaultData.total
         this.userDefaultData.nextPage = 2
 
         notifyDataSetChanged()
     }
 
-    fun addData(topicSettingData: UserDefaultData) {
+    fun addData(userDefaultData: UserDefaultData) {
         val size: Int = itemCount
-        this.userDefaultData.items.addAll(topicSettingData.items)
+        this.userDefaultData.items.addAll(userDefaultData.items)
 
         this.userDefaultData.isLoading = false
         this.userDefaultData.nextPage += 1

@@ -41,4 +41,11 @@ interface IUserRequest {
     @GET(ApiURL.USER_PROFILE_MAIN)
     fun profileMain(@Header("Authorization") authorization: String,
                     @Query("userId") userId: String): Observable<ResProfileMainData>
+
+    @GET(ApiURL.USER_PROFILE_EDIT)
+    fun profileEdit(@Header("Authorization") authorization: String): Observable<ResProfileEditData>
+
+    @GET(ApiURL.USER_RECOMMEND)
+    fun getRecommendUser(@Header("Authorization") authorization: String,
+                         @Query("page") page: Int): Observable<ResUserDefaultData>
 }

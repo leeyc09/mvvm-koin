@@ -78,6 +78,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         editTextNick.filters = arrayOf(letterOrDigitInputFilter)
 
         registerViewModel.contentTextSet(policy1 = defaultListener.clausePolicyListener, policy2 = defaultListener.personalInfoPolicyListener)
+        registerViewModel.nickNameRegexCheck(nickName = getNickNameText())
     }
 
     private fun onBindEvent() {

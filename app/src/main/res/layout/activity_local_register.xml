@@ -36,7 +36,7 @@
                 app:layout_constraintTop_toTopOf="parent"/>
 
             <xlab.world.xlab.utils.view.textView.TextViewBlackNoto
-                android:id="@+id/textViewLogin"
+                android:id="@+id/textViewRegister"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/register"
@@ -57,9 +57,9 @@
                 android:textSize="14sp"
                 android:maxLines="1"
                 android:hint="@string/email"
-                app:layout_constraintTop_toBottomOf="@id/textViewLogin"
-                app:layout_constraintStart_toStartOf="@id/textViewLogin"
-                app:layout_constraintEnd_toEndOf="@id/textViewLogin"
+                app:layout_constraintTop_toBottomOf="@id/textViewRegister"
+                app:layout_constraintStart_toStartOf="@id/textViewRegister"
+                app:layout_constraintEnd_toEndOf="@id/textViewRegister"
                 android:layout_marginTop="25dp"/>
 
             <LinearLayout
@@ -196,18 +196,16 @@
             android:layout_height="0.5dp"
             android:background="@color/colorC1C1C1"/>
 
-        <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+        <ImageView
             android:id="@+id/finishBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/finish"
-            android:textSize="14sp"
-            android:textColor="@color/enable_bfbfbf_601ec7"
+            android:src="@drawable/okay_button"
             android:enabled="false"
-            android:paddingTop="16dp"
-            android:paddingBottom="15dp"
-            android:paddingStart="32dp"
-            android:paddingEnd="32dp"
+            android:paddingTop="11.5dp"
+            android:paddingBottom="12dp"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
             android:layout_gravity="center"/>
 
     </LinearLayout>

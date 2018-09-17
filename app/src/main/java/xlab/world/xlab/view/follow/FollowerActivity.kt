@@ -110,7 +110,8 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
         defaultListener = DefaultListener(context = this)
         userDefaultListener = UserDefaultListener(context = this,
                 followUserEvent = { position ->
-
+                    followViewModel.userFollow(authorization = spHelper.authorization, position = position,
+                            userData = followerAdapter.getItem(position), recommendUserData = null)
                 })
 
         // follower recycler view & adapter 초기화
@@ -127,6 +128,12 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun onBindEvent() {
         actionBackBtn.setOnClickListener(this) // 뒤로가기
+
+        ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = followerAdapter.dataLoading, total = followerAdapter.dataTotal) { _ ->
+                followViewModel.loadFollower(authorization = spHelper.authorization, userId = userId, page = followerAdapter.dataNextPage)
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -142,11 +149,29 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.userData?.let {
+                    if (it.nextPage <= 2) { // 요청한 page => 첫페이지
+                        followerAdapter.updateData(userDefaultData = it)
+                        actionBarNumber.setText(SupportData.countFormat(it.total), TextView.BufferType.SPANNABLE)
+
+                        textViewNoFollower.visibility =
+                                if (it.items.isEmpty()) View.VISIBLE
+                                else View.INVISIBLE
+                    } else
+                        followerAdapter.addData(userDefaultData = it)
+                }
+                uiData.followCnt?.let {
+                    actionBarNumber.tag = it
+                    actionBarNumber.setText(SupportData.countFormat(it), TextView.BufferType.SPANNABLE)
+                }
+                uiData.userUpdatePosition?.let {
+                    followerAdapter.notifyItemChanged(it)
+                }
             }
         })
 
         // load follower 이벤트 observe
-        followViewModel.loadFollowerEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadFollowerEvent ->
+        followViewModel.loadFollowEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadFollowerEvent ->
             loadFollowerEvent?.let { _ ->
                 loadFollowerEvent.status?.let { isLoading ->
                     followerAdapter.dataLoading = isLoading

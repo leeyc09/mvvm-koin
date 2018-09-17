@@ -3,6 +3,9 @@
     package="xlab.world.xlab">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature android:name="android.hardware.camera2.full" />
@@ -61,7 +64,7 @@
         <activity
             android:name=".TestActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/customNoActionBarTheme"></activity>
+            android:theme="@style/customNoActionBarTheme" />
         <!-- TODO: Activities -->
         <activity
             android:name=".view.preload.PreloadActivity"
@@ -139,7 +142,15 @@
             android:theme="@style/customNoActionBarTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".view.galleryImageSelect.GalleryImageSelectActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
             android:name=".view.follow.FollowerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.follow.FollowingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
     </application>
