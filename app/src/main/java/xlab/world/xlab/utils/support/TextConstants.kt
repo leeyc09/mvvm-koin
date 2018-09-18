@@ -32,4 +32,6 @@ object TextConstants {
     const val SAVED_POST = "저장되었습니다"
 
     const val USED_GOODS_HEADER = "제품"
+
+    const val EMPTY_GALLERY = "갤러리에 사진이 없습니다"
 }

@@ -92,12 +92,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.PROFILE_EDIT -> { // 프로필 수정
-//                        loadUserProfileData { isSuccess ->
-//                            if (!isSuccess) {
-//                                defaultToast.showToast("존재하지 않는 유저입니다")
-//                                actionBackBtn.performClick()
-//                            }
-//                        }
+                        profileViewModel.loadUserData(authorization = spHelper.authorization, userId = userId)
                     }
                     RequestCodeData.USED_GOODS, // 사용한 제품 더보기
                     RequestCodeData.FOLLOW, // 팔로우, 팔로잉

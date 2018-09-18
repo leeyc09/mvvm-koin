@@ -1,6 +1,7 @@
 package xlab.world.xlab.server.provider
 
 import io.reactivex.disposables.Disposable
+import okhttp3.RequestBody
 import xlab.world.xlab.data.request.ReqConfirmEmailData
 import xlab.world.xlab.data.request.ReqLoginData
 import xlab.world.xlab.data.request.ReqNewPasswordData
@@ -51,6 +52,10 @@ interface ApiUserProvider {
     // profile edit data 요청
     fun requestProfileEdit(scheduler: SchedulerProvider, authorization: String,
                            responseData: (ResProfileEditData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // profile update 요청
+    fun requestProfileUpdate(scheduler: SchedulerProvider, authorization: String, userId: String, requestBody: RequestBody,
+                             responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
     // recommend user data 요청
     fun requestRecommendUser(scheduler: SchedulerProvider, authorization: String, page: Int,
@@ -161,6 +166,17 @@ class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
     override fun requestProfileEdit(scheduler: SchedulerProvider, authorization: String,
                                     responseData: (ResProfileEditData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserRequest.profileEdit(authorization = authorization)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestProfileUpdate(scheduler: SchedulerProvider, authorization: String, userId: String, requestBody: RequestBody,
+                                      responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.profileUpdate(authorization = authorization, userId = userId, requestBody = requestBody)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

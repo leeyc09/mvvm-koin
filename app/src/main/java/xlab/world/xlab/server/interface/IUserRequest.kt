@@ -1,6 +1,7 @@
 package xlab.world.xlab.server.`interface`
 
 import io.reactivex.Observable
+import okhttp3.RequestBody
 import retrofit2.http.*
 import xlab.world.xlab.data.request.ReqLoginData
 import xlab.world.xlab.data.request.ReqRegisterData
@@ -44,6 +45,11 @@ interface IUserRequest {
 
     @GET(ApiURL.USER_PROFILE_EDIT)
     fun profileEdit(@Header("Authorization") authorization: String): Observable<ResProfileEditData>
+
+    @POST(ApiURL.USER_PROFILE_UPDATE)
+    fun profileUpdate(@Header("Authorization") authorization: String,
+                      @Query("userId") userId: String,
+                      @Body requestBody: RequestBody): Observable<ResMessageData>
 
     @GET(ApiURL.USER_RECOMMEND)
     fun getRecommendUser(@Header("Authorization") authorization: String,

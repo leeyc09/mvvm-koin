@@ -4,8 +4,4 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 data class ReqSearchGoodsData(@SerializedName("text") val text: String,
-                              @SerializedName("code") val code: String): Serializable {
-    override fun toString(): String {
-        return "text: $text / code: $code"
-    }
-}
+                              @SerializedName("code") val code: String): Serializable

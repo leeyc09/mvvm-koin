@@ -1,5 +1,9 @@
 package xlab.world.xlab.utils.support
 
+import android.graphics.Bitmap
+import android.os.Environment
+import java.io.File
+import java.io.FileOutputStream
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -12,6 +16,11 @@ object SupportData {
     const val YOUTUBE_THUMB_480x360 = 2
     const val YOUTUBE_THUMB_640x480 = 3
     const val YOUTUBE_THUMB_1280x720 = 4
+
+    private val timeStamp: String
+        get() {
+            return "xlab_" + System.currentTimeMillis()
+        }
 
     // youtube id 로 해당 영상 썸네일 가져오기
     fun getYoutubeThumbnailUrl(videoId: String, quality: Int): String {
@@ -72,5 +81,68 @@ object SupportData {
     // authorization 으로 guest 판단하기
     fun isGuest(authorization: String): Boolean {
         return authorization.replace("Bearer", "").trim().isEmpty()
+    }
+
+    // folder 없으면 생성
+    private fun createFolder(path: String): File {
+        val mediaStorageDirPic = File(path)
+
+        if (!mediaStorageDirPic.exists())
+            mediaStorageDirPic.mkdirs()
+
+        return mediaStorageDirPic
+    }
+
+    // temp file 생성
+    fun createTmpFile(type: Int): File? {
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+        val mediaStorageDir = File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM), ".xlab")
+
+        if (!mediaStorageDir.exists())
+            mediaStorageDir.mkdirs()
+
+        // Create a media file name
+        return when (type) {
+            AppConstants.MEDIA_VIDEO -> File(createFolder(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DCIM).toString() + AppConstants.TMP_VIDEO_FOLDER).absolutePath + File.separator +
+                    timeStamp + ".mp4")
+            AppConstants.MEDIA_GIF -> File(createFolder(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DCIM).toString() + AppConstants.TMP_GIF_FOLDER).absolutePath + File.separator +
+                    timeStamp + ".gif")
+            AppConstants.MEDIA_IMAGE -> File(createFolder(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DCIM).toString() + AppConstants.TMP_PICTURE_FOLDER).absolutePath + File.separator +
+                    timeStamp + ".jpg")
+            else -> File(createFolder(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DCIM).toString() + AppConstants.TMP_PICTURE_FOLDER).absolutePath + File.separator +
+                    timeStamp + ".jpg")
+        }
+    }
+
+    // file 저장
+    fun saveFile(bitmap: Bitmap, path: String, quality: Int = 90) {
+        val file = File(path)
+        if (file.exists()) file.delete()
+        try {
+            val out = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out)
+            out.flush()
+            out.close()
+            PrintLog.d("save file", file.absolutePath, "File")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    // file 삭제
+
+    fun deleteFile(path: String) {
+        val file = File(path)
+        if (file.exists()) {
+            PrintLog.d("delete file", file.absolutePath, "File")
+            file.delete()
+        }
     }
 }

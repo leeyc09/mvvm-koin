@@ -3,11 +3,17 @@ package xlab.world.xlab.view.profileEdit
 import android.arch.lifecycle.MutableLiveData
 import android.view.View
 import io.reactivex.Observable
+import okhttp3.MediaType
+import okhttp3.RequestBody
+import xlab.world.xlab.data.request.ReqProfileUpdateData
 import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.AbstractViewModel
+import xlab.world.xlab.view.SingleLiveEvent
+import xlab.world.xlab.view.profile.ProfileEvent
+import java.io.File
 
 class ProfileEditViewModel(private val apiUser: ApiUserProvider,
                            private val networkCheck: NetworkCheck,
@@ -15,8 +21,15 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
     val tag = "ProfileEdit"
 
     private var initProfileData: InitProfile? = null
+    private var newProfileImage: ArrayList<String> = ArrayList()
 
+    val profileUpdateEvent = SingleLiveEvent<ProfileEvent>()
     val uiData = MutableLiveData<UIModel>()
+
+    fun setNewProfileImage(profileImage: String) {
+        newProfileImage.add(profileImage)
+        uiData.value = UIModel(profileImage = newProfileImage.last())
+    }
 
     fun loadProfileEditData(authorization: String) {
         // 네트워크 연결 확인
@@ -57,7 +70,9 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
     fun birthRegexCheck(birth: String) {
         launch {
             Observable.create<Boolean> {
-                val birthRegex = DataRegex.birthRegex(birth.toInt())
+                val birthRegex =
+                        if (birth.isNotEmpty()) DataRegex.birthRegex(birth.toInt())
+                        else false
 
                 it.onNext(birthRegex)
                 it.onComplete()
@@ -81,7 +96,13 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
 
                 PrintLog.d("initProfileData", initProfileData.toString(), tag)
                 PrintLog.d("recentData", recentData.toString(), tag)
-                it.onNext(initProfileData?.let { _ -> initProfileData != recentData } ?:let { _ ->false})
+                val birthRegex =
+                        if (birth.isEmpty()) initProfileData?.let{_->initProfileData!!.birth.isEmpty()}?: let{_->false}
+                        else DataRegex.birthRegex(recentData.birth.toInt())
+                val regex = birthRegex && DataRegex.nickNameRegex(recentData.nickName)
+                it.onNext(initProfileData?.let { _ ->
+                    regex && ((initProfileData != recentData) || newProfileImage.isNotEmpty()) }
+                        ?:let { _ ->false})
                 it.onComplete()
             }.with(scheduler).subscribe { resultData ->
                 PrintLog.d("existChangedData", resultData.toString(), tag)
@@ -89,9 +110,64 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
             }
         }
     }
+
+    // 프로필 변경
+    fun changeProfileData(authorization: String, userId: String,
+                          nickName: String, introduction: String, gender: Int, birth: String) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            val reqData = ReqProfileUpdateData()
+            // 프로필 이미지 변경된 경우
+            if (newProfileImage.isNotEmpty()) {
+                val imageFile = File(newProfileImage.last())
+                val requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), imageFile)
+                reqData.addProfileImage(fileName = imageFile.name, requestBody = requestBody)
+            }
+            // 닉네임 변경된 경우
+            if (initProfileData!!.nickName != nickName && nickName.isNotEmpty())
+                reqData.addNickName(nickName = nickName)
+
+            // 소개 변경된 경우
+            if (initProfileData!!.introduction != introduction)
+                reqData.addIntroduction(introduction = introduction)
+
+            // 성별
+            reqData.addGender(gender = gender.toString())
+
+            // 생년 변경된 경우
+            if (initProfileData!!.birth != birth)
+                reqData.addBirthYear(birthYear = birth)
+
+            apiUser.requestProfileUpdate(scheduler = scheduler, authorization = authorization, userId = userId, requestBody = reqData.getReqBody(),
+                    responseData = {
+                        profileUpdateEvent.value = ProfileEvent(status = true)
+                        uiData.value = UIModel(isLoading = false)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.d("requestProfileUpdate fail", errorData.message, tag)
+                        }
+                    })
+        }
+
+    }
+
+    fun deleteProfileImage() {
+        newProfileImage.forEach { filePath ->
+            SupportData.deleteFile(path = filePath)
+        }
+    }
 }
 
 data class InitProfile(val nickName: String, val introduction: String, val gender: String?, val birth: String)
+data class ProfileEditEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val profileImage: String? = null, val nickName: String? = null,
                    val introduction: String? = null, val detailInfoVisibility: Int? = null,

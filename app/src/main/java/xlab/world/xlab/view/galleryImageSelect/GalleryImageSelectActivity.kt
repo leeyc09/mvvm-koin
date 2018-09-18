@@ -3,26 +3,40 @@ package xlab.world.xlab.view.galleryImageSelect
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Matrix
+import android.graphics.drawable.BitmapDrawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.SimpleItemAnimator
 import android.view.View
+import android.widget.ImageView
+import com.bumptech.glide.Glide
+import com.github.chrisbanes.photoview.PhotoViewAttacher
 import kotlinx.android.synthetic.main.action_bar_default.*
 import kotlinx.android.synthetic.main.activity_gallery_image_select.*
 import org.koin.android.architecture.ext.viewModel
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.GalleryAdapter
-import xlab.world.xlab.utils.support.AppConstants
-import xlab.world.xlab.utils.support.IntentPassName
-import xlab.world.xlab.utils.support.ViewFunction
+import xlab.world.xlab.utils.support.*
+import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
+import xlab.world.xlab.utils.view.toast.DefaultToast
 
 class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
     private val galleryImageSelectViewModel: GalleryImageSelectViewModel by viewModel()
 
     private lateinit var galleryAdapter: GalleryAdapter
 
+    private lateinit var defaultToast: DefaultToast
+    private lateinit var progressDialog: DefaultProgressDialog
+
+    private val gallerySelectListener = View.OnClickListener { view ->
+        val position = view.tag as Int
+        galleryImageSelectViewModel.changeImageSelect(position = position,
+                newSelectedData = galleryAdapter.getItem(position))
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery_image_select)
@@ -48,9 +62,16 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
                 if (intent.getBooleanExtra(IntentPassName.WITH_CIRCLE_OVERLAY, true)) View.VISIBLE
                 else View.GONE
 
+//        imageViewPreview.scaleType = ImageView.ScaleType.FIT_CENTER
+        imageViewPreview.getDisplayMatrix(Matrix())
+
+        // Toast 초기화
+        defaultToast = DefaultToast(context = this)
+        progressDialog = DefaultProgressDialog(context = this)
+
         // gallery recycler view & adapter 초기화
         galleryAdapter = GalleryAdapter(context = this,
-                selectListener = View.OnClickListener {  })
+                selectListener = gallerySelectListener)
         recyclerView.adapter = galleryAdapter
         recyclerView.layoutManager = GridLayoutManager(this, 4, GridLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(CustomItemDecoration(context = this, offset = 0.5f))
@@ -61,6 +82,7 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun onBindEvent() {
         actionBackBtn.setOnClickListener(this) // 뒤로가기
+        actionBtn.setOnClickListener(this) // 사진 선택 완료
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = galleryAdapter.dataLoading, total = galleryAdapter.dataTotal) { _ ->
@@ -73,11 +95,38 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
         // UI 이벤트 observe
         galleryImageSelectViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
+                uiData.isLoading?.let {
+                    if (it && !progressDialog.isShowing)
+                        progressDialog.show()
+                    else if (!it && progressDialog.isShowing)
+                        progressDialog.dismiss()
+                }
+                uiData.toastMessage?.let {
+                    defaultToast.showToast(message = it)
+                    actionBackBtn.performClick()
+                }
+                uiData.oneSelectData?.let {
+                    galleryImageSelectViewModel.setSingleSelectData(selectData = galleryAdapter.getItem(it.position))
+                    imageViewPreview.setDisplayMatrix(Matrix())
+                    Glide.with(this)
+                            .load(it.data)
+                            .into(imageViewPreview)
+                }
                 uiData.galleryData?.let {
-                    if (it.nextPage <= 2 ) // 요청한 page => 첫페이지
+                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
                         galleryAdapter.updateData(galleryData = it)
+                    }
                     else
                         galleryAdapter.addData(galleryData = it)
+                }
+                uiData.galleryUpdatePosition?.let {
+                    galleryAdapter.notifyItemChanged(it)
+                }
+                uiData.finalImagePath?.let {
+                    val intent = Intent()
+                    intent.putExtra("imageUri",it)
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
                 }
             }
         })
@@ -98,6 +147,11 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
                 R.id.actionBackBtn -> { // 뒤로가기
                     setResult(Activity.RESULT_CANCELED)
                     finish()
+                }
+                R.id.actionBtn -> {  // 사진 선택 완료
+                    imageViewPreview.buildDrawingCache()
+                    val bitmap: Bitmap = imageViewPreview.drawingCache
+                    galleryImageSelectViewModel.createImageFileBySelectedImage(bitmap = bitmap)
                 }
             }
         }

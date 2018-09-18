@@ -97,7 +97,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
             apiUser.requestProfileMain(scheduler = scheduler, authorization = authorization, userId = userId,
                     responseData = {
                         PrintLog.d("requestProfileMain success", it.toString(), tag)
-                        uiData.value = UIModel(isLoading = true,
+                        uiData.value = UIModel(isLoading = false,
                                 profileImage = it.profileImg,
                                 nickName = it.nickName,
                                 introduction = it.introduction,

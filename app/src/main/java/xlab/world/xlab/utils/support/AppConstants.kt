@@ -50,4 +50,20 @@ object AppConstants {
 
     // used goods topic type
     const val USED_GOODS_PET = 1
+
+    // media save type
+    const val MEDIA_VIDEO = 1
+    const val MEDIA_GIF = 2
+    const val MEDIA_IMAGE = 3
+
+    // media save folders
+    const val TMP_VITAMIO_FILES_FOLDER = "/.xlab/tmp_video/"
+    const val TMP_VIDEO_FOLDER = "/.xlab/video/"
+    const val TMP_RAW_FOLDER = "/.xlab/raw/"
+    const val TMP_PICTURE_FOLDER = "/.xlab/pictures/"
+    const val TMP_GIF_FOLDER = "/.xlab/gif/"
+    const val PICTURE_FOLDER = "/xlab/pictures/"
+    const val VIDEO_FOLDER = "/xlab/video/"
+    const val GIF_FOLDER = "/xlab/gif/"
+
 }

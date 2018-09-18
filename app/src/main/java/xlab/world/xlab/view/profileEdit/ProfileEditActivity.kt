@@ -63,6 +63,12 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
         observeViewModel()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        profileEditViewModel.deleteProfileImage()
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -87,15 +93,9 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
                 when (requestCode) {
                     RequestCodeData.PROFILE_EDIT -> { // 프로필 이미지 수정
                         // profile image change success
-//                        val imageUri = data!!.getStringExtra("imageUri")
-//                        tmpProfileImageList.add(imageUri)
-//
-//                        Glide.with(this)
-//                                .load(imageUri)
-//                                .apply(glideOption)
-//                                .into(imageViewProfile)
-//
-//                        actionBtn.enableSave()
+                        val imageUri = data!!.getStringExtra("imageUri")
+                        profileEditViewModel.setNewProfileImage(profileImage = imageUri)
+                        profileEditViewModel.existChangedData(nickName = getNickNameText(), introduction = getIntroductionText(), gender = getGender(), birth = getBirthText())
                     }
                 }
             }
@@ -118,6 +118,7 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
 
     private fun onBindEvent() {
         actionBackBtn.setOnClickListener(this) // 뒤로가기
+        actionBtn.setOnClickListener(this) // 프로필 변경
         profileImageLayout.setOnClickListener(this) // 프로필 이미지 변경
         editTextNick.setOnTouchListener(this) // 닉네임 지우기
         textViewGender.setOnClickListener(this) // 성별 선택
@@ -146,7 +147,7 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
             }
         }
         ViewFunction.onTextChange(editText = editTextIntroduction) { _ ->
-            if (textViewIntroductionNum.hasFocus()) {
+            if (editTextIntroduction.hasFocus()) {
                 textViewIntroductionNum.text = (100 - getIntroductionText().length).toString()
                 profileEditViewModel.existChangedData(nickName = getNickNameText(), introduction = getIntroductionText(), gender = getGender(), birth = getBirthText())
             }
@@ -206,6 +207,18 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
             }
         })
 
+        // profile update 이벤트 observe
+        profileEditViewModel.profileUpdateEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { profileUpdateEvent ->
+            profileUpdateEvent?.let { _ ->
+                profileUpdateEvent.status?.let { isSuccess ->
+                    if (isSuccess) {
+                        setResult(Activity.RESULT_OK)
+                        finish()
+                    }
+                }
+            }
+        })
+
         // TODO: Register View Model
         // UI 이벤트 observe
         registerViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
@@ -236,6 +249,17 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
                 R.id.actionBackBtn -> { // 뒤로가기
                     setResult(Activity.RESULT_CANCELED)
                     finish()
+                }
+                R.id.actionBtn -> { // 프로필 변경
+                    profileEditViewModel.changeProfileData(
+                            authorization = spHelper.authorization,
+                            userId = spHelper.userId,
+                            nickName = getNickNameText(),
+                            introduction = getIntroductionText(),
+                            gender =
+                            if (textViewGender.tag is String) (textViewGender.tag as String).toInt()
+                            else textViewGender.tag as Int,
+                            birth = getBirthText())
                 }
                 R.id.profileImageLayout -> { // 프로필 이미지 변경
                     currentFocus?.clearFocus()
