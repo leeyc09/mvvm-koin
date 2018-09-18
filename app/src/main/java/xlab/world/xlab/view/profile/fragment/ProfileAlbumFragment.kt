@@ -138,18 +138,17 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
             recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, offset = 0.5f))
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
-        if (needInitData) {
-            profileViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = 1)
-            profileViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = 1, loginUserId = spHelper.userId)
-        }
+        if (needInitData)
+            reloadPetUsedGoodsData(loadingBar = true)
+        else
+            setLayoutVisibility()
     }
 
     private fun onBindEvent() {
         noPostsLayout.setOnClickListener(this) // 포스트 업로드
 
         swipeRefreshLayout.setOnRefreshListener {
-            profileViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = 1, loadingBar = null)
-            profileViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = 1, loginUserId = spHelper.userId, loadingBar = null)
+            reloadPetUsedGoodsData(loadingBar = null)
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
@@ -255,9 +254,10 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
         }
     }
 
-    fun reloadPetUsedGoodsData() {
+    fun reloadPetUsedGoodsData(loadingBar: Boolean?) {
         context?.let {
-//            profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1)
+            profileViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = 1, loadingBar = loadingBar)
+            profileViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = 1, loginUserId = spHelper.userId, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 

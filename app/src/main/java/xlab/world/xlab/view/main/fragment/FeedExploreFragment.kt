@@ -81,7 +81,7 @@ class FeedExploreFragment: Fragment() {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         if (needInitData)
-            reloadFeedData()
+            reloadFeedData(loadingBar = true)
     }
 
     private fun onBindEvent() {
@@ -139,7 +139,7 @@ class FeedExploreFragment: Fragment() {
         recyclerView.scrollToPosition(0)
     }
 
-    fun reloadFeedData(loadingBar: Boolean? = true) {
+    fun reloadFeedData(loadingBar: Boolean?) {
         context?.let {
             mainViewModel.loadExploreFeedData(authorization = spHelper.authorization, page = 1, loadingBar = loadingBar)
         } ?:let { needInitData = true }

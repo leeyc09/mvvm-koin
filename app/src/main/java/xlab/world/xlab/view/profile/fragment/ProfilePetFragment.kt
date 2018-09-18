@@ -79,7 +79,7 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
 
 
         if (needInitData) {
-            reloadPetUsedGoodsData()
+            reloadPetUsedGoodsData(loadingBar = true)
         } else
             setLayoutVisibility()
     }
@@ -142,7 +142,7 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
         }
     }
 
-    fun reloadPetUsedGoodsData(loadingBar: Boolean? = true) {
+    fun reloadPetUsedGoodsData(loadingBar: Boolean?) {
         context?.let {
             profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1, loadingBar = loadingBar)
         } ?:let { needInitData = true }

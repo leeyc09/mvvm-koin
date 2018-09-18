@@ -12,7 +12,6 @@ import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
-import xlab.world.xlab.view.profile.ProfileEvent
 import java.io.File
 
 class ProfileEditViewModel(private val apiUser: ApiUserProvider,
@@ -23,7 +22,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
     private var initProfileData: InitProfile? = null
     private var newProfileImage: ArrayList<String> = ArrayList()
 
-    val profileUpdateEvent = SingleLiveEvent<ProfileEvent>()
+    val profileUpdateEvent = SingleLiveEvent<ProfileEditEvent>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setNewProfileImage(profileImage: String) {
@@ -146,7 +145,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
 
             apiUser.requestProfileUpdate(scheduler = scheduler, authorization = authorization, userId = userId, requestBody = reqData.getReqBody(),
                     responseData = {
-                        profileUpdateEvent.value = ProfileEvent(status = true)
+                        profileUpdateEvent.value = ProfileEditEvent(status = true)
                         uiData.value = UIModel(isLoading = false)
                     },
                     errorData = { errorData ->

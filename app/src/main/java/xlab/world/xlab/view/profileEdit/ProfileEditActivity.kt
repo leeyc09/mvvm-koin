@@ -18,6 +18,7 @@ import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.utils.support.*
+import xlab.world.xlab.utils.view.dialog.DefaultDialog
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.dialog.DialogCreator
 import xlab.world.xlab.utils.view.dialog.GenderSelectDialog
@@ -31,8 +32,6 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
     private val letterOrDigitInputFilter: LetterOrDigitInputFilter by inject()
     private val permissionHelper: PermissionHelper by inject()
 
-    private var resultCode = Activity.RESULT_CANCELED
-
     private val glideOption = RequestOptions()
             .circleCrop()
             .placeholder(R.drawable.profile_image_default)
@@ -40,6 +39,7 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
+    private lateinit var editCancelDialog: DefaultDialog
     private lateinit var genderSelectDialog: GenderSelectDialog
 
     private val genderDialogListener = object : GenderSelectDialog.Listener {
@@ -69,6 +69,10 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
         profileEditViewModel.deleteProfileImage()
     }
 
+    override fun onBackPressed() {
+        actionBackBtn.performClick()
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -79,10 +83,6 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
         }
     }
 
-    override fun onBackPressed() {
-        actionBackBtn.performClick()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
@@ -91,7 +91,7 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
         when (resultCode) {
             Activity.RESULT_OK -> {
                 when (requestCode) {
-                    RequestCodeData.PROFILE_EDIT -> { // 프로필 이미지 수정
+                    RequestCodeData.GALLARY_IMAGE_SELECT -> { // 프로필 이미지 수정
                         // profile image change success
                         val imageUri = data!!.getStringExtra("imageUri")
                         profileEditViewModel.setNewProfileImage(profileImage = imageUri)
@@ -107,6 +107,7 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
 
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
+        editCancelDialog = DialogCreator.editCancelDialog(context= this)
         genderSelectDialog = DialogCreator.genderSelectDialog(listener = genderDialogListener)
 
         // 출생연도 숫자만 가능하게
@@ -247,6 +248,10 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
+                    if (actionBtn.isEnabled) {
+                        editCancelDialog.show()
+                        return
+                    }
                     setResult(Activity.RESULT_CANCELED)
                     finish()
                 }

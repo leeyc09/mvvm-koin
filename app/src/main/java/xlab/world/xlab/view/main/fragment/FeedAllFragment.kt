@@ -88,7 +88,7 @@ class FeedAllFragment: Fragment() {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         if (needInitData)
-            reloadFeedData()
+            reloadFeedData(loadingBar = true)
         else
             matchVisibleChange(matchVisibility)
     }
@@ -155,7 +155,7 @@ class FeedAllFragment: Fragment() {
         }
     }
 
-    fun reloadFeedData(loadingBar: Boolean? = true) {
+    fun reloadFeedData(loadingBar: Boolean?) {
         context?.let {
             mainViewModel.loadAllFeedData(authorization = spHelper.authorization, page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList), loadingBar = loadingBar)
         } ?:let { needInitData = true }

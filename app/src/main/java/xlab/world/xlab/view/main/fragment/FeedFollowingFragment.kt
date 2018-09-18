@@ -89,7 +89,7 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         if (needInitData)
-            reloadFeedData()
+            reloadFeedData(loadingBar = true)
         else
             setLayoutVisibility()
     }
@@ -198,7 +198,7 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
         recyclerView.scrollToPosition(0)
     }
 
-    fun reloadFeedData(loadingBar: Boolean? = true) {
+    fun reloadFeedData(loadingBar: Boolean?) {
         context?.let {
             mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1, loadingBar = loadingBar)
         } ?:let { needInitData = true }

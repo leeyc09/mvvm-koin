@@ -65,7 +65,8 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
                     this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.PROFILE -> { // 프로필
-//                        reloadAllData { max, current -> }
+                        followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, loadingBar = null)
+                        followViewModel.loadFollowing(authorization = spHelper.authorization, userId = userId, page = 1, loadingBar = null)
                     }
                 }
             }
@@ -75,7 +76,8 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
             }
             ResultCodeData.LOGIN_SUCCESS -> {
                 this.resultCode = ResultCodeData.LOGIN_SUCCESS
-//                reloadAllData { max, current -> }
+                followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, loadingBar = null)
+                followViewModel.loadFollowing(authorization = spHelper.authorization, userId = userId, page = 1, loadingBar = null)
             }
         }
     }
@@ -171,6 +173,8 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
                     actionBarNumber.setText(SupportData.countFormat(it), TextView.BufferType.SPANNABLE)
                 }
                 uiData.userUpdatePosition?.let {
+                    if (this.resultCode == Activity.RESULT_CANCELED)
+                        this.resultCode = Activity.RESULT_OK
                     userRecommendAdapter.notifyItemChanged(it)
                     followingAdapter.notifyItemChanged(it)
                 }
@@ -200,18 +204,6 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { //뒤로가기
-//                    when (resultCode) {
-//                        ResultCodeData.LOGIN_SUCCESS,
-//                        Activity.RESULT_OK-> {
-//                            setResult(resultCode)
-//                        }
-//                        else -> {
-//                            if (postDetailListener.isChange)
-//                                setResult(Activity.RESULT_OK)
-//                            else
-//                                setResult(Activity.RESULT_CANCELED)
-//                        }
-//                    }
                     setResult(resultCode)
                     finish()
                 }

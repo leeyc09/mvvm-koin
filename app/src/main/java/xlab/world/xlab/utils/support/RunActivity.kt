@@ -16,6 +16,7 @@ import xlab.world.xlab.view.profileEdit.ProfileEditActivity
 import xlab.world.xlab.view.register.LocalRegisterActivity
 import xlab.world.xlab.view.register.SocialRegisterActivity
 import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
+import xlab.world.xlab.view.topicEdit.TopicPetEditActivity
 import xlab.world.xlab.view.topicSetting.TopicSettingActivity
 import xlab.world.xlab.view.webView.DefaultWebViewActivity
 
@@ -85,19 +86,21 @@ object RunActivity {
 
     fun galleryImageSelectActivity(context: Activity, withOverlay: Boolean) {
         val intent = GalleryImageSelectActivity.newIntent(context = context, withOverlay = withOverlay)
-        context.startActivityForResult(intent, RequestCodeData.PROFILE_EDIT)
+        context.startActivityForResult(intent, RequestCodeData.GALLARY_IMAGE_SELECT)
     }
 
-    fun goodsDetailActivity(context: Activity, goodsCd: String) {
-        PrintLog.d("Run", "GoodsDetail", tag)
-    }
-
-    fun petEditActivity(context: Activity, petPage: Int, petId: String?) {
-        PrintLog.d("Run", "PetEdit", tag)
+    fun petEditActivity(context: Activity, petNo: Int?) {
+        val intent = TopicPetEditActivity.newIntent(context = context, petNo = petNo)
+        val requestCode = petNo?.let{RequestCodeData.TOPIC_EDIT}?:let{RequestCodeData.TOPIC_ADD}
+        context.startActivityForResult(intent, requestCode)
     }
 
     fun hashTagPostActivity(context: Activity, hashTag: String) {
         PrintLog.d("Run", "HashTagPost", tag)
+    }
+
+    fun goodsDetailActivity(context: Activity, goodsCd: String) {
+        PrintLog.d("Run", "GoodsDetail", tag)
     }
 
     fun searchGoodsActivity(context: Activity, searchText: String, searchCode: String) {

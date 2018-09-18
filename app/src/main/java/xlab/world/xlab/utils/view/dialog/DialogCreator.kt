@@ -26,7 +26,19 @@ object DialogCreator {
                 textRegular = context.resources.getString(R.string.dial_add_topic2),
                 listener = object: DefaultDialog.Listener {
                     override fun onOkayTouch(tag: Any?) {
-                        RunActivity.petEditActivity(context = context, petPage = 1, petId = null)
+                        RunActivity.petEditActivity(context = context, petNo = null)
+                    }
+                })
+    }
+
+    fun editCancelDialog(context: Activity): DefaultDialog {
+        return DefaultDialog(context = context,
+                textBold = context.resources.getString(R.string.dial_cancel),
+                textRegular = context.resources.getString(R.string.dial_cancel2),
+                listener = object: DefaultDialog.Listener{
+                    override fun onOkayTouch(tag: Any?) {
+                        context.setResult(Activity.RESULT_CANCELED)
+                        context.finish()
                     }
                 })
     }
@@ -56,6 +68,13 @@ object DialogCreator {
 
     fun genderSelectDialog(listener: GenderSelectDialog.Listener): GenderSelectDialog {
         val dialog = GenderSelectDialog.newDialog()
+        dialog.handle(listener = listener)
+
+        return dialog
+    }
+
+    fun topicColorSelectDialog(selectPosition: Int, listener: TopicColorSelectDialog.Listener): TopicColorSelectDialog {
+        val dialog = TopicColorSelectDialog.newDialog(selectPosition = selectPosition)
         dialog.handle(listener = listener)
 
         return dialog

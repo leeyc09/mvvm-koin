@@ -53,6 +53,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
     private val topicSelectListener = View.OnClickListener { view ->
         PrintLog.d("topic select", (view.tag as Int).toString(), profileViewModel.tag)
+        RunActivity.petEditActivity(context = this@ProfileActivity, petNo = view.tag as Int)
 //        if (view.tag is Int) {
 //            val position = view.tag as Int
 //            val intent = TopicPetActivity.newIntent(
@@ -60,8 +61,8 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 //            startActivityForResult(intent, RequestCodeData.TOPIC_DETAIL)
 //        }
     }
-    private val topicAddListener = View.OnClickListener { view ->
-        PrintLog.d("topic add", "", profileViewModel.tag)
+    private val topicAddListener = View.OnClickListener {
+        RunActivity.petEditActivity(context = this@ProfileActivity, petNo = null)
 //        val intent = TopicPetEditActivity.newIntent(this, 1, null)
 //        startActivityForResult(intent, RequestCodeData.TOPIC_ADD)
     }
@@ -92,7 +93,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.PROFILE_EDIT -> { // 프로필 수정
-                        profileViewModel.loadUserData(authorization = spHelper.authorization, userId = userId)
+                        profileViewModel.loadUserData(authorization = spHelper.authorization, userId = userId, loadingBar = null)
                     }
                     RequestCodeData.USED_GOODS, // 사용한 제품 더보기
                     RequestCodeData.FOLLOW, // 팔로우, 팔로잉
@@ -104,38 +105,32 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     RequestCodeData.POST_COMMENT, // 댓글
                     RequestCodeData.GOODS_DETAIL, // 상품 상세
                     RequestCodeData.MY_SHOP -> {
-//                        reloadAllData { max, current ->  }
-//                        profileAlbumFragment.initAllPostDat { max, current ->  }
-//                        profilePetFragment.initUsedItemData {  }
+                        profileViewModel.loadUserData(authorization = spHelper.authorization, userId = userId, loadingBar = null)
+                        profileViewModel.loadUserTopicData(userId = userId, page = 1, topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
+                        profileAlbumFragment.reloadPetUsedGoodsData(loadingBar = null)
+                        profilePetFragment.reloadPetUsedGoodsData(loadingBar = null)
                     }
                     RequestCodeData.TOPIC_ADD -> { // 펫 추가
-//                        loadUserPetData(1, { petData ->
-//                            profileTopicAdapter.updateData(petData)
-//                        }, { isEnd ->
-//                            isLoadingTopic = !isEnd
-//                        })
+                        profileViewModel.loadUserTopicData(userId = userId, page = 1, topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
                     }
                     RequestCodeData.POST_UPLOAD -> { // 포스트 업로드
                         // set user post data
-//                        profileAlbumFragment.initAllPostDat { max, current ->  }
+                        profileAlbumFragment.reloadPetUsedGoodsData(loadingBar = null)
                     }
                 }
             }
             ResultCodeData.TOPIC_DELETE -> {
 //                if (this.resultCode == Activity.RESULT_CANCELED)
 //                    this.resultCode = Activity.RESULT_OK
-//                loadUserPetData(1, { petData ->
-//                    profileTopicAdapter.updateData(petData)
-//                }, { isEnd ->
-//                    isLoadingTopic = !isEnd
-//                })
+                profileViewModel.loadUserTopicData(userId = userId, page = 1, topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
                 this.resultCode = ResultCodeData.LOGIN_SUCCESS
-//                reloadAllData { max, current -> }
+                profileViewModel.setProfileType(profileUserId = userId, loginUserId = spHelper.userId, loadingBar = null)
+                profileViewModel.loadUserData(authorization = spHelper.authorization, userId = userId, loadingBar = null)
+                profileViewModel.loadUserTopicData(userId = userId, page = 1, topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-//                setProfileView()
                 setResult(ResultCodeData.LOGOUT_SUCCESS)
                 finish()
             }

@@ -63,7 +63,7 @@ class GalleryAdapter(private val context: Context,
             AppConstants.GALLERY_ONE -> OneSelectViewHolderBind(LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_gallery_one, parent, false))
 
-            AppConstants.ADAPTER_CONTENT -> ManySelectContentViewHolderBind(LayoutInflater.from(parent.context)
+            AppConstants.ADAPTER_CONTENT -> ManySelectViewHolderBind(LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_gallery_many, parent, false))
 
             else -> OneSelectViewHolderBind(LayoutInflater.from(parent.context)
@@ -81,7 +81,7 @@ class GalleryAdapter(private val context: Context,
         return galleryData.items.size
     }
 
-    // header view holder
+    // one select image view holder
     inner class OneSelectViewHolderBind(view: View): ViewHolder(view) {
         private val mainLayout: CardView = view.findViewById(R.id.mainLayout)
         private val imageView: ImageView = view.findViewById(R.id.imageView)
@@ -107,8 +107,8 @@ class GalleryAdapter(private val context: Context,
         }
     }
 
-    // content view holder
-    inner class ManySelectContentViewHolderBind(view: View) : ViewHolder(view) {
+    // many select image view holder
+    inner class ManySelectViewHolderBind(view: View) : ViewHolder(view) {
         private val mainLayout: CardView = view.findViewById(R.id.mainLayout)
         private val imageView: ImageView = view.findViewById(R.id.imageView)
         private val overlayFilter: ImageView = view.findViewById(R.id.overlayFilter)

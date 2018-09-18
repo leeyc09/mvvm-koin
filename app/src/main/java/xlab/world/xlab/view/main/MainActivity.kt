@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 when (requestCode) {
 //                    RequestCodeData.POST_COMMENT, // 댓글
                     RequestCodeData.POST_DETAIL -> {  // 포스트 상세
-                        feedFollowingFragment.reloadFeedData()
+                        feedFollowingFragment.reloadFeedData(loadingBar = null)
                     }
 //                    RequestCodeData.TOPIC_ADD, // 토픽 추가
 //                    RequestCodeData.COMBINATION_SEARCH , // 통합 검색
@@ -220,10 +220,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun reloadAllData() {
-        feedAllFragment.reloadFeedData()
-        feedFollowingFragment.reloadFeedData()
-        feedExploreFragment.reloadFeedData()
-        feedShopFragment.reloadFeedData()
+        feedAllFragment.reloadFeedData(loadingBar = null)
+        feedFollowingFragment.reloadFeedData(loadingBar = null)
+        feedExploreFragment.reloadFeedData(loadingBar = null)
+        feedShopFragment.reloadFeedData(loadingBar = null)
     }
 
     companion object {

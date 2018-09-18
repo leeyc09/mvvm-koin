@@ -63,33 +63,13 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
                     this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.PROFILE -> { // 프로필
-//                        loadFollowerData(1, { followerData ->
-//                            followerUserAdapter.updateData(followerData)
-//                            // set follower total
-//                            val followerNumStr = when {
-//                                followerData.total < 1000 -> followerData.total.toString()
-//                                else -> String.format("%.1fk", (followerData.total / 1000).toFloat()) // if count more than 1000, show ?k
-//                            }
-//                            actionBarNumber.setText(followerNumStr, TextView.BufferType.SPANNABLE)
-//                        }, { isEnd ->
-//                            isLoading = !isEnd
-//                        })
+                        followViewModel.loadFollower(authorization = spHelper.authorization, userId = userId, page = 1, loadingBar = null)
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
                 this.resultCode = ResultCodeData.LOGIN_SUCCESS
-//                loadFollowerData(1, { followerData ->
-//                    followerUserAdapter.updateData(followerData)
-//                    // set follower total
-//                    val followerNumStr = when {
-//                        followerData.total < 1000 -> followerData.total.toString()
-//                        else -> String.format("%.1fk", (followerData.total / 1000).toFloat()) // if count more than 1000, show ?k
-//                    }
-//                    actionBarNumber.setText(followerNumStr, TextView.BufferType.SPANNABLE)
-//                }, { isEnd ->
-//                    isLoading = !isEnd
-//                })
+                followViewModel.loadFollower(authorization = spHelper.authorization, userId = userId, page = 1, loadingBar = null)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
                 setResult(ResultCodeData.LOGOUT_SUCCESS)
@@ -165,6 +145,8 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
                     actionBarNumber.setText(SupportData.countFormat(it), TextView.BufferType.SPANNABLE)
                 }
                 uiData.userUpdatePosition?.let {
+                    if (this.resultCode == Activity.RESULT_CANCELED)
+                        this.resultCode = Activity.RESULT_OK
                     followerAdapter.notifyItemChanged(it)
                 }
             }
@@ -184,18 +166,6 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { //뒤로가기
-//                    when (resultCode) {
-//                        ResultCodeData.LOGIN_SUCCESS,
-//                        Activity.RESULT_OK-> {
-//                            setResult(resultCode)
-//                        }
-//                        else -> {
-//                            if (postDetailListener.isChange)
-//                                setResult(Activity.RESULT_OK)
-//                            else
-//                                setResult(Activity.RESULT_CANCELED)
-//                        }
-//                    }
                     setResult(resultCode)
                     finish()
                 }

@@ -27,6 +27,7 @@ import xlab.world.xlab.view.profile.ProfileViewModel
 import xlab.world.xlab.view.profileEdit.ProfileEditViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
 import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
+import xlab.world.xlab.view.topicEdit.TopicPetEditViewModel
 import xlab.world.xlab.view.topicSetting.TopicSettingViewModel
 import java.util.concurrent.TimeUnit
 
@@ -58,6 +59,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { FollowViewModel(apiFollow = get(), apiUser = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Gallery Image Select View
     viewModel { GalleryImageSelectViewModel(scheduler = get()) }
+    // ViewModel for Topic Pet Edit View
+    viewModel { TopicPetEditViewModel(apiPet = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

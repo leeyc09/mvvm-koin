@@ -29,8 +29,8 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
     val loadUserPostsDetailDataEvent = SingleLiveEvent<ProfileEvent>()
     val uiData = MutableLiveData<UIModel>()
 
-    fun setProfileType(profileUserId: String, loginUserId: String) {
-        uiData.value = UIModel(isLoading = true)
+    fun setProfileType(profileUserId: String, loginUserId: String, loadingBar: Boolean? = true) {
+        uiData.value = UIModel(isLoading = loadingBar)
         launch {
             Observable.create<Int> {
                 it.onNext(
@@ -39,19 +39,19 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                 it.onComplete()
             }.with(scheduler).subscribe {
                 PrintLog.d("setProfileType", it.toString(), tag)
-                uiData.value = UIModel(isLoading = false, profileType = it)
+                uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, profileType = it)
             }
         }
     }
 
-    fun loadUserTopicData(userId: String, page: Int, topicDataCount: Int, loginUserId: String) {
+    fun loadUserTopicData(userId: String, page: Int, topicDataCount: Int, loginUserId: String, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
             return
         }
 
-        uiData.value = UIModel(isLoading = true)
+        uiData.value = UIModel(isLoading = loadingBar)
         loadUserPetEvent.value = ProfileEvent(status = true)
         launch {
             apiPet.getUserPetList(scheduler = scheduler, userId = userId, page = page,
@@ -74,10 +74,10 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                             topicData.items.add(ProfileTopicListData(dataType = AppConstants.ADAPTER_FOOTER))
 
                         PrintLog.d("getUserPetList success", topicData.toString(), tag)
-                        uiData.value = UIModel(isLoading = false, topicData = topicData)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, topicData = topicData)
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
                             PrintLog.d("getUserPetList fail", errorData.message, tag)
                         }
@@ -85,19 +85,19 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         }
     }
 
-    fun loadUserData(authorization: String, userId: String) {
+    fun loadUserData(authorization: String, userId: String, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
             return
         }
 
-        uiData.value = UIModel(isLoading = true)
+        uiData.value = UIModel(isLoading = loadingBar)
         launch {
             apiUser.requestProfileMain(scheduler = scheduler, authorization = authorization, userId = userId,
                     responseData = {
                         PrintLog.d("requestProfileMain success", it.toString(), tag)
-                        uiData.value = UIModel(isLoading = false,
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
                                 profileImage = it.profileImg,
                                 nickName = it.nickName,
                                 introduction = it.introduction,
@@ -106,7 +106,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                                 followState = it.isFollowing)
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false, toastMessage = TextConstants.NO_EXIST_USER)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, toastMessage = TextConstants.NO_EXIST_USER)
                         loadUserDataEvent.postValue(ProfileEvent(status = false))
                         errorData?.let {
                             PrintLog.d("requestProfileMain fail", errorData.message, tag)

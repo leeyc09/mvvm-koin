@@ -153,6 +153,11 @@
             android:name=".view.follow.FollowingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.topicEdit.TopicPetEditActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

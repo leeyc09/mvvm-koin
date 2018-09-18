@@ -53,6 +53,8 @@
     <string name="dial_add_topic2">관심있을 제품을 소개해드립니다</string>
     <string name="dial_delete_post">해당 게시물을 삭제하시겠어요?</string>
     <string name="dial_delete_post2">다시 복구할 수 없습니다.</string>
+    <string name="dial_cancel">취소하시겠어요?</string>
+    <string name="dial_cancel2">입력한 내용이 저장되지 않습니다.</string>
 
     <!-- TODO: OnBoarding -->
     <string name="skip_onBoarding">건너뛰기</string>
@@ -138,8 +140,6 @@
     <string name="birth">출생연도</string>
     <string name="birth_hint">YYYY</string>
     <string name="birth_confirm">출생연도를 다시 확인해주세요.</string>
-    <string name="is_cancel">취소하시겠어요?</string>
-    <string name="is_cancel2">입력한 내용이 저장되지 않습니다.</string>
 
     <!--TODO: Setting-->
     <string name="setting_title">설정</string>
