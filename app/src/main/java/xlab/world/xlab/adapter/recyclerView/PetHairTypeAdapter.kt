@@ -55,6 +55,7 @@ class PetHairTypeAdapter(val context: Context,
         private val textViewType: TextView = view.findViewById(R.id.textViewType)
 
         override fun display(item: PetHairTypeListData, position: Int) {
+            textViewType.isSelected = item.isSelect
             textViewType.setText(petInfo.petHairType[item.hairTypeCode], TextView.BufferType.SPANNABLE)
 
             textViewType.tag = position
