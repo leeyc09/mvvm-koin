@@ -6,6 +6,7 @@ import io.reactivex.Observable
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import xlab.world.xlab.data.request.ReqProfileUpdateData
+import xlab.world.xlab.data.response.ResProfileEditData
 import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
@@ -19,8 +20,9 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
                            private val scheduler: SchedulerProvider): AbstractViewModel() {
     val tag = "ProfileEdit"
 
-    private var initProfileData: InitProfile? = null
-    private var newProfileImage: ArrayList<String> = ArrayList()
+    private var initProfileData: ResProfileEditData? = null
+    private var recentProfileData = ResProfileEditData()
+    private val newProfileImage: ArrayList<String> = ArrayList()
 
     val profileUpdateEvent = SingleLiveEvent<ProfileEditEvent>()
     val uiData = MutableLiveData<UIModel>()
@@ -41,10 +43,8 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
         launch {
             apiUser.requestProfileEdit(scheduler = scheduler, authorization = authorization,
                     responseData = {
-                        initProfileData = InitProfile(nickName = it.nickName,
-                                introduction = it.introduction,
-                                gender = UserInfo.genderMap[it.gender],
-                                birth = it.birthYear)
+                        initProfileData = it.copy()
+                        recentProfileData = it.copy()
 
                         uiData.value = UIModel(isLoading = false,
                                 profileImage = it.profileImg,
@@ -85,22 +85,22 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
     }
 
     // 변경된 데이터 있는지 확인
-    fun existChangedData(nickName: String, introduction: String, gender: String?, birth: String) {
+    fun existChangedData(nickName: String? = null, introduction: String? = null, gender: Int? = null, birth: String? = null) {
         launch {
             Observable.create<Boolean> {
-                val recentData = InitProfile(nickName = nickName,
-                        introduction = introduction,
-                        gender = gender,
-                        birth = birth)
+                nickName?.let {_-> recentProfileData.nickName = nickName }
+                introduction?.let {_-> recentProfileData.introduction = introduction }
+                gender?.let {_-> recentProfileData.gender = gender }
+                birth?.let {_-> recentProfileData.birthYear = birth }
 
                 PrintLog.d("initProfileData", initProfileData.toString(), tag)
-                PrintLog.d("recentData", recentData.toString(), tag)
+                PrintLog.d("recentData", recentProfileData.toString(), tag)
                 val birthRegex =
-                        if (birth.isEmpty()) initProfileData?.let{_->initProfileData!!.birth.isEmpty()}?: let{_->false}
-                        else DataRegex.birthRegex(recentData.birth.toInt())
-                val regex = birthRegex && DataRegex.nickNameRegex(recentData.nickName)
+                        if (recentProfileData.birthYear.isEmpty()) initProfileData?.let{_->initProfileData!!.birthYear.isEmpty()}?: let{_->false}
+                        else DataRegex.birthRegex(recentProfileData.birthYear.toInt())
+                val regex = birthRegex && DataRegex.nickNameRegex(recentProfileData.nickName)
                 it.onNext(initProfileData?.let { _ ->
-                    regex && ((initProfileData != recentData) || newProfileImage.isNotEmpty()) }
+                    regex && ((initProfileData != recentProfileData) || newProfileImage.isNotEmpty()) }
                         ?:let { _ ->false})
                 it.onComplete()
             }.with(scheduler).subscribe { resultData ->
@@ -111,8 +111,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
     }
 
     // 프로필 변경
-    fun changeProfileData(authorization: String, userId: String,
-                          nickName: String, introduction: String, gender: Int, birth: String) {
+    fun changeProfileData(authorization: String, userId: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
@@ -129,19 +128,19 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
                 reqData.addProfileImage(fileName = imageFile.name, requestBody = requestBody)
             }
             // 닉네임 변경된 경우
-            if (initProfileData!!.nickName != nickName && nickName.isNotEmpty())
-                reqData.addNickName(nickName = nickName)
+            if (initProfileData!!.nickName != recentProfileData.nickName && recentProfileData.nickName.isNotEmpty())
+                reqData.addNickName(nickName = recentProfileData.nickName)
 
             // 소개 변경된 경우
-            if (initProfileData!!.introduction != introduction)
-                reqData.addIntroduction(introduction = introduction)
+            if (initProfileData!!.introduction != recentProfileData.introduction)
+                reqData.addIntroduction(introduction = recentProfileData.introduction)
 
             // 성별
-            reqData.addGender(gender = gender.toString())
+            reqData.addGender(gender = recentProfileData.gender)
 
             // 생년 변경된 경우
-            if (initProfileData!!.birth != birth)
-                reqData.addBirthYear(birthYear = birth)
+            if (initProfileData!!.birthYear != recentProfileData.birthYear)
+                reqData.addBirthYear(birthYear = recentProfileData.birthYear)
 
             apiUser.requestProfileUpdate(scheduler = scheduler, authorization = authorization, userId = userId, requestBody = reqData.getReqBody(),
                     responseData = {
@@ -165,7 +164,8 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
     }
 }
 
-data class InitProfile(val nickName: String, val introduction: String, val gender: String?, val birth: String)
+data class InitProfile(var nickName: String = "", var introduction: String = "",
+                       var gender: String? = "", var birth: String = "")
 data class ProfileEditEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val profileImage: String? = null, val nickName: String? = null,

@@ -145,4 +145,104 @@ object ViewFunction {
             tab.requestLayout()
         }
     }
+
+    // birth format watcher (yyyy-mm-dd)
+    fun birthWatcher(editText: EditText, result: (String) -> Unit) {
+        editText.addTextChangedListener(object: TextWatcher {
+            var preLength = 0
+            var preBirth = ""
+            var cursorPosition = 0
+            override fun afterTextChanged(s: Editable?) {
+                val length = s!!.toString().length
+                val originBirth = s.toString().replace("-", "")
+
+                if (!originBirth.isEmpty()) {
+                    try {
+                        originBirth.toInt()
+                    } catch (e: NumberFormatException) {
+                        editText.setText(preBirth)
+                        editText.setSelection(cursorPosition-1)
+                        return
+                    }
+                }
+
+                var newBirth = ""
+                for ((index, char) in originBirth.withIndex()) {
+                    newBirth +=
+                            if (index == 4 || index == 6) "-$char"
+                            else char
+                }
+
+                if (s.toString() != newBirth) {
+                    cursorPosition = editText.selectionEnd
+                    editText.setText(newBirth)
+                    if (length == cursorPosition) {
+                        editText.setSelection(newBirth.length)
+                    }
+                    else {
+                        if (preLength > length)
+                            cursorPosition--
+                        editText.setSelection(cursorPosition)
+                    }
+                }
+                result(newBirth)
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                preLength = s!!.toString().length
+                preBirth = s.toString()
+                cursorPosition = editText.selectionEnd
+            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
+    }
+
+    // pet weight watcher
+//    fun weightWatcher(editText: EditText, result: (Float) -> Unit) {
+//        editText.addTextChangedListener(object: TextWatcher {
+//            var preWeight = ""
+//            var cursorPosition = 0
+//            override fun afterTextChanged(s: Editable?) {
+//                if (!s!!.toString().isEmpty()) {
+//                    try {
+//                        val weightFloat = s.toString().toFloat()
+//
+//                        if (preWeight != s.toString()) {
+//                            val weightStr = s.toString().split(".")
+//                            val weightInteger: String?
+//                            val weightFloating: String?
+//                            if (!weightStr.isEmpty()) {
+//                                weightInteger = weightStr[0]
+//                                if (weightInteger.length > 3) {
+//                                    editText.setText(preWeight)
+//                                    editText.setSelection(cursorPosition-1)
+//                                    return
+//                                }
+//                                if (weightStr.size > 1) {
+//                                    weightFloating = weightStr[1]
+//                                    if (weightFloating.length > 1) {
+//                                        editText.setText(preWeight)
+//                                        editText.setSelection(cursorPosition-1)
+//                                        return
+//                                    }
+//                                }
+//                            }
+//                            result(weightFloat)
+//                        }
+//                    } catch (e: NumberFormatException) {
+//                        editText.setText(preWeight)
+//                        editText.setSelection(cursorPosition-1)
+//                    }
+//                } else {
+//                    result(-1f)
+//                }
+//            }
+//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+//                preWeight = s!!.toString()
+//                cursorPosition = editText.selectionEnd
+//            }
+//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//            }
+//        })
+//    }
 }

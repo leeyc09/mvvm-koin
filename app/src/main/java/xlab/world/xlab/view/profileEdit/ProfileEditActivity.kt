@@ -43,12 +43,12 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
     private lateinit var genderSelectDialog: GenderSelectDialog
 
     private val genderDialogListener = object : GenderSelectDialog.Listener {
-        override fun onGenderSelect(genderNum: Int, genderStr: String?) {
+        override fun onGenderSelect(genderTag: String, genderStr: String?) {
             genderStr?.let {
-                textViewGender.tag = genderNum
+                textViewGender.tag = genderTag
                 textViewGender.setText(genderStr, TextView.BufferType.SPANNABLE)
                 textViewGender.isSelected = true
-                profileEditViewModel.existChangedData(nickName = getNickNameText(), introduction = getIntroductionText(), gender = getGender(), birth = getBirthText())
+                profileEditViewModel.existChangedData(gender = genderTag.toInt())
             }
         }
     }
@@ -93,9 +93,9 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
                 when (requestCode) {
                     RequestCodeData.GALLARY_IMAGE_SELECT -> { // 프로필 이미지 수정
                         // profile image change success
-                        val imageUri = data!!.getStringExtra("imageUri")
+                        val imageUri = data!!.getStringExtra(IntentPassName.IMAGE_URL)
                         profileEditViewModel.setNewProfileImage(profileImage = imageUri)
-                        profileEditViewModel.existChangedData(nickName = getNickNameText(), introduction = getIntroductionText(), gender = getGender(), birth = getBirthText())
+                        profileEditViewModel.existChangedData()
                     }
                 }
             }
@@ -113,8 +113,8 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
         // 출생연도 숫자만 가능하게
         editTextBirth.filters = arrayOf(letterOrDigitInputFilter, InputFilter.LengthFilter(4))
 
+        profileEditViewModel.existChangedData()
         profileEditViewModel.loadProfileEditData(authorization = spHelper.authorization)
-        profileEditViewModel.existChangedData(nickName = getNickNameText(), introduction = getIntroductionText(), gender = getGender(), birth = getBirthText())
     }
 
     private fun onBindEvent() {
@@ -144,19 +144,19 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
         ViewFunction.onTextChange(editText = editTextNick) { _ ->
             if (editTextNick.hasFocus()) {
                 registerViewModel.nickNameRegexCheck(nickName = getNickNameText())
-                profileEditViewModel.existChangedData(nickName = getNickNameText(), introduction = getIntroductionText(), gender = getGender(), birth = getBirthText())
+                profileEditViewModel.existChangedData(nickName = getNickNameText())
             }
         }
         ViewFunction.onTextChange(editText = editTextIntroduction) { _ ->
             if (editTextIntroduction.hasFocus()) {
                 textViewIntroductionNum.text = (100 - getIntroductionText().length).toString()
-                profileEditViewModel.existChangedData(nickName = getNickNameText(), introduction = getIntroductionText(), gender = getGender(), birth = getBirthText())
+                profileEditViewModel.existChangedData(introduction = getIntroductionText())
             }
         }
         ViewFunction.onTextChange(editText = editTextBirth) { _ ->
             if (editTextBirth.hasFocus()) {
                 profileEditViewModel.birthRegexCheck(birth = getBirthText())
-                profileEditViewModel.existChangedData(nickName = getNickNameText(), introduction = getIntroductionText(), gender = getGender(), birth = getBirthText())
+                profileEditViewModel.existChangedData(birth = getBirthText())
             }
         }
     }
@@ -258,13 +258,7 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
                 R.id.actionBtn -> { // 프로필 변경
                     profileEditViewModel.changeProfileData(
                             authorization = spHelper.authorization,
-                            userId = spHelper.userId,
-                            nickName = getNickNameText(),
-                            introduction = getIntroductionText(),
-                            gender =
-                            if (textViewGender.tag is String) (textViewGender.tag as String).toInt()
-                            else textViewGender.tag as Int,
-                            birth = getBirthText())
+                            userId = spHelper.userId)
                 }
                 R.id.profileImageLayout -> { // 프로필 이미지 변경
                     currentFocus?.clearFocus()
@@ -305,11 +299,7 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
     private fun getNickNameText() = editTextNick.text?.trim().toString()
     private fun getIntroductionText() = editTextIntroduction.text?.trim().toString()
     private fun getGender(): String? {
-        val genderNum: Int =
-                if (textViewGender.tag is String) (textViewGender.tag as String).toInt()
-                else textViewGender.tag as Int
-
-        return UserInfo.genderMap[genderNum]
+        return UserInfo.genderMap[(textViewGender.tag as String).toInt()]
     }
     private fun getBirthText() = editTextBirth.text?.trim().toString()
 

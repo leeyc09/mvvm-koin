@@ -1,8 +1,6 @@
 package xlab.world.xlab.adapter.recyclerView
 
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
-import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -10,11 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.utils.support.AppConstants
-import xlab.world.xlab.utils.support.SupportData
 
 class GalleryAdapter(private val context: Context,
                      private val selectListener: View.OnClickListener) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
@@ -95,11 +91,11 @@ class GalleryAdapter(private val context: Context,
                     .into(imageView)
 
             overlayFilter.visibility =
-                    if (galleryData.items[position].selected) View.VISIBLE
+                    if (galleryData.items[position].isSelect) View.VISIBLE
                     else View.GONE
 
             selectedFilter.visibility =
-                    if (galleryData.items[position].selected) View.VISIBLE
+                    if (galleryData.items[position].isSelect) View.VISIBLE
                     else View.GONE
 
             mainLayout.tag = position

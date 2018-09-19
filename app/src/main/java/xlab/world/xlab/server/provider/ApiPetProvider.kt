@@ -9,6 +9,10 @@ import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
 
 interface ApiPetProvider {
+    // pet data 가져오기
+    fun requestUserPet(scheduler: SchedulerProvider, userId: String, petNo: Int,
+                       responseData: (ResUserPetData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
     // pet list 가져오기
     fun getUserPetList(scheduler: SchedulerProvider, userId: String, page: Int,
                        responseData: (ResUserPetsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
@@ -19,6 +23,17 @@ interface ApiPetProvider {
 }
 
 class ApiPet(private val iPetRequest: IPetRequest): ApiPetProvider {
+    override fun requestUserPet(scheduler: SchedulerProvider, userId: String, petNo: Int,
+                                responseData: (ResUserPetData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iPetRequest.getUserPet(userId = userId, petNo = petNo)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
     override fun getUserPetList(scheduler: SchedulerProvider, userId: String, page: Int,
                                 responseData: (ResUserPetsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPetRequest.getUserPetList(userId = userId, page = page)

@@ -13,4 +13,7 @@ object IntentPassName {
     const val USER_ID = "USER_ID"
     const val WITH_CIRCLE_OVERLAY = "WITH_CIRCLE_OVERLAY"
     const val PET_NO = "PET_NO"
+    const val PET_TYPE = "PET_TYPE"
+    const val IMAGE_URL = "IMAGE_URL"
+    const val BREED_INDEX = "BREED_INDEX"
 }

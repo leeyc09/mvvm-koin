@@ -225,7 +225,7 @@
                 android:id="@+id/textViewGender"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:tag="-1"
+                android:tag="@string/tag_gender_none"
                 android:text="@string/none_type"
                 android:textSize="18sp"
                 android:textColor="@color/select_e2e2e2_000000"

@@ -1,9 +1,7 @@
 package xlab.world.xlab.view.galleryImageSelect
 
-import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.provider.MediaStore
 import io.reactivex.Observable
@@ -62,7 +60,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                                 data = cursor.getString(2),
                                 size = cursor.getString(3),
                                 displayName = cursor.getString(4),
-                                selected = (page == 1 && galleryData.items.isEmpty())))
+                                isSelect = (page == 1 && galleryData.items.isEmpty())))
                     }
                     cursor.close()
 
@@ -90,11 +88,11 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                     if (selectData.data != newSelectedData.data) {
                         val selectedPosition = SelectPosition(oldPosition = singleSelectIndex, newPosition = position)
                         // 기존 선택된 데이터 선택 해제 & 새로운 데이터로 갱신
-                        selectData.selected = false
+                        selectData.isSelect = false
                         singleSelectData = newSelectedData
                         singleSelectIndex = position
                         // 새로 선택된 데이터 선택
-                        newSelectedData.selected = true
+                        newSelectedData.isSelect = true
 
                         it.onNext(selectedPosition)
                         it.onComplete()

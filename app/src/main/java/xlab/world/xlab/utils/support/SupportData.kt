@@ -64,6 +64,17 @@ object SupportData {
         }
     }
 
+    // 생년월일 표기
+    fun birthDayForm(year: Int, month: Int, day: Int): String {
+        return String.format(
+                "%d-%s-%s",
+                year,
+                if (month > 9) month.toString()
+                else "0$month",
+                if (day > 9) day.toString()
+                else "0$day")
+    }
+
     // 1000 이상 k 로 표기
     fun countFormat(count: Int): String {
         return if (count < 1000) count.toString()

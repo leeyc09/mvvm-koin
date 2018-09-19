@@ -22,9 +22,9 @@ data class ReqProfileUpdateData(private val builder: MultipartBody.Builder =
         builder.addFormDataPart("introduction", introduction)
         PrintLog.d("Introduction", introduction, tag)
     }
-    fun addGender(gender: String) {
-        builder.addFormDataPart("gender", gender)
-        PrintLog.d("Gender", gender, tag)
+    fun addGender(gender: Int) {
+        builder.addFormDataPart("gender", gender.toString())
+        PrintLog.d("Gender", gender.toString(), tag)
     }
     fun addBirthYear(birthYear: String) {
         builder.addFormDataPart("birthYear", birthYear)

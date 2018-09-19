@@ -1,6 +1,8 @@
 package xlab.world.xlab.utils.support
 
 import android.util.Patterns
+import java.text.ParseException
+import java.text.SimpleDateFormat
 import java.util.*
 
 object DataRegex {
@@ -14,7 +16,7 @@ object DataRegex {
     private const val nickNameMinLength = 3
     private const val nickNameMaxLength = 10
 
-    private const val birthYearMin = 1920
+    private const val birthYearMin = 1950
 
     // 이메일 정규식
     fun emailRegex(email: String): Boolean {
@@ -45,5 +47,26 @@ object DataRegex {
     // 생년월일 정규식
     fun birthRegex(birth: Int): Boolean {
         return (birth in birthYearMin..Calendar.getInstance().get(Calendar.YEAR))
+    }
+    // 생년월일 정규식 (년,월,일 비교)
+    fun birthRegex(birthday: String): Boolean {
+        if (birthday.length < 10) return false
+        try {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            dateFormat.isLenient = false
+            val date: Date = dateFormat.parse(birthday)
+            val nowDate = Date(System.currentTimeMillis())
+
+            val dateCalendar = Calendar.getInstance()
+            dateCalendar.time = date
+
+            val nowDateCalendar = Calendar.getInstance()
+            nowDateCalendar.time = nowDate
+
+            return !(dateCalendar.get(Calendar.YEAR) < birthYearMin || dateCalendar.after(nowDateCalendar))
+
+        } catch (e: ParseException) {
+            return false
+        }
     }
 }

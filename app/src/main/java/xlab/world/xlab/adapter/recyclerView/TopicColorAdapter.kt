@@ -14,7 +14,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
-import xlab.world.xlab.utils.support.AppConstants
 
 class TopicColorAdapter(private val context: Context,
                         private val selectIndex: Int,
@@ -28,9 +27,9 @@ class TopicColorAdapter(private val context: Context,
         topicColorStrArray.forEach { color ->
             topicColorData.items.add(TopicColorListData(
                     colorStr = color,
-                    selected = false))
+                    isSelect = false))
         }
-        topicColorData.items[selectIndex].selected = true
+        topicColorData.items[selectIndex].isSelect = true
     }
 
     fun getItem(position: Int): TopicColorListData {
@@ -39,7 +38,7 @@ class TopicColorAdapter(private val context: Context,
 
     override
     fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ContentViewHolderBind(LayoutInflater.from(parent.context)
+        return ViewHolderBind(LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_topic_color, parent, false))
     }
 
@@ -53,8 +52,8 @@ class TopicColorAdapter(private val context: Context,
         return topicColorData.items.size
     }
 
-    // content view holder
-    inner class ContentViewHolderBind(view: View) : ViewHolder(view) {
+    // view holder
+    inner class ViewHolderBind(view: View) : ViewHolder(view) {
         private val mainLayout: CardView = view.findViewById(R.id.mainLayout)
         private val imageViewSelected: ImageView = view.findViewById(R.id.imageViewSelected)
         private val imageViewColor: ImageView = view.findViewById(R.id.imageViewColor)
@@ -67,7 +66,7 @@ class TopicColorAdapter(private val context: Context,
 
             // 선택 레이아웃
             imageViewSelected.visibility =
-                    if (item.selected) View.VISIBLE
+                    if (item.isSelect) View.VISIBLE
                     else View.GONE
 
             Glide.with(context)

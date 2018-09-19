@@ -60,7 +60,7 @@ val viewModelModule: Module = applicationContext {
     // ViewModel for Gallery Image Select View
     viewModel { GalleryImageSelectViewModel(scheduler = get()) }
     // ViewModel for Topic Pet Edit View
-    viewModel { TopicPetEditViewModel(apiPet = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { TopicPetEditViewModel(apiPet = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

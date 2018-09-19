@@ -10,6 +10,7 @@ import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectActivity
 import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
+import xlab.world.xlab.view.petBreed.PetBreedActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
 import xlab.world.xlab.view.profile.ProfileActivity
 import xlab.world.xlab.view.profileEdit.ProfileEditActivity
@@ -93,6 +94,11 @@ object RunActivity {
         val intent = TopicPetEditActivity.newIntent(context = context, petNo = petNo)
         val requestCode = petNo?.let{RequestCodeData.TOPIC_EDIT}?:let{RequestCodeData.TOPIC_ADD}
         context.startActivityForResult(intent, requestCode)
+    }
+
+    fun petBreedActivity(context: Activity, petType: String) {
+        val intent = PetBreedActivity.newIntent(context = context, petType = petType)
+        context.startActivityForResult(intent, RequestCodeData.TOPIC_BREED)
     }
 
     fun hashTagPostActivity(context: Activity, hashTag: String) {

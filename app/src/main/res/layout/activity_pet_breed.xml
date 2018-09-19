@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:context=".view.petBreed.PetBreedActivity">
+
+    <include
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/action_bar_default"/>
+
+    <LinearLayout
+        android:id="@+id/searchLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorF5F5F5"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/search"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="17dp"/>
+
+        <xlab.world.xlab.utils.view.editText.EditTextMediumNoto
+            android:id="@+id/editTextPetBreed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:inputType="textNoSuggestions"
+            android:textColor="@color/color000000"
+            android:textColorHint="@color/colorBFBFBF"
+            android:textSize="16sp"
+            android:maxLines="1"
+            android:hint="@string/search"
+            android:layout_marginStart="8dp"
+            android:layout_gravity="center_vertical"/>
+
+        <ImageView
+            android:id="@+id/imageViewDeleteText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/textdelete_black"
+            android:layout_marginEnd="20dp"
+            android:layout_gravity="center_vertical"
+            android:visibility="invisible"/>
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        android:overScrollMode="never" />
+
+</LinearLayout>

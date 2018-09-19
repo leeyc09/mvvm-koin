@@ -3,12 +3,10 @@ package xlab.world.xlab.utils.view.dialog
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialogFragment
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SimpleItemAnimator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import kotlinx.android.synthetic.main.dialog_select_topic_color.*
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.TopicColorAdapter
@@ -34,8 +32,8 @@ class TopicColorSelectDialog: BottomSheetDialogFragment(), View.OnClickListener 
     private val topicColorListener = View.OnClickListener { view ->
         val newSelectPosition = view.tag as Int
         if (selectPosition != newSelectPosition) {
-            topicColorAdapter.getItem(position = selectPosition).selected = false
-            topicColorAdapter.getItem(position = newSelectPosition).selected = true
+            topicColorAdapter.getItem(position = selectPosition).isSelect = false
+            topicColorAdapter.getItem(position = newSelectPosition).isSelect = true
 
             topicColorAdapter.notifyItemChanged(selectPosition)
             topicColorAdapter.notifyItemChanged(newSelectPosition)

@@ -124,7 +124,7 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 uiData.finalImagePath?.let {
                     val intent = Intent()
-                    intent.putExtra("imageUri",it)
+                    intent.putExtra(IntentPassName.IMAGE_URL,it)
                     setResult(Activity.RESULT_OK, intent)
                     finish()
                 }

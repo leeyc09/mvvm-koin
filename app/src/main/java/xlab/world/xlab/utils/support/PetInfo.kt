@@ -2,6 +2,7 @@ package xlab.world.xlab.utils.support
 
 import android.content.Context
 import com.opencsv.CSVReader
+import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.PetBreedListData
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -13,13 +14,13 @@ class PetInfo(context: Context) {
     private val tag = "PetInfo"
 
     // pet type
-    val dogCode = "PAF01"
-    val catCode = "PAF02"
+    val dogCode = context.getString(R.string.tag_pet_type_dog)
+    val catCode = context.getString(R.string.tag_pet_type_cat)
     val petType = HashMap<String, String>() // code, name
 
     // pet gender type
-    private val female = "PAA01"
-    private val male = "PAA02"
+    val femaleCode = context.getString(R.string.tag_pet_gender_female)
+    val maleode = context.getString(R.string.tag_pet_gender_male)
     val petGender = HashMap<String, String>() // code, name
 
     // pet hair type

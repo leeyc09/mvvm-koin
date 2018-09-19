@@ -18,6 +18,16 @@
     <string name="mail_content4">앱 버전 : </string>
     <string name="mail_content5">기기 정보 : </string>
 
+    <!-- TODO: Tag Data -->
+    <string name="tag_gender_none">-1</string>
+    <string name="tag_gender_female">0</string>
+    <string name="tag_gender_male">1</string>
+    <string name="tag_gender_etc">2</string>
+    <string name="tag_pet_type_dog">PAF01</string>
+    <string name="tag_pet_type_cat">PAF02</string>
+    <string name="tag_pet_gender_female">PAA01</string>
+    <string name="tag_pet_gender_male">PAA02</string>
+
     <!-- TODO: Common Word-->
     <string name="finish">완료</string>
     <string name="okay">확인</string>
