@@ -21,7 +21,6 @@ import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
 class NewPasswordFragment: Fragment(), View.OnClickListener {
     private val resetPasswordViewModel: ResetPasswordViewModel by viewModel()
     private val dataRegex: DataRegex by inject()
-    private val spHelper: SPHelper by inject()
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog

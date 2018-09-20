@@ -52,14 +52,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var profilePetFragment: ProfilePetFragment
 
     private val topicSelectListener = View.OnClickListener { view ->
-        PrintLog.d("topic select", (view.tag as Int).toString(), profileViewModel.tag)
-        RunActivity.petEditActivity(context = this@ProfileActivity, petNo = view.tag as Int)
-//        if (view.tag is Int) {
-//            val position = view.tag as Int
-//            val intent = TopicPetActivity.newIntent(
-//                    this, userId = userId, topicNum = position+1, totalTopicNum = profilePetTopicData.total)
-//            startActivityForResult(intent, RequestCodeData.TOPIC_DETAIL)
-//        }
+        RunActivity.petDetailActivity(context = this@ProfileActivity, userId = userId, petNo = view.tag as Int, petTotal = profileTopicAdapter.dataTotal)
     }
     private val topicAddListener = View.OnClickListener {
         RunActivity.petEditActivity(context = this@ProfileActivity, petNo = null)

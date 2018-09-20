@@ -17,6 +17,7 @@ import xlab.world.xlab.view.profileEdit.ProfileEditActivity
 import xlab.world.xlab.view.register.LocalRegisterActivity
 import xlab.world.xlab.view.register.SocialRegisterActivity
 import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
+import xlab.world.xlab.view.topicDetail.TopicPetDetailActivity
 import xlab.world.xlab.view.topicEdit.TopicPetEditActivity
 import xlab.world.xlab.view.topicSetting.TopicSettingActivity
 import xlab.world.xlab.view.webView.DefaultWebViewActivity
@@ -99,6 +100,11 @@ object RunActivity {
     fun petBreedActivity(context: Activity, petType: String) {
         val intent = PetBreedActivity.newIntent(context = context, petType = petType)
         context.startActivityForResult(intent, RequestCodeData.TOPIC_BREED)
+    }
+
+    fun petDetailActivity(context: Activity, userId: String, petNo: Int, petTotal: Int) {
+        val intent = TopicPetDetailActivity.newIntent(context = context, userId = userId, petNo = petNo, petTotal = petTotal)
+        context.startActivityForResult(intent, RequestCodeData.TOPIC_DETAIL)
     }
 
     fun hashTagPostActivity(context: Activity, hashTag: String) {

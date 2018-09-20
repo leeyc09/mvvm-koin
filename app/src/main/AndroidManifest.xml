@@ -162,6 +162,10 @@
             android:name=".view.petBreed.PetBreedActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.topicDetail.TopicPetDetailActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
     </application>
 
 </manifest>

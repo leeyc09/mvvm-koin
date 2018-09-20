@@ -26,7 +26,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
 
 
     // access token 로그인 시도
-    fun requestLoginByAccessToken(authorization: String, fcmToken: String = "") {
+    fun requestLoginByAccessToken(authorization: String, fcmToken: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))

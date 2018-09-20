@@ -38,13 +38,13 @@ val viewModelModule: Module = applicationContext {
     // ViewModel for OnBoarding View
     viewModel { OnBoardingViewModel(scheduler = get()) }
     // ViewModel for Login View
-    viewModel { LoginViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { LoginViewModel(apiUser = get(), spHelper = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Register View
     viewModel { RegisterViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Reset Password View
     viewModel { ResetPasswordViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Main(Feed) View
-    viewModel { MainViewModel(apiPost = get(), apiShop = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { MainViewModel(apiPost = get(), apiShop = get(), spHelper = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Topic Setting View
     viewModel { TopicSettingViewModel(apiPet = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Post Detail View
@@ -52,7 +52,7 @@ val viewModelModule: Module = applicationContext {
     // ViewModel for Comment View
     viewModel { CommentViewModel(apiPost = get(), apiComment = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Profile View
-    viewModel { ProfileViewModel(apiUser = get(), apiPet = get(), apiFollow = get(), apiPost = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { ProfileViewModel(apiUser = get(), apiPet = get(), apiFollow = get(), apiPost = get(), apiUserActivity = get(), spHelper = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Profile Edit View
     viewModel { ProfileEditViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for follow View
