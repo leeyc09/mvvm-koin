@@ -104,7 +104,7 @@ class ProfileTopicAdapter(private val context: Context,
                     .apply(glideOption)
                     .into(imageView)
 
-            // touch 이벤트
+            // touch 이벤트 -> pet no 넘겨줌 -> index 보다 1크게
             mainLayout.tag = position + 1
             mainLayout.setOnClickListener(selectListener)
         }

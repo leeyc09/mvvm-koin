@@ -47,10 +47,10 @@ class OnBoardingActivity : AppCompatActivity(), View.OnClickListener {
         firstFragment = OnBoardingFragment.newFragment(0)
         secondFragment = OnBoardingFragment.newFragment(1)
         thirdFragment = OnBoardingFragment.newFragment(2)
-        viewPagerAdapter = ViewStatePagerAdapter(supportFragmentManager)
-        viewPagerAdapter.addFragment(firstFragment, "firstFragment")
-        viewPagerAdapter.addFragment(secondFragment, "secondFragment")
-        viewPagerAdapter.addFragment(thirdFragment, "thirdFragment")
+        viewPagerAdapter = ViewStatePagerAdapter(manager = supportFragmentManager)
+        viewPagerAdapter.addFragment(fragment = firstFragment, title = "firstFragment")
+        viewPagerAdapter.addFragment(fragment = secondFragment, title = "secondFragment")
+        viewPagerAdapter.addFragment(fragment = thirdFragment, title = "thirdFragment")
         viewPager.adapter = viewPagerAdapter
 
         // link tab layout with view pager

@@ -144,9 +144,9 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         profileAlbumFragment = ProfileAlbumFragment.newFragment(userId = userId)
         profilePetFragment = ProfilePetFragment.newFragment(userId = userId)
 
-        viewPagerAdapter = ViewStatePagerAdapter(supportFragmentManager)
-        viewPagerAdapter.addFragment(profileAlbumFragment, getString(R.string.profile_tab_album))
-        viewPagerAdapter.addFragment(profilePetFragment, getString(R.string.profile_tab_pet))
+        viewPagerAdapter = ViewStatePagerAdapter(manager = supportFragmentManager)
+        viewPagerAdapter.addFragment(fragment = profileAlbumFragment, title = getString(R.string.profile_tab_album))
+        viewPagerAdapter.addFragment(fragment = profilePetFragment, title = getString(R.string.profile_tab_pet))
         viewPager.adapter = viewPagerAdapter
 
         // tab layout 초기화

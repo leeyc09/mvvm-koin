@@ -21,7 +21,7 @@
         android:src="@drawable/arrow_back_black"/>
 
     <xlab.world.xlab.utils.view.textView.TextViewBoldHan
-        android:id="@+id/textViewTopicNum"
+        android:id="@+id/textViewPetNo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="0"
@@ -42,7 +42,7 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <xlab.world.xlab.utils.view.textView.TextViewBoldHan
-        android:id="@+id/textViewTopicTotalNum"
+        android:id="@+id/textViewPetTotal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="0"

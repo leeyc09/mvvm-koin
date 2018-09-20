@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.action_bar_main.*
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_reset_password.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
@@ -139,11 +140,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         feedExploreFragment = FeedExploreFragment.newFragment()
         feedShopFragment = FeedShopFragment.newFragment()
 
-        viewPagerAdapter = ViewStatePagerAdapter(supportFragmentManager)
-        viewPagerAdapter.addFragment(feedAllFragment, resources.getString(R.string.all))
-        viewPagerAdapter.addFragment(feedFollowingFragment, resources.getString(R.string.following))
-        viewPagerAdapter.addFragment(feedExploreFragment, resources.getString(R.string.explore))
-        viewPagerAdapter.addFragment(feedShopFragment, resources.getString(R.string.shop))
+        viewPagerAdapter = ViewStatePagerAdapter(manager = supportFragmentManager)
+        viewPagerAdapter.addFragment(fragment = feedAllFragment, title = resources.getString(R.string.all))
+        viewPagerAdapter.addFragment(fragment = feedFollowingFragment, title = resources.getString(R.string.following))
+        viewPagerAdapter.addFragment(fragment = feedExploreFragment, title = resources.getString(R.string.explore))
+        viewPagerAdapter.addFragment(fragment = feedShopFragment, title = resources.getString(R.string.shop))
         viewPager.adapter = viewPagerAdapter
 
         // tab layout 초기화

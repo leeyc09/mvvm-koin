@@ -63,7 +63,7 @@
                 android:layout_marginTop="7dp">
 
                 <android.support.v4.view.ViewPager
-                    android:id="@+id/viewPagerImage"
+                    android:id="@+id/imageViewPager"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scrollbars="none"
@@ -96,7 +96,7 @@
 
                     <xlab.world.xlab.utils.view.textView.TextViewBlackNoto
                         android:id="@+id/textViewPetName"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textSize="20sp"
@@ -190,7 +190,7 @@
 
                     <xlab.world.xlab.utils.view.textView.TextViewBoldHan
                         android:id="@+id/textViewPetWeight"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:singleLine="true"
