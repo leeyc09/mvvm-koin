@@ -22,9 +22,7 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.PetHairColorAdapter
 import xlab.world.xlab.adapter.recyclerView.PetHairTypeAdapter
 import xlab.world.xlab.utils.support.*
-import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
-import xlab.world.xlab.utils.view.dialog.DialogCreator
-import xlab.world.xlab.utils.view.dialog.TopicColorSelectDialog
+import xlab.world.xlab.utils.view.dialog.*
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 
@@ -46,11 +44,13 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
+    private lateinit var editCancelDialog: DefaultDialog
+    private lateinit var topicDeleteDialog: DefaultOneDialog
     private lateinit var topicColorSelectDialog: TopicColorSelectDialog
 
     private val topicColorListener = object:TopicColorSelectDialog.Listener {
         override fun onTopicColorSelect(selectColorStr: String) {
-            topicPetEditViewModel.existChangedData(topicColor = selectColorStr)
+            topicPetEditViewModel.enableSaveData(topicColor = selectColorStr)
             topicColorBtn.tag = selectColorStr
             topicColorBtn.setBackgroundColor(Color.parseColor("#$selectColorStr"))
         }
@@ -61,6 +61,11 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
     private val petHairColorListener = View.OnClickListener { view ->
         val position = view.tag as Int
         topicPetEditViewModel.hairColorSelect(position = position, hairColorData = petHairColorAdapter.getItem(position = position))
+    }
+    private val topicDeleteListener = object: DefaultOneDialog.Listener {
+        override fun onOkayTouch(tag: Any?) {
+            topicPetEditViewModel.deletePet(authorization = spHelper.authorization)
+        }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,12 +135,12 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
 //            breedDetailVisibility = View.GONE
             breedDetailLayout.visibility = View.GONE
             topicDeleteBtn.visibility = View.GONE
-            topicColorBtn.tag = topicColorStrArray[0]
-            topicColorBtn.setBackgroundColor(Color.parseColor("#${topicColorStrArray[0]}"))
         }
 
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
+        editCancelDialog = DialogCreator.editCancelDialog(context= this)
+        topicDeleteDialog = DialogCreator.deletePetDialog(context = this, listener = topicDeleteListener)
         topicColorSelectDialog = DialogCreator.topicColorSelectDialog(selectPosition = 0, listener = topicColorListener)
 
         // petHairTypeAdapter adapter & recycler 초기화
@@ -156,9 +161,11 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
 
         petNo?.let {
             topicPetEditViewModel.loadPetData(userId = spHelper.userId, petNo = it, topicColorList = resources.getStringArray(R.array.topicColorStringList))
-            topicPetEditViewModel.existChangedData()
+            topicPetEditViewModel.enableSaveData()
         } ?: let {
-            topicPetEditViewModel.existChangedData()
+            topicColorBtn.tag = topicColorStrArray[0]
+            topicColorBtn.setBackgroundColor(Color.parseColor("#${topicColorStrArray[0]}"))
+            topicPetEditViewModel.enableSaveData(topicColor = topicColorStrArray[0])
         }
     }
 
@@ -174,6 +181,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
         textViewPetMale.setOnClickListener(this) // 수컷 선택
         neuteredBtn.setOnClickListener(this) // 중성화 선택
         breedLayout.setOnClickListener(this) // 품종 선택
+        topicDeleteBtn.setOnClickListener(this) // pet 삭제
 
         // pet 이름 지우기 버튼 활성화
         ViewFunction.onFocusChange(editText = editTextPetName) { hasFocus ->
@@ -182,7 +190,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
         }
 
         ViewFunction.onTextChange(editText = editTextPetName) {
-            topicPetEditViewModel.existChangedData(petName = it)
+            topicPetEditViewModel.enableSaveData(petName = it)
         }
 
         // pet 생년월일 입력 이벤트
@@ -191,7 +199,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
         }
         // pet weight 입력 이벤트
         ViewFunction.onTextChange(editText = editTextPetWeight) {
-            topicPetEditViewModel.existChangedData(petWeight = try { it.toFloat()} catch (e: NumberFormatException) {-1f})
+            topicPetEditViewModel.enableSaveData(petWeight = try { it.toFloat()} catch (e: NumberFormatException) {-1f})
         }
     }
 
@@ -211,6 +219,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
                 uiData.topicColorData?.let {
                     topicColorBtn.tag = it.topicColor
                     topicColorBtn.setBackgroundColor(Color.parseColor("#${it.topicColor}"))
+                    topicPetEditViewModel.enableSaveData(topicColor = it.topicColor)
                     topicColorSelectDialog = DialogCreator.topicColorSelectDialog(selectPosition = it.colorIndex, listener = topicColorListener)
                 }
                 uiData.petImage?.let {
@@ -218,6 +227,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
                             .load(it)
                             .apply(glideOption)
                             .into(imageViewPet)
+                    topicPetEditViewModel.enableSaveData()
                 }
                 uiData.petType?.let {
                     textViewDog.isSelected = it
@@ -251,7 +261,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
                 }
                 uiData.hairTypeUpdateValue?.let {
                     petHairTypeAdapter.changeSelectType(hairType = it)
-                    topicPetEditViewModel.existChangedData()
+                    topicPetEditViewModel.enableSaveData()
                 }
                 uiData.hairColorData?.let {
                     petHairColorAdapter.updateData(petHairColorData = it)
@@ -262,21 +272,41 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
                 }
                 uiData.hairColorUpdateIndex?.let {
                     petHairColorAdapter.notifyItemChanged(it)
-                    topicPetEditViewModel.existChangedData()
+                    topicPetEditViewModel.enableSaveData()
                 }
                 uiData.petBirth?.let {
                     editTextPetBirth.setText(it)
                 }
                 uiData.birthRegexVisibility?.let {
                     layoutConfirmBirth.visibility = it
-                    topicPetEditViewModel.existChangedData()
+                    topicPetEditViewModel.enableSaveData()
                 }
                 uiData.petWeight?.let {
                     editTextPetWeight.setText(it)
                 }
-
                 uiData.saveEnable?.let {
                     actionBtn.isEnabled = it
+                }
+            }
+        })
+
+        // enable save pet 이벤트 observe
+        topicPetEditViewModel.enableSaveDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { enableSaveDataEvent ->
+            enableSaveDataEvent?.let { _ ->
+                enableSaveDataEvent.status?.let { backPopUpDialog ->
+                    actionBackBtn.tag = backPopUpDialog
+                }
+            }
+        })
+
+        // save pet 이벤트 observe
+        topicPetEditViewModel.saveDeletePetEvent.observe(owner = this, observer = android.arch.lifecycle.Observer {
+            it?.let { _ ->
+                it.status?.let { isSuccess ->
+                    if (isSuccess) {
+                        setResult(Activity.RESULT_OK)
+                        finish()
+                    }
                 }
             }
         })
@@ -284,45 +314,48 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
 
     override fun onClick(v: View?) {
         v?.let {
+            currentFocus?.clearFocus()
+            v.requestFocus()
             ViewFunction.hideKeyboard(context = this, view = v)
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-//                    if (actionBtn.isEnabled) {
-//                        editCancelDialog.show()
-//                        return
-//                    }
+                    if (actionBackBtn.tag as Boolean) {
+                        editCancelDialog.show()
+                        return
+                    }
                     setResult(Activity.RESULT_CANCELED)
                     finish()
                 }
                 R.id.actionBtn -> { // 토픽 (추가, 수정)
-
+                    topicPetEditViewModel.savePet(authorization = spHelper.authorization)
                 }
                 R.id.topicColorBtn -> { // 토픽 색상 변경
                     topicColorSelectDialog.show(supportFragmentManager, "TopicColorSelectDialog")
                 }
                 R.id.imageViewPet -> { // 토픽 이미지 변경
-                    currentFocus?.clearFocus()
-                    v.requestFocus()
-
                     if (!permissionHelper.hasPermission(context = this, permissions = permissionHelper.galleryPermissions)) {
                         permissionHelper.requestGalleryPermissions(context = this)
                         return
                     }
-
                     RunActivity.galleryImageSelectActivity(context = this, withOverlay = false)
                 }
                 R.id.textViewDog, R.id.textViewCat -> { // 강아지, 고양이 선택
-                    topicPetEditViewModel.existChangedData(petType = v.tag as String)
+                    if (!v.isSelected)
+                        topicPetEditViewModel.enableSaveData(petType = v.tag as String)
                 }
                 R.id.textViewPetFemale, R.id.textViewPetMale -> { // 암컷, 수컷 선택
-                    topicPetEditViewModel.existChangedData(petGender = v.tag as String)
+                    if (!v.isSelected)
+                        topicPetEditViewModel.enableSaveData(petGender = v.tag as String)
                 }
                 R.id.neuteredBtn -> { // 중성화 선택
-                    topicPetEditViewModel.existChangedData(petNeutered = v.isSelected)
+                    topicPetEditViewModel.enableSaveData(petNeutered = v.isSelected)
                 }
                 R.id.breedLayout -> { // 품종 선택
                     if (textViewDog.isSelected) RunActivity.petBreedActivity(context= this, petType = petInfo.dogCode)
                     else if (textViewCat.isSelected) RunActivity.petBreedActivity(context = this, petType = petInfo.catCode)
+                }
+                R.id.topicDeleteBtn -> { // pet 삭제
+                    topicDeleteDialog.show()
                 }
             }
         }

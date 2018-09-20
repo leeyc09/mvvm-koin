@@ -63,8 +63,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     }
     private val topicAddListener = View.OnClickListener {
         RunActivity.petEditActivity(context = this@ProfileActivity, petNo = null)
-//        val intent = TopicPetEditActivity.newIntent(this, 1, null)
-//        startActivityForResult(intent, RequestCodeData.TOPIC_ADD)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

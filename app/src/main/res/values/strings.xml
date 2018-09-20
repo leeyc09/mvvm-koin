@@ -69,6 +69,7 @@
     <string name="dial_delete_post2">다시 복구할 수 없습니다.</string>
     <string name="dial_cancel">취소하시겠어요?</string>
     <string name="dial_cancel2">입력한 내용이 저장되지 않습니다.</string>
+    <string name="dial_delete_topic">토픽을 삭제하시겠어요?</string>
 
     <!-- TODO: OnBoarding -->
     <string name="skip_onBoarding">건너뛰기</string>
@@ -220,7 +221,6 @@
     <string name="breed_mix_kor">믹스견</string>
     <string name="breed_mix_en">MIX</string>
     <string name="delete_topic">토픽 삭제</string>
-    <string name="is_delete_topic">토픽을 삭제하시겠어요?</string>
 
     <!-- TODO: Filter name -->
     <string name="filter_original">Original</string>

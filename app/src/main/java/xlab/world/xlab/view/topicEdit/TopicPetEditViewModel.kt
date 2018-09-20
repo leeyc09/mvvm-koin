@@ -3,14 +3,19 @@ package xlab.world.xlab.view.topicEdit
 import android.arch.lifecycle.MutableLiveData
 import android.view.View
 import io.reactivex.Observable
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import xlab.world.xlab.data.adapter.PetHairFeatureData
 import xlab.world.xlab.data.adapter.PetHairFeatureListData
+import xlab.world.xlab.data.request.ReqPetData
 import xlab.world.xlab.data.response.ResUserPetData
 import xlab.world.xlab.server.provider.ApiPetProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.AbstractViewModel
+import xlab.world.xlab.view.SingleLiveEvent
+import java.io.File
 
 class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                             private val petInfo: PetInfo,
@@ -18,10 +23,12 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                             private val scheduler: SchedulerProvider): AbstractViewModel() {
     val tag = "TopicPetEdit"
 
-    private var initPetData: ResUserPetData? = null
+    private var initPetData = ResUserPetData(size = ArrayList(), hairColor = ArrayList())
     private var recentPetData = ResUserPetData(size = ArrayList(), hairColor = ArrayList())
     private val newPetImage: ArrayList<String> = ArrayList()
 
+    val saveDeletePetEvent = SingleLiveEvent<TopicEditEventData>()
+    val enableSaveDataEvent = SingleLiveEvent<TopicEditEventData>()
     val uiData = MutableLiveData<UIModel>()
 
     var isAddPet: Boolean = true
@@ -72,7 +79,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
     }
 
     // 변경된 데이터 있는지 확인
-    fun existChangedData(topicColor: String? = null, petType: String? = null, petName: String? = null,
+    fun enableSaveData(topicColor: String? = null, petType: String? = null, petName: String? = null,
                          petGender: String? = null, petNeutered: Boolean? = null, petWeight: Float? = null) {
         launch {
             Observable.create<Boolean> {
@@ -96,14 +103,17 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                     recentPetData.weight = petWeight
                 }
 
+                PrintLog.d("isAddPet", isAddPet.toString(), tag)
                 PrintLog.d("initPetData", initPetData.toString(), tag)
                 PrintLog.d("recentData", recentPetData.toString(), tag)
+                PrintLog.d("newPetImage", newPetImage.toString(), tag)
 
                 val result =
                         if(isAddPet) newPetImage.isNotEmpty() && recentPetData.isFillData()
-                        else initPetData?.let { _ ->
-                            recentPetData.isFillData() && ((initPetData != recentPetData) || newPetImage.isNotEmpty()) }
-                                ?:let { _ ->false}
+                        else recentPetData.isFillData() && ((initPetData != recentPetData) || newPetImage.isNotEmpty())
+
+                enableSaveDataEvent.postValue(TopicEditEventData(
+                        status = (initPetData != recentPetData) || newPetImage.isNotEmpty()))
 
                 it.onNext(result)
                 it.onComplete()
@@ -212,7 +222,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                         hairTypeData = it.hairTypeData, hairTypeVisibility = it.hairTypeData?.let{_->View.VISIBLE}?:let{_->View.GONE},
                         hairColorData = it.hairColorData, hairColorVisibility = it.hairColorData?.let{_->View.VISIBLE}?:let{_->View.GONE})
 
-                existChangedData()
+                enableSaveData()
             }
         }
     }
@@ -254,12 +264,102 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
             SupportData.deleteFile(path = filePath)
         }
     }
+
+    fun savePet(authorization: String) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            val reqPetData = ReqPetData()
+            reqPetData.addTopicColor(topicColor = recentPetData.topicColor)
+            if (newPetImage.isNotEmpty()) {
+                val imageFile = File(newPetImage.last())
+                val requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), imageFile)
+                reqPetData.addPetImage(fileName = imageFile.name, requestBody = requestBody)
+            }
+            reqPetData.addPetType(type = recentPetData.type)
+            reqPetData.addPetName(name = recentPetData.name)
+            reqPetData.addPetGender(gender = recentPetData.gender)
+            reqPetData.addPetNeutered(isNeutered = recentPetData.isNeutered)
+            reqPetData.addPetBreed(breed = recentPetData.breed)
+            recentPetData.size?.forEach {
+                reqPetData.addPetSize(size = it)
+            }
+            reqPetData.addPetHairType(hairType = recentPetData.hairType)
+            recentPetData.hairColor?.let {
+                it.sort()
+                it.forEach { color->
+                    reqPetData.addPetHairColor(hairColor = color)
+                }
+            }
+            reqPetData.addPetBirthYear(birthYear = recentPetData.birthYear)
+            reqPetData.addPetBirthMonth(birthMonth = recentPetData.birthMonth)
+            reqPetData.addPetBirthDay(birthDay = recentPetData.birthDay)
+            reqPetData.addPetWeight(weight = recentPetData.weight)
+
+            if (isAddPet)
+                apiPet.requestAddPet(scheduler = scheduler, authorization = authorization, requestBody = reqPetData.getReqBody(),
+                        responseData = {
+                            PrintLog.d("requestAddPet success", "", tag)
+                            saveDeletePetEvent.value = TopicEditEventData(status = true)
+                            uiData.value = UIModel(isLoading = false)
+                        },
+                        errorData = { errorData ->
+                            uiData.value = UIModel(isLoading = false)
+                            errorData?.let {
+                                PrintLog.d("requestAddPet fail", errorData.message, tag)
+                            }
+                        })
+            else
+                apiPet.requestUpdatePet(scheduler = scheduler, authorization = authorization, petId = recentPetData.id, requestBody = reqPetData.getReqBody(),
+                        responseData = {
+                            PrintLog.d("requestAddPet success", "", tag)
+                            saveDeletePetEvent.value = TopicEditEventData(status = true)
+                            uiData.value = UIModel(isLoading = false)
+                        },
+                        errorData = { errorData ->
+                            uiData.value = UIModel(isLoading = false)
+                            errorData?.let {
+                                PrintLog.d("requestUpdatePet fail", errorData.message, tag)
+                            }
+                        })
+        }
+    }
+
+    fun deletePet(authorization: String) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            apiPet.requestDeletePet(scheduler = scheduler, authorization = authorization, petId = recentPetData.id,
+                    responseData = {
+                        PrintLog.d("requestDeletePet success", "", tag)
+                        saveDeletePetEvent.value = TopicEditEventData(status = true)
+                        uiData.value = UIModel(isLoading = false)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.d("requestDeletePet fail", errorData.message, tag)
+                        }
+                    })
+        }
+    }
 }
 
 data class TopicColorData(val topicColor: String, val colorIndex: Int)
 data class BreedData(var breedName: String = "",
                      var hairTypeData: PetHairFeatureData? = PetHairFeatureData(),
                      var hairColorData: PetHairFeatureData? = PetHairFeatureData())
+data class TopicEditEventData(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val topicColorData: TopicColorData? = null, val petImage: String? = null,
                    val petType: Boolean? = null, val petName: String? = null,

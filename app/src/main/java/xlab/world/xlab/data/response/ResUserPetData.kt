@@ -5,7 +5,7 @@ import java.io.Serializable
 
 data class ResUserPetData(@SerializedName("message") val message: String = "",
                           @SerializedName("id") val id: String = "",
-                          @SerializedName("topicColor") var topicColor: String = "",
+                          @SerializedName("topicColor") var topicColor: String = "FF959C",
                           @SerializedName("profileImg") val profileImage: String = "",
                           @SerializedName("type") var type: String = "",
                           @SerializedName("name") var name: String = "",

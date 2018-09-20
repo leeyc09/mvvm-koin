@@ -2,6 +2,7 @@ package xlab.world.xlab.utils.view.dialog
 
 import android.app.Activity
 import android.support.v4.content.res.ResourcesCompat
+import android.view.View
 import xlab.world.xlab.R
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.RequestCodeData
@@ -41,6 +42,12 @@ object DialogCreator {
                         context.finish()
                     }
                 })
+    }
+
+    fun deletePetDialog(context: Activity, listener: DefaultOneDialog.Listener): DefaultOneDialog {
+        return DefaultOneDialog(context = context,
+                text = context.getString(R.string.dial_delete_topic),
+                listener = listener)
     }
 
     fun postMoreDialog(context: Activity, listener: TwoSelectBottomDialog.Listener): TwoSelectBottomDialog {
