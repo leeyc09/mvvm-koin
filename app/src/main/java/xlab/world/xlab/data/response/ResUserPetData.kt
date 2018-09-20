@@ -12,7 +12,7 @@ data class ResUserPetData(@SerializedName("message") val message: String = "",
                           @SerializedName("gender") var gender: String = "",
                           @SerializedName("isNeutered") var isNeutered: Boolean = false,
                           @SerializedName("breed") var breed: String = "",
-                          @SerializedName("size") val size: ArrayList<String>? = null,
+                          @SerializedName("size") var size: ArrayList<String>? = null,
                           @SerializedName("hairType") var hairType: String = "",
                           @SerializedName("hairColor") var hairColor :ArrayList<String>? = null,
                           @SerializedName("birthYear") var birthYear: Int = -1,
@@ -21,6 +21,21 @@ data class ResUserPetData(@SerializedName("message") val message: String = "",
                           @SerializedName("ageYear") var ageYear: Int = -1,
                           @SerializedName("ageMonth") var ageMonth: Int = -1,
                           @SerializedName("weight") var weight: Float = -1f): Serializable {
+    fun valueCopy(): ResUserPetData {
+        val newData = this.copy()
+        size?.let {
+            val newSize = ArrayList<String>()
+            newSize.addAll(it)
+            newData.size = newSize
+        }
+        hairColor?.let {
+            val newHairColor = ArrayList<String>()
+            newHairColor.addAll(it)
+            newData.hairColor = newHairColor
+        }
+        return newData
+    }
+
     fun isFillData(): Boolean {
         return topicColor.isNotEmpty() &&
                 type.isNotEmpty() &&

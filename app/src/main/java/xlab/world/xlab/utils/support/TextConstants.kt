@@ -34,4 +34,6 @@ object TextConstants {
     const val USED_GOODS_HEADER = "제품"
 
     const val EMPTY_GALLERY = "갤러리에 사진이 없습니다"
+
+    const val SELET_PET_BREED = "품종 선택"
 }

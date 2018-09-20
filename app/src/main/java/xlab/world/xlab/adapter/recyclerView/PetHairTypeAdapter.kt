@@ -2,14 +2,11 @@ package xlab.world.xlab.adapter.recyclerView
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
-import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.bumptech.glide.request.RequestOptions
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
@@ -19,15 +16,16 @@ class PetHairTypeAdapter(val context: Context,
                          private val selectListener: View.OnClickListener) : RecyclerView.Adapter<PetHairTypeAdapter.ViewHolder>() {
 
     private val petInfo: PetInfo by (context as Activity).inject()
-    private val petHairTypeData: PetHairTypeData = PetHairTypeData()
+    private val petHairTypeData: PetHairFeatureData = PetHairFeatureData()
 
-    private val imagePlaceHolder = ColorDrawable(ResourcesCompat.getColor(context.resources, R.color.colorE2E2E2, null))
-    private val glideOption = RequestOptions().centerCrop()
-            .centerCrop()
-            .placeholder(imagePlaceHolder)
-            .error(imagePlaceHolder)
+    fun changeSelectType(hairType: String) {
+        petHairTypeData.items.forEach {
+            it.isSelect = hairType == it.hairFeatureCode
+        }
+        notifyDataSetChanged()
+    }
 
-    fun updateData(petHairTypeData: PetHairTypeData) {
+    fun updateData(petHairTypeData: PetHairFeatureData) {
         this.petHairTypeData.items.clear()
         this.petHairTypeData.items.addAll(petHairTypeData.items)
 
@@ -54,16 +52,16 @@ class PetHairTypeAdapter(val context: Context,
     inner class ViewHolderBind(view: View) : ViewHolder(view) {
         private val textViewType: TextView = view.findViewById(R.id.textViewType)
 
-        override fun display(item: PetHairTypeListData, position: Int) {
+        override fun display(item: PetHairFeatureListData, position: Int) {
             textViewType.isSelected = item.isSelect
-            textViewType.setText(petInfo.petHairType[item.hairTypeCode], TextView.BufferType.SPANNABLE)
+            textViewType.setText(petInfo.petHairType[item.hairFeatureCode], TextView.BufferType.SPANNABLE)
 
-            textViewType.tag = position
+            textViewType.tag = item.hairFeatureCode
             textViewType.setOnClickListener(selectListener)
         }
     }
 
     abstract class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        abstract fun display(item: PetHairTypeListData, position: Int)
+        abstract fun display(item: PetHairFeatureListData, position: Int)
     }
 }

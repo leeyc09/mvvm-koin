@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_topic_pet_edit.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
+import xlab.world.xlab.adapter.recyclerView.PetHairColorAdapter
 import xlab.world.xlab.adapter.recyclerView.PetHairTypeAdapter
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
@@ -41,6 +42,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
     private var petNo: Int? = null
 
     private lateinit var petHairTypeAdapter: PetHairTypeAdapter
+    private lateinit var petHairColorAdapter: PetHairColorAdapter
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
@@ -48,15 +50,17 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
 
     private val topicColorListener = object:TopicColorSelectDialog.Listener {
         override fun onTopicColorSelect(selectColorStr: String) {
-            topicPetEditViewModel.existChangedData(isAddPet = petNo?.let{_->false}?:let{_->true},
-                    topicColor = selectColorStr)
+            topicPetEditViewModel.existChangedData(topicColor = selectColorStr)
             topicColorBtn.tag = selectColorStr
             topicColorBtn.setBackgroundColor(Color.parseColor("#$selectColorStr"))
-//            actionBtn.enableSave()
         }
     }
     private val petHairTypeListener = View.OnClickListener { view ->
-
+        topicPetEditViewModel.hairTypeSelect(hairType = view.tag as String)
+    }
+    private val petHairColorListener = View.OnClickListener { view ->
+        val position = view.tag as Int
+        topicPetEditViewModel.hairColorSelect(position = position, hairColorData = petHairColorAdapter.getItem(position = position))
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,7 +108,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
                     }
                     RequestCodeData.TOPIC_BREED -> {
                         val breedIndex = data!!.getStringExtra(IntentPassName.BREED_INDEX)
-                        topicPetEditViewModel.setBreedDetailData(breedIndex = breedIndex)
+                        topicPetEditViewModel.setBreedDetailData(breedIndex = breedIndex, petData = null)
                     }
                 }
             }
@@ -113,6 +117,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
 
     private fun onSetup() {
         petNo = intent.getStringExtra(IntentPassName.PET_NO)?.toInt()
+        topicPetEditViewModel.isAddPet = petNo?.let{_->false}?:let{_->true}
 
         val topicColorStrArray = resources.getStringArray(R.array.topicColorStringList)
         petNo?.let { // pet 수정
@@ -136,16 +141,24 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
         // petHairTypeAdapter adapter & recycler 초기화
         petHairTypeAdapter = PetHairTypeAdapter(context = this,
                 selectListener = petHairTypeListener)
-        recyclerViewHairType.adapter = petHairTypeAdapter
-        recyclerViewHairType.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        recyclerViewHairType.addItemDecoration(CustomItemDecoration(context = this, right = 20f))
-        (recyclerViewHairType.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        hairTypeRecyclerView.adapter = petHairTypeAdapter
+        hairTypeRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        hairTypeRecyclerView.addItemDecoration(CustomItemDecoration(context = this, right = 20f))
+        (hairTypeRecyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+
+        // petHairColorAdapter adapter & recycler 초기화
+        petHairColorAdapter = PetHairColorAdapter(context = this,
+                selectListener = petHairColorListener)
+        hairColorRecyclerView.adapter = petHairColorAdapter
+        hairColorRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        hairColorRecyclerView.addItemDecoration(CustomItemDecoration(context = this, right = 6f))
+        (hairColorRecyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         petNo?.let {
             topicPetEditViewModel.loadPetData(userId = spHelper.userId, petNo = it, topicColorList = resources.getStringArray(R.array.topicColorStringList))
-            topicPetEditViewModel.existChangedData(isAddPet = false)
+            topicPetEditViewModel.existChangedData()
         } ?: let {
-            topicPetEditViewModel.existChangedData(isAddPet = true)
+            topicPetEditViewModel.existChangedData()
         }
     }
 
@@ -169,8 +182,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
         }
 
         ViewFunction.onTextChange(editText = editTextPetName) {
-            topicPetEditViewModel.existChangedData(isAddPet = petNo?.let{_->false}?:let{_->true},
-                    petName = it)
+            topicPetEditViewModel.existChangedData(petName = it)
         }
 
         // pet 생년월일 입력 이벤트
@@ -179,8 +191,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
         }
         // pet weight 입력 이벤트
         ViewFunction.onTextChange(editText = editTextPetWeight) {
-            topicPetEditViewModel.existChangedData(isAddPet = petNo?.let{_->false}?:let{_->true},
-                    petWeight = try { it.toFloat()} catch (e: NumberFormatException) {-1f})
+            topicPetEditViewModel.existChangedData(petWeight = try { it.toFloat()} catch (e: NumberFormatException) {-1f})
         }
     }
 
@@ -236,13 +247,29 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
                 }
                 uiData.hairTypeVisibility?.let {
                     hairTypeLayout.visibility = it
+                    petHairTypeAdapter.notifyDataSetChanged()
+                }
+                uiData.hairTypeUpdateValue?.let {
+                    petHairTypeAdapter.changeSelectType(hairType = it)
+                    topicPetEditViewModel.existChangedData()
+                }
+                uiData.hairColorData?.let {
+                    petHairColorAdapter.updateData(petHairColorData = it)
+                }
+                uiData.hairColorVisibility?.let {
+                    hairColorLayout.visibility = it
+                    petHairColorAdapter.notifyDataSetChanged()
+                }
+                uiData.hairColorUpdateIndex?.let {
+                    petHairColorAdapter.notifyItemChanged(it)
+                    topicPetEditViewModel.existChangedData()
                 }
                 uiData.petBirth?.let {
                     editTextPetBirth.setText(it)
                 }
                 uiData.birthRegexVisibility?.let {
                     layoutConfirmBirth.visibility = it
-                    topicPetEditViewModel.existChangedData(isAddPet = petNo?.let{_->false}?:let{_->true})
+                    topicPetEditViewModel.existChangedData()
                 }
                 uiData.petWeight?.let {
                     editTextPetWeight.setText(it)
@@ -285,16 +312,13 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
                     RunActivity.galleryImageSelectActivity(context = this, withOverlay = false)
                 }
                 R.id.textViewDog, R.id.textViewCat -> { // 강아지, 고양이 선택
-                    topicPetEditViewModel.existChangedData(isAddPet = petNo?.let{_->false}?:let{_->true},
-                            petType = v.tag as String)
+                    topicPetEditViewModel.existChangedData(petType = v.tag as String)
                 }
                 R.id.textViewPetFemale, R.id.textViewPetMale -> { // 암컷, 수컷 선택
-                    topicPetEditViewModel.existChangedData(isAddPet = petNo?.let{_->false}?:let{_->true},
-                            petGender = v.tag as String)
+                    topicPetEditViewModel.existChangedData(petGender = v.tag as String)
                 }
                 R.id.neuteredBtn -> { // 중성화 선택
-                    topicPetEditViewModel.existChangedData(isAddPet = petNo?.let{_->false}?:let{_->true},
-                            petNeutered = v.isSelected)
+                    topicPetEditViewModel.existChangedData(petNeutered = v.isSelected)
                 }
                 R.id.breedLayout -> { // 품종 선택
                     if (textViewDog.isSelected) RunActivity.petBreedActivity(context= this, petType = petInfo.dogCode)
