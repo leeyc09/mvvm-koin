@@ -158,7 +158,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
                             ))
                         }
                         loadPetDataEvent.value = LoadPetDataEvent(petUsedGoods = petUsedGoods)
-                        PrintLog.d("requestPetUsedGoods success", "", tag)
+                        PrintLog.d("requestPetUsedGoods success", petUsedGoods.toString(), tag)
                     },
                     errorData = { errorData ->
                         errorData?.let {

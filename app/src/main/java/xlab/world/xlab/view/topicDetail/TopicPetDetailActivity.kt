@@ -182,6 +182,8 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
+            PrintLog.d("topicUsedGoodsAdapter.dataLoading", topicUsedGoodsAdapter.dataLoading.toString(), topicPetDetailViewModel.tag)
+            PrintLog.d("topicUsedGoodsAdapter.dataTotal", topicUsedGoodsAdapter.dataTotal.toString(), topicPetDetailViewModel.tag)
             ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = topicUsedGoodsAdapter.dataLoading, total = topicUsedGoodsAdapter.dataTotal) { _ ->
                 topicPetDetailViewModel.loadPetUsedGoodsData(page = topicUsedGoodsAdapter.dataNextPage)
             }
@@ -224,6 +226,7 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
                     textViewPetWeight.setText(it.weight, TextView.BufferType.SPANNABLE)
                 }
                 uiData.petUsedGoods?.let {
+                    PrintLog.d("petUsedGoods in activity", it.toString(), topicPetDetailViewModel.tag)
                     if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
                         topicUsedGoodsAdapter.updateData(topicUsedGoodsData = it)
                     }

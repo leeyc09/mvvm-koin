@@ -117,6 +117,7 @@ object ViewFunction {
     fun onRecyclerViewScrolledDown(recyclerView: RecyclerView, isScrolled: (RecyclerView.LayoutManager) -> Unit) {
         recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                PrintLog.d("onRecyclerViewScrolledDown", "onScrolled", "TopicPetDetail")
                 if (dx > 0 || dy > 0) {
                     isScrolled(recyclerView.layoutManager)
                 }
