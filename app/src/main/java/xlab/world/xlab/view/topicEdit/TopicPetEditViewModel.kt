@@ -342,7 +342,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
             apiPet.requestDeletePet(scheduler = scheduler, authorization = authorization, petId = recentPetData.id,
                     responseData = {
                         PrintLog.d("requestDeletePet success", "", tag)
-                        saveDeletePetEvent.value = TopicEditEventData(status = true)
+                        saveDeletePetEvent.value = TopicEditEventData(status = false)
                         uiData.value = UIModel(isLoading = false)
                     },
                     errorData = { errorData ->

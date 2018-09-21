@@ -3,10 +3,7 @@ package xlab.world.xlab.server.`interface`
 import io.reactivex.Observable
 import okhttp3.RequestBody
 import retrofit2.http.*
-import xlab.world.xlab.data.response.ResMessageData
-import xlab.world.xlab.data.response.ResUserPetsData
-import xlab.world.xlab.data.response.ResUpdateTopicToggleData
-import xlab.world.xlab.data.response.ResUserPetData
+import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.ApiURL
 
 interface IPetRequest {
@@ -35,4 +32,8 @@ interface IPetRequest {
     @PUT(ApiURL.PETS_TOGGLE)
     fun updateTopicHidden(@Header("Authorization") authorization: String,
                           @Query("petId") petId: String): Observable<ResUpdateTopicToggleData>
+
+    @GET(ApiURL.PET_USED_ITEMS)
+    fun getPetUsedGoods(@Query("page") page: Int,
+                        @Query("petId") petId: String): Observable<ResPetUsedGoodsData>
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xlab.world.xlab.utils.view.cardView.SquareCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="88dp"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:cardElevation="0dp"
     app:cardCornerRadius="0dp"
@@ -15,9 +15,15 @@
         android:layout_height="match_parent"
         android:scaleType="centerInside"/>
 
-    <ImageView
+    <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/goods_circle_overlay"/>
+        android:background="@color/colorBlack03"/>
+
+    <ImageView
+        android:id="@+id/imageViewRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"/>
 
 </xlab.world.xlab.utils.view.cardView.SquareCardView>

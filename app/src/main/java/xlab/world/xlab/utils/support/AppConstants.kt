@@ -51,6 +51,12 @@ object AppConstants {
     // used goods topic type
     const val USED_GOODS_PET = 1
 
+    // goods rating
+    const val GOODS_RATING_NONE = -1
+    const val GOODS_RATING_BAD = 0
+    const val GOODS_RATING_SOSO = 1
+    const val GOODS_RATING_GOOD = 2
+
     // media save type
     const val MEDIA_VIDEO = 1
     const val MEDIA_GIF = 2

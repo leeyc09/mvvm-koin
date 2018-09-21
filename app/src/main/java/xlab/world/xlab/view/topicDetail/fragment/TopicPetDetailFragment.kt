@@ -10,6 +10,7 @@ import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.fragment_image_pager.*
 import org.koin.android.architecture.ext.viewModel
 import xlab.world.xlab.R
+import xlab.world.xlab.data.adapter.TopicUsedGoodsData
 import xlab.world.xlab.data.response.ResUserPetData
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
@@ -23,6 +24,11 @@ class TopicPetDetailFragment: Fragment() {
         get() = arguments?.getSerializable("petData")?.let{it as ResUserPetData}
         set(value) {
             arguments?.putSerializable("petData", value)
+        }
+    var petUsedGoods: TopicUsedGoodsData?
+        get() = arguments?.getSerializable("petUsedGoods")?.let{it as TopicUsedGoodsData}
+        set(value) {
+            arguments?.putSerializable("petUsedGoods", value)
         }
     private var petNo: Int
         get() = arguments?.getInt("petNo") ?: 1
@@ -94,6 +100,9 @@ class TopicPetDetailFragment: Fragment() {
             loadPetDataEvent?.let { _ ->
                 loadPetDataEvent.petData?.let {
                     petData = it
+                }
+                loadPetDataEvent.petUsedGoods?.let {
+                    petUsedGoods = it
                 }
             }
         })

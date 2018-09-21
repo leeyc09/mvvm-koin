@@ -6,6 +6,8 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'com.google.gms.google-services'
 
+apply plugin: 'io.fabric'
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
@@ -43,6 +45,11 @@ dependencies {
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // fabric
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.2@aar') {
+        transitive = true
+    }
 
     // Facebook
     implementation "com.facebook.android:facebook-android-sdk:$rootProject.facebookSdkVersion"

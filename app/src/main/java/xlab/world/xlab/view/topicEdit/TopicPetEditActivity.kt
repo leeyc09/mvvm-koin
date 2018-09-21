@@ -299,14 +299,15 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
             }
         })
 
-        // save pet 이벤트 observe
+        // save or delete pet 이벤트 observe
         topicPetEditViewModel.saveDeletePetEvent.observe(owner = this, observer = android.arch.lifecycle.Observer {
             it?.let { _ ->
-                it.status?.let { isSuccess ->
-                    if (isSuccess) {
-                        setResult(Activity.RESULT_OK)
-                        finish()
-                    }
+                it.status?.let { saveOrDelete -> // true - (update, add) false - delete
+                    val resultCode =
+                            if (saveOrDelete) Activity.RESULT_OK
+                            else ResultCodeData.TOPIC_DELETE
+                    setResult(resultCode)
+                    finish()
                 }
             }
         })

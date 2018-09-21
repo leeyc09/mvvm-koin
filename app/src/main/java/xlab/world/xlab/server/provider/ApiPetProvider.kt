@@ -33,6 +33,9 @@ interface ApiPetProvider {
     // topic hidden setting 변경
     fun updateTopicHidden(scheduler: SchedulerProvider, authorization: String, petId: String,
                           responseData: (ResUpdateTopicToggleData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    fun requestPetUsedGoods(scheduler: SchedulerProvider, petId: String, page: Int,
+                            responseData: (ResPetUsedGoodsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiPet(private val iPetRequest: IPetRequest): ApiPetProvider {
@@ -94,6 +97,17 @@ class ApiPet(private val iPetRequest: IPetRequest): ApiPetProvider {
     override fun updateTopicHidden(scheduler: SchedulerProvider, authorization: String, petId: String,
                                    responseData: (ResUpdateTopicToggleData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPetRequest.updateTopicHidden(authorization = authorization, petId = petId)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestPetUsedGoods(scheduler: SchedulerProvider, petId: String, page: Int,
+                                     responseData: (ResPetUsedGoodsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iPetRequest.getPetUsedGoods(petId = petId, page = page)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

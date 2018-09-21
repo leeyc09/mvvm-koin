@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import android.widget.TextView
 import kotlinx.android.synthetic.main.action_bar_topic.*
@@ -12,11 +13,13 @@ import kotlinx.android.synthetic.main.activity_topic_pet_detail.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
+import xlab.world.xlab.adapter.recyclerView.TopicUsedGoodsAdapter
 import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
 import xlab.world.xlab.data.response.ResUserPetData
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
+import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.topicDetail.fragment.TopicPetDetailFragment
 
@@ -29,6 +32,8 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
     private var resultCode = Activity.RESULT_CANCELED
 
     private lateinit var viewPagerAdapter: ViewStatePagerAdapter
+
+    private lateinit var topicUsedGoodsAdapter: TopicUsedGoodsAdapter
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
@@ -69,7 +74,7 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
                         viewPagerAdapter.addFragment(fragment = TopicPetDetailFragment.newFragment(userId = userId, petNo = viewPagerAdapter.count + 1), title = "")
                         imageViewPager.setCurrentItem(0, false)
 
-                        topicPetDetailViewModel.changePetTotal(total = viewPagerAdapter.count + 1)
+                        topicPetDetailViewModel.changePetTotal(total = viewPagerAdapter.count)
                         topicPetDetailViewModel.loadPetDetailData(userId = userId, petNo = 1, reLoad = true)
                     }
                     RequestCodeData.TOPIC_EDIT -> { // 펫 수정
@@ -87,40 +92,25 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             ResultCodeData.TOPIC_DELETE -> {
-//                if (this.resultCode == Activity.RESULT_CANCELED)
-//                    this.resultCode = ResultCodeData.TOPIC_DELETE
-//                when (requestCode) {
-//                    RequestCodeData.TOPIC_EDIT -> {
-//                        XlabLog.d("delete topic", "delete topic")
-//                        totalTopicNum--
-//                        if (totalTopicNum > 0) {
-//                            if (totalTopicNum == 1) {
-//                                textViewTopicNum.visibility = View.GONE
-//                                imageViewSlash.visibility = View.GONE
-//                                textViewTopicTotalNum.visibility = View.GONE
-//                            }
-//
-//                            (0 until viewPagerAdapter.count).forEach { index ->
-//                                val frag = viewPagerAdapter.getItem(index) as TopicPetFragment
-//                                frag.petData = null
-//                            }
-//                            viewPagerAdapter.removeFragment(viewPagerAdapter.count - 1)
-//                            topicNum = 1
-//
-//                            viewPagerImage.setCurrentItem(topicNum - 1, false)
-//
-//                            loadPetData(topicNum) { petData ->
-//                                setPetInfoData(petData)
-//                            }
-//
-//                            textViewTopicNum.text = topicNum.toString()
-//                            textViewTopicTotalNum.text = totalTopicNum.toString()
-//                        } else {
-//                            setResult(ResultCodeData.TOPIC_DELETE)
-//                            finish()
-//                        }
-//                    }
-//                }
+                if (this.resultCode == Activity.RESULT_CANCELED)
+                    this.resultCode = ResultCodeData.TOPIC_DELETE
+                when (requestCode) {
+                    RequestCodeData.TOPIC_EDIT -> {
+                        viewPagerAdapter.removeFragment(viewPagerAdapter.count - 1)
+                        if (viewPagerAdapter.count > 0) {
+                            (0 until viewPagerAdapter.count).forEach { index ->
+                                val frag = viewPagerAdapter.getItem(index) as TopicPetDetailFragment
+                                frag.resetPetData(petNo = null)
+                            }
+
+                            topicPetDetailViewModel.changePetTotal(total = viewPagerAdapter.count)
+                            topicPetDetailViewModel.loadPetDetailData(userId = userId, petNo = imageViewPager.currentItem + 1, reLoad = true)
+                        } else {
+                            setResult(ResultCodeData.TOPIC_DELETE)
+                            finish()
+                        }
+                    }
+                }
             }
             ResultCodeData.LOGOUT_SUCCESS -> {
                 setResult(ResultCodeData.LOGOUT_SUCCESS)
@@ -153,6 +143,14 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
 
         defaultListener = DefaultListener(context = this)
 
+        // topicUsedGoods adapter & recycler view 초기화
+        topicUsedGoodsAdapter = TopicUsedGoodsAdapter(context = this,
+                goodsListener = defaultListener.goodsListener)
+        recyclerView.adapter = topicUsedGoodsAdapter
+        recyclerView.layoutManager = GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false)
+        recyclerView.addItemDecoration(CustomItemDecoration(context = this, offset = 0.5f))
+        recyclerView.isNestedScrollingEnabled = false
+
         // 프래그먼트 & 뷰 페이저 초기화
         viewPagerAdapter = ViewStatePagerAdapter(manager = supportFragmentManager)
         (1..intent.getIntExtra(IntentPassName.PET_TOTAL, 1)).forEach { petNo ->
@@ -177,6 +175,15 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
             val frag = viewPagerAdapter.getItem(position) as TopicPetDetailFragment
             frag.petData?.let {
                 topicPetDetailViewModel.changePetData(petData = it, isMine = userId == spHelper.userId)
+            }
+            frag.petUsedGoods?.let {
+                topicPetDetailViewModel.changePetUsedGoodsData(petUsedGoods = it)
+            }
+        }
+
+        ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = topicUsedGoodsAdapter.dataLoading, total = topicUsedGoodsAdapter.dataTotal) { _ ->
+                topicPetDetailViewModel.loadPetUsedGoodsData(page = topicUsedGoodsAdapter.dataNextPage)
             }
         }
     }
@@ -216,6 +223,13 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
                     textViewPetAge.setText(it.age, TextView.BufferType.SPANNABLE)
                     textViewPetWeight.setText(it.weight, TextView.BufferType.SPANNABLE)
                 }
+                uiData.petUsedGoods?.let {
+                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
+                        topicUsedGoodsAdapter.updateData(topicUsedGoodsData = it)
+                    }
+                    else
+                        topicUsedGoodsAdapter.addData(topicUsedGoodsData = it)
+                }
             }
         })
 
@@ -224,6 +238,9 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
             loadPetDataEvent?.let { _ ->
                 loadPetDataEvent.petData?.let {
                     topicPetDetailViewModel.changePetData(petData = it, isMine = userId == spHelper.userId)
+                }
+                loadPetDataEvent.petUsedGoods?.let {
+                    topicPetDetailViewModel.changePetUsedGoodsData(petUsedGoods = it)
                 }
             }
         })

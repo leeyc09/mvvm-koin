@@ -5,6 +5,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Base64
+import com.crashlytics.android.Crashlytics
+import io.fabric.sdk.android.Fabric
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.BuildConfig
@@ -32,6 +34,7 @@ class PreloadActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Fabric.with(this, Crashlytics())
 
         onSetup()
 

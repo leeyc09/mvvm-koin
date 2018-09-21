@@ -2,10 +2,10 @@ package xlab.world.xlab.view.topicDetail
 
 import android.arch.lifecycle.MutableLiveData
 import android.graphics.Color
-import android.support.v4.content.res.ResourcesCompat
 import android.view.View
 import io.reactivex.Observable
-import xlab.world.xlab.R
+import xlab.world.xlab.data.adapter.TopicUsedGoodsData
+import xlab.world.xlab.data.adapter.TopicUsedGoodsListData
 import xlab.world.xlab.data.response.ResUserPetData
 import xlab.world.xlab.server.provider.ApiPetProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
@@ -24,6 +24,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
     val tag = "TopicPetDetail"
 
     private var petData: ResUserPetData? = null
+    private var petUsedGoodsData: TopicUsedGoodsData? = null
 
     val loadPetDataEvent = SingleLiveEvent<LoadPetDataEvent>()
     val uiData = MutableLiveData<UIModel>()
@@ -63,6 +64,15 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
         }
     }
 
+    fun changePetUsedGoodsData(petUsedGoods: TopicUsedGoodsData?) {
+        petUsedGoods?.let {
+            this.petUsedGoodsData = it
+            uiData.value = UIModel(petUsedGoods = it)
+        } ?: let {
+            this.petUsedGoodsData = null
+        }
+    }
+
     fun setButtonVisible(userId: String, loginUserId: String) {
         launch {
             Observable.create<Int> {
@@ -94,8 +104,10 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
             petData?.let {
                 loadPetDataEvent.value = LoadPetDataEvent(petData = it)
                 uiData.value = UIModel(petImage = it.profileImage)
-            } ?:let { _ ->
-                loadPetData(userId = userId, petNo = petNo)
+            } ?: loadPetData(userId = userId, petNo = petNo)
+
+            petUsedGoodsData?.let {
+                loadPetDataEvent.value = LoadPetDataEvent(petUsedGoods = it)
             }
         }
     }
@@ -115,6 +127,8 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
                         PrintLog.d("requestUserPet success", it.toString(), tag)
                         loadPetDataEvent.value = LoadPetDataEvent(petData = it)
                         uiData.value = UIModel(isLoading = false, petImage = it.profileImage)
+
+                        petUsedGoodsData?: loadPetUsedGoodsData(page = 1)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
@@ -124,14 +138,43 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
                     })
         }
     }
+
+    fun loadPetUsedGoodsData(page: Int) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            return
+        }
+
+        launch {
+            apiPet.requestPetUsedGoods(scheduler = scheduler, petId = petData!!.id, page = page,
+                    responseData = {
+                        val petUsedGoods = TopicUsedGoodsData(total = it.total, nextPage = page + 1)
+                        it.goodsData?.forEach { goods ->
+                            petUsedGoods.items.add(TopicUsedGoodsListData(
+                                    goodsCode = goods.code,
+                                    imageURL = goods.image,
+                                    rating = goods.rating
+                            ))
+                        }
+                        loadPetDataEvent.value = LoadPetDataEvent(petUsedGoods = petUsedGoods)
+                        PrintLog.d("requestPetUsedGoods success", "", tag)
+                    },
+                    errorData = { errorData ->
+                        errorData?.let {
+                            PrintLog.d("requestPetUsedGoods fail", errorData.message, tag)
+                        }
+                    })
+        }
+    }
 }
 
 data class PetDetailData(val breed: String, val topicColor: Int,
                          val type: String, val name: String,
                          val gender: Boolean, val age: String, val weight: String)
-data class LoadPetDataEvent(val petData: ResUserPetData? = null)
+data class LoadPetDataEvent(val petData: ResUserPetData? = null, val petUsedGoods: TopicUsedGoodsData? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val btnVisibility: Int? = null,
                    val petTotal: Int? = null, val petCountVisibility: Int? = null,
                    val petImage: String? = null,
-                   val petDetailData: PetDetailData? = null)//, val petGoodsData:)
+                   val petDetailData: PetDetailData? = null, val petUsedGoods: TopicUsedGoodsData? = null)
