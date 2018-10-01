@@ -9,6 +9,7 @@ import xlab.world.xlab.view.follow.FollowingActivity
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectActivity
 import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
+import xlab.world.xlab.view.notice.NoticeActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
 import xlab.world.xlab.view.petBreed.PetBreedActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
@@ -176,6 +177,11 @@ object RunActivity {
     fun policyActivity(context: Activity) {
         val intent = PolicyActivity.newIntent(context = context)
         context.startActivity(intent)
+    }
+
+    fun noticeActivity(context: Activity) {
+        val intent = NoticeActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.NOTICE)
     }
 
     fun withdrawActivity(context: Activity) {

@@ -21,6 +21,7 @@ import xlab.world.xlab.view.comment.CommentViewModel
 import xlab.world.xlab.view.follow.FollowViewModel
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
 import xlab.world.xlab.view.main.MainViewModel
+import xlab.world.xlab.view.notice.NoticeViewModel
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
 import xlab.world.xlab.view.posts.PostsViewModel
@@ -71,8 +72,10 @@ val viewModelModule: Module = applicationContext {
     viewModel { SettingViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Posts View
     viewModel { PostsViewModel(apiPost = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
-    // ViewModel for withdraw
+    // ViewModel for Withdraw View
     viewModel { WithDrawViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Notice View
+    viewModel { NoticeViewModel(apiNotice = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
@@ -132,6 +135,11 @@ val remoteModule: Module = applicationContext {
     bean { createRetrofit<ICommentRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
     // comment api implement
     bean { ApiComment(iCommentRequest = get()) as ApiCommentProvider }
+
+    // notice api interface
+    bean { createRetrofit<INoticeRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
+    // notice api implement
+    bean { ApiNotice(iNoticeRequest = get()) as ApiNoticeProvider }
 }
 
 /**

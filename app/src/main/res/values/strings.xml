@@ -171,6 +171,9 @@
     <string name="change_shop_account">쇼핑 정보 수정</string>
     <string name="push_receive">푸시 알림 수신</string>
 
+    <!-- TODO: Notice -->
+    <string name="no_notice">공지사항이 없어요</string>
+
     <!-- TODO: Withdraw -->
     <string name="withdraw_title">탈퇴하려는 이유는"\n"무엇인가요?</string>
     <string name="withdraw_reason1">자주 사용하지 않아서</string>

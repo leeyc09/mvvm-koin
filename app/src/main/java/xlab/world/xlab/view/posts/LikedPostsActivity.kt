@@ -124,6 +124,15 @@ class LikedPostsActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         })
+
+        // load like posts 이벤트 observe
+        postsViewModel.loadPostsEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { loadPostsEventData ->
+            loadPostsEventData?.let { _->
+                loadPostsEventData.status?.let { isLoading ->
+                    postsAdapter.dataLoading = isLoading
+                }
+            }
+        })
     }
 
     override fun onClick(v: View?) {

@@ -196,7 +196,7 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
                     settingViewModel.updatePushAlarm(authorization = spHelper.authorization)
                 }
                 R.id.noticeBtn -> { // 공지사항
-                    RunActivity.notificationActivity(context = this)
+                    RunActivity.noticeActivity(context = this)
                 }
                 R.id.updateBtn -> { // 앱 버전 업데이트
                     val updateURL = Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)

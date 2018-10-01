@@ -64,6 +64,30 @@ object SupportData {
         }
     }
 
+    // 날짜 표기 (같은 연도 생략)
+    fun contentDateForm(year: Int, month: Int, day: Int): String {
+        // get current time
+        val calendar = Calendar.getInstance()
+        val timeFormat = SimpleDateFormat("yyyy-MM-dd")
+        val dateStr = timeFormat.format(calendar.time)
+        val timeList = ArrayList<Int>()
+        dateStr.split("-").forEach { // year,month,day,hour,min
+            timeList.add(it.toInt())
+        }
+
+        val monthDayStr = String.format("%s.%s",
+                if (month > 9) month.toString()
+                else "0$month",
+                if (day > 9) day.toString()
+                else "0$day")
+
+        return if (year == timeList[0]) { // 연도 생략
+            monthDayStr
+        } else { // other day
+            String.format("%d.%s",year, monthDayStr)
+        }
+    }
+
     // 생년월일 표기
     fun birthDayForm(year: Int, month: Int, day: Int): String {
         return String.format(

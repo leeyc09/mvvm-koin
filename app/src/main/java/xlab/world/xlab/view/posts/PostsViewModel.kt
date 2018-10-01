@@ -34,6 +34,7 @@ class PostsViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiUserActivity.requestLikedPosts(scheduler = scheduler, authorization = authorization, page = page,
                     responseData = {
+                        PrintLog.d("requestLikedPosts success", it.toString(), tag)
                         val postsThumbnailData = PostThumbnailData(total = it.total, nextPage = page + 1)
                         it.likedPostsData?.forEach { post ->
                             postsThumbnailData.items.add(PostThumbnailListData(
@@ -44,7 +45,6 @@ class PostsViewModel(private val apiPost: ApiPostProvider,
                                     youTubeVideoID = post.youTubeVideoID
                             ))
                         }
-                        PrintLog.d("requestLikedPosts success", postsThumbnailData.toString(), tag)
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, postsData = postsThumbnailData)
                     },
                     errorData = { errorData ->
