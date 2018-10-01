@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorFFFFFF"
+    tools:context=".view.setting.SettingActivity">
+
+    <include
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/action_bar_default"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        android:overScrollMode="never"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="44dp">
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/account"
+                android:textSize="12sp"
+                android:textColor="@color/colorA4A4A4"
+                android:layout_marginTop="19dp"/>
+
+            <LinearLayout
+                android:id="@+id/profileEditBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="7dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_edit"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"
+                    android:paddingTop="17dp"
+                    android:paddingBottom="16dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorF5F5F5" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/topicSettingBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/topic_setting"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"
+                    android:paddingTop="17dp"
+                    android:paddingBottom="16dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorF5F5F5" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/likedPostBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/liked_post"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"
+                    android:paddingTop="17dp"
+                    android:paddingBottom="16dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorF5F5F5" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/changePasswordBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/password_reset"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"
+                    android:paddingTop="17dp"
+                    android:paddingBottom="16dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorF5F5F5" />
+            </LinearLayout>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/shopping"
+                android:textSize="12sp"
+                android:textColor="@color/colorA4A4A4"
+                android:layout_marginTop="27dp"/>
+
+            <LinearLayout
+                android:id="@+id/updateShopAccountBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="7dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/change_shop_account"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"
+                    android:paddingTop="17dp"
+                    android:paddingBottom="16dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorF5F5F5" />
+            </LinearLayout>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/setting"
+                android:textSize="12sp"
+                android:textColor="@color/colorA4A4A4"
+                android:layout_marginTop="27dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="7dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/push_receive"
+                        android:textSize="13sp"
+                        android:textColor="@color/color000000"
+                        android:paddingTop="17dp"
+                        android:paddingBottom="16dp"
+                        android:layout_weight="1"/>
+
+                    <ImageView
+                        android:id="@+id/pushAlarmBtn"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/default_toggle"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginTop="2dp"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorF5F5F5" />
+            </LinearLayout>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/support"
+                android:textSize="12sp"
+                android:textColor="@color/colorA4A4A4"
+                android:layout_marginTop="27dp"/>
+
+            <LinearLayout
+                android:id="@+id/noticeBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/notice"
+                        android:textColor="@color/color000000"
+                        android:textSize="13sp"
+                        android:paddingTop="17dp"
+                        android:paddingBottom="16dp" />
+
+                    <View
+                        android:id="@+id/noticeDotView"
+                        android:layout_width="4dp"
+                        android:layout_height="4dp"
+                        android:background="@color/color5300ED"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorF5F5F5" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="16dp"
+                        android:paddingTop="17dp"
+                        android:text="@string/version"
+                        android:textColor="@color/color000000"
+                        android:textSize="13sp"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularHan
+                        android:id="@+id/textViewVersion"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/version"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorBFBFBF"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                        android:visibility="gone"
+                        android:id="@+id/updateBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/update"
+                        android:textSize="14sp"
+                        android:textColor="@color/color5300ED"
+                        android:layout_gravity="center"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorF5F5F5" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/policyBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/policy"
+                        android:textSize="13sp"
+                        android:textColor="@color/color000000"
+                        android:paddingTop="17dp"
+                        android:paddingBottom="16dp"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorF5F5F5" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/suggestionBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/suggestion"
+                        android:textSize="13sp"
+                        android:textColor="@color/color000000"
+                        android:paddingTop="17dp"
+                        android:paddingBottom="16dp"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorF5F5F5" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/logoutBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="52dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/logout"
+                    android:textSize="13sp"
+                    android:textColor="@color/color6D6D6D"
+                    android:paddingTop="17dp"
+                    android:paddingBottom="16dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/withdrawBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/withdraw"
+                    android:textSize="13sp"
+                    android:textColor="@color/color6D6D6D"
+                    android:paddingTop="17dp"
+                    android:paddingBottom="16dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

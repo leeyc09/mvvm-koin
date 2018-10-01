@@ -16,7 +16,10 @@ object TextConstants {
     const val DUPLICATE_EMAIL = "이미 사용중인 이메일입니다."
     const val DUPLICATE_NICK = "이미 사용중인 닉네임입니다."
 
+    const val WRONG_PASSWORD = "비밀번호가 일치하지 않습니다"
     const val COMPLETE_CHANGE_PASSWORD = "비밀번호 재설정이 완료되었습니다"
+
+    const val WITHDRAW_SUCCESS = "회원탈퇴가 완료되었습니다"
 
     const val CATEGORY_LIVING = "Living"
     const val CATEGORY_FASHION = "Fashion"

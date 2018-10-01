@@ -11,10 +11,9 @@ object ApiURL {
     private const val XLAB_GODO_DOMAIN = "shop.xlab.io"
     private const val XLAB_GODO_MOBILE_DOMAIN = "m.$XLAB_GODO_DOMAIN"
     const val XLAB_GODO_URL_SSL =  "$MAIN_SCHEME_SSL://$XLAB_GODO_DOMAIN"
-    const val XLAB_GODO_URL =  "$MAIN_SCHEME://$XLAB_GODO_DOMAIN"
     const val XLAB_GODO_MOBILE_URL_SSL =  "$MAIN_SCHEME_SSL://$XLAB_GODO_MOBILE_DOMAIN"
     const val XLAB_GODO_MOBILE_URL =  "$MAIN_SCHEME://$XLAB_GODO_MOBILE_DOMAIN"
-    const val GODO_IMAGE_HEADER_URL = "$XLAB_GODO_URL/data/goods/"
+    const val GODO_IMAGE_HEADER_URL = "$XLAB_GODO_URL_SSL/data/goods/"
 
     // TODO: xlab shop member
     private const val GODO_MEM = "/api/mem"
@@ -104,8 +103,8 @@ object ApiURL {
     const val SHOP_VIEW_GOODS = "$SHOP/viewGoods"
 
     private const val GODO = "/godo"
-    const val SHOP_LOGIN = "$XLAB_GODO_URL/Users/UsersLoginController"
-    const val SHOP_LOGOUT = "$XLAB_GODO_URL/Users/UsersLogoutController"
+    const val SHOP_LOGIN = "$XLAB_GODO_URL_SSL/Users/UsersLoginController"
+    const val SHOP_LOGOUT = "$XLAB_GODO_URL_SSL/Users/UsersLogoutController"
     const val SHOP_MY_CART = "$GODO/cart"
     const val SHOP_MY_CART_COUNT = "$SHOP_MY_CART/count"
     const val SHOP_MY_CART_UPDATE = "$SHOP_MY_CART/update"

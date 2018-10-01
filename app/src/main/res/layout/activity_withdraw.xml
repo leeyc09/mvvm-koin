@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:fillViewport="true"
+    android:overScrollMode="never"
+    android:scrollbars="none"
+    tools:context=".view.withdraw.WithdrawActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/action_bar_default" />
+
+        <xlab.world.xlab.utils.view.textView.TextViewBlackNoto
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="@string/withdraw_title"
+            android:textSize="20sp"
+            android:textColor="@color/color000000"/>
+
+        <RadioGroup
+            android:id="@+id/reasonRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="49dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp">
+
+            <xlab.world.xlab.utils.view.radioButton.RadioButtonRegularNoto
+                android:id="@+id/reasonRadio1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/withdraw_reason1"
+                android:textSize="13sp"
+                android:textColor="@color/color000000"
+                android:button="@drawable/radio_button"
+                android:paddingStart="8dp"
+                android:paddingEnd="0dp"/>
+
+            <xlab.world.xlab.utils.view.radioButton.RadioButtonRegularNoto
+                android:id="@+id/reasonRadio2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/withdraw_reason2"
+                android:textSize="13sp"
+                android:textColor="@color/color000000"
+                android:button="@drawable/radio_button"
+                android:paddingStart="8dp"
+                android:paddingEnd="0dp"
+                android:layout_marginTop="32dp"/>
+
+            <xlab.world.xlab.utils.view.radioButton.RadioButtonRegularNoto
+                android:id="@+id/reasonRadio3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/withdraw_reason3"
+                android:textSize="13sp"
+                android:textColor="@color/color000000"
+                android:button="@drawable/radio_button"
+                android:paddingStart="8dp"
+                android:paddingEnd="0dp"
+                android:layout_marginTop="32dp"/>
+
+            <xlab.world.xlab.utils.view.radioButton.RadioButtonRegularNoto
+                android:id="@+id/reasonRadio4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/withdraw_reason4"
+                android:textSize="13sp"
+                android:textColor="@color/color000000"
+                android:button="@drawable/radio_button"
+                android:paddingStart="8dp"
+                android:paddingEnd="0dp"
+                android:layout_marginTop="32dp"/>
+
+            <xlab.world.xlab.utils.view.radioButton.RadioButtonRegularNoto
+                android:id="@+id/reasonRadio5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/etc"
+                android:textSize="13sp"
+                android:textColor="@color/color000000"
+                android:button="@drawable/radio_button"
+                android:paddingStart="8dp"
+                android:paddingEnd="0dp"
+                android:layout_marginTop="32dp"/>
+
+        </RadioGroup>
+
+        <xlab.world.xlab.utils.view.editText.EditTextBoldNoto
+            android:visibility="gone"
+            android:id="@+id/editTextReason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/withdraw_reason_hint"
+            android:textSize="15sp"
+            android:textColor="@color/color000000"
+            android:textColorHint="@color/colorE2E2E2"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="12dp"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/withdraw_more_info"
+            android:textSize="12sp"
+            android:textColor="@color/color000000"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="60dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="27dp">
+
+            <ImageView
+                android:id="@+id/agreeBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/circle_checkbox_button"
+                android:layout_gravity="center"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/withdraw_agree"
+                android:textSize="12sp"
+                android:textColor="@color/color4A4A4A"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/colorA4A4A4"
+            android:layout_marginTop="62dp" />
+
+        <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+            android:id="@+id/withdrawBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/withdraw_button"
+            android:enabled="false"
+            android:textSize="14sp"
+            android:textColor="@color/enable_bfbfbf_de5359"
+            android:paddingTop="13.5dp"
+            android:paddingBottom="14dp"
+            android:gravity="center"/>
+
+    </LinearLayout>
+
+</ScrollView>

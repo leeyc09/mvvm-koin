@@ -6,29 +6,23 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.action_bar_default.*
-import kotlinx.android.synthetic.main.activity_reset_password.*
-import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
-import xlab.world.xlab.utils.support.IntentPassName
-import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SPHelper
-import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
-import xlab.world.xlab.view.resetPassword.fragment.EmailConfirmFragment
 import xlab.world.xlab.view.resetPassword.fragment.NewPasswordFragment
+import xlab.world.xlab.view.resetPassword.fragment.PasswordConfirmFragment
 
-class ResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
-
-    private var initEmail: String = ""
+class UpdatePasswordActivity : AppCompatActivity(), View.OnClickListener {
+    private val spHelper: SPHelper by inject()
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_reset_password)
+        setContentView(R.layout.activity_update_password)
 
         onSetup()
 
@@ -42,15 +36,13 @@ class ResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
-        initEmail = intent.getStringExtra(IntentPassName.USER_EMAIL)
-
         // 타이틀, 확인 버튼 비활성화
         actionBarTitle.visibility = View.GONE
         actionBtn.visibility = View.GONE
 
         // 프래그먼트 초기화
-        val emailConfirmFragment = EmailConfirmFragment.newFragment(initEmail)
-        supportFragmentManager.beginTransaction().replace(R.id.fragmentLayout, emailConfirmFragment).commit()
+        val passwordConfirmFragment = PasswordConfirmFragment.newFragment()
+        supportFragmentManager.beginTransaction().replace(R.id.fragmentLayout, passwordConfirmFragment).commit()
 
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
@@ -62,6 +54,7 @@ class ResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
+
     }
 
     override fun onClick(v: View?) {
@@ -74,17 +67,14 @@ class ResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    fun runNewPasswordFragment(accessToken: String) {
-        val newPasswordFragment = NewPasswordFragment.newFragment(accessToken = accessToken)
+    fun runNewPasswordFragment() {
+        val newPasswordFragment = NewPasswordFragment.newFragment(accessToken = spHelper.accessToken)
         supportFragmentManager.beginTransaction().replace(R.id.fragmentLayout, newPasswordFragment).commit()
     }
 
     companion object {
-        fun newIntent(context: Context, email: String): Intent {
-            val intent = Intent(context, ResetPasswordActivity::class.java)
-            intent.putExtra(IntentPassName.USER_EMAIL, email)
-
-            return intent
+        fun newIntent(context: Context): Intent {
+            return Intent(context, UpdatePasswordActivity::class.java)
         }
     }
 }

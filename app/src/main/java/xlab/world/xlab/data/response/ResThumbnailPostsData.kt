@@ -5,7 +5,9 @@ import java.io.Serializable
 
 data class ResThumbnailPostsData(@SerializedName("message") val message: String,
                                  @SerializedName("total") val total: Int,
-                                 @SerializedName("postsData") val postsData: ArrayList<PostsThumb>?): Serializable {
+                                 @SerializedName("postsData") val postsData: ArrayList<PostsThumb>?,
+                                 @SerializedName("likedPosts") val likedPostsData: ArrayList<PostsThumb>?,
+                                 @SerializedName("savedPost") val savedPostsData: ArrayList<PostsThumb>?): Serializable {
 
     data class PostsThumb(@SerializedName("id") val id: String,
                           @SerializedName("postType") val postType: Int,

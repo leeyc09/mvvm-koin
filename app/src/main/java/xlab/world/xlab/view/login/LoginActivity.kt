@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.activity_login.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
-import xlab.world.xlab.data.response.ResUserLoginData
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.support.AppConstants.FACEBOOK_LOGIN
 import xlab.world.xlab.utils.support.AppConstants.KAKAO_LOGIN
@@ -24,10 +23,7 @@ import xlab.world.xlab.utils.support.AppConstants.LOCAL_LOGIN
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.utils.support.IntentPassName
-import xlab.world.xlab.view.main.MainActivity
-import xlab.world.xlab.view.register.LocalRegisterActivity
-import xlab.world.xlab.view.register.SocialRegisterActivity
-import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
+import xlab.world.xlab.utils.view.dialog.ShopLoginDialog
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
     private val loginViewModel: LoginViewModel by viewModel()
@@ -40,7 +36,20 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
+    private lateinit var shopLoginDialog: ShopLoginDialog
 
+    private val shopLoginListener = object: ShopLoginDialog.Listener {
+        override fun isSuccessLogin(result: Boolean) {
+            if (result) {
+                if (isComePreLoadActivity)  // 앱 실행으로 로그인 화면 온 경우
+                    RunActivity.mainActivity(context = this@LoginActivity, linkData = null)
+                else  // 다른 화면에서 로그인 화면으로 온 경우
+                    setResult(ResultCodeData.LOGIN_SUCCESS)
+
+                finish()
+            }
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -120,6 +129,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
+        shopLoginDialog = ShopLoginDialog(context = this, listener = shopLoginListener)
 
         // 페이스북 email 읽기 권한 추가
         originFacebookBtn.setReadPermissions("email")
@@ -318,8 +328,9 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 userEmail = userEmail,
                 push = push)
 
+//        shopLoginDialog.requestLogin(userId = userId)
         if (isComePreLoadActivity)  // 앱 실행으로 로그인 화면 온 경우
-            RunActivity.mainActivity(context = this, linkData = null)
+            RunActivity.mainActivity(context = this@LoginActivity, linkData = null)
         else  // 다른 화면에서 로그인 화면으로 온 경우
             setResult(ResultCodeData.LOGIN_SUCCESS)
 

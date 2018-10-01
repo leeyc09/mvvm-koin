@@ -13,9 +13,17 @@ interface ApiUserActivityProvider {
     fun postLike(scheduler: SchedulerProvider, authorization: String, postId: String,
                  responseData: (ResLikeSavePostData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
+    // liked post 요청
+    fun requestLikedPosts(scheduler: SchedulerProvider, authorization: String, page: Int,
+                          responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
     // post save
     fun postSave(scheduler: SchedulerProvider, authorization: String, postId: String,
                  responseData: (ResLikeSavePostData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // saved post 요청
+    fun requestSavedPosts(scheduler: SchedulerProvider, authorization: String, page: Int,
+                          responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
     // topic 사용한 goods 요청
     fun requestTopicUsedGoods(scheduler: SchedulerProvider, userId: String, goodsType: Int, page: Int,
@@ -34,9 +42,31 @@ class ApiUserActivity(private val iUserActivityRequest: IUserActivityRequest): A
                 })
     }
 
+    override fun requestLikedPosts(scheduler: SchedulerProvider, authorization: String, page: Int,
+                                   responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserActivityRequest.getLikedPosts(authorization = authorization, page = page)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
     override fun postSave(scheduler: SchedulerProvider, authorization: String, postId: String,
                           responseData: (ResLikeSavePostData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserActivityRequest.savePost(authorization = authorization, postId = postId)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestSavedPosts(scheduler: SchedulerProvider, authorization: String, page: Int,
+                                   responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserActivityRequest.getSavedPosts(authorization = authorization, page = page)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

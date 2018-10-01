@@ -23,13 +23,16 @@ import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
 import xlab.world.xlab.view.main.MainViewModel
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
+import xlab.world.xlab.view.posts.PostsViewModel
 import xlab.world.xlab.view.profile.ProfileViewModel
 import xlab.world.xlab.view.profileEdit.ProfileEditViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
 import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
+import xlab.world.xlab.view.setting.SettingViewModel
 import xlab.world.xlab.view.topicDetail.TopicPetDetailViewModel
 import xlab.world.xlab.view.topicEdit.TopicPetEditViewModel
 import xlab.world.xlab.view.topicSetting.TopicSettingViewModel
+import xlab.world.xlab.view.withdraw.WithDrawViewModel
 import java.util.concurrent.TimeUnit
 
 /**
@@ -64,6 +67,12 @@ val viewModelModule: Module = applicationContext {
     viewModel { TopicPetEditViewModel(apiPet = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Topic Pet Detail View
     viewModel { TopicPetDetailViewModel(apiPet = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Setting View
+    viewModel { SettingViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Posts View
+    viewModel { PostsViewModel(apiPost = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for withdraw
+    viewModel { WithDrawViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

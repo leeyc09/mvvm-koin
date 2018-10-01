@@ -6,7 +6,7 @@ import retrofit2.http.*
 import xlab.world.xlab.data.request.ReqLoginData
 import xlab.world.xlab.data.request.ReqRegisterData
 import xlab.world.xlab.data.request.ReqConfirmEmailData
-import xlab.world.xlab.data.request.ReqNewPasswordData
+import xlab.world.xlab.data.request.ReqPasswordData
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.ApiURL
 
@@ -26,8 +26,15 @@ interface IUserRequest {
     fun login(@Body reqLoginData: ReqLoginData,
               @Query("type") type: Int): Observable<ResUserLoginData>
 
+    @POST(ApiURL.USER_LOGOUT)
+    fun logout(@Header("Authorization") authorization: String): Observable<ResMessageData>
+
     @POST(ApiURL.USER_REGISTER)
     fun register(@Body reqRegisterData: ReqRegisterData): Observable<ResUserRegisterData>
+
+    @POST(ApiURL.USER_WITHDRAW)
+    fun withdraw(@Header("Authorization") authorization: String,
+                 @Query("content") content: String): Observable<ResMessageData>
 
     @POST(ApiURL.USER_AUTH_EMAIL)
     fun confirmEmail(@Body reqConfirmEmailData: ReqConfirmEmailData): Observable<ResMessageData>
@@ -35,9 +42,13 @@ interface IUserRequest {
     @POST(ApiURL.USER_AUTH_EMAIL_CODE)
     fun confirmEmailCode(@Body reqConfirmEmailData: ReqConfirmEmailData): Observable<ResConfirmEmailCodeData>
 
+    @POST(ApiURL.USER_CHECK_PASSWORD)
+    fun checkPassword(@Header("Authorization") authorization: String,
+                      @Body reqPasswordData: ReqPasswordData): Observable<ResMessageData>
+
     @POST(ApiURL.USER_CHANGE_PASSWORD)
     fun changePassword(@Header("Authorization") authorization: String,
-                       @Body reqPasswordData: ReqNewPasswordData): Observable<ResMessageData>
+                       @Body reqPasswordData: ReqPasswordData): Observable<ResMessageData>
 
     @GET(ApiURL.USER_PROFILE_MAIN)
     fun profileMain(@Header("Authorization") authorization: String,
@@ -54,4 +65,10 @@ interface IUserRequest {
     @GET(ApiURL.USER_RECOMMEND)
     fun getRecommendUser(@Header("Authorization") authorization: String,
                          @Query("page") page: Int): Observable<ResUserDefaultData>
+
+    @GET(ApiURL.USER_SETTING)
+    fun getSetting(@Header("Authorization") authorization: String): Observable<ResSettingData>
+
+    @POST(ApiURL.USER_SETTING_PUSH)
+    fun pushSetting(@Header("Authorization") authorization: String): Observable<ResSettingPushData>
 }

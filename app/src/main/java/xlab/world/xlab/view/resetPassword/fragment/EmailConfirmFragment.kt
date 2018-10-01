@@ -90,7 +90,7 @@ class EmailConfirmFragment: Fragment(), View.OnClickListener {
         // 메일 인증 시도 Event
         resetPasswordViewModel.requestConfirmEmailEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { requestConfirmEmailEvent ->
             requestConfirmEmailEvent?.let { _ ->
-                requestConfirmEmailEvent.isSuccess?.let {
+                requestConfirmEmailEvent.status?.let {
                     if (it) { // 메일 인증 성공
                         confirmCodeLayout.visibility = View.VISIBLE
                         textViewMailRequest.visibility = View.INVISIBLE

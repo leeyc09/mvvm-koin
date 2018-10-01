@@ -21,6 +21,7 @@ class DefaultListener(private val context: Activity) {
     private val spHelper: SPHelper by context.inject()
 
     private val suggestAddTopicDialog = DialogCreator.suggestAddTopicDialog(context = context)
+    private val loginDialog = DialogCreator.loginDialog(context = context)
 
     // 이용 약관 터치
     val clausePolicyListener = object: ClickableSpan() {
@@ -118,30 +119,6 @@ class DefaultListener(private val context: Activity) {
 //            activity.startActivityForResult(intent, RequestCodeData.LOGIN_USER)
 //        }
 //    }
-//
-//    // 프로필 수정
-//    val profileEditListener = View.OnClickListener {
-//        // login check
-//        if (SPHelper(activity).accessToken == "") { // guest mode
-//            loginDialog.show()
-//        } else {
-//            val intent = ProfileEditActivity.newIntent(activity)
-//            activity.startActivityForResult(intent, RequestCodeData.PROFILE_EDIT)
-//        }
-//    }
-//
-//    // 토픽 설정
-//    val topicSettingListener = View.OnClickListener {
-//        // login check
-//        if (SPHelper(activity).accessToken == "") { // guest mode
-//            loginDialog.show()
-//        } else {
-//            val intent = TopicSettingActivity.newIntent(activity)
-//            activity.startActivityForResult(intent, RequestCodeData.TOPIC_SETTING)
-//        }
-//    }
-//
-//
 //
 //    // 장바구니
 //    val myCartListener = View.OnClickListener {

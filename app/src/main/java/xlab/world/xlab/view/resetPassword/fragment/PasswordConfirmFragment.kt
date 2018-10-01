@@ -2,31 +2,30 @@ package xlab.world.xlab.view.resetPassword.fragment
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import kotlinx.android.synthetic.main.fragment_new_password.*
+import kotlinx.android.synthetic.main.fragment_password_confirm.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
-import xlab.world.xlab.utils.support.DataRegex
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
-import xlab.world.xlab.view.register.RegisterViewModel
 import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
+import xlab.world.xlab.view.resetPassword.UpdatePasswordActivity
 
-class NewPasswordFragment: Fragment(), View.OnClickListener {
+class PasswordConfirmFragment: Fragment(), View.OnClickListener {
     private val resetPasswordViewModel: ResetPasswordViewModel by viewModel()
+    private val spHelper: SPHelper by inject()
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_new_password, container, false)
+        return inflater.inflate(R.layout.fragment_password_confirm, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -38,26 +37,24 @@ class NewPasswordFragment: Fragment(), View.OnClickListener {
     }
 
     private fun onSetup() {
-        textViewConfirmPasswordText.isSelected = false
-        textViewConfirmPasswordLength.isSelected = false
-
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = context!!)
         progressDialog = DefaultProgressDialog(context = context!!)
+
+        nextBtn.isEnabled = false
     }
 
     private fun onBindEvent() {
-        finishBtn.setOnClickListener(this) // 비밀번호 변경 완료버튼
+        nextBtn.setOnClickListener(this) // 기존 비밀번호 확인 버튼
 
+        // 다음버튼 활성화
         ViewFunction.onTextChange(editText = editTextPassword) { password ->
-            textViewConfirmPasswordText.isSelected = DataRegex.passwordTextRegex(password = password)
-            textViewConfirmPasswordLength.isSelected = DataRegex.passwordLengthRegex(password = password)
-            finishBtn.isEnabled = textViewConfirmPasswordText.isSelected && textViewConfirmPasswordLength.isSelected
+            nextBtn.isEnabled = password.isNotEmpty()
         }
 
         ViewFunction.onKeyboardActionTouch(editText = editTextPassword, putActionID = EditorInfo.IME_ACTION_DONE) { isTouch ->
-            if (isTouch && finishBtn.isEnabled)
-                finishBtn.performClick()
+           if (isTouch && nextBtn.isEnabled)
+               nextBtn.performClick()
         }
     }
 
@@ -77,12 +74,12 @@ class NewPasswordFragment: Fragment(), View.OnClickListener {
             }
         })
 
-        // 비밀번호 변경 Event
-        resetPasswordViewModel.requestChangePasswordEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { requestChangePasswordEvent ->
-            requestChangePasswordEvent?.let { _ ->
-                requestChangePasswordEvent.status?.let {
-                    if (it) { // 비밀번호 변경 성공
-                        (context as AppCompatActivity).finish()
+        // confirm password 이벤트 observe
+        resetPasswordViewModel.requestConfirmPasswrodEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { requestConfirmPasswrodEvent ->
+            requestConfirmPasswrodEvent?.let { _ ->
+                requestConfirmPasswrodEvent.status?.let {
+                    if (it) { // 비밀번호 체크 성공
+                        (context as UpdatePasswordActivity).runNewPasswordFragment()
                     }
                 }
             }
@@ -92,25 +89,18 @@ class NewPasswordFragment: Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         v?.let {
             when (v.id) {
-                R.id.finishBtn -> { // 비밀번호 변경 완료버튼
-                    resetPasswordViewModel.requestChangePassword(authorization = "Bearer ${getBundleAccessToken()}", password = getPassword())
+                R.id.nextBtn -> { // 기존 비밀번호 확인 버튼
+                    resetPasswordViewModel.requestConfirmPasswrod(authorization = spHelper.authorization, password = getPassword())
                 }
             }
         }
     }
 
-    private fun getBundleAccessToken(): String = arguments?.getString("accessToken") ?: ""
     private fun getPassword(): String = editTextPassword?.text.toString()
 
     companion object {
-        fun newFragment(accessToken: String): NewPasswordFragment {
-            val fragment = NewPasswordFragment()
-
-            val args = Bundle()
-            args.putString("accessToken", accessToken)
-            fragment.arguments = args
-
-            return fragment
+        fun newFragment(): PasswordConfirmFragment {
+            return PasswordConfirmFragment()
         }
     }
 }

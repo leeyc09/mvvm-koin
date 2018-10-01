@@ -12,15 +12,20 @@ import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
 import xlab.world.xlab.view.petBreed.PetBreedActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
+import xlab.world.xlab.view.posts.LikedPostsActivity
 import xlab.world.xlab.view.profile.ProfileActivity
 import xlab.world.xlab.view.profileEdit.ProfileEditActivity
 import xlab.world.xlab.view.register.LocalRegisterActivity
 import xlab.world.xlab.view.register.SocialRegisterActivity
 import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
+import xlab.world.xlab.view.resetPassword.UpdatePasswordActivity
+import xlab.world.xlab.view.setting.SettingActivity
 import xlab.world.xlab.view.topicDetail.TopicPetDetailActivity
 import xlab.world.xlab.view.topicEdit.TopicPetEditActivity
 import xlab.world.xlab.view.topicSetting.TopicSettingActivity
 import xlab.world.xlab.view.webView.DefaultWebViewActivity
+import xlab.world.xlab.view.webView.PolicyActivity
+import xlab.world.xlab.view.withdraw.WithdrawActivity
 
 object RunActivity {
     private const val tag = "RunActivity"
@@ -135,12 +140,27 @@ object RunActivity {
         PrintLog.d("Run", "SavedPost", tag)
     }
 
+    fun likedPostActivity(context: Activity) {
+        val intent = LikedPostsActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.LIKED_POST)
+    }
+
+    fun updatePasswordActivity(context: Activity) {
+        val intent = UpdatePasswordActivity.newIntent(context = context)
+        context.startActivity(intent)
+    }
+
     fun myShoppingActivity(context: Activity) {
         PrintLog.d("Run", "MyShopping", tag)
     }
 
+    fun shopInfoUpdateActivity(context: Activity) {
+        PrintLog.d("Run", "ShopInfoUpdate", tag)
+    }
+
     fun settingActivity(context: Activity) {
-        PrintLog.d("Run", "Setting", tag)
+        val intent = SettingActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.SETTING)
     }
 
     fun followerActivity(context: Activity, userId: String) {
@@ -151,5 +171,15 @@ object RunActivity {
     fun followingActivity(context: Activity, userId: String) {
         val intent = FollowingActivity.newIntent(context = context, userId = userId)
         context.startActivityForResult(intent, RequestCodeData.FOLLOW)
+    }
+
+    fun policyActivity(context: Activity) {
+        val intent = PolicyActivity.newIntent(context = context)
+        context.startActivity(intent)
+    }
+
+    fun withdrawActivity(context: Activity) {
+        val intent = WithdrawActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.WITHDRAW)
     }
 }

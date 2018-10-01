@@ -4,7 +4,7 @@ import io.reactivex.disposables.Disposable
 import okhttp3.RequestBody
 import xlab.world.xlab.data.request.ReqConfirmEmailData
 import xlab.world.xlab.data.request.ReqLoginData
-import xlab.world.xlab.data.request.ReqNewPasswordData
+import xlab.world.xlab.data.request.ReqPasswordData
 import xlab.world.xlab.data.request.ReqRegisterData
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.`interface`.IUserRequest
@@ -29,9 +29,17 @@ interface ApiUserProvider {
     fun requestLogin(scheduler: SchedulerProvider, reqLoginData: ReqLoginData,
                      responseData: (ResUserLoginData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
+    // logout 요청
+    fun requestLogout(scheduler: SchedulerProvider, authorization: String,
+                      responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
     // register 요청
     fun requestRegister(scheduler: SchedulerProvider, reqRegisterData: ReqRegisterData,
                         responseData: (ResUserRegisterData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // 회원 탈퇴 요청
+    fun requestWithdraw(scheduler: SchedulerProvider, authorization: String, content: String,
+                        responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
     // email 인증 요청
     fun requestConfirmEmail(scheduler: SchedulerProvider, reqConfirmEmailData: ReqConfirmEmailData,
@@ -41,8 +49,12 @@ interface ApiUserProvider {
     fun requestConfirmEmailCode(scheduler: SchedulerProvider, reqConfirmEmailData: ReqConfirmEmailData,
                                 responseData: (ResConfirmEmailCodeData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
+    // password confirm 요청
+    fun requestConfirmPassword(scheduler: SchedulerProvider, authorization: String, reqPasswordData: ReqPasswordData,
+                               responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
     // change password 요청
-    fun requestChangePassword(scheduler: SchedulerProvider, authorization: String, reqNewPasswordData: ReqNewPasswordData,
+    fun requestChangePassword(scheduler: SchedulerProvider, authorization: String, reqNewPasswordData: ReqPasswordData,
                               responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
     // profile main data 요청
@@ -60,6 +72,14 @@ interface ApiUserProvider {
     // recommend user data 요청
     fun requestRecommendUser(scheduler: SchedulerProvider, authorization: String, page: Int,
                              responseData: (ResUserDefaultData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // setting data 요청
+    fun requestSetting(scheduler: SchedulerProvider, authorization: String,
+                       responseData: (ResSettingData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // push setting update 요청
+    fun requestPushUpdate(scheduler: SchedulerProvider, authorization: String,
+                          responseData: (ResSettingPushData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
 }
 
@@ -108,9 +128,31 @@ class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
                 })
     }
 
+    override fun requestLogout(scheduler: SchedulerProvider, authorization: String,
+                               responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.logout(authorization = authorization)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
     override fun requestRegister(scheduler: SchedulerProvider, reqRegisterData: ReqRegisterData,
                                  responseData: (ResUserRegisterData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserRequest.register(reqRegisterData = reqRegisterData)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestWithdraw(scheduler: SchedulerProvider, authorization: String, content: String,
+                                 responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.withdraw(authorization = authorization, content = content)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)
@@ -141,7 +183,18 @@ class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
                 })
     }
 
-    override fun requestChangePassword(scheduler: SchedulerProvider, authorization: String, reqNewPasswordData: ReqNewPasswordData,
+    override fun requestConfirmPassword(scheduler: SchedulerProvider, authorization: String, reqPasswordData: ReqPasswordData,
+                                        responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.checkPassword(authorization = authorization, reqPasswordData = reqPasswordData)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestChangePassword(scheduler: SchedulerProvider, authorization: String, reqNewPasswordData: ReqPasswordData,
                                        responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserRequest.changePassword(authorization = authorization, reqPasswordData = reqNewPasswordData)
                 .with(scheduler)
@@ -188,6 +241,28 @@ class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
     override fun requestRecommendUser(scheduler: SchedulerProvider, authorization: String, page: Int,
                                       responseData: (ResUserDefaultData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserRequest.getRecommendUser(authorization = authorization, page = page)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestSetting(scheduler: SchedulerProvider, authorization: String,
+                                responseData: (ResSettingData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.getSetting(authorization = authorization)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestPushUpdate(scheduler: SchedulerProvider, authorization: String,
+                                   responseData: (ResSettingPushData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.pushSetting(authorization = authorization)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)
