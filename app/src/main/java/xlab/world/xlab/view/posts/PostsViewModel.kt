@@ -55,6 +55,40 @@ class PostsViewModel(private val apiPost: ApiPostProvider,
                     })
         }
     }
+
+    fun loadSavedPostsData(authorization: String, page: Int, loadingBar: Boolean? = true) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = loadingBar)
+        loadPostsEventData.postValue(PostsEvent(status = true))
+        launch {
+            apiUserActivity.requestSavedPosts(scheduler = scheduler, authorization = authorization, page = page,
+                    responseData = {
+                        PrintLog.d("requestSavedPosts success", it.toString(), tag)
+                        val postsThumbnailData = PostThumbnailData(total = it.total, nextPage = page + 1)
+                        it.likedPostsData?.forEach { post ->
+                            postsThumbnailData.items.add(PostThumbnailListData(
+                                    dataType = AppConstants.ADAPTER_CONTENT,
+                                    postId = post.id,
+                                    postType = post.postType,
+                                    imageURL = post.postFile.firstOrNull(),
+                                    youTubeVideoID = post.youTubeVideoID
+                            ))
+                        }
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, postsData = postsThumbnailData)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
+                        errorData?.let {
+                            PrintLog.d("requestSavedPosts fail", errorData.message, tag)
+                        }
+                    })
+        }
+    }
 }
 
 data class PostsEvent(val status: Boolean? = null)

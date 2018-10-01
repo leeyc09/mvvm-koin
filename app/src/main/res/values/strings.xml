@@ -131,7 +131,7 @@
     <string name="no_used_item">평가한 제품이 없어요</string>
     <string name="no_used_item_my">사용해본 제품을 평가해보세요</string>
     <string name="upload_post">포스트 업로드</string>
-    <string name="save_post">저장한 포스트</string>
+    <string name="saved_post">저장한 포스트</string>
     <string name="pet_item">제품</string>
     <string name="more_item">더보기</string>
     <string name="is_report_user">신고하시겠어요?</string>
@@ -264,7 +264,7 @@
     <string name="content_hint">내용 입력</string>
     <string name="save_cancel_post_message">저장이 취소되었습니다</string>
     <string name="no_liked_post">좋아한 포스트가 없어요</string>
-    <string name="no_saveD_post">저장한 포스트가 없어요</string>
+    <string name="no_saved_post">저장한 포스트가 없어요</string>
 
     <!-- TODO: Comment-->
     <string name="input_comment">댓글 입력</string>

@@ -175,6 +175,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
         <activity
+            android:name=".view.posts.SavedPostsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
             android:name=".view.resetPassword.UpdatePasswordActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme"

@@ -14,6 +14,7 @@ import xlab.world.xlab.view.onBoarding.OnBoardingActivity
 import xlab.world.xlab.view.petBreed.PetBreedActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
 import xlab.world.xlab.view.posts.LikedPostsActivity
+import xlab.world.xlab.view.posts.SavedPostsActivity
 import xlab.world.xlab.view.profile.ProfileActivity
 import xlab.world.xlab.view.profileEdit.ProfileEditActivity
 import xlab.world.xlab.view.register.LocalRegisterActivity
@@ -138,7 +139,8 @@ object RunActivity {
     }
 
     fun savedPostActivity(context: Activity) {
-        PrintLog.d("Run", "SavedPost", tag)
+        val intent = SavedPostsActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.SAVED_POST)
     }
 
     fun likedPostActivity(context: Activity) {
