@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import android.widget.TextView
@@ -181,10 +182,8 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
 
-        ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
-            PrintLog.d("topicUsedGoodsAdapter.dataLoading", topicUsedGoodsAdapter.dataLoading.toString(), topicPetDetailViewModel.tag)
-            PrintLog.d("topicUsedGoodsAdapter.dataTotal", topicUsedGoodsAdapter.dataTotal.toString(), topicPetDetailViewModel.tag)
-            ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = topicUsedGoodsAdapter.dataLoading, total = topicUsedGoodsAdapter.dataTotal) { _ ->
+        ViewFunction.isNestedScrollViewScrolledDown(nestedScrollView = scrollView) { isScrolled ->
+            if (isScrolled && !topicUsedGoodsAdapter.dataLoading) {
                 topicPetDetailViewModel.loadPetUsedGoodsData(page = topicUsedGoodsAdapter.dataNextPage)
             }
         }
@@ -226,12 +225,12 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
                     textViewPetWeight.setText(it.weight, TextView.BufferType.SPANNABLE)
                 }
                 uiData.petUsedGoods?.let {
-                    PrintLog.d("petUsedGoods in activity", it.toString(), topicPetDetailViewModel.tag)
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
+                    if (it.nextPage <= 2 ) // 요청한 page => 첫페이지
                         topicUsedGoodsAdapter.updateData(topicUsedGoodsData = it)
-                    }
                     else
                         topicUsedGoodsAdapter.addData(topicUsedGoodsData = it)
+
+                    topicUsedGoodsAdapter.dataLoading = it.items.isEmpty()
                 }
             }
         })
@@ -244,6 +243,15 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 loadPetDataEvent.petUsedGoods?.let {
                     topicPetDetailViewModel.changePetUsedGoodsData(petUsedGoods = it)
+                }
+            }
+        })
+
+        // load pet used goods 이벤트 observe
+        topicPetDetailViewModel.loadPetUsedGoodsEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadPetUsedGoodsEvent ->
+            loadPetUsedGoodsEvent?.let { _ ->
+                loadPetUsedGoodsEvent.status?.let {  isLoading ->
+                    topicUsedGoodsAdapter.dataLoading = isLoading
                 }
             }
         })

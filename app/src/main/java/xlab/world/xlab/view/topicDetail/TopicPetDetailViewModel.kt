@@ -27,6 +27,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
     private var petUsedGoodsData: TopicUsedGoodsData? = null
 
     val loadPetDataEvent = SingleLiveEvent<LoadPetDataEvent>()
+    val loadPetUsedGoodsEvent = SingleLiveEvent<TopicPetEvent>()
     val uiData = MutableLiveData<UIModel>()
 
     fun changePetData(petData: ResUserPetData?, isMine: Boolean) {
@@ -146,6 +147,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
             return
         }
 
+        loadPetUsedGoodsEvent.value = TopicPetEvent(status = true)
         launch {
             apiPet.requestPetUsedGoods(scheduler = scheduler, petId = petData!!.id, page = page,
                     responseData = {
@@ -169,6 +171,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
     }
 }
 
+data class TopicPetEvent(val status: Boolean? = null)
 data class PetDetailData(val breed: String, val topicColor: Int,
                          val type: String, val name: String,
                          val gender: Boolean, val age: String, val weight: String)

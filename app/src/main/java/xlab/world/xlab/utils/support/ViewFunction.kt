@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Rect
 import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
+import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
@@ -114,12 +115,11 @@ object ViewFunction {
     }
 
     // recycler view 스크롤 판단
-    fun onRecyclerViewScrolledDown(recyclerView: RecyclerView, isScrolled: (RecyclerView.LayoutManager) -> Unit) {
+    fun onRecyclerViewScrolledDown(recyclerView: RecyclerView, layoutManager: (RecyclerView.LayoutManager) -> Unit) {
         recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                PrintLog.d("onRecyclerViewScrolledDown", "onScrolled", "TopicPetDetail")
                 if (dx > 0 || dy > 0) {
-                    isScrolled(recyclerView.layoutManager)
+                    layoutManager(recyclerView.layoutManager)
                 }
             }
         })
@@ -134,6 +134,19 @@ object ViewFunction {
         if (visibleItemCount + pastVisibleItems >= listItemCount && !isLoading) {
             if (total < 0 || total > listItemCount)// total 알수 없을 때 or total 보다 data count 작을 경우 스크롤 가능으로 판단
                 isScrolled(true)
+        }
+    }
+
+    // nested scroll view 스크롤 판단
+    fun isNestedScrollViewScrolledDown(nestedScrollView: NestedScrollView, isScrolled: (Boolean) -> Unit) {
+        nestedScrollView.setOnScrollChangeListener { v: NestedScrollView?, _: Int, scrollY: Int, _: Int, oldScrollY: Int ->
+            v?.let { _ ->
+                v.getChildAt(v.childCount - 1).let { childView ->
+                    if ((scrollY >= childView.measuredHeight - v.measuredHeight) && scrollY > oldScrollY) {
+                        isScrolled(true)
+                    }
+                }
+            }
         }
     }
 
