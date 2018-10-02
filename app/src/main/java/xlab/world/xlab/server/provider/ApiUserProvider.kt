@@ -81,6 +81,10 @@ interface ApiUserProvider {
     fun requestPushUpdate(scheduler: SchedulerProvider, authorization: String,
                           responseData: (ResSettingPushData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
+    // user search 요청
+    fun requestSearchUser(scheduler: SchedulerProvider, authorization: String, searchText: String, page: Int,
+                          responseData: (ResUserDefaultData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
 }
 
 class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
@@ -263,6 +267,17 @@ class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
     override fun requestPushUpdate(scheduler: SchedulerProvider, authorization: String,
                                    responseData: (ResSettingPushData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserRequest.pushSetting(authorization = authorization)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestSearchUser(scheduler: SchedulerProvider, authorization: String, searchText: String, page: Int,
+                                   responseData: (ResUserDefaultData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.userSearch(authorization = authorization, searchText = searchText, page = page)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

@@ -9,8 +9,6 @@ import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.action_bar_main.*
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_reset_password.*
-import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
@@ -24,7 +22,6 @@ import xlab.world.xlab.view.main.fragment.FeedAllFragment
 import xlab.world.xlab.view.main.fragment.FeedExploreFragment
 import xlab.world.xlab.view.main.fragment.FeedFollowingFragment
 import xlab.world.xlab.view.main.fragment.FeedShopFragment
-import xlab.world.xlab.view.topicSetting.TopicSettingViewModel
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val fontColorSpan: FontColorSpan by inject()
@@ -32,11 +29,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     private var linkData: Uri? = null
 
-    private lateinit var matchButtonHelper: MatchButtonHelper
-    private lateinit var tabLayoutHelper: TabLayoutHelper
-
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
+
+    private lateinit var matchButtonHelper: MatchButtonHelper
+    private lateinit var tabLayoutHelper: TabLayoutHelper
 
     private lateinit var viewPagerAdapter: ViewStatePagerAdapter
     private lateinit var feedAllFragment: FeedAllFragment
@@ -144,7 +141,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         viewPagerAdapter.addFragment(fragment = feedAllFragment, title = resources.getString(R.string.all))
         viewPagerAdapter.addFragment(fragment = feedFollowingFragment, title = resources.getString(R.string.following))
         viewPagerAdapter.addFragment(fragment = feedExploreFragment, title = resources.getString(R.string.explore))
-        viewPagerAdapter.addFragment(fragment = feedShopFragment, title = resources.getString(R.string.shop))
+        viewPagerAdapter.addFragment(fragment = feedShopFragment, title = resources.getString(R.string.goods))
         viewPager.adapter = viewPagerAdapter
 
         // tab layout 초기화
@@ -162,7 +159,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 extraData = null)
         tabLayoutHelper.addTab(tabName = getString(R.string.following), tabLayout = null, fontSize = null, selectFont = null, unSelectFont = null, extraData = null)
         tabLayoutHelper.addTab(tabName = getString(R.string.explore), tabLayout = null, fontSize = null, selectFont = null, unSelectFont = null, extraData = null)
-        tabLayoutHelper.addTab(tabName = getString(R.string.shop), tabLayout = null, fontSize = null, selectFont = null, unSelectFont = null, extraData = null)
+        tabLayoutHelper.addTab(tabName = getString(R.string.goods), tabLayout = null, fontSize = null, selectFont = null, unSelectFont = null, extraData = null)
         tabLayoutHelper.changeSelectedTab(selectIndex = 0)
 
         // match button 초기화
@@ -181,6 +178,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         // 키보드 보일때 매칭 버튼 안보이게
         ViewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
+            matchBtnLayout.visibility =
+                    if (visibility == View.VISIBLE) View.GONE
+                    else View.VISIBLE
         }
 
         ViewFunction.onViewPagerChangePosition(viewPager = viewPager) { position ->
@@ -196,7 +196,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionSearchBtn -> { // 통합 검색 버튼
-                    RunActivity.searchActivity(context = this)
+                    RunActivity.combinedSearchActivity(context = this)
                 }
                 R.id.actionNotificationBtn -> { // 노티 버튼
                     if (spHelper.accessToken.isEmpty()) // 게스트

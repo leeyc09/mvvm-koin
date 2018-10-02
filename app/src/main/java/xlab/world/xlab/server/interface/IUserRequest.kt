@@ -71,4 +71,9 @@ interface IUserRequest {
 
     @POST(ApiURL.USER_SETTING_PUSH)
     fun pushSetting(@Header("Authorization") authorization: String): Observable<ResSettingPushData>
+
+    @GET(ApiURL.USER_SEARCH)
+    fun userSearch(@Header("Authorization") authorization: String,
+                   @Query("query") searchText: String,
+                   @Query("page") page: Int): Observable<ResUserDefaultData>
 }

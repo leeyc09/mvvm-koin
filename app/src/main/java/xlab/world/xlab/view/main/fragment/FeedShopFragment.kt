@@ -1,7 +1,6 @@
 package xlab.world.xlab.view.main.fragment
 
 import android.app.Activity
-import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -71,7 +70,7 @@ class FeedShopFragment: Fragment() {
             var handled = false
             val text = v.text.toString().trim()
             if (actionID == EditorInfo.IME_ACTION_DONE && text.isNotEmpty()) {
-                RunActivity.searchGoodsActivity(context = context as Activity, searchText = text, searchCode = "")
+                RunActivity.goodsSearchActivity(context = context as Activity, searchText = text, searchCode = "")
                 handled = true
             }
             handled
@@ -79,7 +78,7 @@ class FeedShopFragment: Fragment() {
         categoryListener = categoryListener ?: View.OnClickListener { view ->
             if (view.tag is ReqSearchGoodsData) {
                 val searchData = view.tag as ReqSearchGoodsData
-                RunActivity.searchGoodsActivity(context = context as Activity, searchText = searchData.text, searchCode = searchData.code)
+                RunActivity.goodsSearchActivity(context = context as Activity, searchText = searchData.text, searchCode = searchData.code)
             }
         }
 

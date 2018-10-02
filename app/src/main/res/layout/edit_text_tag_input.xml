@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xlab.world.xlab.utils.view.editText.EditTextMediumNoto
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:singleLine="true"
+    android:minEms="2"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp"
+    android:layout_marginTop="9dp"
+    android:layout_marginBottom="9dp"
+    android:inputType="text|textNoSuggestions"
+    android:hint="@string/search_item"
+    android:imeOptions="actionDone"
+    android:textColor="@color/color000000"
+    android:textColorHint="@color/colorBFBFBF"
+    android:textSize="12sp"/>

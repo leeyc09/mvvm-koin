@@ -16,6 +16,7 @@ import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.TopicSettingAdapter
 import xlab.world.xlab.utils.support.PrintLog
+import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
@@ -56,6 +57,21 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
         actionBackBtn.performClick()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
+        PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
+
+        when (resultCode) {
+            Activity.RESULT_OK -> {
+                if (this.resultCode == Activity.RESULT_CANCELED)
+                    this.resultCode = Activity.RESULT_OK
+
+                topicSettingViewModel.loadUserPetsData(userId = spHelper.userId, page = 1)
+            }
+        }
+    }
+
     private fun onSetup() {
         actionBarTitle.setText(getString(R.string.topic_setting), TextView.BufferType.SPANNABLE)
         actionBtn.visibility = View.GONE
@@ -76,6 +92,7 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun onBindEvent() {
         actionBackBtn.setOnClickListener(this) // 뒤로가기
+        addTopicBtn.setOnClickListener(this) // 토픽 추가하기
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = topicSettingAdapter.dataLoading, total = topicSettingAdapter.dataTotal) { _ ->
@@ -100,11 +117,11 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.petData?.let {
                     if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
                         if (it.items.isEmpty()) { // topic 없음
-                            noTopicLayout.visibility = View.VISIBLE
+                            addTopicBtn.visibility = View.VISIBLE
                             textLayout.visibility = View.GONE
                             recyclerView.visibility = View.GONE
                         } else { // topic 있음
-                            noTopicLayout.visibility = View.GONE
+                            addTopicBtn.visibility = View.GONE
                             textLayout.visibility = View.VISIBLE
                             recyclerView.visibility = View.VISIBLE
                         }
@@ -138,6 +155,9 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
                 R.id.actionBackBtn -> { // 뒤로가기
                     setResult(resultCode)
                     finish()
+                }
+                R.id.addTopicBtn -> { // 토픽 추가하기
+                    RunActivity.petEditActivity(context = this, petNo = null)
                 }
             }
         }

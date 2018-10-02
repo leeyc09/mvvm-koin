@@ -7,7 +7,8 @@ data class ResUserDefaultData(@SerializedName("message") val message: String,
                               @SerializedName("total") val total: Int,
                               @SerializedName("follower") val follower: ArrayList<UserData>?,
                               @SerializedName("following") val following: ArrayList<UserData>?,
-                              @SerializedName("recommendUser") val recommend: ArrayList<UserData>?): Serializable {
+                              @SerializedName("recommendUser") val recommend: ArrayList<UserData>?,
+                              @SerializedName("users") val searchUsers: ArrayList<UserData>?): Serializable {
 
     data class UserData(@SerializedName("id") val id: String,
                         @SerializedName("nickName") val nickName: String,

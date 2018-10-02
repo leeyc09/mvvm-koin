@@ -33,7 +33,7 @@
     <string name="okay">확인</string>
     <string name="all">전체</string>
     <string name="explore">탐색</string>
-    <string name="shop">제품</string>
+    <string name="goods">제품</string>
     <string name="topic">토픽</string>
     <string name="add">추가</string>
     <string name="popularity_rate">인기율</string>
@@ -132,7 +132,6 @@
     <string name="no_used_item_my">사용해본 제품을 평가해보세요</string>
     <string name="upload_post">포스트 업로드</string>
     <string name="saved_post">저장한 포스트</string>
-    <string name="pet_item">제품</string>
     <string name="more_item">더보기</string>
     <string name="is_report_user">신고하시겠어요?</string>
     <string name="is_report_user2">검토 후 해당 계정이용이 정지됩니다.</string>
@@ -274,6 +273,7 @@
     <string name="post">포스트</string>
     <string name="user">사람</string>
     <string name="recommend_keyword">추천키워드</string>
+    <string name="no_search_data">검색 결과가 없어요</string>
 
     <!-- TODO: Shop-->
     <string name="all_category">전체 카테고리</string>
@@ -559,7 +559,6 @@
     <string name="select_all">전체 선택</string>
     <string name="payment_price">결제금액</string>
     <string name="no_cart">카트에 담긴 제품이 없습니다</string>
-    <string name="goods">제품</string>
     <string name="cart_delivery">배송</string>
     <string name="plus_unit">"+"</string>
     <string name="xlab_delivery">슬랩 배송</string>

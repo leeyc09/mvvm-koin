@@ -17,4 +17,6 @@ object IntentPassName {
     const val PET_TOTAL = "PET_TOTAL"
     const val IMAGE_URL = "IMAGE_URL"
     const val BREED_INDEX = "BREED_INDEX"
+    const val SEARCH_TEXT = "SEARCH_TEXT"
+    const val SEARCH_CODE = "SEARCH_CODE"
 }

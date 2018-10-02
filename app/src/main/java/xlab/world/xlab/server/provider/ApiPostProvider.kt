@@ -39,6 +39,10 @@ interface ApiPostProvider {
     // user posts detail 가져오기
     fun requestUserPostsDetail(scheduler: SchedulerProvider, authorization: String, userId: String, page: Int,
                                responseData: (ResDetailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // post search 요청
+    fun requestSearchPosts(scheduler: SchedulerProvider, searchText: String, page: Int,
+                           responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
@@ -122,6 +126,17 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun requestUserPostsDetail(scheduler: SchedulerProvider, authorization: String, userId: String, page: Int,
                                         responseData: (ResDetailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.getUserPostsDetail(authorization = authorization, userId = userId, page = page)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestSearchPosts(scheduler: SchedulerProvider, searchText: String, page: Int,
+                                    responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iPostRequest.searchPost(searchText = searchText, page = page)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

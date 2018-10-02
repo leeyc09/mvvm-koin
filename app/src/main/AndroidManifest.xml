@@ -195,6 +195,14 @@
             android:name=".view.notice.NoticeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.search.GoodsSearchActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.search.CombinedSearchActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
     </application>
 
 </manifest>

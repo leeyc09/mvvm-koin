@@ -1,0 +1,187 @@
+package xlab.world.xlab.view.search
+
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
+import android.view.View
+import android.view.inputmethod.EditorInfo
+import kotlinx.android.synthetic.main.action_bar_search.*
+import kotlinx.android.synthetic.main.activity_combined_search.*
+import org.koin.android.architecture.ext.viewModel
+import org.koin.android.ext.android.inject
+import xlab.world.xlab.R
+import xlab.world.xlab.adapter.recyclerView.RecentCombinedSearchAdapter
+import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
+import xlab.world.xlab.utils.font.FontColorSpan
+import xlab.world.xlab.utils.support.*
+import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
+import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
+import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.search.fragment.CombinedSearchGoodsFragment
+import xlab.world.xlab.view.search.fragment.CombinedSearchPostFragment
+import xlab.world.xlab.view.search.fragment.CombinedSearchUserFragment
+
+class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
+    private val searchViewModel: SearchViewModel by viewModel()
+    private val spHelper: SPHelper by inject()
+    private val fontColorSpan: FontColorSpan by inject()
+
+    private var resultCode = Activity.RESULT_CANCELED
+
+    private lateinit var defaultToast: DefaultToast
+    private lateinit var progressDialog: DefaultProgressDialog
+
+    private lateinit var tabLayoutHelper: TabLayoutHelper
+
+    private lateinit var viewPagerAdapter: ViewStatePagerAdapter
+    private lateinit var searchPostsFragment: CombinedSearchPostFragment
+    private lateinit var searchUserFragment: CombinedSearchUserFragment
+    private lateinit var searchGoodsFragment: CombinedSearchGoodsFragment
+
+    private lateinit var recentCombinedSearchAdapter: RecentCombinedSearchAdapter
+
+    private val recentSearchListener = View.OnClickListener { view ->
+//        if (view.tag is String) {
+//            val searchText = view.tag as String
+//
+//            editTextSearch.setText(searchText)
+//            search(searchText) { max, current -> }
+//        }
+    }
+    private val recentDeleteListener = View.OnClickListener { view ->
+//        if (view.tag is String) {
+//            val searchText = view.tag as String
+//
+//            val searchList = SPHelper(this).recentSearch
+//            searchList.remove(searchText)
+//            SPHelper(this).recentSearch = searchList
+//
+//            recentSearchAdapter.removeData(searchText)
+//        }
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_combined_search)
+
+        onSetup()
+
+        onBindEvent()
+
+        observeViewModel()
+    }
+
+    override fun onBackPressed() {
+        actionBackBtn.performClick()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
+        PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
+
+        when (resultCode) {
+            Activity.RESULT_OK -> {
+                if (this.resultCode == Activity.RESULT_CANCELED)
+                    this.resultCode = Activity.RESULT_OK
+                when (requestCode) {
+                    RequestCodeData.TOPIC_ADD, // 토픽 추가
+                    RequestCodeData.PROFILE, // 프로필
+                    RequestCodeData.POST_DETAIL, // 포스트 상세
+                    RequestCodeData.GOODS_DETAIL-> { // 상품 상세
+//                        search(lastSearchText) { max, current -> }
+                    }
+                }
+            }
+            ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
+                this.resultCode = ResultCodeData.LOGIN_SUCCESS
+//                search(lastSearchText) { max, current -> }
+            }
+            ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
+                setResult(ResultCodeData.LOGOUT_SUCCESS)
+                finish()
+            }
+        }
+    }
+
+    private fun onSetup() {
+        // Toast, Dialog 초기화
+        defaultToast = DefaultToast(context = this)
+        progressDialog = DefaultProgressDialog(context = this)
+
+        // 프래그먼트 초기화
+        searchPostsFragment = CombinedSearchPostFragment.newFragment()
+        searchUserFragment = CombinedSearchUserFragment.newFragment()
+        searchGoodsFragment = CombinedSearchGoodsFragment.newFragment()
+
+        viewPagerAdapter = ViewStatePagerAdapter(manager = supportFragmentManager)
+        viewPagerAdapter.addFragment(fragment = searchPostsFragment, title = getString(R.string.post))
+        viewPagerAdapter.addFragment(fragment = searchUserFragment, title = getString(R.string.user))
+        viewPagerAdapter.addFragment(fragment = searchGoodsFragment, title = getString(R.string.goods))
+        searchViewPager.adapter = viewPagerAdapter
+
+        // tab layout 초기화
+        tabLayoutHelper = TabLayoutHelper(context = this,
+                defaultSelectFont = fontColorSpan.notoBold303030,
+                defaultUnSelectFont = fontColorSpan.notoMediumA4A4A4,
+                useDefaultEvent = true,
+                listener = null)
+        tabLayoutHelper.handle(layout = tabLayout, viewPager = searchViewPager)
+        tabLayoutHelper.addTab(tabName = getString(R.string.post), tabLayout = R.layout.tab_layout_number, fontSize = null, selectFont = null, unSelectFont = null, extraData = 0)
+        tabLayoutHelper.addTab(tabName = getString(R.string.user), tabLayout = R.layout.tab_layout_number, fontSize = null, selectFont = null, unSelectFont = null, extraData = 0)
+        tabLayoutHelper.addTab(tabName = getString(R.string.goods), tabLayout = R.layout.tab_layout_number, fontSize = null, selectFont = null, unSelectFont = null, extraData = 0)
+        tabLayoutHelper.changeSelectedTab(0)
+
+        // 최근 검색 목록 adapter & recycler 초기화
+        recentCombinedSearchAdapter = RecentCombinedSearchAdapter(context = this,
+                selectListener = recentSearchListener,
+                deleteListener = recentDeleteListener)
+        recentSearchRecyclerView.adapter = recentCombinedSearchAdapter
+        recentSearchRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+    }
+
+    private fun onBindEvent() {
+        actionBackBtn.setOnClickListener(this) // 뒤로가기
+        searchDeleteBtn.setOnClickListener(this) // 검색창 지우기
+
+        ViewFunction.onKeyboardActionTouch(editText = editTextSearch, putActionID = EditorInfo.IME_ACTION_DONE) { isTouch: Boolean ->
+            if (isTouch && getSearchText().isNotEmpty()){
+//                search(editTextSearch.text.toString()) { max, current -> }
+            }
+        }
+
+        ViewFunction.onTextChange(editText = editTextSearch) { searchText ->
+            searchDeleteBtn.visibility =
+                    if (searchText.isEmpty()) View.INVISIBLE
+                    else View.VISIBLE
+        }
+    }
+
+    private fun observeViewModel() {
+
+    }
+
+    override fun onClick(v: View?) {
+        v?.let {
+            when (v.id) {
+                R.id.actionBackBtn -> { // 뒤로가기
+                    setResult(resultCode)
+                    finish()
+                }
+                R.id.searchDeleteBtn -> { // 검색창 지우기
+                    editTextSearch.setText("")
+                }
+            }
+        }
+    }
+
+    private fun getSearchText(): String = editTextSearch.text.toString()
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            return Intent(context, CombinedSearchActivity::class.java)
+        }
+    }
+}

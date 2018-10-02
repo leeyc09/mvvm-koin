@@ -17,9 +17,5 @@ data class ResFeedData(@SerializedName("data") val feedData: ArrayList<FeedData>
 
     data class GoodsData(@SerializedName("code") val code: String,
                          @SerializedName("image") val image: String,
-                         @SerializedName("topicMatch") val topicMatch: ArrayList<TopicMatch>?): Serializable
-
-    data class TopicMatch(@SerializedName("topicId") val topicId: String,
-                          @SerializedName("topicColor") val topicColor: String,
-                          @SerializedName("match") val match: Int): Serializable
+                         @SerializedName("topicMatch") val topicMatch: ArrayList<ResGoodsSearchData.TopicMatch>?): Serializable
 }

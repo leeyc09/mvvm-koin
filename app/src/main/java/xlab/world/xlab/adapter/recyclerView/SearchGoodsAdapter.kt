@@ -50,6 +50,8 @@ class SearchGoodsAdapter(private val context: Context,
         notifyDataSetChanged()
     }
 
+    fun getItem(position: Int): SearchGoodsListData = searchGoodsData.items[position]
+
     fun updateData(searchGoodsData: SearchGoodsData) {
         this.searchGoodsData.items.clear()
         this.searchGoodsData.items.addAll(searchGoodsData.items)
@@ -104,7 +106,6 @@ class SearchGoodsAdapter(private val context: Context,
         private val textViewItemNum: TextView = view.findViewById(R.id.textViewItemNum)
         private val sortLayout: LinearLayout = view.findViewById(R.id.sortLayout)
         private val textViewSort: TextView = view.findViewById(R.id.textViewSort)
-        private val imageViewSort: ImageView = view.findViewById(R.id.imageViewSort)
 
         override fun display(item: SearchGoodsListData, position: Int) {
             // 검색 상품 갯수

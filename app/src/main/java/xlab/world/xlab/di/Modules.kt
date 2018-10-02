@@ -29,6 +29,7 @@ import xlab.world.xlab.view.profile.ProfileViewModel
 import xlab.world.xlab.view.profileEdit.ProfileEditViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
 import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
+import xlab.world.xlab.view.search.SearchViewModel
 import xlab.world.xlab.view.setting.SettingViewModel
 import xlab.world.xlab.view.topicDetail.TopicPetDetailViewModel
 import xlab.world.xlab.view.topicEdit.TopicPetEditViewModel
@@ -76,6 +77,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { WithDrawViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Notice View
     viewModel { NoticeViewModel(apiNotice = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Search View
+    viewModel { SearchViewModel(apiShop = get(), apiPost = get(), apiUser = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

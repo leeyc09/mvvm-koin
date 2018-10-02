@@ -21,6 +21,8 @@ import xlab.world.xlab.view.register.LocalRegisterActivity
 import xlab.world.xlab.view.register.SocialRegisterActivity
 import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
 import xlab.world.xlab.view.resetPassword.UpdatePasswordActivity
+import xlab.world.xlab.view.search.CombinedSearchActivity
+import xlab.world.xlab.view.search.GoodsSearchActivity
 import xlab.world.xlab.view.setting.SettingActivity
 import xlab.world.xlab.view.topicDetail.TopicPetDetailActivity
 import xlab.world.xlab.view.topicEdit.TopicPetEditActivity
@@ -122,12 +124,14 @@ object RunActivity {
         PrintLog.d("Run", "GoodsDetail", tag)
     }
 
-    fun searchGoodsActivity(context: Activity, searchText: String, searchCode: String) {
-        PrintLog.d("Run", "SearchGoods", tag)
+    fun goodsSearchActivity(context: Activity, searchText: String, searchCode: String) {
+        val intent = GoodsSearchActivity.newIntent(context = context, searchText = searchText, searchCode = searchCode)
+        context.startActivityForResult(intent, RequestCodeData.GOODS_SEARCH)
     }
 
-    fun searchActivity(context: Activity) {
-        PrintLog.d("Run", "Search", tag)
+    fun combinedSearchActivity(context: Activity) {
+        val intent = CombinedSearchActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.COMBINED_SEARCH)
     }
 
     fun notificationActivity(context: Activity) {

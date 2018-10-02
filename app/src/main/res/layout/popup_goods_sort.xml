@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorFFFFFF"
+    android:orientation="vertical"
+    android:id="@+id/layoutMain">
+
+    <LinearLayout
+        android:id="@+id/currentSortLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="20dp"
+        android:paddingBottom="14dp"
+        android:gravity="end"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/sortUpPriceBtn"
+        app:layout_constraintEnd_toEndOf="@id/sortUpPriceBtn">
+        <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+            android:id="@+id/textViewCurrentSort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/sort_match"
+            android:textSize="13sp"
+            android:textColor="@color/color000000"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/arrow_drop_down_down_grey"
+            android:rotation="180"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="20dp"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divideView"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:background="@color/colorE2E2E2"
+        app:layout_constraintTop_toBottomOf="@id/currentSortLayout"
+        app:layout_constraintStart_toStartOf="@id/sortUpPriceBtn"
+        app:layout_constraintEnd_toEndOf="@id/sortUpPriceBtn"/>
+
+    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+        android:id="@+id/sortMatchBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/sort_match"
+        android:textSize="12sp"
+        android:textColor="@color/color000000"
+        android:tag="1"
+        android:paddingTop="17dp"
+        android:paddingBottom="17dp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/divideView"
+        app:layout_constraintStart_toStartOf="@id/sortUpPriceBtn"
+        app:layout_constraintEnd_toEndOf="@id/sortUpPriceBtn"/>
+
+    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+        android:id="@+id/sortDownPriceBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/sort_down_price"
+        android:textSize="12sp"
+        android:textColor="@color/color000000"
+        android:tag="2"
+        android:paddingTop="17dp"
+        android:paddingBottom="17dp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/sortMatchBtn"
+        app:layout_constraintStart_toStartOf="@id/sortUpPriceBtn"
+        app:layout_constraintEnd_toEndOf="@id/sortUpPriceBtn" />
+
+
+    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+        android:id="@+id/sortUpPriceBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sort_up_price"
+        android:textSize="12sp"
+        android:textColor="@color/color000000"
+        android:tag="3"
+        android:paddingStart="35dp"
+        android:paddingEnd="35dp"
+        android:paddingTop="17dp"
+        android:paddingBottom="17dp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/sortDownPriceBtn"/>
+
+
+</android.support.constraint.ConstraintLayout>

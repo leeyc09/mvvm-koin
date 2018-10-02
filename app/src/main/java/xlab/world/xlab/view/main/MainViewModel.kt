@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.graphics.Color
 import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.data.response.ResFeedData
+import xlab.world.xlab.data.response.ResGoodsSearchData
 import xlab.world.xlab.data.response.ResShopFeedData
 import xlab.world.xlab.server.ApiURL
 import xlab.world.xlab.server.provider.ApiPostProvider
@@ -236,7 +237,7 @@ class MainViewModel(private val apiPost: ApiPostProvider,
         }
     }
 
-    private fun getPercentValueAndColor(topicColorList: Array<String>, matchData: ResFeedData.TopicMatch?): MatchData {
+    private fun getPercentValueAndColor(topicColorList: Array<String>, matchData: ResGoodsSearchData.TopicMatch?): MatchData {
         val randIndex = Random()
         var percentValue = 0
         var percentColor = Color.parseColor("#${topicColorList[randIndex.nextInt(topicColorList.size)]}")
@@ -248,7 +249,7 @@ class MainViewModel(private val apiPost: ApiPostProvider,
         return MatchData(percent = percentValue, color = percentColor)
     }
 
-    private fun getEachCategoryGoods(categoryGoods: ArrayList<ResShopFeedData.Goods>?, topicColorList: Array<String>): SearchGoodsData {
+    private fun getEachCategoryGoods(categoryGoods: ArrayList<ResGoodsSearchData.Goods>?, topicColorList: Array<String>): SearchGoodsData {
         val categoryGoodsData = SearchGoodsData()
         categoryGoods?.forEach { goods ->
             val matchData = getPercentValueAndColor(topicColorList = topicColorList,

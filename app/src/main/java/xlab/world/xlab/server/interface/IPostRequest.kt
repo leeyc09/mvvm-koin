@@ -39,4 +39,8 @@ interface IPostRequest {
     fun getUserPostsDetail(@Header("Authorization") authorization: String,
                            @Query("userId") userId: String,
                            @Query("page") page: Int): Observable<ResDetailPostsData>
+
+    @GET(ApiURL.POSTS_SEARCH)
+    fun searchPost(@Query("query") searchText: String,
+                   @Query("page") page: Int): Observable<ResThumbnailPostsData>
 }
