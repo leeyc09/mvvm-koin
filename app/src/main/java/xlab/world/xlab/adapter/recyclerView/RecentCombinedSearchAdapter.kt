@@ -29,10 +29,15 @@ class RecentCombinedSearchAdapter(val context: Context,
         return recentCombinedSearchData.items[position]
     }
 
+    fun removeData(position: Int) {
+        recentCombinedSearchData.items.removeAt(position)
+        notifyDataSetChanged()
+    }
+
     override
     fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolderBind(LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_pet_breed, parent, false))
+                    .inflate(R.layout.item_recent_combined_search, parent, false))
     }
 
     override
@@ -56,7 +61,7 @@ class RecentCombinedSearchAdapter(val context: Context,
             textView.setOnClickListener(selectListener)
 
 
-            deleteBtn.tag = item.searchText
+            deleteBtn.tag = position
             deleteBtn.setOnClickListener(deleteListener)
         }
     }

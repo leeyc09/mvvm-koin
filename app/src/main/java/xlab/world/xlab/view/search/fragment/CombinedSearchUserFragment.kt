@@ -12,6 +12,7 @@ import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.SPHelper
+import xlab.world.xlab.utils.view.button.ScrollUpButtonHelper
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.search.SearchViewModel
@@ -29,6 +30,8 @@ class CombinedSearchUserFragment: Fragment() {
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
 
+    private var scrollUpButtonHelper: ScrollUpButtonHelper? = null
+
     private var defaultListener: DefaultListener? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -44,11 +47,22 @@ class CombinedSearchUserFragment: Fragment() {
     }
 
     private fun onSetup() {
+        matchBtnLayout.visibility = View.GONE
         // Toast, Dialog 초기화
         defaultToast = defaultToast ?: DefaultToast(context = context!!)
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
 
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
+
+        // scroll up button 초기화
+        scrollUpButtonHelper?.let {
+            scrollUpButtonHelper = it
+        }?: let {
+            scrollUpButtonHelper = ScrollUpButtonHelper(
+                    smoothScroll = true,
+                    scrollUpBtn = scrollUpBtn)
+            scrollUpButtonHelper?.handle(recyclerView)
+        }
     }
 
     private fun onBindEvent() {

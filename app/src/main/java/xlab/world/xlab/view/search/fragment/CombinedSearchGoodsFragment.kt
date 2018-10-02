@@ -10,8 +10,11 @@ import kotlinx.android.synthetic.main.fragment_combined_search.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
+import xlab.world.xlab.adapter.recyclerView.SearchGoodsAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.SPHelper
+import xlab.world.xlab.utils.view.button.MatchButtonHelper
+import xlab.world.xlab.utils.view.button.ScrollUpButtonHelper
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.search.SearchViewModel
@@ -34,8 +37,18 @@ class CombinedSearchGoodsFragment: Fragment() {
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
 
+    private var searchGoodsAdapter: SearchGoodsAdapter? = null
+
+    private var matchButtonHelper: MatchButtonHelper? = null
+    private var scrollUpButtonHelper: ScrollUpButtonHelper? = null
+
     private var defaultListener: DefaultListener? = null
 
+    private val matchButtonListener = object: MatchButtonHelper.Listener {
+        override fun matchVisibility(visibility: Int) {
+            searchGoodsAdapter?.changeMatchVisible(visibility)
+        }
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_combined_search, container, false)
     }
@@ -54,6 +67,23 @@ class CombinedSearchGoodsFragment: Fragment() {
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
 
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
+
+        // match button 초기화
+        matchButtonHelper = matchButtonHelper ?: MatchButtonHelper(
+                context = context as Activity,
+                rootView = matchBtnLayout,
+                isMatchShow = true,
+                listener = matchButtonListener)
+
+        // scroll up button 초기화
+        scrollUpButtonHelper?.let {
+            scrollUpButtonHelper = it
+        }?: let {
+            scrollUpButtonHelper = ScrollUpButtonHelper(
+                    smoothScroll = true,
+                    scrollUpBtn = scrollUpBtn)
+            scrollUpButtonHelper?.handle(recyclerView)
+        }
     }
 
     private fun onBindEvent() {

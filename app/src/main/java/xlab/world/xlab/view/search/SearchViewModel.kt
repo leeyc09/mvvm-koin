@@ -50,7 +50,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
         }
     }
 
-    fun requestCombinedSearchTotal(searchText: String) {
+    fun requestCombinedSearchTotal(authorization: String, searchText: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
@@ -59,12 +59,38 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
 
         launch {
             // post total 가져오기
-            apiPost.requestSearchPosts(scheduler = scheduler, searchText = searchText, page = 0,
+            apiPost.requestSearchPosts(scheduler = scheduler, searchText = searchText, page = 1,
                     responseData = {
-
+                        uiData.value = UIModel(searchPostsTotal = it.total)
+                    },
+                    errorData = { errorData ->
+                        errorData?.let {
+                            PrintLog.d("searchUser fail", errorData.message, tag)
+                        }
+                    })
+            // user total 가져오기
+            apiUser.requestSearchUser(scheduler = scheduler, authorization = authorization, searchText = searchText, page = 1,
+                    responseData = {
+                        uiData.value = UIModel(searchUserTotal = it.total)
                     },
                     errorData = {
-
+                        errorData ->
+                        errorData?.let {
+                            PrintLog.d("searchPosts fail", errorData.message, tag)
+                        }
+                    })
+            // goods total 가져오기
+            val reqSearchData = ArrayList<ReqGoodsSearchData>()
+            reqSearchData.add(ReqGoodsSearchData(text = searchText, code = ""))
+            apiShop.requestSearchGoods(scheduler = scheduler, authorization = authorization, reqGoodsSearchData = reqSearchData,
+                    page = 1, sortType = searchSortType,
+                    responseData = {
+                        uiData.value = UIModel(searchGoodsTotal = it.goodsTotal)
+                    },
+                    errorData = { errorData ->
+                        errorData?.let {
+                            PrintLog.d("searchGoods fail", errorData.message, tag)
+                        }
                     })
         }
     }
@@ -222,4 +248,5 @@ data class SearchEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val keywordData: GoodsKeywordData? = null, val searchGoodsData: SearchGoodsData? = null,
                    val searchGoodsUpdatePosition: Int? = null,
-                   val searchPostsData: PostThumbnailData? = null)
+                   val searchPostsData: PostThumbnailData? = null,
+                   val searchPostsTotal: Int? = null, val searchUserTotal: Int? = null, val searchGoodsTotal: Int? = null)

@@ -33,31 +33,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <FrameLayout
+        <android.support.v4.view.ViewPager
+            android:id="@+id/searchViewPager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/searchViewPager"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:id="@+id/scrollUpBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/arrow_page_up_black"
-                android:background="@drawable/scroll_up_back"
-                android:padding="13dp"
-                android:layout_gravity="end|bottom"
-                android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"/>
-        </FrameLayout>
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
 
     <LinearLayout
-        android:visibility="gone"
         android:id="@+id/recentSearchLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"

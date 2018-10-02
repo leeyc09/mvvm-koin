@@ -14,6 +14,7 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.PostThumbnailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.SPHelper
+import xlab.world.xlab.utils.view.button.ScrollUpButtonHelper
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
@@ -28,9 +29,16 @@ class CombinedSearchPostFragment: Fragment() {
         set(value) {
             arguments?.putBoolean("needInitData", value)
         }
+    private var searchText
+        get() = arguments?.getString("searchText") ?: ""
+        set(value) {
+            arguments?.putString("searchText", value)
+        }
 
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
+
+    private var scrollUpButtonHelper: ScrollUpButtonHelper? = null
 
     private var searchPostAdapter: PostThumbnailAdapter? = null
 
@@ -49,11 +57,22 @@ class CombinedSearchPostFragment: Fragment() {
     }
 
     private fun onSetup() {
+        matchBtnLayout.visibility = View.GONE
         // Toast, Dialog 초기화
         defaultToast = defaultToast ?: DefaultToast(context = context!!)
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
 
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
+
+        // scroll up button 초기화
+        scrollUpButtonHelper?.let {
+            scrollUpButtonHelper = it
+        }?: let {
+            scrollUpButtonHelper = ScrollUpButtonHelper(
+                    smoothScroll = true,
+                    scrollUpBtn = scrollUpBtn)
+            scrollUpButtonHelper?.handle(recyclerView)
+        }
 
         // search post adapter & recycler view 초기화
         searchPostAdapter = searchPostAdapter ?: PostThumbnailAdapter(context = context!!,
@@ -71,8 +90,10 @@ class CombinedSearchPostFragment: Fragment() {
     private fun observeViewModel() {
     }
 
-    fun reloadPostsData(loadingBar: Boolean?) {
+    fun searchPostsData(searchText: String, loadingBar: Boolean?) {
+        this.searchText = searchText
         context?.let {
+            searchViewModel.searchPosts(searchText = this.searchText, page = 1)
         } ?:let { needInitData = true }
     }
 

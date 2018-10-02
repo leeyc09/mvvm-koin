@@ -17,9 +17,7 @@ import xlab.world.xlab.adapter.recyclerView.RecentCombinedSearchAdapter
 import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
-import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
-import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.search.fragment.CombinedSearchGoodsFragment
 import xlab.world.xlab.view.search.fragment.CombinedSearchPostFragment
 import xlab.world.xlab.view.search.fragment.CombinedSearchUserFragment
@@ -31,9 +29,6 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
 
     private var resultCode = Activity.RESULT_CANCELED
 
-    private lateinit var defaultToast: DefaultToast
-    private lateinit var progressDialog: DefaultProgressDialog
-
     private lateinit var tabLayoutHelper: TabLayoutHelper
 
     private lateinit var viewPagerAdapter: ViewStatePagerAdapter
@@ -44,23 +39,17 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var recentCombinedSearchAdapter: RecentCombinedSearchAdapter
 
     private val recentSearchListener = View.OnClickListener { view ->
-//        if (view.tag is String) {
-//            val searchText = view.tag as String
-//
-//            editTextSearch.setText(searchText)
-//            search(searchText) { max, current -> }
-//        }
+        editTextSearch.setText(view.tag as String)
+        requestSearch(searchText = view.tag as String)
     }
     private val recentDeleteListener = View.OnClickListener { view ->
-//        if (view.tag is String) {
-//            val searchText = view.tag as String
-//
-//            val searchList = SPHelper(this).recentSearch
-//            searchList.remove(searchText)
-//            SPHelper(this).recentSearch = searchList
-//
-//            recentSearchAdapter.removeData(searchText)
-//        }
+        val item = recentCombinedSearchAdapter.getItem(position = (view.tag as Int))
+
+        val searchList = spHelper.recentSearch
+        searchList.remove(item.searchText)
+        spHelper.recentSearch = searchList
+
+        recentCombinedSearchAdapter.removeData(position = (view.tag as Int))
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,10 +96,6 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
-        // Toast, Dialog 초기화
-        defaultToast = DefaultToast(context = this)
-        progressDialog = DefaultProgressDialog(context = this)
-
         // 프래그먼트 초기화
         searchPostsFragment = CombinedSearchPostFragment.newFragment()
         searchUserFragment = CombinedSearchUserFragment.newFragment()
@@ -148,7 +133,7 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
 
         ViewFunction.onKeyboardActionTouch(editText = editTextSearch, putActionID = EditorInfo.IME_ACTION_DONE) { isTouch: Boolean ->
             if (isTouch && getSearchText().isNotEmpty()){
-//                search(editTextSearch.text.toString()) { max, current -> }
+                requestSearch(searchText = getSearchText())
             }
         }
 
@@ -160,7 +145,23 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
-
+        // UI 이벤트 observe
+        searchViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.searchPostsTotal?.let {
+                    tabLayoutHelper.getTabData(0).extraData = it
+                    tabLayoutHelper.updateTabView(0)
+                }
+                uiData.searchUserTotal?.let {
+                    tabLayoutHelper.getTabData(1).extraData = it
+                    tabLayoutHelper.updateTabView(1)
+                }
+                uiData.searchGoodsTotal?.let {
+                    tabLayoutHelper.getTabData(2).extraData = it
+                    tabLayoutHelper.updateTabView(2)
+                }
+            }
+        })
     }
 
     override fun onClick(v: View?) {
@@ -175,6 +176,24 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         }
+    }
+
+    private fun requestSearch(searchText: String) {
+        val searchList = spHelper.recentSearch
+        searchList.remove(searchText)
+        searchList.add(searchText)
+        spHelper.recentSearch = searchList
+
+//        spHelper.recentSearch.remove(searchText)
+//        spHelper.recentSearch.add(searchText)
+//        spHelper.recentSearch = spHelper.recentSearch
+
+        if (recentSearchLayout.visibility != View.GONE)
+            recentSearchLayout.visibility = View.GONE
+
+        searchViewModel.requestCombinedSearchTotal(authorization = spHelper.authorization, searchText = searchText)
+
+        // need request data on fragment
     }
 
     private fun getSearchText(): String = editTextSearch.text.toString()
