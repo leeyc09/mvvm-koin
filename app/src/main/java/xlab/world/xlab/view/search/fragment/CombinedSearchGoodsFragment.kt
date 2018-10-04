@@ -48,12 +48,13 @@ class CombinedSearchGoodsFragment: Fragment() {
 
     private var searchGoodsAdapter: SearchGoodsAdapter? = null
 
-    private var matchButtonHelper: MatchButtonHelper? = null
+    private lateinit var matchButtonHelper: MatchButtonHelper
     private lateinit var scrollUpButtonHelper: ScrollUpButtonHelper
 
     private var defaultListener: DefaultListener? = null
     private val matchButtonListener = object: MatchButtonHelper.Listener {
         override fun matchVisibility(visibility: Int) {
+            matchVisibility = visibility
             searchGoodsAdapter?.changeMatchVisible(visibility)
         }
     }
@@ -77,10 +78,10 @@ class CombinedSearchGoodsFragment: Fragment() {
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
 
         // match button 초기화
-        matchButtonHelper = matchButtonHelper ?: MatchButtonHelper(
+        matchButtonHelper = MatchButtonHelper(
                 context = context as Activity,
                 rootView = matchBtnLayout,
-                isMatchShow = true,
+                isMatchShow = matchVisibility == View.VISIBLE,
                 listener = matchButtonListener)
 
         // scroll up button 초기화
@@ -103,7 +104,7 @@ class CombinedSearchGoodsFragment: Fragment() {
             recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, left = 0.5f, right = 0.5f))
 
         if (needInitData)
-            searchGoodssData(searchText = this.searchText, loadingBar = true)
+            searchGoodsData(searchText = this.searchText, loadingBar = true)
     }
 
     private fun onBindEvent() {
@@ -118,9 +119,43 @@ class CombinedSearchGoodsFragment: Fragment() {
     }
 
     private fun observeViewModel() {
+        // UI 이벤트 observe
+        searchViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.isLoading?.let {
+                    if (it && !progressDialog!!.isShowing)
+                        progressDialog!!.show()
+                    else if (!it && progressDialog!!.isShowing)
+                        progressDialog!!.dismiss()
+                }
+                uiData.toastMessage?.let {
+                    defaultToast?.showToast(message = it)
+                }
+                uiData.searchGoodsData?.let {
+                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
+                        setBundleVisibilityData(noSearchDataVisibility =
+                        if (it.items.isEmpty()) View.VISIBLE
+                        else View.GONE)
+                        searchGoodsAdapter?.updateData(searchGoodsData = it)
+                    }
+                    else
+                        searchGoodsAdapter?.addData(searchGoodsData = it)
+                }
+            }
+        })
+
+        // search user 이벤트 observe
+        searchViewModel.searchGoodsEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.status?.let { isLoading ->
+                    searchGoodsAdapter?.dataLoading = isLoading
+                    needInitData = false
+                }
+            }
+        })
     }
 
-    fun searchGoodssData(searchText: String, loadingBar: Boolean?) {
+    fun searchGoodsData(searchText: String, loadingBar: Boolean?) {
         this.searchText = searchText
         context?.let {
             searchViewModel.searchGoods(authorization = spHelper.authorization,
