@@ -115,9 +115,6 @@ class CombinedSearchPostFragment: Fragment() {
                     else
                         searchPostAdapter?.addData(postThumbnailData = it)
                 }
-//                uiData.scrollUpBtnVisibility?.let {
-//                    scrollUpBtn.visibility = it
-//                }
             }
         })
 

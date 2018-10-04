@@ -119,8 +119,6 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                                     youTubeVideoID = post.youTubeVideoID
                             ))
                         }
-                        if (page == 1)
-                            uiData.value = UIModel(scrollUpBtnVisibility = if(postsData.items.isEmpty()) View.GONE else View.VISIBLE)
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, searchPostsData = postsData)
                     },
                     errorData = { errorData ->
@@ -155,8 +153,6 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                                     topic = topicBreed,
                                     isFollowing = user.isFollowing))
                         }
-                        if (page == 1)
-                            uiData.value = UIModel(scrollUpBtnVisibility = if(userData.items.isEmpty()) View.GONE else View.VISIBLE)
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, searchUserData = userData)
                     },
                     errorData = { errorData ->
@@ -169,7 +165,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
     }
 
     fun searchGoods(authorization: String, searchData: ArrayList<EditTextTagHelper.SearchData>,
-                    page: Int, topicColorList: Array<String>, loadingBar: Boolean? = true) {
+                    page: Int, topicColorList: Array<String>, withHeader: Boolean = true, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
@@ -218,7 +214,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                             }
                         }
 
-                        if (page == 1)
+                        if (page == 1 && withHeader)
                             goodsData.items.add(0, SearchGoodsListData(
                                     dataType = AppConstants.ADAPTER_HEADER,
                                     sortType = searchSortType)
@@ -253,7 +249,7 @@ data class MatchData(val percent: Int, val color: Int)
 data class SearchEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val keywordData: GoodsKeywordData? = null, val searchGoodsData: SearchGoodsData? = null,
-                   val searchGoodsUpdatePosition: Int? = null, val scrollUpBtnVisibility: Int? = null,
+                   val searchGoodsUpdatePosition: Int? = null,
                    val searchPostsData: PostThumbnailData? = null,
                    val searchUserData: UserDefaultData? = null,
                    val searchPostsTotal: Int? = null, val searchUserTotal: Int? = null, val searchGoodsTotal: Int? = null)

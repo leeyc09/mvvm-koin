@@ -127,9 +127,6 @@ class CombinedSearchUserFragment: Fragment() {
                     else
                         searchUserAdapter?.addData(userDefaultData = it)
                 }
-//                uiData.scrollUpBtnVisibility?.let {
-//                    scrollUpBtn.visibility = it
-//                }
             }
         })
 

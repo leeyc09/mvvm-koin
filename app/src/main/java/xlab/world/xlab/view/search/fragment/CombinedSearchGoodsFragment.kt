@@ -3,6 +3,7 @@ package xlab.world.xlab.view.search.fragment
 import android.app.Activity
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,8 @@ import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.button.MatchButtonHelper
 import xlab.world.xlab.utils.view.button.ScrollUpButtonHelper
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
+import xlab.world.xlab.utils.view.hashTag.EditTextTagHelper
+import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.search.SearchViewModel
 
@@ -85,21 +88,45 @@ class CombinedSearchGoodsFragment: Fragment() {
                 smoothScroll = true,
                 scrollUpBtn = scrollUpBtn)
         scrollUpButtonHelper.handle(recyclerView)
+
+        // search goods adapter & recycler view 초기화
+        searchGoodsAdapter = searchGoodsAdapter ?: SearchGoodsAdapter(
+                context = context!!,
+                sortListener = null,
+                goodsListener = defaultListener!!.goodsListener,
+                questionListener = defaultListener!!.questionMatchListener,
+                contentBottomMargin = 50f,
+                matchVisible = View.VISIBLE)
+        recyclerView.adapter = searchGoodsAdapter
+        recyclerView.layoutManager = GridLayoutManager(context, 3, GridLayoutManager.VERTICAL, false)
+        if (recyclerView.itemDecorationCount < 1)
+            recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, left = 0.5f, right = 0.5f))
+
+        if (needInitData)
+            searchGoodssData(searchText = this.searchText, loadingBar = true)
     }
 
     private fun onBindEvent() {
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
-//            ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = searchUserAdapter!!.dataLoading, total = searchUserAdapter!!.dataTotal) { _ ->
-//                searchViewModel.searchUsers(authorization = spHelper.authorization, searchText = searchText, page = searchUserAdapter!!.dataNextPage)
-//            }
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = searchGoodsAdapter!!.dataLoading, total = searchGoodsAdapter!!.dataTotal) { _ ->
+                searchViewModel.searchGoods(authorization = spHelper.authorization,
+                        searchData = arrayListOf(EditTextTagHelper.SearchData(text = searchText, code = "")),
+                        page = searchGoodsAdapter!!.dataNextPage, topicColorList = resources.getStringArray(R.array.topicColorStringList),
+                        withHeader = false)
+            }
         }
     }
 
     private fun observeViewModel() {
     }
 
-    fun reloadPostsData(loadingBar: Boolean?) {
+    fun searchGoodssData(searchText: String, loadingBar: Boolean?) {
+        this.searchText = searchText
         context?.let {
+            searchViewModel.searchGoods(authorization = spHelper.authorization,
+                    searchData = arrayListOf(EditTextTagHelper.SearchData(text = searchText, code = "")),
+                    page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList),
+                    withHeader = false, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 

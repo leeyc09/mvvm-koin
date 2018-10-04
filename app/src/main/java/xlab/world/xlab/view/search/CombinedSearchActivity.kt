@@ -192,6 +192,7 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
         // need request data on fragment
         searchPostsFragment.searchPostsData(searchText = searchText, loadingBar = true)
         searchUserFragment.searchUserData(searchText = searchText, loadingBar = true)
+        searchGoodsFragment.searchGoodssData(searchText = searchText, loadingBar = true)
     }
 
     private fun getSearchText(): String = editTextSearch.text.toString()
