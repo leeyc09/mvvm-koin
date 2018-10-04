@@ -302,7 +302,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
                 }
                 R.id.followBtn -> { // 팔로우 버튼
-
+                    profileViewModel.userFollow(authorization = spHelper.authorization, userId = userId)
                 }
                 R.id.followerLayout -> { // 팔로워
                     RunActivity.followerActivity(context = this, userId = userId)

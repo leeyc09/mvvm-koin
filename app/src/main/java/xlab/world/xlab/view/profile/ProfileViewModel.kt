@@ -251,6 +251,29 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                     })
         }
     }
+
+    fun userFollow(authorization: String, userId: String) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            apiFollow.requestFollow(scheduler = scheduler, authorization = authorization, userId = userId,
+                    responseData = {
+                        PrintLog.d("follow success", it.status.toString(), tag)
+                        uiData.value = UIModel(isLoading = false, followState = it.status)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.d("follow fail", errorData.message, tag)
+                        }
+                    })
+        }
+    }
 }
 
 data class ProfileEvent(val status: Boolean? = null)

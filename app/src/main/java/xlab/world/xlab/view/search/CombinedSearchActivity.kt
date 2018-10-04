@@ -80,13 +80,13 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
                     RequestCodeData.PROFILE, // 프로필
                     RequestCodeData.POST_DETAIL, // 포스트 상세
                     RequestCodeData.GOODS_DETAIL-> { // 상품 상세
-//                        search(lastSearchText) { max, current -> }
+                        requestSearch(searchText = getSearchText())
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
                 this.resultCode = ResultCodeData.LOGIN_SUCCESS
-//                search(lastSearchText) { max, current -> }
+                requestSearch(searchText = getSearchText())
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
                 setResult(ResultCodeData.LOGOUT_SUCCESS)
