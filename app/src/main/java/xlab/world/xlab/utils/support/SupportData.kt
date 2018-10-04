@@ -1,9 +1,11 @@
 package xlab.world.xlab.utils.support
 
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.os.Environment
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -128,6 +130,22 @@ object SupportData {
         return mediaStorageDirPic
     }
 
+
+    fun rotateCropSquareImage(src: Bitmap, degree: Float, flip: Boolean): Bitmap {
+        // create new matrix
+        val matrix = Matrix()
+        // flip horizontal
+        if (flip)
+            matrix.preScale(-1.0f, 1.0f)
+        // setup rotation degree
+        matrix.postRotate(degree)
+
+        val croppedSize = if (src.width > src.height) src.height else src.width
+
+        return Bitmap.createBitmap(src, 0, 0, croppedSize, croppedSize, matrix, true)
+//        return Bitmap.createBitmap(src, 0, 0, src.width, src.height, matrix, true)
+    }
+
     // temp file 생성
     fun createTmpFile(type: Int): File? {
         // To be safe, you should check that the SDCard is mounted
@@ -156,6 +174,34 @@ object SupportData {
         }
     }
 
+    // release file 생성
+    fun createReleaseFile(type: Int): File? {
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+        val mediaStorageDir = File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM), "xlab")
+
+        if (!mediaStorageDir.exists())
+            mediaStorageDir.mkdirs()
+
+        // Create a media file name
+        return when (type) {
+            AppConstants.MEDIA_VIDEO -> File(createFolder(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DCIM).toString() + AppConstants.VIDEO_FOLDER).absolutePath + File.separator +
+                    timeStamp + ".mp4")
+            AppConstants.MEDIA_GIF -> File(createFolder(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DCIM).toString() + AppConstants.GIF_FOLDER).absolutePath + File.separator +
+                    timeStamp + ".gif")
+            AppConstants.MEDIA_IMAGE -> File(createFolder(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DCIM).toString() + AppConstants.PICTURE_FOLDER).absolutePath + File.separator +
+                    timeStamp + ".jpg")
+            else -> File(createFolder(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DCIM).toString() + AppConstants.PICTURE_FOLDER).absolutePath + File.separator +
+                    timeStamp + ".jpg")
+        }
+    }
+
     // file 저장
     fun saveFile(bitmap: Bitmap, path: String, quality: Int = 90) {
         val file = File(path)
@@ -172,12 +218,17 @@ object SupportData {
     }
 
     // file 삭제
-
     fun deleteFile(path: String) {
         val file = File(path)
         if (file.exists()) {
             PrintLog.d("delete file", file.absolutePath, "File")
             file.delete()
         }
+    }
+
+    @Throws(IOException::class)
+    fun moveFile(src: File, dst: File): String {
+        src.renameTo(dst)
+        return dst.absolutePath
     }
 }

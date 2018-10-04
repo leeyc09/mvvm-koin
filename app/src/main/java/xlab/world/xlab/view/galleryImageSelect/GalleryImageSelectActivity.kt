@@ -33,9 +33,8 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var progressDialog: DefaultProgressDialog
 
     private val gallerySelectListener = View.OnClickListener { view ->
-        val position = view.tag as Int
-        galleryImageSelectViewModel.changeImageSelect(position = position,
-                newSelectedData = galleryAdapter.getItem(position))
+        galleryImageSelectViewModel.changeImageSelect(position = view.tag as Int,
+                newSelectedData = galleryAdapter.getItem(position = view.tag as Int))
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +61,6 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
                 if (intent.getBooleanExtra(IntentPassName.WITH_CIRCLE_OVERLAY, true)) View.VISIBLE
                 else View.GONE
 
-//        imageViewPreview.scaleType = ImageView.ScaleType.FIT_CENTER
         imageViewPreview.getDisplayMatrix(Matrix())
 
         // Toast 초기화
@@ -71,7 +69,8 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
 
         // gallery recycler view & adapter 초기화
         galleryAdapter = GalleryAdapter(context = this,
-                selectListener = gallerySelectListener)
+                selectListener = gallerySelectListener,
+                directSelectListener = null)
         recyclerView.adapter = galleryAdapter
         recyclerView.layoutManager = GridLayoutManager(this, 4, GridLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(CustomItemDecoration(context = this, offset = 0.5f))

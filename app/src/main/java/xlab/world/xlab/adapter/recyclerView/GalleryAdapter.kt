@@ -13,7 +13,8 @@ import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.utils.support.AppConstants
 
 class GalleryAdapter(private val context: Context,
-                     private val selectListener: View.OnClickListener) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
+                     private val selectListener: View.OnClickListener,
+                     private val directSelectListener: View.OnClickListener?) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
 
     private val galleryData: GalleryData = GalleryData()
     var dataLoading: Boolean
@@ -59,7 +60,7 @@ class GalleryAdapter(private val context: Context,
             AppConstants.GALLERY_ONE -> OneSelectViewHolderBind(LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_gallery_one, parent, false))
 
-            AppConstants.ADAPTER_CONTENT -> ManySelectViewHolderBind(LayoutInflater.from(parent.context)
+            AppConstants.GALLERY_MANY -> ManySelectViewHolderBind(LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_gallery_many, parent, false))
 
             else -> OneSelectViewHolderBind(LayoutInflater.from(parent.context)
@@ -87,15 +88,15 @@ class GalleryAdapter(private val context: Context,
         override fun display(item: GalleryListData, position: Int) {
             // gallery image
             Glide.with(context)
-                    .load(galleryData.items[position].data)
+                    .load(item.data)
                     .into(imageView)
 
             overlayFilter.visibility =
-                    if (galleryData.items[position].isSelect) View.VISIBLE
+                    if (item.isSelect) View.VISIBLE
                     else View.GONE
 
             selectedFilter.visibility =
-                    if (galleryData.items[position].isSelect) View.VISIBLE
+                    if (item.isSelect) View.VISIBLE
                     else View.GONE
 
             mainLayout.tag = position
@@ -113,6 +114,32 @@ class GalleryAdapter(private val context: Context,
         private val textViewNum: TextView = view.findViewById(R.id.textViewNum)
 
         override fun display(item: GalleryListData, position: Int) {
+            // gallery image
+            Glide.with(context)
+                    .load(item.data)
+                    .into(imageView)
+
+            overlayFilter.visibility =
+                    if (item.isSelect) View.VISIBLE
+                    else View.GONE
+
+            selectedFilter.visibility =
+                    if (item.isSelect) View.VISIBLE
+                    else View.GONE
+
+            imageViewSelect.isSelected = item.isSelect
+            item.selectNum?.let {
+                textViewNum.visibility = View.VISIBLE
+                textViewNum.setText(it.toString(), TextView.BufferType.SPANNABLE)
+            } ?: let {
+                textViewNum.visibility = View.GONE
+            }
+
+            mainLayout.tag = position
+            mainLayout.setOnClickListener(selectListener)
+
+            imageViewSelect.tag = position
+            imageViewSelect.setOnClickListener(directSelectListener)
         }
     }
 

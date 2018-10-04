@@ -12,5 +12,6 @@ data class GalleryListData(val dataType: Int = AppConstants.GALLERY_ONE,
                            val displayName: String,
                            val duration: String = "",
                            var isSelect: Boolean = false,
-                           var isPreview: Boolean = false): Serializable
+                           var isPreview: Boolean = false,
+                           var selectNum: Int? = null): Serializable
 

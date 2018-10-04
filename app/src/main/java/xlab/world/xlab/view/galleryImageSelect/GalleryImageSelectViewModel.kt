@@ -16,19 +16,30 @@ import xlab.world.xlab.utils.support.TextConstants
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 import java.io.File
+import kotlin.math.max
 
 class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): AbstractViewModel() {
     val tag = "GalleryImageSelect"
 
     private val galleryOnePage = 40
-    var singleSelectIndex = 0
+    private var maxSelectCount: Int = 3 // limit item select count
+
+    private var singleSelectIndex = 0
     private var singleSelectData: GalleryListData? = null
+
+    private var multiSelectIndex: ArrayList<Int> = ArrayList()
+    private var multiSelectData: ArrayList<GalleryListData> = ArrayList()
 
     val loadGalleryImageEvent = SingleLiveEvent<GalleryEvent>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setSingleSelectData(selectData: GalleryListData) {
         singleSelectData = selectData
+    }
+
+    fun addMultiSelectData(selectData: GalleryListData) {
+        multiSelectData.add(selectData)
+        multiSelectIndex.add(0)
     }
 
     fun loadGalleryImage(context: Context, page: Int, dataType: Int) {
@@ -53,6 +64,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                     val galleryData = GalleryData(nextPage = page + 1)
 
                     while (cursor.moveToNext()) {
+                        val isSelect = (page == 1 && galleryData.items.isEmpty())
                         galleryData.items.add(GalleryListData(
                                 dataType  = dataType,
                                 id = cursor.getString(0),
@@ -60,7 +72,8 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                                 data = cursor.getString(2),
                                 size = cursor.getString(3),
                                 displayName = cursor.getString(4),
-                                isSelect = (page == 1 && galleryData.items.isEmpty())))
+                                isSelect = isSelect,
+                                selectNum = if(isSelect) 1 else null))
                     }
                     cursor.close()
 
@@ -81,12 +94,13 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
         }
     }
 
+    // 선택 이미지 변경 (이미지 선택 1개)
     fun changeImageSelect(position: Int, newSelectedData: GalleryListData) {
         launch {
-            Observable.create<SelectPosition> {
+            Observable.create<ArrayList<Int>> {
                 singleSelectData?.let { selectData ->
                     if (selectData.data != newSelectedData.data) {
-                        val selectedPosition = SelectPosition(oldPosition = singleSelectIndex, newPosition = position)
+                        val updatePosition = arrayListOf(singleSelectIndex, position)
                         // 기존 선택된 데이터 선택 해제 & 새로운 데이터로 갱신
                         selectData.isSelect = false
                         singleSelectData = newSelectedData
@@ -94,14 +108,60 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                         // 새로 선택된 데이터 선택
                         newSelectedData.isSelect = true
 
-                        it.onNext(selectedPosition)
+                        it.onNext(updatePosition)
                         it.onComplete()
                     }
                 }
             }.with(scheduler).subscribe {
-                uiData.value = UIModel(galleryUpdatePosition = it.oldPosition)
-                uiData.value = UIModel(galleryUpdatePosition = it.newPosition)
+                it.forEach { position ->
+                    uiData.value = UIModel(galleryUpdatePosition = position)
+                }
                 uiData.value = UIModel(oneSelectData = SelectData(position = singleSelectIndex, data = singleSelectData!!.data))
+            }
+        }
+    }
+
+    fun directSelectImage(position: Int, selectData: GalleryListData) {
+        launch {
+            Observable.create<ArrayList<Int>> {
+                val updatePosition = ArrayList<Int>()
+                updatePosition.addAll(multiSelectIndex)
+
+                if (selectData.isSelect) { // 기존 선택 O 이미지
+                    if (multiSelectData.size > 1) { // 선택 된 이미지가 2개 이상
+                        selectData.selectNum = null
+                        multiSelectIndex.remove(position)
+                        multiSelectData.remove(selectData)
+
+                        multiSelectData.forEachIndexed { index, data ->
+                            data.selectNum = index + 1
+                        }
+
+                        selectData.isSelect = false
+                        updatePosition.add(position)
+                    }
+                } else { // 기존 선택 X 이미지
+                    if (multiSelectData.size < maxSelectCount) { // 선택 이미지가 max 갯수보다 작을 경우
+                        multiSelectIndex.add(position)
+                        multiSelectData.add(selectData)
+
+                        selectData.selectNum = multiSelectData.size
+
+                        selectData.isSelect = true
+                        updatePosition.add(position)
+                    }
+                }
+
+                PrintLog.d("multiSelectIndex", multiSelectIndex.toString(), tag)
+                PrintLog.d("multiSelectData", multiSelectData.toString(), tag)
+
+                it.onNext(updatePosition)
+                it.onComplete()
+            }.with(scheduler).subscribe {
+                it.forEach { position ->
+                    uiData.value = UIModel(galleryUpdatePosition = position)
+                }
+//                uiData.value = UIModel(oneSelectData = SelectData(position = singleSelectIndex, data = singleSelectData!!.data))
             }
         }
     }

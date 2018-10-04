@@ -26,6 +26,7 @@ import xlab.world.xlab.view.main.fragment.FeedShopFragment
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val fontColorSpan: FontColorSpan by inject()
     private val spHelper: SPHelper by inject()
+    private val permissionHelper: PermissionHelper by inject()
 
     private var linkData: Uri? = null
 
@@ -66,6 +67,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         onBindEvent()
 
         observeViewModel()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            AppConstants.PERMISSION_REQUEST_CAMERA_CODE -> {
+                if (permissionHelper.resultRequestPermissions(results = grantResults))
+                    actionUploadBtn.performClick()
+            }
+        }
     }
 
     override fun onPause() {
@@ -207,6 +218,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 R.id.actionUploadBtn -> { // 포스트 업로드 버튼
                     if (spHelper.accessToken.isEmpty()) // 게스트
                         return
+
+                    if (!permissionHelper.hasPermission(context = this, permissions = permissionHelper.cameraPermissions)) {
+                        permissionHelper.requestCameraPermissions(context = this)
+                        return
+                    }
 
                     RunActivity.postUploadActivity(context = this)
                 }
