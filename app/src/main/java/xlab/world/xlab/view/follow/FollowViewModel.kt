@@ -72,8 +72,8 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
             apiFollow.requestGetFollower(scheduler = scheduler, authorization = authorization, userId = userId, page = page,
                     responseData = {
                         val followerData = UserDefaultData(total = it.total, nextPage = page + 1)
-                        it.follower?.forEach { follower ->
-                            val topicBreed = getTopicBreed(follower.petData)
+                        it.userData?.forEach { follower ->
+                            val topicBreed = petInfo.getTopicBreed(follower.petData)
                             followerData.items.add(UserDefaultListData(userId = follower.id,
                                     profileImage = follower.profileImg,
                                     nickName = follower.nickName,
@@ -105,9 +105,10 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
         launch {
             apiFollow.requestGetFollowing(scheduler = scheduler, authorization = authorization, userId = userId, page = page,
                     responseData = {
+                        PrintLog.d("requestGetFollowing success", it.toString(), tag)
                         val followingData = UserDefaultData(total = it.total, nextPage = page + 1)
-                        it.following?.forEach { following ->
-                            val topicBreed = getTopicBreed(following.petData)
+                        it.userData?.forEach { following ->
+                            val topicBreed = petInfo.getTopicBreed(following.petData)
                             followingData.items.add(UserDefaultListData(userId = following.id,
                                     profileImage = following.profileImg,
                                     nickName = following.nickName,
@@ -115,7 +116,6 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
                                     isFollowing = following.isFollowing))
                         }
 
-                        PrintLog.d("requestGetFollowing success", followingData.toString(), tag)
                         uiData.value = UIModel(isLoading = false, userData = followingData, followCnt = it.total)
                     },
                     errorData = { errorData ->
@@ -140,7 +140,7 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
             apiUser.requestRecommendUser(scheduler = scheduler, authorization = authorization, page = page,
                     responseData = {
                         val recommendUserData = UserRecommendData(total = it.total, nextPage = page + 1)
-                        it.recommend?.forEach { recommend ->
+                        it.userData?.forEach { recommend ->
                             recommendUserData.items.add(UserRecommendListData(userId = recommend.id,
                                     profileImage = recommend.profileImg,
                                     nickName = recommend.nickName,
@@ -159,20 +159,20 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
         }
     }
 
-    private fun getTopicBreed(petData: ArrayList<ResUserDefaultData.FollowUserPetInfo>?): ArrayList<String>{
-        // topic(pet) 종 이름 가져오기
-        val topicBreed = ArrayList<String>()
-        petData?.forEach { pet ->
-            val breedStr = when (pet.type) {
-                petInfo.dogCode -> petInfo.dogBreedInfo[pet.breed.toInt()].nameKor
-                petInfo.catCode -> petInfo.catBreedInfo[pet.breed.toInt()].nameKor
-                else -> ""
-            }
-            if (breedStr.isNotEmpty())
-                topicBreed.add(breedStr)
-        }
-        return topicBreed
-    }
+//    private fun getTopicBreed(petData: ArrayList<ResUserDefaultData.UserPetInfo>?): ArrayList<String>{
+//        // topic(pet) 종 이름 가져오기
+//        val topicBreed = ArrayList<String>()
+//        petData?.forEach { pet ->
+//            val breedStr = when (pet.type) {
+//                petInfo.dogCode -> petInfo.dogBreedInfo[pet.breed.toInt()].nameKor
+//                petInfo.catCode -> petInfo.catBreedInfo[pet.breed.toInt()].nameKor
+//                else -> ""
+//            }
+//            if (breedStr.isNotEmpty())
+//                topicBreed.add(breedStr)
+//        }
+//        return topicBreed
+//    }
 }
 
 data class FollowEvent(val status: Boolean? = null)

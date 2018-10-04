@@ -184,16 +184,14 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
         searchList.add(searchText)
         spHelper.recentSearch = searchList
 
-//        spHelper.recentSearch.remove(searchText)
-//        spHelper.recentSearch.add(searchText)
-//        spHelper.recentSearch = spHelper.recentSearch
-
         if (recentSearchLayout.visibility != View.GONE)
             recentSearchLayout.visibility = View.GONE
 
         searchViewModel.requestCombinedSearchTotal(authorization = spHelper.authorization, searchText = searchText)
 
         // need request data on fragment
+        searchPostsFragment.searchPostsData(searchText = searchText, loadingBar = true)
+        searchUserFragment.searchUserData(searchText = searchText, loadingBar = true)
     }
 
     private fun getSearchText(): String = editTextSearch.text.toString()

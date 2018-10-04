@@ -78,7 +78,7 @@ val viewModelModule: Module = applicationContext {
     // ViewModel for Notice View
     viewModel { NoticeViewModel(apiNotice = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Search View
-    viewModel { SearchViewModel(apiShop = get(), apiPost = get(), apiUser = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { SearchViewModel(apiShop = get(), apiPost = get(), apiUser = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

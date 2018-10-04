@@ -2,20 +2,19 @@ package xlab.world.xlab.view.search
 
 import android.arch.lifecycle.MutableLiveData
 import android.graphics.Color
+import android.view.View
 import io.reactivex.Observable
 import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.data.request.ReqGoodsSearchData
 import xlab.world.xlab.data.response.ResGoodsSearchData
+import xlab.world.xlab.data.response.ResUserDefaultData
 import xlab.world.xlab.server.ApiURL
 import xlab.world.xlab.server.provider.ApiPostProvider
 import xlab.world.xlab.server.provider.ApiShopProvider
 import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
-import xlab.world.xlab.utils.support.AppConstants
-import xlab.world.xlab.utils.support.NetworkCheck
-import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.TextConstants
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.hashTag.EditTextTagHelper
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
@@ -24,6 +23,7 @@ import java.util.*
 class SearchViewModel(private val apiShop: ApiShopProvider,
                       private val apiPost: ApiPostProvider,
                       private val apiUser: ApiUserProvider,
+                      private val petInfo: PetInfo,
                       private val networkCheck: NetworkCheck,
                       private val scheduler: SchedulerProvider): AbstractViewModel() {
     val tag = "Search"
@@ -32,6 +32,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
 
     val changeSearchSortTypeEventData = SingleLiveEvent<SearchEvent>()
     val searchPostsEventData = SingleLiveEvent<SearchEvent>()
+    val searchUserEventData = SingleLiveEvent<SearchEvent>()
     val searchGoodsEventData = SingleLiveEvent<SearchEvent>()
     val uiData = MutableLiveData<UIModel>()
 
@@ -118,6 +119,8 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                                     youTubeVideoID = post.youTubeVideoID
                             ))
                         }
+                        if (page == 1)
+                            uiData.value = UIModel(scrollUpBtnVisibility = if(postsData.items.isEmpty()) View.GONE else View.VISIBLE)
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, searchPostsData = postsData)
                     },
                     errorData = { errorData ->
@@ -137,21 +140,24 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
         }
 
         uiData.value = UIModel(isLoading = loadingBar)
+        searchUserEventData.value = SearchEvent(status = true)
         launch {
-            apiUser.requestSearchUser(scheduler = scheduler,authorization = authorization, searchText = searchText, page = page,
+            PrintLog.d("authorization", authorization, tag)
+            apiUser.requestSearchUser(authorization = authorization, scheduler = scheduler, searchText = searchText, page = page,
                     responseData = {
                         PrintLog.d("searchUser success", it.toString(), tag)
                         val userData = UserDefaultData(total = it.total, nextPage = page + 1)
-//                        it.searchUsers?.forEach { user ->
-//                            userData.items.add(PostThumbnailListData(
-//                                    dataType = AppConstants.ADAPTER_CONTENT,
-//                                    postId = post.id,
-//                                    postType = post.postType,
-//                                    imageURL = post.postFile.firstOrNull(),
-//                                    youTubeVideoID = post.youTubeVideoID
-//                            ))
-//                        }
-//                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, searchPostsData = postsData)
+                        it.userData?.forEach { user ->
+                            val topicBreed = petInfo.getTopicBreed(user.petData)
+                            userData.items.add(UserDefaultListData(userId = user.id,
+                                    profileImage = user.profileImg,
+                                    nickName = user.nickName,
+                                    topic = topicBreed,
+                                    isFollowing = user.isFollowing))
+                        }
+                        if (page == 1)
+                            uiData.value = UIModel(scrollUpBtnVisibility = if(userData.items.isEmpty()) View.GONE else View.VISIBLE)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, searchUserData = userData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
@@ -247,6 +253,7 @@ data class MatchData(val percent: Int, val color: Int)
 data class SearchEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val keywordData: GoodsKeywordData? = null, val searchGoodsData: SearchGoodsData? = null,
-                   val searchGoodsUpdatePosition: Int? = null,
+                   val searchGoodsUpdatePosition: Int? = null, val scrollUpBtnVisibility: Int? = null,
                    val searchPostsData: PostThumbnailData? = null,
+                   val searchUserData: UserDefaultData? = null,
                    val searchPostsTotal: Int? = null, val searchUserTotal: Int? = null, val searchGoodsTotal: Int? = null)

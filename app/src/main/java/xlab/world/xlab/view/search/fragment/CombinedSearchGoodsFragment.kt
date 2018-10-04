@@ -13,6 +13,7 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.SearchGoodsAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.SPHelper
+import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.button.MatchButtonHelper
 import xlab.world.xlab.utils.view.button.ScrollUpButtonHelper
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
@@ -24,9 +25,14 @@ class CombinedSearchGoodsFragment: Fragment() {
     private val spHelper: SPHelper by inject()
 
     private var needInitData
-        get() = arguments?.getBoolean("needInitData") ?: true
+        get() = arguments?.getBoolean("needInitData") ?: false
         set(value) {
             arguments?.putBoolean("needInitData", value)
+        }
+    private var searchText
+        get() = arguments?.getString("searchText") ?: ""
+        set(value) {
+            arguments?.putString("searchText", value)
         }
     private var matchVisibility
         get() = arguments?.getInt("matchVisibility") ?: View.VISIBLE
@@ -40,10 +46,9 @@ class CombinedSearchGoodsFragment: Fragment() {
     private var searchGoodsAdapter: SearchGoodsAdapter? = null
 
     private var matchButtonHelper: MatchButtonHelper? = null
-    private var scrollUpButtonHelper: ScrollUpButtonHelper? = null
+    private lateinit var scrollUpButtonHelper: ScrollUpButtonHelper
 
     private var defaultListener: DefaultListener? = null
-
     private val matchButtonListener = object: MatchButtonHelper.Listener {
         override fun matchVisibility(visibility: Int) {
             searchGoodsAdapter?.changeMatchVisible(visibility)
@@ -76,17 +81,18 @@ class CombinedSearchGoodsFragment: Fragment() {
                 listener = matchButtonListener)
 
         // scroll up button 초기화
-        scrollUpButtonHelper?.let {
-            scrollUpButtonHelper = it
-        }?: let {
-            scrollUpButtonHelper = ScrollUpButtonHelper(
-                    smoothScroll = true,
-                    scrollUpBtn = scrollUpBtn)
-            scrollUpButtonHelper?.handle(recyclerView)
-        }
+        scrollUpButtonHelper = ScrollUpButtonHelper(
+                smoothScroll = true,
+                scrollUpBtn = scrollUpBtn)
+        scrollUpButtonHelper.handle(recyclerView)
     }
 
     private fun onBindEvent() {
+        ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
+//            ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = searchUserAdapter!!.dataLoading, total = searchUserAdapter!!.dataTotal) { _ ->
+//                searchViewModel.searchUsers(authorization = spHelper.authorization, searchText = searchText, page = searchUserAdapter!!.dataNextPage)
+//            }
+        }
     }
 
     private fun observeViewModel() {
@@ -114,7 +120,7 @@ class CombinedSearchGoodsFragment: Fragment() {
             val fragment = CombinedSearchGoodsFragment()
 
             val args = Bundle()
-            args.putBoolean("needInitData", true)
+            args.putBoolean("needInitData", false)
             args.putInt("noSearchDataVisibility", View.GONE)
             args.putInt("matchVisibility", View.VISIBLE)
             fragment.arguments = args

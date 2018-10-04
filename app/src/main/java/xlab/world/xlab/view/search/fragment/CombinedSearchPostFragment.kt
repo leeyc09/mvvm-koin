@@ -14,6 +14,7 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.PostThumbnailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.SPHelper
+import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.button.ScrollUpButtonHelper
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
@@ -25,7 +26,7 @@ class CombinedSearchPostFragment: Fragment() {
     private val spHelper: SPHelper by inject()
 
     private var needInitData
-        get() = arguments?.getBoolean("needInitData") ?: true
+        get() = arguments?.getBoolean("needInitData") ?: false
         set(value) {
             arguments?.putBoolean("needInitData", value)
         }
@@ -38,7 +39,7 @@ class CombinedSearchPostFragment: Fragment() {
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
 
-    private var scrollUpButtonHelper: ScrollUpButtonHelper? = null
+    private lateinit var scrollUpButtonHelper: ScrollUpButtonHelper
 
     private var searchPostAdapter: PostThumbnailAdapter? = null
 
@@ -65,14 +66,10 @@ class CombinedSearchPostFragment: Fragment() {
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
 
         // scroll up button 초기화
-        scrollUpButtonHelper?.let {
-            scrollUpButtonHelper = it
-        }?: let {
-            scrollUpButtonHelper = ScrollUpButtonHelper(
-                    smoothScroll = true,
-                    scrollUpBtn = scrollUpBtn)
-            scrollUpButtonHelper?.handle(recyclerView)
-        }
+        scrollUpButtonHelper = ScrollUpButtonHelper(
+                smoothScroll = true,
+                scrollUpBtn = scrollUpBtn)
+        scrollUpButtonHelper.handle(recyclerView)
 
         // search post adapter & recycler view 초기화
         searchPostAdapter = searchPostAdapter ?: PostThumbnailAdapter(context = context!!,
@@ -82,18 +79,63 @@ class CombinedSearchPostFragment: Fragment() {
         recyclerView.layoutManager = GridLayoutManager(context, 3, GridLayoutManager.VERTICAL, false)
         if (recyclerView.itemDecorationCount < 1)
             recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, offset = 0.5f))
+
+        if (needInitData)
+            searchPostsData(searchText = this.searchText, loadingBar = true)
     }
 
     private fun onBindEvent() {
+        ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = searchPostAdapter!!.dataLoading, total = searchPostAdapter!!.dataTotal) { _ ->
+                searchViewModel.searchPosts(searchText = searchText, page = searchPostAdapter!!.dataNextPage)
+            }
+        }
     }
 
     private fun observeViewModel() {
+        // UI 이벤트 observe
+        searchViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.isLoading?.let {
+                    if (it && !progressDialog!!.isShowing)
+                        progressDialog!!.show()
+                    else if (!it && progressDialog!!.isShowing)
+                        progressDialog!!.dismiss()
+                }
+                uiData.toastMessage?.let {
+                    defaultToast?.showToast(message = it)
+                }
+                uiData.searchPostsData?.let {
+                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
+                        setBundleVisibilityData(noSearchDataVisibility =
+                        if (it.items.isEmpty()) View.VISIBLE
+                        else View.GONE)
+                        searchPostAdapter?.updateData(postThumbnailData = it)
+                    }
+                    else
+                        searchPostAdapter?.addData(postThumbnailData = it)
+                }
+//                uiData.scrollUpBtnVisibility?.let {
+//                    scrollUpBtn.visibility = it
+//                }
+            }
+        })
+
+        // search post 이벤트 observe
+        searchViewModel.searchPostsEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.status?.let { isLoading ->
+                    searchPostAdapter?.dataLoading = isLoading
+                    needInitData = false
+                }
+            }
+        })
     }
 
     fun searchPostsData(searchText: String, loadingBar: Boolean?) {
         this.searchText = searchText
         context?.let {
-            searchViewModel.searchPosts(searchText = this.searchText, page = 1)
+            searchViewModel.searchPosts(searchText = this.searchText, page = 1, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 
@@ -114,7 +156,7 @@ class CombinedSearchPostFragment: Fragment() {
             val fragment = CombinedSearchPostFragment()
 
             val args = Bundle()
-            args.putBoolean("needInitData", true)
+            args.putBoolean("needInitData", false)
             args.putInt("noSearchDataVisibility", View.GONE)
             fragment.arguments = args
 

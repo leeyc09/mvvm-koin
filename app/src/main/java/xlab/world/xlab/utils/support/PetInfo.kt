@@ -4,6 +4,7 @@ import android.content.Context
 import com.opencsv.CSVReader
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.PetBreedListData
+import xlab.world.xlab.data.response.ResUserDefaultData
 import java.io.FileNotFoundException
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -149,6 +150,21 @@ class PetInfo(context: Context) {
         } finally {
             return breedInfoList
         }
+    }
+
+    // topic(pet) 종 이름 가져오기
+    fun getTopicBreed(petData: ArrayList<ResUserDefaultData.UserPetInfo>?): ArrayList<String>{
+        val topicBreed = ArrayList<String>()
+        petData?.forEach { pet ->
+            val breedStr = when (pet.type) {
+                dogCode -> dogBreedInfo[pet.breed.toInt()].nameKor
+                catCode -> catBreedInfo[pet.breed.toInt()].nameKor
+                else -> ""
+            }
+            if (breedStr.isNotEmpty())
+                topicBreed.add(breedStr)
+        }
+        return topicBreed
     }
 }
 

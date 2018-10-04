@@ -91,7 +91,7 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
         userDefaultListener = UserDefaultListener(context = this,
                 followUserEvent = { position ->
                     followViewModel.userFollow(authorization = spHelper.authorization, position = position,
-                            userData = followerAdapter.getItem(position), recommendUserData = null)
+                            userData = followerAdapter.getItem(position = position), recommendUserData = null)
                 })
 
         // follower recycler view & adapter 초기화
