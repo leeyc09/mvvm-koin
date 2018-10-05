@@ -5,15 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Matrix
-import android.graphics.drawable.BitmapDrawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.SimpleItemAnimator
 import android.view.View
-import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.github.chrisbanes.photoview.PhotoViewAttacher
 import kotlinx.android.synthetic.main.action_bar_default.*
 import kotlinx.android.synthetic.main.activity_gallery_image_select.*
 import org.koin.android.architecture.ext.viewModel
@@ -33,7 +30,7 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var progressDialog: DefaultProgressDialog
 
     private val gallerySelectListener = View.OnClickListener { view ->
-        galleryImageSelectViewModel.changeImageSelect(position = view.tag as Int,
+        galleryImageSelectViewModel.singleSelectImageChange(position = view.tag as Int,
                 newSelectedData = galleryAdapter.getItem(position = view.tag as Int))
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,9 +101,8 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
                     defaultToast.showToast(message = it)
                     actionBackBtn.performClick()
                 }
-                uiData.oneSelectData?.let {
-                    galleryImageSelectViewModel.setSingleSelectData(selectData = galleryAdapter.getItem(it.position))
-                    imageViewPreview.setDisplayMatrix(Matrix())
+                uiData.imagePreviewData?.let {
+                    imageViewPreview.setDisplayMatrix(it.matrix)
                     Glide.with(this)
                             .load(it.data)
                             .into(imageViewPreview)
@@ -131,10 +127,19 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // load gallery image 이벤트 observe
-        galleryImageSelectViewModel.loadGalleryImageEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadGalleryImageEvent ->
-            loadGalleryImageEvent?.let { _ ->
-                loadGalleryImageEvent.status?.let { isLoading ->
+        galleryImageSelectViewModel.loadGalleryImageEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.status?.let { isLoading ->
                     galleryAdapter.dataLoading = isLoading
+                }
+            }
+        })
+
+        // image preview 이벤트 observe
+        galleryImageSelectViewModel.imagePreviewEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.updateIndex?.let {
+                    galleryImageSelectViewModel.updateSelectDataList(index = it, selectData = galleryAdapter.getItem(it))
                 }
             }
         })

@@ -120,7 +120,7 @@ class GalleryAdapter(private val context: Context,
                     .into(imageView)
 
             overlayFilter.visibility =
-                    if (item.isSelect) View.VISIBLE
+                    if (item.isPreview) View.VISIBLE
                     else View.GONE
 
             selectedFilter.visibility =

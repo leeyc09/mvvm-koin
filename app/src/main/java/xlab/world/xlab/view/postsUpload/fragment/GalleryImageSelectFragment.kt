@@ -1,8 +1,10 @@
 package xlab.world.xlab.view.postsUpload.fragment
 
 import android.app.Activity
+import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.SimpleItemAnimator
@@ -13,9 +15,12 @@ import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.action_bar_post_upload.*
 import kotlinx.android.synthetic.main.fragment_gallery_image_select.*
 import org.koin.android.architecture.ext.viewModel
+import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.GalleryAdapter
 import xlab.world.xlab.utils.support.AppConstants
+import xlab.world.xlab.utils.support.PrintLog
+import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
@@ -24,6 +29,7 @@ import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
 
 class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
     private val galleryImageSelectViewModel: GalleryImageSelectViewModel by viewModel()
+    private val spHelper: SPHelper by inject()
 
     private var galleryAdapter: GalleryAdapter? = null
 
@@ -31,9 +37,17 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
     private var progressDialog: DefaultProgressDialog? = null
 
     private val gallerySelectListener = View.OnClickListener { view ->
+        val matrix = Matrix()
+        imageViewPreview.getDisplayMatrix(matrix)
+        galleryImageSelectViewModel.updateMatrix(matrix = matrix)
+        galleryImageSelectViewModel.multiSelectImageChange(position = view.tag as Int,
+                selectData = galleryAdapter!!.getItem(position = view.tag as Int))
     }
     private val directGallerySelectListener = View.OnClickListener { view ->
-        galleryImageSelectViewModel.directSelectImage(position = view.tag as Int,
+        val matrix = Matrix()
+        imageViewPreview.getDisplayMatrix(matrix)
+        galleryImageSelectViewModel.updateMatrix(matrix = matrix)
+        galleryImageSelectViewModel.directMultiSelectImageChange(position = view.tag as Int,
                 selectData = galleryAdapter!!.getItem(position = view.tag as Int))
     }
 
@@ -70,11 +84,13 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
         recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, offset = 0.5f))
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
+        galleryImageSelectViewModel.initMaxSelectCount(userLevel = spHelper.userLevel)
         galleryImageSelectViewModel.loadGalleryImage(context = context!!, page = 1, dataType = AppConstants.GALLERY_MANY)
     }
 
     private fun onBindEvent() {
         actionCloseBtn.setOnClickListener(this) // 닫기 버튼
+        actionNextBtn.setOnClickListener(this) // 다음버튼
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = galleryAdapter!!.dataLoading, total = galleryAdapter!!.dataTotal) { _->
@@ -97,12 +113,24 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
                     defaultToast?.showToast(message = it)
                     actionNextBtn.isEnabled = false
                 }
-                uiData.oneSelectData?.let {
-                    galleryImageSelectViewModel.addMultiSelectData(selectData = galleryAdapter!!.getItem(it.position))
-                    imageViewPreview.setDisplayMatrix(Matrix())
+                uiData.imagePreviewData?.let {
+                    imageViewPreview.visibility = View.INVISIBLE
                     Glide.with(this)
                             .load(it.data)
                             .into(imageViewPreview)
+                    object: CountDownTimer(50, 50) {
+                        override fun onTick(millisUntilFinished: Long) {
+                        }
+
+                        override fun onFinish() {
+                            imageViewPreview.visibility = View.VISIBLE
+                            imageViewPreview.setDisplayMatrix(it.matrix)
+
+                            imageViewPreview.buildDrawingCache()
+                            val bitmap: Bitmap = imageViewPreview.drawingCache
+                            galleryImageSelectViewModel.updateBitmap(bitmap = bitmap)
+                        }
+                    }.start()
                 }
                 uiData.galleryData?.let {
                     if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
@@ -114,6 +142,9 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
                 uiData.galleryUpdatePosition?.let {
                     galleryAdapter?.notifyItemChanged(it)
                 }
+                uiData.finalImagePathList?.let {
+                    PrintLog.d("finalImagePathList", it.toString(), galleryImageSelectViewModel.tag)
+                }
             }
         })
 
@@ -122,6 +153,21 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
             loadGalleryImageEvent?.let { _ ->
                 loadGalleryImageEvent.status?.let { isLoading ->
                     galleryAdapter?.dataLoading = isLoading
+                }
+            }
+        })
+
+        // image preview 이벤트 observe
+        galleryImageSelectViewModel.imagePreviewEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.updateIndex?.let {
+                    galleryImageSelectViewModel.updateSelectDataList(index = it, selectData = galleryAdapter!!.getItem(it))
+                }
+                eventData.addIndex?.let {
+                    galleryImageSelectViewModel.addSelectDataList(index = it, selectData = galleryAdapter!!.getItem(it))
+                }
+                eventData.removeIndex?.let {
+                    galleryImageSelectViewModel.removeSelectDataList(index = it)
                 }
             }
         })
@@ -137,6 +183,9 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
                 R.id.cameraBtn -> { // 카메라버튼
                 }
                 R.id.actionNextBtn -> { // 다음버튼
+                    imageViewPreview.buildDrawingCache()
+                    val bitmap: Bitmap = imageViewPreview.drawingCache
+                    galleryImageSelectViewModel.createImageFileBySelectedImageList(lastBitmap = bitmap)
                 }
             }
         }
