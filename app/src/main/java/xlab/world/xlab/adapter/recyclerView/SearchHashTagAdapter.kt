@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
+import xlab.world.xlab.utils.support.SupportData
 
 class SearchHashTagAdapter(private val context: Context,
                            private val selectListener: View.OnClickListener) : RecyclerView.Adapter<SearchHashTagAdapter.ViewHolder>() {
@@ -82,7 +83,7 @@ class SearchHashTagAdapter(private val context: Context,
             hashTagStr.setSpan(charStyle, 0, searchHashTagData.searchText.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             textViewHashTag.setText(hashTagStr, TextView.BufferType.SPANNABLE)
 
-            textViewHashTagCnt.setText(item.hashTagCnt.toString(), TextView.BufferType.SPANNABLE)
+            textViewHashTagCnt.setText(SupportData.applyPriceFormat(item.hashTagCnt), TextView.BufferType.SPANNABLE)
 
             mainLayout.tag = "${item.hashTag} "
             mainLayout.setOnClickListener(selectListener)
