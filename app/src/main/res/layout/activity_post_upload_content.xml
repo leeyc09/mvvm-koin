@@ -1,9 +1,253 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.postsUpload.content.PostUploadContentActivity">
+    tools:context=".view.postsUpload.content.PostUploadContentActivity"
+    android:id="@+id/mainLayout">
+
+    <include
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/action_bar_default"/>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/scrollView"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        android:overScrollMode="never"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorF5F5F5"
+        app:layout_constraintTop_toBottomOf="@id/actionBar"
+        app:layout_constraintBottom_toTopOf="@id/popupLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/colorFFFFFF"
+                android:paddingBottom="29dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/thumbnailLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <FrameLayout
+                        android:id="@+id/youtubeThumbnailLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        app:layout_constraintDimensionRatio="w, 3:4">
+                        <ImageView
+                            android:id="@+id/youtubeThumbnailView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"/>
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/play_video_36"
+                            android:layout_gravity="center"/>
+                    </FrameLayout>
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/imageRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:overScrollMode="never"
+                        android:scrollbars="none"
+                        app:layout_constraintTop_toBottomOf="@id/youtubeThumbnailLayout"
+                        android:layout_marginTop="5dp"/>
+
+                </android.support.constraint.ConstraintLayout>
+
+                <xlab.world.xlab.utils.view.editText.EditTextRegularNoto
+                    android:id="@+id/editTextContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/color000000"
+                    android:textColorHint="@color/colorA4A4A4"
+                    android:hint="@string/content_hint"
+                    android:gravity="top"
+                    android:background="@android:color/transparent"
+                    app:layout_constraintTop_toBottomOf="@id/thumbnailLayout"
+                    android:layout_marginTop="24dp"/>
+
+            </android.support.constraint.ConstraintLayout>
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/usedItemLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/colorFFFFFF"
+                android:layout_marginTop="20dp">
+
+                <android.support.constraint.Guideline
+                    android:id="@+id/startGuideline2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.0555" />
+
+                <android.support.constraint.Guideline
+                    android:id="@+id/endGuideline2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.9444" />
+
+                <LinearLayout
+                    android:id="@+id/usedItemTitleLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintStart_toStartOf="@id/startGuideline2"
+                    app:layout_constraintEnd_toEndOf="@id/endGuideline2">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/item_black"
+                        android:layout_gravity="center_vertical"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tag_item"
+                        android:textSize="14sp"
+                        android:textColor="@color/color000000"
+                        android:layout_marginStart="5dp"
+                        android:paddingTop="15dp"
+                        android:paddingBottom="15dp"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                        android:id="@+id/textViewUsedItemNum"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="17sp"
+                        android:textColor="@color/colorA4A4A4"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="8dp"/>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/upload_product_black"
+                        android:layout_gravity="center_vertical"/>
+
+                </LinearLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/itemRecyclerView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/usedItemTitleLayout"
+                    app:layout_constraintStart_toStartOf="@id/startGuideline2"
+                    app:layout_constraintEnd_toEndOf="@id/endGuideline2"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp"
+                    android:background="@color/colorF5F5F5"
+                    app:layout_constraintTop_toBottomOf="@id/itemRecyclerView"/>
+
+            </android.support.constraint.ConstraintLayout>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/popupLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <View
+            android:id="@+id/divideViewTop"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorD8D8D8"/>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/normalPopupLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorFFFFFF"
+            app:layout_constraintTop_toBottomOf="@id/divideViewTop"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp">
+
+            <ImageView
+                android:id="@+id/hashTagBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/tag_hashtag"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="20dp"/>
+
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/userTagBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/tag_user"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/hashTagBtn"
+                android:layout_marginStart="20dp" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                android:id="@+id/finishBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/finish"
+                android:textSize="15sp"
+                android:textColor="@color/color000000"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="20dp"/>
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/hashTagPopupLayout"
+            android:layout_width="match_parent"
+            android:layout_height="164dp"
+            android:background="@color/colorFFFFFF"
+            app:layout_constraintTop_toBottomOf="@id/divideViewTop"
+            android:paddingTop="4dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/hashTagRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:overScrollMode="never"/>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

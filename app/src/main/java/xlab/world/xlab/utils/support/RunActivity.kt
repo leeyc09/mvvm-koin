@@ -15,6 +15,7 @@ import xlab.world.xlab.view.petBreed.PetBreedActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
 import xlab.world.xlab.view.posts.LikedPostsActivity
 import xlab.world.xlab.view.posts.SavedPostsActivity
+import xlab.world.xlab.view.postsUpload.content.PostUploadContentActivity
 import xlab.world.xlab.view.postsUpload.filter.PostUploadFilterActivity
 import xlab.world.xlab.view.postsUpload.picture.PostUploadPictureActivity
 import xlab.world.xlab.view.profile.ProfileActivity
@@ -139,13 +140,18 @@ object RunActivity {
         PrintLog.d("Run", "Notification", tag)
     }
 
-    fun postUploadPictureActivity(context: Activity) {
-        val intent = PostUploadPictureActivity.newIntent(context = context)
+    fun postUploadPictureActivity(context: Activity, youTubeVideoId: String) {
+        val intent = PostUploadPictureActivity.newIntent(context = context, youTubeVideoId = youTubeVideoId)
         context.startActivityForResult(intent, RequestCodeData.POST_UPLOAD)
     }
 
-    fun postUploadFilterActivity(context: Activity, imagePathList: ArrayList<String>) {
-        val intent = PostUploadFilterActivity.newIntent(context = context, imagePath = imagePathList)
+    fun postUploadFilterActivity(context: Activity, imagePathList: ArrayList<String>, youTubeVideoId: String) {
+        val intent = PostUploadFilterActivity.newIntent(context = context, imagePath = imagePathList, youTubeVideoId = youTubeVideoId)
+        context.startActivityForResult(intent, RequestCodeData.POST_UPLOAD)
+    }
+
+    fun postUploadContentActivity(context: Activity, imagePathList: ArrayList<String>, youTubeVideoId: String) {
+        val intent = PostUploadContentActivity.newIntent(context = context, imagePath = imagePathList, youTubeVideoId = youTubeVideoId)
         context.startActivityForResult(intent, RequestCodeData.POST_UPLOAD)
     }
 

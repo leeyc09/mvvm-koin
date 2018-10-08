@@ -29,9 +29,9 @@ class LikedPostsActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
 
-    private lateinit var defaultListener: DefaultListener
-
     private lateinit var postsAdapter: PostThumbnailAdapter
+
+    private lateinit var defaultListener: DefaultListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -286,7 +286,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 //                        return
 //                    }
 
-                    RunActivity.postUploadPictureActivity(context = this)
+                    RunActivity.postUploadPictureActivity(context = this, youTubeVideoId = "")
                 }
                 R.id.actionMyShopBtn -> { // 마이쇼핑
                     RunActivity.myShoppingActivity(context = this)

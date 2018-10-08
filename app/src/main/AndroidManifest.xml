@@ -211,7 +211,11 @@
             android:name=".view.postsUpload.filter.PostUploadFilterActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
-        <activity android:name=".view.postsUpload.content.PostUploadContentActivity"></activity>
+        <activity
+            android:name=".view.postsUpload.content.PostUploadContentActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

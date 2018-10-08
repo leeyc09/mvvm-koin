@@ -27,10 +27,7 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.span.FontForegroundColorSpan
-import xlab.world.xlab.utils.support.IntentPassName
-import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.RequestCodeData
-import xlab.world.xlab.utils.support.ViewFunction
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.textView.TextViewMediumNoto
 import xlab.world.xlab.view.postsUpload.filter.fragment.ImageFilterPreviewFragment
@@ -144,7 +141,8 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
                         createFilterPreviewScrollView(it)
                 }
                 uiData.finalImagePathList?.let {
-                    PrintLog.d("finalImagePathList", it.toString(), imageFilterViewModel.tag)
+                    RunActivity.postUploadContentActivity(context = this, imagePathList = it,
+                            youTubeVideoId = intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID))
                 }
             }
         })
@@ -294,9 +292,10 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     companion object {
-        fun newIntent(context: Context, imagePath: ArrayList<String>):Intent {
+        fun newIntent(context: Context, imagePath: ArrayList<String>, youTubeVideoId: String):Intent {
             val intent = Intent(context, PostUploadFilterActivity::class.java)
             intent.putExtra(IntentPassName.IMAGE_PATH_LIST, imagePath)
+            intent.putExtra(IntentPassName.YOUTUBE_VIDEO_ID, youTubeVideoId)
 
             return intent
         }

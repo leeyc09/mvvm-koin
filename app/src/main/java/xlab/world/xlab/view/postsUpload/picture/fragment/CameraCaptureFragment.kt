@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import kotlinx.android.synthetic.main.action_bar_post_upload.*
 import kotlinx.android.synthetic.main.fragment_camera_capture.*
 import xlab.world.xlab.R
+import xlab.world.xlab.utils.support.IntentPassName
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
@@ -76,7 +77,8 @@ class CameraCaptureFragment: Fragment(), View.OnClickListener {
                     activity.cameraHelper.takePicture { picturePath ->
                         progressDialog!!.dismiss()
                         if (picturePath.isNotEmpty()) {
-                            RunActivity.postUploadFilterActivity(context = activity, imagePathList = arrayListOf(picturePath))
+                            RunActivity.postUploadFilterActivity(context = activity, imagePathList = arrayListOf(picturePath),
+                                    youTubeVideoId = activity.intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID))
                         }
                     }
                 }

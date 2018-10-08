@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment
 import kotlinx.android.synthetic.main.activity_post_upload_picture.*
 import xlab.world.xlab.R
 import xlab.world.xlab.utils.camera.CameraHelper
+import xlab.world.xlab.utils.support.IntentPassName
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.RequestCodeData
 import xlab.world.xlab.view.postsUpload.picture.fragment.CameraCaptureFragment
@@ -80,8 +81,11 @@ class PostUploadPictureActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun newIntent(context: Context): Intent {
-            return Intent(context, PostUploadPictureActivity::class.java)
+        fun newIntent(context: Context, youTubeVideoId: String): Intent {
+            val intent = Intent(context, PostUploadPictureActivity::class.java)
+            intent.putExtra(IntentPassName.YOUTUBE_VIDEO_ID, youTubeVideoId)
+
+            return intent
         }
     }
 }

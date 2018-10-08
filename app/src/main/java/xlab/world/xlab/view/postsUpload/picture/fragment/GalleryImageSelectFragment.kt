@@ -163,7 +163,8 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
                     galleryAdapter?.notifyItemChanged(it)
                 }
                 uiData.finalImagePathList?.let {
-                    RunActivity.postUploadFilterActivity(context = activity, imagePathList = it)
+                    RunActivity.postUploadFilterActivity(context = activity, imagePathList = it,
+                            youTubeVideoId = activity.intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID))
                 }
             }
         })

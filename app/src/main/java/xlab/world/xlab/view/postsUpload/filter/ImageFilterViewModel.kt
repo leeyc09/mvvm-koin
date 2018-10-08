@@ -131,7 +131,7 @@ class ImageFilterViewModel(private val gpuImageFilterData: GPUImageFilterData,
 
 data class FilterPreviewData(val imageFile: File, val isSelect: Boolean, val filterData: GPUImageFilterData.FilterData)
 data class ChangeFilterData(val singleFilter: FilterPreviewData? = null, val filterIndex: Int? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
+data class UIModel(val isLoading: Boolean? = null,
                    val oneImagePreViewVisible: Int? = null, val manyImagePreViewVisible: Int? = null,
                    val imageFile: File? = null, val imageFileList: ArrayList<File>? = null,
                    val filterPreviewData: ArrayList<FilterPreviewData>? = null,

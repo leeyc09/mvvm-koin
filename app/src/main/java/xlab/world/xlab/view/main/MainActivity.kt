@@ -224,7 +224,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                         return
                     }
 
-                    RunActivity.postUploadPictureActivity(context = this)
+                    RunActivity.postUploadPictureActivity(context = this, youTubeVideoId = "")
                 }
                 R.id.actionProfileBtn -> { // 프로필 버튼
                     if (spHelper.accessToken.isEmpty()) // 게스트

@@ -32,7 +32,7 @@ class HashTagHelper(private val hashTagCharsColor: HashMap<Char, Int>,
     }
 
     private var state: Int = stateNoTag
-    var userTags: ArrayList<String> = arrayListOf("xlab", "kakao", "facebook")
+//    var userTags: ArrayList<String> = arrayListOf("xlab", "kakao", "facebook")
 
     private var textView: TextView? = null
 
@@ -89,9 +89,9 @@ class HashTagHelper(private val hashTagCharsColor: HashMap<Char, Int>,
     private fun clearSpannable(text: CharSequence) {
         val spannable = textView!!.text as Spannable
         val spans = spannable.getSpans(0, text.length, CharacterStyle::class.java)
-        PrintLog.d("ClickableForegroundColorSpan::class.java.name", ClickableForegroundColorSpan::class.java.name, tag)
         spans.forEach { span ->
-            if (span::class.java.name == ClickableForegroundColorSpan::class.java.name)
+            if (span::class.java.name == ClickableForegroundColorSpan::class.java.name ||
+                    span::class.java.name == FontForegroundColorSpan::class.java.name )
                 spannable.removeSpan(span)
         }
     }
@@ -139,9 +139,9 @@ class HashTagHelper(private val hashTagCharsColor: HashMap<Char, Int>,
         }
 
         if (sign.contains(AppConstants.USER_TAG_SIGN)) { // user tag color and font chance
-            if (userTags.contains(hashTag)) {
-                spannable.setSpan(characterStyle, startIndex, nextIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
+//            if (userTags.contains(hashTag)) {
+//                spannable.setSpan(characterStyle, startIndex, nextIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+//            }
         } else if (sign.contains(AppConstants.HASH_TAG_SIGN)){ // hash tag color and fon change
             spannable.setSpan(characterStyle, startIndex, nextIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
@@ -157,14 +157,16 @@ class HashTagHelper(private val hashTagCharsColor: HashMap<Char, Int>,
 
         spannable.getSpans(0, text.length, CharacterStyle::class.java).forEach { span ->
             val sign = text.substring(spannable.getSpanStart(span), spannable.getSpanStart(span) + 1)
-            val tag = text.substring(spannable.getSpanStart(span) + 1, spannable.getSpanEnd(span))
+            val tagText = text.substring(spannable.getSpanStart(span) + 1, spannable.getSpanEnd(span))
+            PrintLog.d("sign", sign, tag)
+            PrintLog.d("tagText", tagText, tag)
             if (sign.contains(AppConstants.HASH_TAG_SIGN)) {
-                hashTags.remove(tag)
-                hashTags.add(tag)
+                hashTags.remove(tagText)
+                hashTags.add(tagText)
             }
             else {
-                userTags.remove(tag)
-                userTags.add(tag)
+                userTags.remove(tagText)
+                userTags.add(tagText)
             }
         }
 
