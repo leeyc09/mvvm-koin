@@ -1,17 +1,11 @@
 package xlab.world.xlab.di
 
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.logging.HttpLoggingInterceptor
 import xlab.world.xlab.utils.rx.ApplicationSchedulerProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.view.login.LoginViewModel
 import org.koin.android.architecture.ext.viewModel
 import org.koin.dsl.module.Module
 import org.koin.dsl.module.applicationContext
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 import xlab.world.xlab.server.*
 import xlab.world.xlab.server.`interface`.*
 import xlab.world.xlab.server.provider.*
@@ -25,6 +19,7 @@ import xlab.world.xlab.view.notice.NoticeViewModel
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
 import xlab.world.xlab.view.posts.PostsViewModel
+import xlab.world.xlab.view.postsUpload.filter.ImageFilterViewModel
 import xlab.world.xlab.view.profile.ProfileViewModel
 import xlab.world.xlab.view.profileEdit.ProfileEditViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
@@ -35,7 +30,6 @@ import xlab.world.xlab.view.topicDetail.TopicPetDetailViewModel
 import xlab.world.xlab.view.topicEdit.TopicPetEditViewModel
 import xlab.world.xlab.view.topicSetting.TopicSettingViewModel
 import xlab.world.xlab.view.withdraw.WithDrawViewModel
-import java.util.concurrent.TimeUnit
 
 /**
  *  Koin main module
@@ -79,6 +73,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { NoticeViewModel(apiNotice = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Search View
     viewModel { SearchViewModel(apiShop = get(), apiPost = get(), apiUser = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Image Filter View
+    viewModel { ImageFilterViewModel(gpuImageFilterData = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
@@ -96,6 +92,8 @@ val utilModule: Module = applicationContext {
     bean { LetterOrDigitInputFilter() }
     // provided permission checker
     bean { PermissionHelper() }
+    // GPU Image filter
+    bean { GPUImageFilterData() }
 }
 
 //const val xlabRemoteBaseUrl = ApiURL.XLAB_API_URL_SSL

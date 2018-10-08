@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <include
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/action_bar_post_upload"/>
+
+    <View
+        android:id="@+id/cameraView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="w, 1:1"
+        app:layout_constraintTop_toBottomOf="@id/actionBar"/>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorFFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/cameraView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/flashBtn"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/flash_off"
+            android:tint="@color/enable_white85_000000"
+            app:layout_constraintTop_toTopOf="@id/captureBtn"
+            app:layout_constraintBottom_toBottomOf="@id/captureBtn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/captureBtn"
+            app:layout_constraintHorizontal_bias="0.5535"
+            android:padding="4dp"/>
+
+        <ImageView
+            android:id="@+id/captureBtn"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/camera_capture"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.4375"
+            android:padding="4dp"/>
+
+        <ImageView
+            android:id="@+id/switchBtn"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/switch_camera"
+            app:layout_constraintTop_toTopOf="@id/captureBtn"
+            app:layout_constraintBottom_toBottomOf="@id/captureBtn"
+            app:layout_constraintStart_toEndOf="@id/captureBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.4375"
+            android:padding="4dp"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>

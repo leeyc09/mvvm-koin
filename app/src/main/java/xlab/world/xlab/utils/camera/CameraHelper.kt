@@ -4,12 +4,15 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.SurfaceTexture
+import android.graphics.drawable.Drawable
 import android.hardware.Camera
 import android.media.CamcorderProfile
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.os.AsyncTask
+import android.support.v4.content.res.ResourcesCompat
 import android.view.*
+import xlab.world.xlab.R
 import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SupportData
@@ -123,7 +126,7 @@ class CameraHelper(private val context: Context,
     }
 
     override
-    fun changeFlashMode(flashMode: (String) -> Unit) {
+    fun changeFlashMode(flashModeImage: (Drawable?) -> Unit) {
         val parameters: Camera.Parameters = camera!!.parameters
 
         try {
@@ -137,15 +140,22 @@ class CameraHelper(private val context: Context,
             cameraFlash = parameters.flashMode
             camera!!.parameters = parameters
 
-            flashMode(cameraFlash)
+            val flashDrawable: Drawable = when(cameraFlash) {
+                Camera.Parameters.FLASH_MODE_ON -> ResourcesCompat.getDrawable(context.resources, R.drawable.flash_on, null)!!
+                Camera.Parameters.FLASH_MODE_OFF -> ResourcesCompat.getDrawable(context.resources, R.drawable.flash_off, null)!!
+                Camera.Parameters.FOCUS_MODE_AUTO -> ResourcesCompat.getDrawable(context.resources, R.drawable.flash_auto, null)!!
+                else -> ResourcesCompat.getDrawable(context.resources, R.drawable.flash_on, null)!!
+            }
+
+            flashModeImage(flashDrawable)
         } catch (e: Exception) {
             PrintLog.e("changeFlashMode", e.message!!, tag)
-            flashMode("")
+            flashModeImage(null)
         }
     }
 
     override
-    fun changeCameraID(cameraID: (Int) -> Unit) {
+    fun changeCameraID(flashEnable: (Boolean) -> Unit) {
         this.cameraID = when (this.cameraID) {
             Camera.CameraInfo.CAMERA_FACING_FRONT -> Camera.CameraInfo.CAMERA_FACING_BACK
             Camera.CameraInfo.CAMERA_FACING_BACK -> Camera.CameraInfo.CAMERA_FACING_FRONT
@@ -153,7 +163,7 @@ class CameraHelper(private val context: Context,
         }
         cameraReload()
 
-        cameraID(this.cameraID)
+        flashEnable(cameraID == Camera.CameraInfo.CAMERA_FACING_BACK)
     }
 
     fun cameraReload() {

@@ -118,8 +118,8 @@
     <string name="login_fail_password">비밀번호가 일치하지 않습니다.</string>
 
     <!--TODO: Camera Tab-->
-    <string name="camera_fragment_library">라이브러리</string>
-    <string name="camera_fragment_cam">카메라</string>
+    <string name="library">라이브러리</string>
+    <string name="camera">카메라</string>
     <string name="image_all">모든 사진</string>
 
     <!--TODO: Profile-->
@@ -221,41 +221,6 @@
     <string name="breed_mix_kor">믹스견</string>
     <string name="breed_mix_en">MIX</string>
     <string name="delete_topic">토픽 삭제</string>
-
-    <!-- TODO: Filter name -->
-    <string name="filter_original">Original</string>
-    <string name="filter_haze">Haze</string>
-    <string name="filter_gamma">Gamma</string>
-    <string name="filter_contrast">Contrast</string>
-    <string name="filter_exposure">Exposure</string>
-    <string name="filter_levels">Levels" "Min</string>
-    <string name="filter_sepia">Sepia</string>
-    <string name="filter_gray">Gray" "scale</string>
-    <string name="filter_vignette">Vignette</string>
-
-    <string name="auto_fix">Autofix</string>
-    <string name="bw">Min/Max Color Intensity</string>
-    <string name="brightness">Brightness</string>
-    <string name="contrast">Contrast</string>
-    <string name="cross_process">Cross Process</string>
-    <string name="documentary">Documentary</string>
-    <string name="duo_tone">Duo Tone</string>
-    <string name="fill_light">Fill Light</string>
-    <string name="fish_eye">Fish Eye</string>
-    <string name="flip_vert">Flip Vertical</string>
-    <string name="flip_hor">Flip Horizontal</string>
-    <string name="grain">Grain</string>
-    <string name="gray_scale">Grayscale</string>
-    <string name="lomoish">Lomoish</string>
-    <string name="negative">Negative</string>
-    <string name="posterize">Posterize</string>
-    <string name="rotate">Rotate</string>
-    <string name="saturate">Saturate</string>
-    <string name="sepia">Sepia</string>
-    <string name="sharpen">Sharpen</string>
-    <string name="temperature">Temperature</string>
-    <string name="tint">Tint</string>
-    <string name="vignette">Vignette</string>
 
     <!-- TODO: Post -->
     <string name="tag_item">제품 태그</string>

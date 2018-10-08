@@ -33,7 +33,7 @@
             android:id="@+id/libraryBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/camera_fragment_library"
+            android:text="@string/library"
             android:textSize="14sp"
             android:textColor="@color/enable_000000_bfbfbf"
             android:paddingTop="11dp"
@@ -45,7 +45,7 @@
             android:id="@+id/cameraBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/camera_fragment_cam"
+            android:text="@string/camera"
             android:textSize="14sp"
             android:textColor="@color/enable_000000_bfbfbf"
             android:paddingTop="11dp"
@@ -56,18 +56,15 @@
 
     </LinearLayout>
 
-    <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+    <ImageView
         android:id="@+id/actionNextBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/next"
-        android:textSize="15sp"
-        android:textColor="@color/enable_bfbfbf_5300ed"
-        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/next_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.9834"
+        android:layout_marginEnd="10dp"
         android:padding="10dp"/>
 
 </android.support.constraint.ConstraintLayout>

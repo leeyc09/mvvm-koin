@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.postsUpload.filter.PostUploadFilterActivity">
+
+    <include
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/action_bar_default_next"/>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/imagePreviewLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="w, 1:1"
+        app:layout_constraintTop_toBottomOf="@id/actionBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <jp.co.cyberagent.android.gpuimage.GPUImageView
+            android:id="@+id/imagePreview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/imageViewPreviewPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:scrollbars="none"
+            android:overScrollMode="never"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            app:layout_constraintDimensionRatio="w, 0.8888:1"
+            app:layout_constraintTop_toBottomOf="@id/textViewPetName"
+            android:layout_marginTop="8dp"/>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabLayoutDot"
+            android:layout_width="wrap_content"
+            android:layout_height="4dp"
+            app:tabGravity="center"
+            app:tabMode="fixed"
+            app:tabMaxWidth="4dp"
+            app:tabBackground="@drawable/dot_indicator_selector"
+            app:tabIndicatorHeight="0dp"
+            app:tabPaddingStart="4dp"
+            app:tabPaddingEnd="4dp"
+            android:foregroundGravity="center_horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageViewPreviewPager"
+            android:layout_marginTop="10dp"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@id/imagePreviewLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="51dp">
+
+        <LinearLayout
+            android:id="@+id/filterList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+
+    </HorizontalScrollView>
+
+</android.support.constraint.ConstraintLayout>

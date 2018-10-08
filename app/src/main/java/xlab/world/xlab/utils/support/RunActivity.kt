@@ -15,7 +15,8 @@ import xlab.world.xlab.view.petBreed.PetBreedActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
 import xlab.world.xlab.view.posts.LikedPostsActivity
 import xlab.world.xlab.view.posts.SavedPostsActivity
-import xlab.world.xlab.view.postsUpload.PostUploadPictureActivity
+import xlab.world.xlab.view.postsUpload.filter.PostUploadFilterActivity
+import xlab.world.xlab.view.postsUpload.picture.PostUploadPictureActivity
 import xlab.world.xlab.view.profile.ProfileActivity
 import xlab.world.xlab.view.profileEdit.ProfileEditActivity
 import xlab.world.xlab.view.register.LocalRegisterActivity
@@ -138,10 +139,14 @@ object RunActivity {
         PrintLog.d("Run", "Notification", tag)
     }
 
-    fun postUploadActivity(context: Activity) {
+    fun postUploadPictureActivity(context: Activity) {
         val intent = PostUploadPictureActivity.newIntent(context = context)
         context.startActivityForResult(intent, RequestCodeData.POST_UPLOAD)
-        PrintLog.d("Run", "PostUpload", tag)
+    }
+
+    fun postUploadFilterActivity(context: Activity, imagePathList: ArrayList<String>) {
+        val intent = PostUploadFilterActivity.newIntent(context = context, imagePath = imagePathList)
+        context.startActivityForResult(intent, RequestCodeData.POST_UPLOAD)
     }
 
     fun savedPostActivity(context: Activity) {

@@ -44,6 +44,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
     fun updateBitmap(bitmap: Bitmap) {
         selectDataList.forEachIndexed { index, data ->
             if (data.isPreview) {
+                PrintLog.d("Bitmap update Index", index.toString(), tag)
                 selectBitmapList[index] = bitmap
             }
         }
@@ -51,7 +52,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
 
     fun updateSelectDataList(index: Int, selectData: GalleryListData) {
         launch {
-            Observable.create<GalleryData> {
+            Observable.create<Any> {
                 selectIndexList.clear()
                 selectDataList.clear()
                 selectMatrixList.clear()
@@ -67,7 +68,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
 
     fun addSelectDataList(index: Int, selectData: GalleryListData) {
         launch {
-            Observable.create<GalleryData> {
+            Observable.create<Any> {
                 selectIndexList.add(index)
                 selectDataList.add(selectData)
                 selectMatrixList.add(Matrix())
@@ -78,7 +79,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
 
     fun removeSelectDataList(index: Int) {
         launch {
-            Observable.create<GalleryData> {
+            Observable.create<Any> {
                 var removeIndex = -1
                 selectIndexList.takeWhile { _-> removeIndex == -1 }.forEachIndexed { i, value ->
                     if (index == value) removeIndex = i
@@ -182,7 +183,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
     // 선택 이미지 바로 변경 (이미지 다수 선택)
     fun directMultiSelectImageChange(position: Int, selectData: GalleryListData) {
         launch {
-            var previewData = ""
+            var previewData: GalleryListData? = null
             var previewMatrix = Matrix()
             var addOrRemove = -1 // 0 - remove, 1 - add
             Observable.create<ArrayList<Int>> {
@@ -199,17 +200,25 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                         selectDataList.forEachIndexed { index, data ->
                             // preview image data 이면서 삭제 될 이미지가 아닌 경우
                             if (data.isPreview && selectIndexList[index] != position) {
-                                previewData = data.data
+                                previewData = data
                                 previewMatrix = selectMatrixList[index]
                             }
                             // 삭제 될 이미지 아닌 경우 이미지 번호
                             if (selectIndexList[index] != position) data.selectNum = imageNum++
                         }
 
-                        if (previewData.isEmpty()) {
-                            previewData = selectDataList[selectDataList.size - 2].data
-                            previewMatrix = selectMatrixList[selectDataList.size - 2]
+                        //기존 preview data 선택 해제
+                        if (previewData == null) {
+                            if (selectDataList.last() != selectData) {
+                                previewData = selectDataList.last()
+                                previewMatrix = selectMatrixList.last()
+                            } else {
+                                previewData = selectDataList[selectDataList.size - 2]
+                                previewMatrix = selectMatrixList[selectMatrixList.size - 2]
+                            }
                         }
+                        previewData!!.isSelect = true
+                        previewData!!.isPreview = true
 
                         addOrRemove = 0
                         updatePosition.add(position)
@@ -220,7 +229,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                         selectData.isSelect = true
                         selectData.isPreview = true
 
-                        previewData = selectData.data
+                        previewData = selectData
 
                         selectDataList.forEach { data -> data.isPreview = false }
 
@@ -235,8 +244,9 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                 it.forEach { position ->
                     uiData.value = UIModel(galleryUpdatePosition = position)
                 }
-                if (previewData.isNotEmpty())
-                    uiData.value = UIModel(imagePreviewData = PreviewData(data = previewData, matrix = previewMatrix))
+                previewData?.let { _->
+                    uiData.value = UIModel(imagePreviewData = PreviewData(data = previewData!!.data, matrix = previewMatrix))
+                }
 
                 if (addOrRemove == 0) // remove
                     imagePreviewEvent.value = ImagePreviewEvent(removeIndex = position)
@@ -248,7 +258,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
     // 선택 이미지 체크 후 변경 (이미지 다수 선택)
     fun multiSelectImageChange(position: Int, selectData: GalleryListData) {
         launch {
-            var previewData = ""
+            var previewData: GalleryListData? = null
             var previewMatrix = Matrix()
             var addOrRemove = -1 // 0 - remove, 1 - add
             Observable.create<ArrayList<Int>> {
@@ -266,17 +276,24 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                             selectDataList.forEachIndexed { index, data ->
                                 // preview image data 이면서 삭제 될 이미지가 아닌 경우
                                 if (data.isPreview && selectIndexList[index] != position) {
-                                    previewData = data.data
+                                    previewData = data
                                     previewMatrix = selectMatrixList[index]
                                 }
                                 // 삭제 될 이미지 아닌 경우 이미지 번호
                                 if (selectIndexList[index] != position) data.selectNum = imageNum++
                             }
 
-                            if (previewData.isEmpty()) {
-                                previewData = selectDataList[selectDataList.size - 2].data
-                                previewMatrix = selectMatrixList[selectDataList.size - 2]
+                            if (previewData == null) {
+                                if (selectDataList.last() != selectData) {
+                                    previewData = selectDataList.last()
+                                    previewMatrix = selectMatrixList.last()
+                                } else {
+                                    previewData = selectDataList[selectDataList.size - 2]
+                                    previewMatrix = selectMatrixList[selectMatrixList.size - 2]
+                                }
                             }
+                            previewData!!.isSelect = true
+                            previewData!!.isPreview = true
 
                             addOrRemove = 0
                             updatePosition.add(position)
@@ -285,7 +302,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                         selectDataList.forEachIndexed { index, data ->
                             data.isPreview = data.data == selectData.data
                             if (data.isPreview) {
-                                previewData = data.data
+                                previewData = data
                                 previewMatrix = selectMatrixList[index]
                             }
                         }
@@ -296,7 +313,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                         selectData.isSelect = true
                         selectData.isPreview = true
 
-                        previewData = selectData.data
+                        previewData = selectData
 
                         selectDataList.forEach { data -> data.isPreview = false }
 
@@ -311,8 +328,9 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                 it.forEach { position ->
                     uiData.value = UIModel(galleryUpdatePosition = position)
                 }
-                if (previewData.isNotEmpty())
-                    uiData.value = UIModel(imagePreviewData = PreviewData(data = previewData, matrix = previewMatrix))
+                previewData?.let { _ ->
+                    uiData.value = UIModel(imagePreviewData = PreviewData(data = previewData!!.data, matrix = previewMatrix))
+                }
 
                 if (addOrRemove == 0) // remove
                     imagePreviewEvent.value = ImagePreviewEvent(removeIndex = position)
@@ -342,17 +360,11 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
         }
     }
 
-    fun createImageFileBySelectedImageList(lastBitmap: Bitmap) {
+    fun createImageFileBySelectedImageList() {
         uiData.value = UIModel(isLoading = true)
         launch {
             Observable.create<ArrayList<String>> {
                 val imagePathList = ArrayList<String>()
-                selectDataList.forEachIndexed { index, data ->
-                    if (data.isPreview) {
-                        PrintLog.d("isPreview index", index.toString(), tag)
-                        selectBitmapList[index] = lastBitmap
-                    }
-                }
 
                 selectBitmapList.forEach { bitmap ->
                     val outFile: File? = SupportData.createTmpFile(type = AppConstants.MEDIA_IMAGE)
@@ -377,7 +389,6 @@ data class PreviewData(val data: String, val matrix: Matrix)
 data class ImagePreviewEvent(val updateIndex: Int? = null, val addIndex: Int? = null, val removeIndex: Int? = null)
 data class GalleryEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
-//                   val imagePreviewData: SelectData? = null,
                    val imagePreviewData: PreviewData? = null,
                    val galleryData: GalleryData? = null, val galleryUpdatePosition: Int? = null,
                    val finalImagePath: String? = null, val finalImagePathList: ArrayList<String>? = null)

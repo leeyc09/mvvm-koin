@@ -204,9 +204,14 @@
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
         <activity
-            android:name=".view.postsUpload.PostUploadPictureActivity"
+            android:name=".view.postsUpload.picture.PostUploadPictureActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.postsUpload.filter.PostUploadFilterActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity android:name=".view.postsUpload.content.PostUploadContentActivity"></activity>
     </application>
 
 </manifest>

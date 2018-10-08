@@ -1,4 +1,4 @@
-package xlab.world.xlab.view.postsUpload.fragment
+package xlab.world.xlab.view.postsUpload.picture.fragment
 
 import android.app.Activity
 import android.graphics.Bitmap
@@ -18,18 +18,24 @@ import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.GalleryAdapter
-import xlab.world.xlab.utils.support.AppConstants
-import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.SPHelper
-import xlab.world.xlab.utils.support.ViewFunction
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
+import xlab.world.xlab.view.postsUpload.picture.PostUploadPictureActivity
 
 class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
     private val galleryImageSelectViewModel: GalleryImageSelectViewModel by viewModel()
     private val spHelper: SPHelper by inject()
+
+    private var needInitData
+        get() = arguments?.getBoolean("needInitData") ?: true
+        set(value) {
+            arguments?.putBoolean("needInitData", value)
+        }
+
+    private lateinit var activity: PostUploadPictureActivity
 
     private var galleryAdapter: GalleryAdapter? = null
 
@@ -40,6 +46,12 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
         val matrix = Matrix()
         imageViewPreview.getDisplayMatrix(matrix)
         galleryImageSelectViewModel.updateMatrix(matrix = matrix)
+
+        imageViewPreview.isDrawingCacheEnabled = true
+        val bitmap: Bitmap = imageViewPreview.drawingCache
+        galleryImageSelectViewModel.updateBitmap(bitmap = bitmap.copy(bitmap.config, true))
+        imageViewPreview.isDrawingCacheEnabled = false
+
         galleryImageSelectViewModel.multiSelectImageChange(position = view.tag as Int,
                 selectData = galleryAdapter!!.getItem(position = view.tag as Int))
     }
@@ -47,6 +59,12 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
         val matrix = Matrix()
         imageViewPreview.getDisplayMatrix(matrix)
         galleryImageSelectViewModel.updateMatrix(matrix = matrix)
+
+        imageViewPreview.isDrawingCacheEnabled = true
+        val bitmap: Bitmap = imageViewPreview.drawingCache
+        galleryImageSelectViewModel.updateBitmap(bitmap = bitmap.copy(bitmap.config, true))
+        imageViewPreview.isDrawingCacheEnabled = false
+
         galleryImageSelectViewModel.directMultiSelectImageChange(position = view.tag as Int,
                 selectData = galleryAdapter!!.getItem(position = view.tag as Int))
     }
@@ -71,25 +89,31 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
 
         swipeRefreshLayout.isEnabled = false
 
+        activity = context as PostUploadPictureActivity
+
         // Toast 초기화
         defaultToast = defaultToast ?: DefaultToast(context = context!!)
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
 
         // gallery recycler view & adapter 초기화
-        galleryAdapter = GalleryAdapter(context = context!!,
+        galleryAdapter = galleryAdapter ?: GalleryAdapter(context = context!!,
                 selectListener = gallerySelectListener,
                 directSelectListener = directGallerySelectListener)
         recyclerView.adapter = galleryAdapter
         recyclerView.layoutManager = GridLayoutManager(context, 4, GridLayoutManager.VERTICAL, false)
-        recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, offset = 0.5f))
+        if (recyclerView.itemDecorationCount < 1)
+            recyclerView.addItemDecoration(CustomItemDecoration(context = context!!, offset = 0.5f))
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         galleryImageSelectViewModel.initMaxSelectCount(userLevel = spHelper.userLevel)
-        galleryImageSelectViewModel.loadGalleryImage(context = context!!, page = 1, dataType = AppConstants.GALLERY_MANY)
+
+        if (needInitData)
+            galleryImageSelectViewModel.loadGalleryImage(context = context!!, page = 1, dataType = AppConstants.GALLERY_MANY)
     }
 
     private fun onBindEvent() {
         actionCloseBtn.setOnClickListener(this) // 닫기 버튼
+        cameraBtn.setOnClickListener(this) // 카메라 버튼
         actionNextBtn.setOnClickListener(this) // 다음버튼
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
@@ -125,10 +149,6 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
                         override fun onFinish() {
                             imageViewPreview.visibility = View.VISIBLE
                             imageViewPreview.setDisplayMatrix(it.matrix)
-
-                            imageViewPreview.buildDrawingCache()
-                            val bitmap: Bitmap = imageViewPreview.drawingCache
-                            galleryImageSelectViewModel.updateBitmap(bitmap = bitmap)
                         }
                     }.start()
                 }
@@ -143,7 +163,7 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
                     galleryAdapter?.notifyItemChanged(it)
                 }
                 uiData.finalImagePathList?.let {
-                    PrintLog.d("finalImagePathList", it.toString(), galleryImageSelectViewModel.tag)
+                    RunActivity.postUploadFilterActivity(context = activity, imagePathList = it)
                 }
             }
         })
@@ -153,6 +173,7 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
             loadGalleryImageEvent?.let { _ ->
                 loadGalleryImageEvent.status?.let { isLoading ->
                     galleryAdapter?.dataLoading = isLoading
+                    needInitData = false
                 }
             }
         })
@@ -181,11 +202,15 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
                     (context as Activity).finish()
                 }
                 R.id.cameraBtn -> { // 카메라버튼
+                    activity.switchFragment(fragment = this)
                 }
                 R.id.actionNextBtn -> { // 다음버튼
-                    imageViewPreview.buildDrawingCache()
+                    imageViewPreview.isDrawingCacheEnabled = true
                     val bitmap: Bitmap = imageViewPreview.drawingCache
-                    galleryImageSelectViewModel.createImageFileBySelectedImageList(lastBitmap = bitmap)
+                    galleryImageSelectViewModel.updateBitmap(bitmap = bitmap.copy(bitmap.config, true))
+                    imageViewPreview.isDrawingCacheEnabled = false
+
+                    galleryImageSelectViewModel.createImageFileBySelectedImageList()
                 }
             }
         }
@@ -193,7 +218,13 @@ class GalleryImageSelectFragment: Fragment(), View.OnClickListener {
 
     companion object {
         fun newFragment(): GalleryImageSelectFragment {
-            return GalleryImageSelectFragment()
+            val fragment = GalleryImageSelectFragment()
+
+            val args = Bundle()
+            args.putBoolean("needInitData", true)
+            fragment.arguments = args
+
+            return fragment
         }
     }
 }

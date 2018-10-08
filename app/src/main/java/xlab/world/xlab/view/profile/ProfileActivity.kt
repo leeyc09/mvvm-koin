@@ -18,7 +18,6 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.ProfileTopicAdapter
 import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
 import xlab.world.xlab.utils.font.FontColorSpan
-import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
@@ -287,7 +286,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 //                        return
 //                    }
 
-                    RunActivity.postUploadActivity(context = this)
+                    RunActivity.postUploadPictureActivity(context = this)
                 }
                 R.id.actionMyShopBtn -> { // 마이쇼핑
                     RunActivity.myShoppingActivity(context = this)

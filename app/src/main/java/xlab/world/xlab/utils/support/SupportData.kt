@@ -140,10 +140,12 @@ object SupportData {
         // setup rotation degree
         matrix.postRotate(degree)
 
-        val croppedSize = if (src.width > src.height) src.height else src.width
+        // rotate bitmap
+        val rotateBitmap = Bitmap.createBitmap(src, 0, 0, src.width, src.height, matrix, true)
 
-        return Bitmap.createBitmap(src, 0, 0, croppedSize, croppedSize, matrix, true)
-//        return Bitmap.createBitmap(src, 0, 0, src.width, src.height, matrix, true)
+        // crop bitmap
+        val croppedSize = if (src.width > src.height) src.height else src.width
+        return Bitmap.createBitmap(rotateBitmap, 0, 0, croppedSize, croppedSize)
     }
 
     // temp file 생성
