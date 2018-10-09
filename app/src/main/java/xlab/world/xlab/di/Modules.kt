@@ -21,6 +21,7 @@ import xlab.world.xlab.view.postDetail.PostDetailViewModel
 import xlab.world.xlab.view.posts.PostsViewModel
 import xlab.world.xlab.view.postsUpload.content.PostContentViewModel
 import xlab.world.xlab.view.postsUpload.filter.ImageFilterViewModel
+import xlab.world.xlab.view.postsUpload.goods.PostGoodsViewModel
 import xlab.world.xlab.view.profile.ProfileViewModel
 import xlab.world.xlab.view.profileEdit.ProfileEditViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
@@ -78,6 +79,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { ImageFilterViewModel(gpuImageFilterData = get(), scheduler = get()) }
     // ViewModel for Post Content View
     viewModel { PostContentViewModel(apiPost = get(), apiHashTag = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Post Goods View
+    viewModel { PostGoodsViewModel(apiShop = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
