@@ -16,6 +16,7 @@ import xlab.world.xlab.view.follow.FollowViewModel
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
 import xlab.world.xlab.view.main.MainViewModel
 import xlab.world.xlab.view.notice.NoticeViewModel
+import xlab.world.xlab.view.notification.NotificationViewModel
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
 import xlab.world.xlab.view.posts.PostsViewModel
@@ -81,6 +82,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { PostContentViewModel(apiPost = get(), apiHashTag = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Post Goods View
     viewModel { PostUsedGoodsViewModel(apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Notification View
+    viewModel { NotificationViewModel(apiNotification = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
@@ -152,6 +155,11 @@ val remoteModule: Module = applicationContext {
     bean { createRetrofit<IHashTagRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
     // hash tag api implement
     bean { ApiHashTag(iHashTagRequest = get()) as ApiHashTagProvider }
+
+    // notification api interface
+    bean { createRetrofit<INotificationRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
+    // notification api implement
+    bean { ApiNotification(iNotificationRequest = get()) as ApiNotificationProvider }
 }
 
 /**

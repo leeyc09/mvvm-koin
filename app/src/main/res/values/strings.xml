@@ -58,6 +58,17 @@
     <string name="male">남성</string>
     <string name="female">여성</string>
     <string name="etc">기타</string>
+    <string name="notification">알림</string>
+    <string name="social">소셜</string>
+    <string name="account">계정</string>
+    <string name="shopping">쇼핑</string>
+    <string name="support">지원</string>
+    <string name="setting">설정</string>
+    <string name="notice">공지사항</string>
+    <string name="version">버전</string>
+    <string name="update">업데이트</string>
+    <string name="logout">로그아웃</string>
+    <string name="withdraw">회원탈퇴</string>
 
     <!-- TODO: Dialog Message -->
     <string name="dial_end_confirm_timer">인증 요청시간을 초과하었습니다</string>
@@ -153,20 +164,11 @@
     <string name="birth_confirm">출생연도를 다시 확인해주세요.</string>
 
     <!--TODO: Setting-->
-    <string name="setting">설정</string>
     <string name="liked_post">좋아한 포스트</string>
-    <string name="notice">공지사항</string>
-    <string name="version">버전</string>
-    <string name="update">업데이트</string>
     <string name="policy">약관 및 정책</string>
     <string name="suggestion">의견 보내기</string>
-    <string name="logout">로그아웃</string>
-    <string name="withdraw">회원탈퇴</string>
     <string name="old_password">기존"\n"비밀번호 입력</string>
     <string name="new_password">새로운"\n"비밀번호 설정</string>
-    <string name="account">계정</string>
-    <string name="shopping">쇼핑</string>
-    <string name="support">지원</string>
     <string name="change_shop_account">쇼핑 정보 수정</string>
     <string name="push_receive">푸시 알림 수신</string>
 
@@ -536,8 +538,6 @@
     <string name="sort_up_price">높은가격순</string>
 
     <!-- TODO: Notification -->
-    <string name="notification">알림</string>
-    <string name="social">소셜</string>
     <string name="no_notification">새로운 소식이 아직 없어요</string>
     <string name="noti_social_like_post">님이 회원님의 포스트를 좋아합니다.</string>
     <string name="noti_social_post_comment">님이 댓글을 남겼습니다.</string>

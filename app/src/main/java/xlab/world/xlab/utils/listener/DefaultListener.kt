@@ -83,7 +83,7 @@ class DefaultListener(private val context: Activity) {
     // 해시태그 포스트
     val hashTagListener = object : HashTagHelper.ClickListener {
         override fun onHashTagClicked(hashTag: String) {
-            RunActivity.hashTagPostActivity(context = context, hashTag = hashTag)
+            RunActivity.searchHashTagPostActivity(context = context, searchTag = hashTag)
         }
     }
 

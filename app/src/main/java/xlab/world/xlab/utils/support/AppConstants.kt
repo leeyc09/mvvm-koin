@@ -61,6 +61,16 @@ object AppConstants {
     const val GOODS_RATING_SOSO = 1
     const val GOODS_RATING_GOOD = 2
 
+    // social notification type
+    const val SOCIAL_NOTIFICATION_LIKE_POST = 0
+    const val SOCIAL_NOTIFICATION_POST_COMMENT = 1
+    const val SOCIAL_NOTIFICATION_TAG = 2
+    const val SOCIAL_NOTIFICATION_FOLLOW = 3
+
+    // shop notification type
+    const val SHOP_NOTIFICATION_LEAD_DECIDE = 0
+    const val SHOP_NOTIFICATION_LEAD_RATING = 1
+
     // media save type
     const val MEDIA_VIDEO = 1
     const val MEDIA_GIF = 2

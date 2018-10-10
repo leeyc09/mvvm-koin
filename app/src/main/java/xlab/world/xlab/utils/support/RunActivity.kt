@@ -13,6 +13,7 @@ import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectActivity
 import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.notice.NoticeActivity
+import xlab.world.xlab.view.notification.NotificationActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
 import xlab.world.xlab.view.petBreed.PetBreedActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
@@ -30,6 +31,7 @@ import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
 import xlab.world.xlab.view.resetPassword.UpdatePasswordActivity
 import xlab.world.xlab.view.search.CombinedSearchActivity
 import xlab.world.xlab.view.search.GoodsSearchActivity
+import xlab.world.xlab.view.search.SearchHashTagPostsActivity
 import xlab.world.xlab.view.setting.SettingActivity
 import xlab.world.xlab.view.topicDetail.TopicPetDetailActivity
 import xlab.world.xlab.view.topicEdit.TopicPetEditActivity
@@ -122,10 +124,6 @@ object RunActivity {
         context.startActivityForResult(intent, RequestCodeData.TOPIC_DETAIL)
     }
 
-    fun hashTagPostActivity(context: Activity, hashTag: String) {
-        PrintLog.d("Run", "HashTagPost", tag)
-    }
-
     fun goodsDetailActivity(context: Activity, goodsCd: String) {
         PrintLog.d("Run", "GoodsDetail", tag)
     }
@@ -140,8 +138,14 @@ object RunActivity {
         context.startActivityForResult(intent, RequestCodeData.COMBINED_SEARCH)
     }
 
+    fun searchHashTagPostActivity(context: Activity, searchTag: String) {
+        val intent = SearchHashTagPostsActivity.newIntent(context = context, searchTag = searchTag)
+        context.startActivityForResult(intent, RequestCodeData.TAG_POST)
+    }
+
     fun notificationActivity(context: Activity) {
-        PrintLog.d("Run", "Notification", tag)
+        val intent = NotificationActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.NOTIFICATION)
     }
 
     fun postUploadPictureActivity(context: Activity, postId: String, youTubeVideoId: String) {

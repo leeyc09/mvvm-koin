@@ -179,6 +179,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
         <activity
+            android:name=".view.search.SearchHashTagPostsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
             android:name=".view.resetPassword.UpdatePasswordActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme"
@@ -218,6 +222,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".view.postsUpload.goods.PostUploadUsedGoodsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.notification.NotificationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
     </application>

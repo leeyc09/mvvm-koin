@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="11dp"
+    android:paddingBottom="8dp"
+    android:background="@color/colorFFFFFF"
+    android:id="@+id/mainLayout">
+
+    <ImageView
+        android:id="@+id/imageViewGoods"
+        android:layout_width="52dp"
+        android:layout_height="52dp" />
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/goods_circle_overlay"
+        app:layout_constraintStart_toStartOf="@id/imageViewGoods"
+        app:layout_constraintEnd_toEndOf="@id/imageViewGoods"
+        app:layout_constraintTop_toTopOf="@id/imageViewGoods"
+        app:layout_constraintBottom_toBottomOf="@id/imageViewGoods"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toEndOf="@id/imageViewGoods"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+            android:id="@+id/textViewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="@color/color000000"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:id="@+id/textViewContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="@color/color000000"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:id="@+id/textViewTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/colorA4A4A4"/>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
