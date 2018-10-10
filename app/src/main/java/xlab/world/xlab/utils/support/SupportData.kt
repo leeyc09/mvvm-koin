@@ -41,18 +41,20 @@ object SupportData {
         // get current time
         val calendar = Calendar.getInstance()
         val timeFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm")
-        val dateStr = timeFormat.format(calendar.time)
-        val timeList = ArrayList<Int>()
-        dateStr.split("-").forEach { // year,month,day,hour,min
-            timeList.add(it.toInt())
-        }
 
-        return if (year == timeList[0] && month == timeList[1] && day == timeList[2]) { // same day
-            if (timeList[3] - hour > 0) { // other hour
-                "${(timeList[3] - hour)}시간"
-            } else { // same hour
-                if (timeList[4] - minute > 0) { // other minute
-                    "${(timeList[4] - minute)}분"
+        val nowDate = timeFormat.parse(timeFormat.format(calendar.time))
+        val getDate = timeFormat.parse("$year-${if (month > 9) month.toString() else "0$month"}-${if (day > 9) day.toString() else "0$day"}-" +
+                "${if (hour > 9) hour.toString() else "0$hour"}-${if (minute > 9) minute.toString() else "0$minute"}")
+
+        val oneDayMin = 24 * 60
+        val calDate: Long = (nowDate.time - getDate.time) / (1000 * 60)
+
+        return if (calDate < oneDayMin) { // in 24 hour
+            if (calDate > 60) {  // other hour
+                "${calDate / 60}시간"
+            }else { // same hour
+                if (calDate > 1) { // other minute
+                    "${calDate}분"
                 } else { // same minute
                     "방금전"
                 }

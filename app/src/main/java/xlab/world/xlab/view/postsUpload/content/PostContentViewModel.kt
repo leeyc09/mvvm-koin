@@ -4,18 +4,19 @@ import android.arch.lifecycle.MutableLiveData
 import android.graphics.Point
 import android.view.View
 import io.reactivex.Observable
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import xlab.world.xlab.data.adapter.*
+import xlab.world.xlab.data.request.ReqPostUploadData
 import xlab.world.xlab.server.provider.ApiHashTagProvider
 import xlab.world.xlab.server.provider.ApiPostProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
-import xlab.world.xlab.utils.support.NetworkCheck
-import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.SupportData
-import xlab.world.xlab.utils.support.TextConstants
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.hashTag.HashTagHelper
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
+import java.io.File
 
 class PostContentViewModel(private val apiPost: ApiPostProvider,
                            private val apiHashTag: ApiHashTagProvider,
@@ -23,6 +24,8 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
                            private val scheduler: SchedulerProvider): AbstractViewModel() {
     val tag = "PostContent"
 
+    private var postId: String = ""
+    private var isPostUpload: Boolean = true // false - 포스트 업데이트
     private var imagePathList: ArrayList<String> = ArrayList()
     private var youTubeVideoId: String = ""
     private var recentHashTagEmpty: Boolean = false
@@ -31,8 +34,18 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
 
     private var hashTagNowState: Int = HashTagHelper.stateNoTag
 
+    val loadPostEvent = SingleLiveEvent<LoadPostEventData>()
+    val setPostIdEvent = SingleLiveEvent<PostContentEventData>()
+    val savePostEvent = SingleLiveEvent<PostContentEventData>()
     val searchHashTagEvent = SingleLiveEvent<PostContentEventData>()
     val uiData = MutableLiveData<UIModel>()
+
+    fun setPostId(postId: String) {
+        this.postId = postId
+        isPostUpload = postId.isEmpty()
+
+        setPostIdEvent.value = PostContentEventData(status = isPostUpload)
+    }
 
     fun initViewModelData(imagePaths: ArrayList<String>, youTubeVideoId: String) {
         uiData.value = UIModel(isLoading = true)
@@ -152,6 +165,102 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
         }
     }
 
+    fun loadPost(authorization: String) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            apiPost.getPostDetail(scheduler = scheduler, authorization = authorization, postId = postId,
+                    responseData = {
+                        PrintLog.d("getPostDetail success", it.toString(), tag)
+                        uiData.value = UIModel(isLoading = false)
+
+                        val goodsData = ArrayList<SelectUsedGoodsListData>()
+                        it.postsData.goods.forEach { goods ->
+                            goodsData.add(SelectUsedGoodsListData(
+                                    dataType = AppConstants.SELECTED_GOODS_WITH_INFO,
+                                    goodsCode = goods.code,
+                                    imageURL = goods.image,
+                                    goodsName = goods.name,
+                                    goodsBrand = goods.brand
+                            ))
+                        }
+                        loadPostEvent.value = LoadPostEventData(content = it.postsData.content, goodsData = goodsData)
+
+                        initViewModelData(imagePaths = it.postsData.postFile,
+                                youTubeVideoId = it.postsData.youTubeVideoID)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false, toastMessage = TextConstants.NO_EXIST_POST)
+                        loadPostEvent.value = LoadPostEventData(isFail = true)
+                        errorData?.let {
+                            PrintLog.d("getPostDetail fail", errorData.message, tag)
+                        }
+                    })
+        }
+    }
+
+    fun savePost(authorization: String, content: String, hashTags: ArrayList<String>,
+                 goodsData: ArrayList<SelectUsedGoodsListData>, imagePaths: ArrayList<String>) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            val postType =
+                    if (youTubeVideoId.isNotEmpty()) AppConstants.POSTS_YOUTUBE_LINK
+                    else AppConstants.POSTS_IMAGE
+
+            val reqPostUploadData = ReqPostUploadData()
+            // set post type
+            reqPostUploadData.addPostType(postType = postType)
+            // set content
+            reqPostUploadData.addContent(content = content)
+            // set hash tag
+            reqPostUploadData.addTag(hashTags = hashTags)
+            // set goods
+            reqPostUploadData.addGoods(goodsData = goodsData)
+            // set post image file
+            reqPostUploadData.addPostFiles(imagePaths = imagePaths)
+            // set youtube video id
+            reqPostUploadData.addYouTubeVideoId(youTubeVideoId = youTubeVideoId)
+
+            if (isPostUpload) // 포스트 업로드
+                apiPost.requestUploadPost(scheduler = scheduler, authorization = authorization, requestBody = reqPostUploadData.getReqBody(),
+                        responseData = {
+                            PrintLog.d("requestUploadPost success", "", tag)
+                            uiData.value = UIModel(isLoading = false)
+                            savePostEvent.value = PostContentEventData(status = true)
+                        },
+                        errorData = { errorData ->
+                            uiData.value = UIModel(isLoading = false)
+                            errorData?.let {
+                                PrintLog.d("requestUploadPost fail", errorData.message, tag)
+                            }
+                        })
+            else // 포스트 업데이트
+                apiPost.requestUpdatePost(scheduler = scheduler, authorization = authorization, postId = postId, requestBody = reqPostUploadData.getReqBody(),
+                        responseData = {
+                            PrintLog.d("requestUpdatePost success", "", tag)
+                            uiData.value = UIModel(isLoading = false)
+                            savePostEvent.value = PostContentEventData(status = true)
+                        },
+                        errorData = { errorData ->
+                            uiData.value = UIModel(isLoading = false)
+                            errorData?.let {
+                                PrintLog.d("requestUpdatePost fail", errorData.message, tag)
+                            }
+                        })
+        }
+    }
+
     fun deleteProfileImage() {
         imagePathList.forEach { filePath ->
             PrintLog.d("deleteFile", filePath, tag)
@@ -160,6 +269,8 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
     }
 }
 
+data class LoadPostEventData(val content: String? = null, val goodsData: ArrayList<SelectUsedGoodsListData>? = null,
+                             val isFail: Boolean? = null)
 data class PostContentEventData(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val normalPopupVisibility: Int? = null, val hashTagPopupVisibility: Int? = null,

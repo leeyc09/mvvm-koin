@@ -116,14 +116,15 @@ class AllFeedAdapter(private val context: Context,
                     else View.VISIBLE
 
             // post 이미지
-            val imageUrl = when (item.postsType) {
-                // 이미지, 비디오 포스트 포스트
-                AppConstants.POSTS_IMAGE,
-                AppConstants.POSTS_VIDEO -> item.imageURL
-                // 유튜브 링크 포스트
-                AppConstants.POSTS_YOUTUBE_LINK -> SupportData.getYoutubeThumbnailUrl(videoId = item.youTubeVideoID, quality = SupportData.YOUTUBE_THUMB_120x90)
-                else -> ""
-            }
+            val imageUrl = item.imageURL
+//                    when (item.postsType) {
+//                // 이미지, 비디오 포스트 포스트
+//                AppConstants.POSTS_IMAGE,
+//                AppConstants.POSTS_VIDEO -> item.imageURL
+//                // 유튜브 링크 포스트
+//                AppConstants.POSTS_YOUTUBE_LINK -> SupportData.getYoutubeThumbnailUrl(videoId = item.youTubeVideoID, quality = SupportData.YOUTUBE_THUMB_120x90)
+//                else -> ""
+//            }
             Glide.with(context)
                     .load(imageUrl)
                     .apply(glideOption)

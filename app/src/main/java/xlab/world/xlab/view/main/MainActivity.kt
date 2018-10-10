@@ -16,6 +16,8 @@ import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.button.MatchButtonHelper
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
+import xlab.world.xlab.utils.view.dialog.DialogCreator
+import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
 import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.main.fragment.FeedAllFragment
@@ -32,6 +34,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
+    private lateinit var postUploadTypeSelectDialog: TwoSelectBottomDialog
 
     private lateinit var matchButtonHelper: MatchButtonHelper
     private lateinit var tabLayoutHelper: TabLayoutHelper
@@ -142,6 +145,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         // appBarLayout 애니메이션 없애기
         appBarLayout.stateListAnimator = null
 
+        postUploadTypeSelectDialog = DialogCreator.postUploadTypeSelectDialog(context = this)
+
         // 프래그먼트 초기화
         feedAllFragment = FeedAllFragment.newFragment()
         feedFollowingFragment = FeedFollowingFragment.newFragment()
@@ -219,12 +224,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     if (spHelper.accessToken.isEmpty()) // 게스트
                         return
 
+                    // 권한 체크
                     if (!permissionHelper.hasPermission(context = this, permissions = permissionHelper.cameraPermissions)) {
                         permissionHelper.requestCameraPermissions(context = this)
                         return
                     }
 
-                    RunActivity.postUploadPictureActivity(context = this, youTubeVideoId = "")
+                    postUploadTypeSelectDialog.show(supportFragmentManager, "postUploadTypeSelectDialog")
                 }
                 R.id.actionProfileBtn -> { // 프로필 버튼
                     if (spHelper.accessToken.isEmpty()) // 게스트

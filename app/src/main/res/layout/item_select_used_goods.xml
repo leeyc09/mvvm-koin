@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@color/colorFFFFFF"
+    android:id="@+id/mainLayout"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp">
+
+    <ImageView
+        android:id="@+id/checkBoxBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/select_check_circle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageViewGoods"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerInside"
+        app:layout_constraintStart_toEndOf="@id/checkBoxBtn"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="15dp"/>
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/goods_circle_overlay"
+        app:layout_constraintStart_toStartOf="@id/imageViewGoods"
+        app:layout_constraintEnd_toEndOf="@id/imageViewGoods"
+        app:layout_constraintTop_toTopOf="@id/imageViewGoods"
+        app:layout_constraintBottom_toBottomOf="@id/imageViewGoods"/>
+
+    <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+        android:id="@+id/textViewTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@color/color000000"
+        app:layout_constraintTop_toTopOf="@id/imageViewGoods"
+        app:layout_constraintStart_toEndOf="@id/imageViewGoods"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="12dp"/>
+
+    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+        android:id="@+id/textViewBrand"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@color/colorA4A4A4"
+        app:layout_constraintTop_toBottomOf="@id/textViewTitle"
+        app:layout_constraintStart_toStartOf="@id/textViewTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="9dp"/>
+
+</android.support.constraint.ConstraintLayout>

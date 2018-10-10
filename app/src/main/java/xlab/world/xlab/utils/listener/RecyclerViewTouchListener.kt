@@ -34,21 +34,17 @@ class RecyclerViewTouchListener(context: Context,
         })
     }
 
-    override fun onInterceptTouchEvent(rv: RecyclerView?, e: MotionEvent?): Boolean {
-        rv?.let { recyclerView ->
-            e?.let { motionEvent ->
-                val child = recyclerView.findChildViewUnder(motionEvent.x, motionEvent.y)
-                child?.let { c ->
-                    if (gestureDetector.onTouchEvent(e)) {
-                        clickListener.onClick(c, recyclerView.getChildAdapterPosition(c))
-                    }
-                }
+    override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+        val child = recyclerView.findChildViewUnder(e.x, e.y)
+        child?.let { c ->
+            if (gestureDetector.onTouchEvent(e)) {
+                clickListener.onClick(c, recyclerView.getChildAdapterPosition(c))
             }
         }
         return false
     }
 
-    override fun onTouchEvent(rv: RecyclerView?, e: MotionEvent?) {
+    override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
     }
 
     override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {

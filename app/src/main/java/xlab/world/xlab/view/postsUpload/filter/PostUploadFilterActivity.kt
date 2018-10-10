@@ -141,8 +141,10 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
                         createFilterPreviewScrollView(it)
                 }
                 uiData.finalImagePathList?.let {
-                    RunActivity.postUploadContentActivity(context = this, imagePathList = it,
-                            youTubeVideoId = intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID))
+                    RunActivity.postUploadContentActivity(context = this,
+                            postId = intent.getStringExtra(IntentPassName.POST_ID),
+                            youTubeVideoId = intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID),
+                            imagePathList = it)
                 }
             }
         })
@@ -292,10 +294,11 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     companion object {
-        fun newIntent(context: Context, imagePath: ArrayList<String>, youTubeVideoId: String):Intent {
+        fun newIntent(context: Context, postId: String, youTubeVideoId: String, imagePath: ArrayList<String>):Intent {
             val intent = Intent(context, PostUploadFilterActivity::class.java)
-            intent.putExtra(IntentPassName.IMAGE_PATH_LIST, imagePath)
+            intent.putExtra(IntentPassName.POST_ID, postId)
             intent.putExtra(IntentPassName.YOUTUBE_VIDEO_ID, youTubeVideoId)
+            intent.putExtra(IntentPassName.IMAGE_PATH_LIST, imagePath)
 
             return intent
         }

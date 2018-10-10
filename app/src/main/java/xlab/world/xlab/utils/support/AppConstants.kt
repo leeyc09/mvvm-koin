@@ -21,6 +21,10 @@ object AppConstants {
     const val ADAPTER_CONTENT = 1
     const val ADAPTER_FOOTER = 2
 
+    // selected goods type
+    const val SELECTED_GOODS_ONLY_THUMB = 0
+    const val SELECTED_GOODS_WITH_INFO = 1
+
     // feed type
     const val FEED_GOODS = 0
     const val FEED_POST = 1

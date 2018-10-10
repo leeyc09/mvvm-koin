@@ -47,7 +47,7 @@ ext {
     targetSdkVersion = 28
     compileSdkVersion = 28
 
-    androidDesignVersion = '27.1.1'
+    androidDesignVersion = '28.0.0'
     constraintVersion = '1.1.3'
     koinVersion = '0.9.3'
     rxJavaVersion = '2.2.1'

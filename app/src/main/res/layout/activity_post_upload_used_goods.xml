@@ -20,7 +20,7 @@
         app:layout_constraintTop_toBottomOf="@id/actionBar">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/selectedItemRecyclerView"
+            android:id="@+id/selectedGoodsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="8dp"
@@ -53,12 +53,26 @@
             android:layout_marginStart="20dp" />
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/itemRecyclerView"
+            android:id="@+id/usedGoodsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="none"
             android:overScrollMode="never"/>
 
     </LinearLayout>
+
+    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+        android:visibility="gone"
+        android:id="@+id/textViewEmptyUsedGoods"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_used_goods"
+        android:textSize="13sp"
+        android:textColor="@color/colorBFBFBF"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/actionBar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

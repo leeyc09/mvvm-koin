@@ -21,4 +21,5 @@ object IntentPassName {
     const val SEARCH_CODE = "SEARCH_CODE"
     const val IMAGE_PATH_LIST = "IMAGE_PATH_LIST"
     const val YOUTUBE_VIDEO_ID = "YOUTUBE_VIDEO_ID"
+    const val SELECTED_USED_GOODS = "SELECTED_USED_GOODS"
 }

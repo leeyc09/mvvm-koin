@@ -27,7 +27,6 @@ class PostDetailListener(context: Activity,
             listener = object: DefaultDialog.Listener {
                 override fun onOkayTouch(tag: Any?) {
                     if (tag is Int) {
-                        PrintLog.d("postDelete", "position: $tag", "PostDetail")
                         postMoreEvent(null, tag)
                     }
                 }
@@ -38,13 +37,13 @@ class PostDetailListener(context: Activity,
             listener = object: TwoSelectBottomDialog.Listener {
                 override fun onFirstBtnClick(tag: Any) {
                     if (tag is Int) {
-                        PrintLog.d("postEdit", "position: $tag", "PostDetail")
                         postMoreEvent(tag, null)
                     }
                 }
 
                 override fun onSecondBtnClick(tag: Any) {
                     if (tag is Int) {
+                        postDeleteDialog.setTag(tag)
                         postDeleteDialog.show()
                     }
                 }

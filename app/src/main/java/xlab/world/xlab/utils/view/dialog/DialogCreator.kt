@@ -69,6 +69,31 @@ object DialogCreator {
         return dialog
     }
 
+    fun postUploadTypeSelectDialog(context: Activity): TwoSelectBottomDialog {
+        val dialog = TwoSelectBottomDialog.newDialog(
+                firstText = context.getString(R.string.picture),
+                firstColor = ResourcesCompat.getColor(context.resources, R.color.color000000, null),
+                secondText = context.getString(R.string.youtube_link),
+                secondColor = ResourcesCompat.getColor(context.resources, R.color.color000000, null))
+
+        dialog.handle(listener = object: TwoSelectBottomDialog.Listener {
+            override fun onFirstBtnClick(tag: Any) { // image post upload
+                RunActivity.postUploadPictureActivity(context = context, postId = "", youTubeVideoId = "")
+            }
+
+            override fun onSecondBtnClick(tag: Any) { // youtube link post upload
+                EditTextDialog(context = context,
+                        listener = object: EditTextDialog.EditTextDialogListener {
+                            override fun onOkayTouch(text: String) {
+                                RunActivity.postUploadPictureActivity(context = context, postId = "", youTubeVideoId = text)
+                            }
+                        }).show()
+            }
+        })
+
+        return dialog
+    }
+
     fun genderSelectDialog(listener: GenderSelectDialog.Listener): GenderSelectDialog {
         val dialog = GenderSelectDialog.newDialog()
         dialog.handle(listener = listener)

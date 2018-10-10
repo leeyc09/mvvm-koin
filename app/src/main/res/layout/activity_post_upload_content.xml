@@ -113,7 +113,7 @@
                     app:layout_constraintGuide_percent="0.9444" />
 
                 <LinearLayout
-                    android:id="@+id/usedItemTitleLayout"
+                    android:id="@+id/usedGoodsTitleLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -137,7 +137,7 @@
                         android:paddingBottom="15dp"/>
 
                     <xlab.world.xlab.utils.view.textView.TextViewBoldHan
-                        android:id="@+id/textViewUsedItemNum"
+                        android:id="@+id/textViewUsedGoodsCnt"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -155,10 +155,10 @@
                 </LinearLayout>
 
                 <android.support.v7.widget.RecyclerView
-                    android:id="@+id/itemRecyclerView"
+                    android:id="@+id/goodsRecyclerView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@id/usedItemTitleLayout"
+                    app:layout_constraintTop_toBottomOf="@id/usedGoodsTitleLayout"
                     app:layout_constraintStart_toStartOf="@id/startGuideline2"
                     app:layout_constraintEnd_toEndOf="@id/endGuideline2"/>
 
@@ -166,7 +166,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="16dp"
                     android:background="@color/colorF5F5F5"
-                    app:layout_constraintTop_toBottomOf="@id/itemRecyclerView"/>
+                    app:layout_constraintTop_toBottomOf="@id/goodsRecyclerView"/>
 
             </android.support.constraint.ConstraintLayout>
 

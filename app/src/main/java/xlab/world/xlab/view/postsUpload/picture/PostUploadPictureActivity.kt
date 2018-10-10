@@ -81,8 +81,9 @@ class PostUploadPictureActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun newIntent(context: Context, youTubeVideoId: String): Intent {
+        fun newIntent(context: Context, postId: String, youTubeVideoId: String): Intent {
             val intent = Intent(context, PostUploadPictureActivity::class.java)
+            intent.putExtra(IntentPassName.POST_ID, postId)
             intent.putExtra(IntentPassName.YOUTUBE_VIDEO_ID, youTubeVideoId)
 
             return intent

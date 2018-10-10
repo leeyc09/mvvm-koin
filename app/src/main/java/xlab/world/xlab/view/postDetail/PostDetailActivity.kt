@@ -101,7 +101,10 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
         postDetailListener = PostDetailListener(context = this, fragmentManager = supportFragmentManager,
                 postMoreEvent = { editPosition, deletePosition ->
                     editPosition?.let { _ ->
-                        PrintLog.d("postMore", "post edit", "PostDetail")
+                        RunActivity.postUploadContentActivity(context = this,
+                                postId = postId,
+                                youTubeVideoId = postDetailAdapter.getItem(0).youTubeVideoID,
+                                imagePathList = ArrayList())
                     }
                     deletePosition?.let { _ ->
                         postDetailViewModel.deletePost(authorization = spHelper.authorization, postId = postId)

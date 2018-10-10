@@ -118,8 +118,10 @@ object ViewFunction {
     fun onRecyclerViewScrolledDown(recyclerView: RecyclerView, layoutManager: (RecyclerView.LayoutManager) -> Unit) {
         recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dx > 0 || dy > 0) {
-                    layoutManager(recyclerView.layoutManager)
+                recyclerView.layoutManager?.let {
+                    if (dx > 0 || dy > 0) {
+                        layoutManager(it)
+                    }
                 }
             }
         })

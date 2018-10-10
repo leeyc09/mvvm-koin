@@ -1,5 +1,6 @@
 package xlab.world.xlab.adapter.recyclerView
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.support.constraint.ConstraintLayout
@@ -20,11 +21,13 @@ import android.view.ViewGroup
 import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.youtube.player.YouTubeStandalonePlayer
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.viewPager.ViewImagePagerAdapter
 import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.utils.font.CustomFont
 import xlab.world.xlab.utils.support.AppConstants
+import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SupportData
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.hashTag.HashTagHelper
@@ -224,8 +227,8 @@ class PostDetailAdapter(private val context: Context,
                         for (i in 0 until tabLayoutDot.tabCount) {
                             val tab: View = (tabLayoutDot.getChildAt(0) as ViewGroup).getChildAt(i)
                             val params = tab.layoutParams as ViewGroup.MarginLayoutParams
-                            val offSetDIP = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, context.resources.displayMetrics).toInt()
-                            params.setMargins(offSetDIP, 0, offSetDIP, 0)
+                            val tabOffSetDIP = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, context.resources.displayMetrics).toInt()
+                            params.setMargins(tabOffSetDIP, 0, tabOffSetDIP, 0)
                             tab.requestLayout()
                         }
                     } else {
@@ -241,13 +244,12 @@ class PostDetailAdapter(private val context: Context,
 
                     val youTubeThumbnail = SupportData.getYoutubeThumbnailUrl(videoId = item.youTubeVideoID, quality = SupportData.YOUTUBE_THUMB_480x360)
                     Glide.with(context)
-                            .load(youTubeThumbnail)
+                            .load(item.imageURL.first())
                             .apply(imageGlideOption)
                             .into(youtubeThumbnailView)
 
                     youtubeThumbnailLayout.setOnClickListener {
-//                        val intent = YouTubeStandalonePlayer.createVideoIntent(context as Activity, context.resources.getString(R.string.app_api_key), item.videoYouTubeID)
-//                        context.startActivity(intent)
+                        RunActivity.youtubePlayerActivity(context = context as Activity, youTubeVideoId = item.youTubeVideoID)
                     }
                 }
             }

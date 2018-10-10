@@ -31,7 +31,7 @@ class ScrollUpButtonHelper(private val smoothScroll: Boolean,
     private var scrollState = -1
     private fun setupListener(recyclerView: RecyclerView) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy < 0 && scrollState == 1) {
                     scrollUpBtn.visibility = View.VISIBLE
                     scrollState = -1

@@ -229,6 +229,7 @@
     <string name="save_cancel_post_message">저장이 취소되었습니다</string>
     <string name="no_liked_post">좋아한 포스트가 없어요</string>
     <string name="no_saved_post">저장한 포스트가 없어요</string>
+    <string name="no_used_goods">사용한 제품이 아직 없어요"\n"제품을 평가해 보세요</string>
 
     <!-- TODO: Comment-->
     <string name="input_comment">댓글 입력</string>

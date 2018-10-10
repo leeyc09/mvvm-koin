@@ -1,6 +1,7 @@
 package xlab.world.xlab.server.provider
 
 import io.reactivex.disposables.Disposable
+import okhttp3.RequestBody
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.`interface`.IPostRequest
 import xlab.world.xlab.server.errorHandle
@@ -8,6 +9,18 @@ import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
 
 interface ApiPostProvider {
+    // post upload 요청
+    fun requestUploadPost(scheduler: SchedulerProvider, authorization: String, requestBody: RequestBody,
+                          responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // post update 요청
+    fun requestUpdatePost(scheduler: SchedulerProvider, authorization: String, postId: String, requestBody: RequestBody,
+                          responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // post delete 요청
+    fun requestDeletePost(scheduler: SchedulerProvider, authorization: String, postId: String,
+                          responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
     // all feed 가져오기
     fun getAllFeed(scheduler: SchedulerProvider, authorization: String, page: Int,
                    responseData: (ResFeedData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
@@ -46,6 +59,39 @@ interface ApiPostProvider {
 }
 
 class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
+    override fun requestUploadPost(scheduler: SchedulerProvider, authorization: String, requestBody: RequestBody,
+                                   responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iPostRequest.upload(authorization = authorization, requestBody = requestBody)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestUpdatePost(scheduler: SchedulerProvider, authorization: String, postId: String, requestBody: RequestBody,
+                                   responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iPostRequest.update(authorization = authorization, postId = postId, requestBody = requestBody)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestDeletePost(scheduler: SchedulerProvider, authorization: String, postId: String,
+                                   responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iPostRequest.delete(authorization = authorization, postId = postId)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
     override fun getAllFeed(scheduler: SchedulerProvider, authorization: String, page: Int,
                             responseData: (ResFeedData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.getAllFeed(authorization = authorization, page = page)

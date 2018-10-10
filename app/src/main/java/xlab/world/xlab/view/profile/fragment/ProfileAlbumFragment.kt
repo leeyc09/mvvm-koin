@@ -21,10 +21,7 @@ import xlab.world.xlab.adapter.recyclerView.PostThumbnailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.listener.PostDetailListener
 import xlab.world.xlab.utils.listener.UserDefaultListener
-import xlab.world.xlab.utils.support.AppConstants
-import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.SPHelper
-import xlab.world.xlab.utils.support.ViewFunction
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
@@ -76,8 +73,11 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
         postDetailListener = postDetailListener ?: PostDetailListener(context = context as Activity, fragmentManager = (context as AppCompatActivity).supportFragmentManager,
                 postMoreEvent = { editPosition, deletePosition ->
-                    editPosition?.let {
-                        PrintLog.d("postMore", "post edit", profileViewModel.tag)
+                    editPosition?.let {  position ->
+                        RunActivity.postUploadContentActivity(context = context as Activity,
+                                postId = postDetailAdapter!!.getItem(position).postId,
+                                youTubeVideoId = postDetailAdapter!!.getItem(position).youTubeVideoID,
+                                imagePathList = ArrayList())
                     }
                     deletePosition?.let { position ->
                         postDetailViewModel.deletePost(authorization = spHelper.authorization, postId = postDetailAdapter!!.getItem(position).postId)
@@ -91,12 +91,10 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                 })
         changeViewTypeListener = changeViewTypeListener ?: View.OnClickListener { view ->
             if (recyclerView.layoutManager is GridLayoutManager) { // post thumbnail adapter
-                PrintLog.d("post view current type", "grid", profileViewModel.tag)
                 // 포스트 썸네일보기 -> 자세히 보기
                 recyclerView.adapter = postDetailAdapter
                 recyclerView.layoutManager = linearLayoutManager
             } else if (recyclerView.layoutManager is LinearLayoutManager) { // post detail adapter
-                PrintLog.d("post view current type", "linear", profileViewModel.tag)
                 // 포스트 자세히 보기 -> 썸네일 보기
                 recyclerView.adapter = postThumbnailAdapter
                 recyclerView.layoutManager = gridLayoutManager

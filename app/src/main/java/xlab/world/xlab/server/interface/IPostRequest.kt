@@ -1,11 +1,25 @@
 package xlab.world.xlab.server.`interface`
 
 import io.reactivex.Observable
+import okhttp3.RequestBody
 import retrofit2.http.*
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.ApiURL
 
 interface IPostRequest {
+
+    @POST(ApiURL.POSTS)
+    fun upload(@Header("Authorization") authorization: String,
+               @Body requestBody: RequestBody): Observable<ResMessageData>
+
+    @POST(ApiURL.POST_UPDATE)
+    fun update(@Header("Authorization") authorization: String,
+               @Query("postId") postId: String,
+               @Body requestBody: RequestBody): Observable<ResMessageData>
+
+    @DELETE(ApiURL.POSTS)
+    fun delete(@Header("Authorization") authorization: String,
+               @Query("postId") postId: String): Observable<ResMessageData>
 
     @GET(ApiURL.POSTS_MAIN)
     fun getAllFeed(@Header("Authorization") authorization: String,

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
+import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.google.android.youtube.player.YouTubeStandalonePlayer
 import kotlinx.android.synthetic.main.action_bar_default.*
@@ -15,21 +16,23 @@ import kotlinx.android.synthetic.main.activity_post_upload_content.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
-import xlab.world.xlab.adapter.recyclerView.PostThumbnailAdapter
-import xlab.world.xlab.adapter.recyclerView.PostUploadPictureAdapter
-import xlab.world.xlab.adapter.recyclerView.RecentHashTagAdapter
-import xlab.world.xlab.adapter.recyclerView.SearchHashTagAdapter
+import xlab.world.xlab.adapter.recyclerView.*
+import xlab.world.xlab.data.adapter.SelectUsedGoodsListData
 import xlab.world.xlab.utils.font.CustomFont
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.hashTag.HashTagHelper
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
+import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.postsUpload.goods.PostUsedGoodsViewModel
 
 class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
     private val postContentViewModel: PostContentViewModel by viewModel()
+    private val postUsedGoodsViewModel: PostUsedGoodsViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
+    private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
 
     private lateinit var hashTagHelper: HashTagHelper
@@ -37,6 +40,7 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var postUploadPictureAdapter: PostUploadPictureAdapter
     private lateinit var recentHashTagAdapter: RecentHashTagAdapter
     private lateinit var searchHashTagAdapter: SearchHashTagAdapter
+    private lateinit var selectedUsedGoodsAdapter: SelectedUsedGoodsAdapter
 
     private val hashTagWritingListener = object: HashTagHelper.WritingListener {
         override fun onWritingHashTag(hashTagSign: Char, hashTag: String, start: Int, end: Int) {
@@ -69,6 +73,9 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
         normalPopupLayout.visibility = View.VISIBLE
         hashTagPopupLayout.visibility = View.GONE
     }
+    private val selectedDeleteListener = View.OnClickListener { view ->
+        postUsedGoodsViewModel.deleteSelectedUsedGoods(selectedGoodsPosition = view.tag as Int, selectedUsedGoods = null)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post_upload_content)
@@ -98,11 +105,8 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
             Activity.RESULT_OK -> {
                 when (requestCode) {
                     RequestCodeData.POST_UPLOAD -> {
-//                        val selectedData = data!!.getParcelableArrayListExtra<UsedItemSelectListData>(PostUploadUsedItemActivity.selectedItemStr)
-//                        val newData = UsedItemSelectData()
-//                        newData.items.addAll(selectedData)
-//                        usedItemSelectAdapter.updateData(newData)
-//                        textViewUsedItemNum.text = usedItemSelectAdapter.itemCount.toString()
+                        val selectedData = data!!.getParcelableArrayListExtra<SelectUsedGoodsListData>(IntentPassName.SELECTED_USED_GOODS)
+                        postUsedGoodsViewModel.setSelectedUsedGoodsData(selectedData = selectedData, dataType = AppConstants.SELECTED_GOODS_WITH_INFO)
                     } // used item update
                 }
             }
@@ -117,6 +121,7 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
         normalPopupLayout.visibility = View.VISIBLE
         hashTagPopupLayout.visibility = View.GONE
 
+        defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
         // hash tag helper setting
@@ -143,8 +148,14 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
         hashTagRecyclerView.adapter = recentHashTagAdapter
         hashTagRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-        postContentViewModel.initViewModelData(imagePaths = intent.getStringArrayListExtra(IntentPassName.IMAGE_PATH_LIST),
-                youTubeVideoId = intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID))
+        // selected used goods adapter & recycler 초기화
+        selectedUsedGoodsAdapter = SelectedUsedGoodsAdapter(context = this, deleteListener = selectedDeleteListener)
+        goodsRecyclerView.adapter = selectedUsedGoodsAdapter
+        goodsRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        goodsRecyclerView.isNestedScrollingEnabled = false
+
+        postContentViewModel.setPostId(postId = intent.getStringExtra(IntentPassName.POST_ID))
+
         postContentViewModel.loadRecentHashTagData(authorization = spHelper.authorization)
 
     }
@@ -156,6 +167,7 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
         hashTagBtn.setOnClickListener(this) // 해시태그 단축키
         userTagBtn.setOnClickListener(this) // 유저태그 단축키
         finishBtn.setOnClickListener(this) // 팝업 내리기
+        usedGoodsTitleLayout.setOnClickListener(this) // 사용한 제품 추가 레이아웃
 
         ViewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
             // 키보드 보일경우, 팝업 레이아웃 보여주고 내용 입력란만 보이게함
@@ -174,6 +186,7 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
+        // TODO: Post content view model event
         // UI 이벤트 observe
         postContentViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
@@ -182,6 +195,9 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
                         progressDialog.show()
                     else if (!it && progressDialog.isShowing)
                         progressDialog.dismiss()
+                }
+                uiData.toastMessage?.let {
+                    defaultToast.showToast(message = it)
                 }
                 uiData.youtubeThumbnailVisible?.let {
                     youtubeThumbnailLayout.visibility = it
@@ -217,11 +233,67 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
+        // set post id 이벤트 observe
+        postContentViewModel.setPostIdEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _->
+                eventData.status?.let { isPostUpload ->
+                    if (isPostUpload) { // 포스트 업로드
+                        postContentViewModel.initViewModelData(imagePaths = intent.getStringArrayListExtra(IntentPassName.IMAGE_PATH_LIST),
+                                youTubeVideoId = intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID))
+                    } else { // 포스트 업데이트
+                        postContentViewModel.loadPost(authorization = spHelper.authorization)
+                    }
+                }
+            }
+        })
+
         // search hash tag 이벤트 observe
-        postContentViewModel.searchHashTagEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadPostsEventData ->
-            loadPostsEventData?.let { _->
-                loadPostsEventData.status?.let { isLoading ->
+        postContentViewModel.searchHashTagEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _->
+                eventData.status?.let { isLoading ->
                     searchHashTagAdapter.dataLoading = isLoading
+                }
+            }
+        })
+
+        // load post 이벤트 observe
+        postContentViewModel.loadPostEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _->
+                eventData.content?.let {
+                    editTextContent.setText(it)
+                }
+                eventData.goodsData?.let {
+                    postUsedGoodsViewModel.setSelectedUsedGoodsData(selectedData = it, dataType = AppConstants.SELECTED_GOODS_WITH_INFO)
+                }
+                eventData.isFail?.let {
+                    actionBackBtn.performClick()
+                }
+            }
+        })
+
+        // save post 이벤트 observe
+        postContentViewModel.savePostEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _->
+                eventData.status?.let { isSuccess ->
+                    if (isSuccess) {
+                        setResult(Activity.RESULT_OK)
+                        finish()
+                    }
+                }
+            }
+        })
+
+        // TODO: Post upload used goods view model event
+        // UI 이벤트 observe
+        postUsedGoodsViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.selectedUsedGoodsData?.let {
+                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
+                    textViewUsedGoodsCnt.setText(it.size.toString(), TextView.BufferType.SPANNABLE)
+                }
+                uiData.updateSelectedUsedGoodsData?.let {
+                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
+                    textViewUsedGoodsCnt.setText(it.size.toString(), TextView.BufferType.SPANNABLE)
                 }
             }
         })
@@ -235,8 +307,7 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
                     finish()
                 }
                 R.id.youtubeThumbnailLayout -> { // 유튜브 썸네일 클릭
-                    val intent = YouTubeStandalonePlayer.createVideoIntent(this, getString(R.string.app_api_key), intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID))
-                    startActivity(intent)
+                    RunActivity.youtubePlayerActivity(context = this, youTubeVideoId = intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID))
                 }
                 R.id.hashTagBtn -> { // 해시태그 단축키
                     editTextContent.text?.insert(editTextContent.selectionStart, AppConstants.HASH_TAG_SIGN.toString())
@@ -254,27 +325,32 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
                     v.requestFocus()
                     ViewFunction.hideKeyboard(this, v)
 
-                    val hashTags = hashTagHelper.getAllHashTags()
-                    PrintLog.d("hashTags", hashTags.toString(), postContentViewModel.tag)
+                    postContentViewModel.savePost(authorization = spHelper.authorization,
+                            content = getPostContent(),
+                            hashTags = hashTagHelper.getAllHashTags(),
+                            goodsData = postUsedGoodsViewModel.getSelectedUsedGoodsData(),
+                            imagePaths = intent.getStringArrayListExtra(IntentPassName.IMAGE_PATH_LIST))
                 }
-//                R.id.usedItemTitleLayout -> { // 사용한 제품 추가 레이아웃
-//                    currentFocus?.clearFocus()
-//                    v.requestFocus()
-//                    ViewFunction.hideKeyboard(this, v)
-//
-//                    val intent = PostUploadUsedItemActivity.newIntent(this, usedItemSelectData.items)
-//                    startActivityForResult(intent, RequestCodeData.POST_UPLOAD)
-//                }
+                R.id.usedGoodsTitleLayout -> { // 사용한 제품 추가 레이아웃
+                    currentFocus?.clearFocus()
+                    v.requestFocus()
+                    ViewFunction.hideKeyboard(this, v)
+
+                    RunActivity.postUploadUsedGoodsActivity(context = this, selectedItem = postUsedGoodsViewModel.getSelectedUsedGoodsData())
+                }
                 else -> {}
             }
         }
     }
 
+    private fun getPostContent(): String = editTextContent.text.toString()
+
     companion object {
-        fun newIntent(context: Context, imagePath: ArrayList<String>, youTubeVideoId: String): Intent {
+        fun newIntent(context: Context, postId: String, youTubeVideoId: String, imagePath: ArrayList<String>): Intent {
             val intent = Intent(context, PostUploadContentActivity::class.java)
-            intent.putExtra(IntentPassName.IMAGE_PATH_LIST, imagePath)
+            intent.putExtra(IntentPassName.POST_ID, postId)
             intent.putExtra(IntentPassName.YOUTUBE_VIDEO_ID, youTubeVideoId)
+            intent.putExtra(IntentPassName.IMAGE_PATH_LIST, imagePath)
 
             return intent
         }

@@ -36,6 +36,8 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiPost.getPostDetail(scheduler = scheduler, authorization = authorization, postId = postId,
                     responseData = {
+                        PrintLog.d("getPostDetail success", it.toString(), tag)
+
                         val postDetailData = PostDetailData()
                         postDetailData.items.add(PostDetailListData(
                                 dataType = AppConstants.ADAPTER_CONTENT,
@@ -62,7 +64,6 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
                                 isMyPost = it.postsData.userId == userId
                         ))
 
-                        PrintLog.d("getPostDetail success", postDetailData.items.first().toString(), tag)
                         uiData.value = UIModel(isLoading = false, postDetailData = postDetailData)
                     },
                     errorData = { errorData ->

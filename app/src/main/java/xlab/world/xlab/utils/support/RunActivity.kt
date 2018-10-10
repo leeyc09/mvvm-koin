@@ -2,6 +2,9 @@ package xlab.world.xlab.utils.support
 
 import android.app.Activity
 import android.net.Uri
+import com.google.android.youtube.player.YouTubeStandalonePlayer
+import xlab.world.xlab.R
+import xlab.world.xlab.data.adapter.SelectUsedGoodsListData
 import xlab.world.xlab.data.response.ResUserLoginData
 import xlab.world.xlab.view.comment.CommentActivity
 import xlab.world.xlab.view.follow.FollowerActivity
@@ -17,6 +20,7 @@ import xlab.world.xlab.view.posts.LikedPostsActivity
 import xlab.world.xlab.view.posts.SavedPostsActivity
 import xlab.world.xlab.view.postsUpload.content.PostUploadContentActivity
 import xlab.world.xlab.view.postsUpload.filter.PostUploadFilterActivity
+import xlab.world.xlab.view.postsUpload.goods.PostUploadUsedGoodsActivity
 import xlab.world.xlab.view.postsUpload.picture.PostUploadPictureActivity
 import xlab.world.xlab.view.profile.ProfileActivity
 import xlab.world.xlab.view.profileEdit.ProfileEditActivity
@@ -140,18 +144,23 @@ object RunActivity {
         PrintLog.d("Run", "Notification", tag)
     }
 
-    fun postUploadPictureActivity(context: Activity, youTubeVideoId: String) {
-        val intent = PostUploadPictureActivity.newIntent(context = context, youTubeVideoId = youTubeVideoId)
+    fun postUploadPictureActivity(context: Activity, postId: String, youTubeVideoId: String) {
+        val intent = PostUploadPictureActivity.newIntent(context = context, postId = postId, youTubeVideoId = youTubeVideoId)
         context.startActivityForResult(intent, RequestCodeData.POST_UPLOAD)
     }
 
-    fun postUploadFilterActivity(context: Activity, imagePathList: ArrayList<String>, youTubeVideoId: String) {
-        val intent = PostUploadFilterActivity.newIntent(context = context, imagePath = imagePathList, youTubeVideoId = youTubeVideoId)
+    fun postUploadFilterActivity(context: Activity, postId: String, youTubeVideoId: String, imagePathList: ArrayList<String>) {
+        val intent = PostUploadFilterActivity.newIntent(context = context, postId = postId, youTubeVideoId = youTubeVideoId, imagePath = imagePathList)
         context.startActivityForResult(intent, RequestCodeData.POST_UPLOAD)
     }
 
-    fun postUploadContentActivity(context: Activity, imagePathList: ArrayList<String>, youTubeVideoId: String) {
-        val intent = PostUploadContentActivity.newIntent(context = context, imagePath = imagePathList, youTubeVideoId = youTubeVideoId)
+    fun postUploadContentActivity(context: Activity, postId: String, youTubeVideoId: String, imagePathList: ArrayList<String>) {
+        val intent = PostUploadContentActivity.newIntent(context = context, postId = postId, youTubeVideoId = youTubeVideoId, imagePath = imagePathList)
+        context.startActivityForResult(intent, RequestCodeData.POST_UPLOAD)
+    }
+
+    fun postUploadUsedGoodsActivity(context: Activity, selectedItem: ArrayList<SelectUsedGoodsListData>) {
+        val intent = PostUploadUsedGoodsActivity.newIntent(context = context, selectedItem = selectedItem)
         context.startActivityForResult(intent, RequestCodeData.POST_UPLOAD)
     }
 
@@ -206,5 +215,10 @@ object RunActivity {
     fun withdrawActivity(context: Activity) {
         val intent = WithdrawActivity.newIntent(context = context)
         context.startActivityForResult(intent, RequestCodeData.WITHDRAW)
+    }
+
+    fun youtubePlayerActivity(context: Activity, youTubeVideoId: String) {
+        val intent = YouTubeStandalonePlayer.createVideoIntent(context, context.resources.getString(R.string.app_api_key), youTubeVideoId)
+        context.startActivity(intent)
     }
 }

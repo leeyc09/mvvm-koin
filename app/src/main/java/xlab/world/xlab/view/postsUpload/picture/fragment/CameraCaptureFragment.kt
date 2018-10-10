@@ -77,8 +77,10 @@ class CameraCaptureFragment: Fragment(), View.OnClickListener {
                     activity.cameraHelper.takePicture { picturePath ->
                         progressDialog!!.dismiss()
                         if (picturePath.isNotEmpty()) {
-                            RunActivity.postUploadFilterActivity(context = activity, imagePathList = arrayListOf(picturePath),
-                                    youTubeVideoId = activity.intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID))
+                            RunActivity.postUploadFilterActivity(context = activity,
+                                    postId = activity.intent.getStringExtra(IntentPassName.POST_ID),
+                                    youTubeVideoId = activity.intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID),
+                                    imagePathList = arrayListOf(picturePath))
                         }
                     }
                 }

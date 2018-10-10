@@ -20,6 +20,8 @@ import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
+import xlab.world.xlab.utils.view.dialog.DialogCreator
+import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
@@ -30,6 +32,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     private val profileViewModel: ProfileViewModel by viewModel()
     private val fontColorSpan: FontColorSpan by inject()
     private val spHelper: SPHelper by inject()
+    private val permissionHelper: PermissionHelper by inject()
 
     private val profileGlideOption = RequestOptions()
             .circleCrop()
@@ -45,6 +48,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
+    private lateinit var postUploadTypeSelectDialog: TwoSelectBottomDialog
 
     private lateinit var viewPagerAdapter: ViewStatePagerAdapter
     private lateinit var profileAlbumFragment: ProfileAlbumFragment
@@ -70,6 +74,16 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onBackPressed() {
         actionBackBtn.performClick()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            AppConstants.PERMISSION_REQUEST_CAMERA_CODE -> {
+                if (permissionHelper.resultRequestPermissions(results = grantResults))
+                    actionPostUploadBtn.performClick()
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -138,6 +152,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
+        postUploadTypeSelectDialog = DialogCreator.postUploadTypeSelectDialog(context = this)
 
         // 프래그먼트 초기화
         profileAlbumFragment = ProfileAlbumFragment.newFragment(userId = userId)
@@ -281,12 +296,13 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     finish()
                 }
                 R.id.actionPostUploadBtn -> { // 포스트 업로드
-//                    if (!xlabPermission.hasPermission(xlabPermission.cameraPermissions)) { // check permission granted
-//                        xlabPermission.requestCameraPermissions() // request permission
-//                        return
-//                    }
+                    // 권한 체크
+                    if (!permissionHelper.hasPermission(context = this, permissions = permissionHelper.cameraPermissions)) {
+                        permissionHelper.requestCameraPermissions(context = this)
+                        return
+                    }
 
-                    RunActivity.postUploadPictureActivity(context = this, youTubeVideoId = "")
+                    postUploadTypeSelectDialog.show(supportFragmentManager, "postUploadTypeSelectDialog")
                 }
                 R.id.actionMyShopBtn -> { // 마이쇼핑
                     RunActivity.myShoppingActivity(context = this)
