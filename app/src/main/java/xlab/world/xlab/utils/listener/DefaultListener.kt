@@ -69,7 +69,7 @@ class DefaultListener(private val context: Activity) {
     // 상품 상세
     val goodsListener = View.OnClickListener { view ->
         if (view.tag is String) {
-            RunActivity.goodsDetailActivity(context = context, goodsCd = view.tag as String)
+            RunActivity.goodsDetailActivity(context = context, goodsCode = view.tag as String)
         }
     }
 

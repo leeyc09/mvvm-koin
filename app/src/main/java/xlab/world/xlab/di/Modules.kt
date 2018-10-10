@@ -14,6 +14,7 @@ import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.comment.CommentViewModel
 import xlab.world.xlab.view.follow.FollowViewModel
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
+import xlab.world.xlab.view.goodsDetail.GoodsDetailViewModel
 import xlab.world.xlab.view.main.MainViewModel
 import xlab.world.xlab.view.notice.NoticeViewModel
 import xlab.world.xlab.view.notification.NotificationViewModel
@@ -84,6 +85,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { PostUsedGoodsViewModel(apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Notification View
     viewModel { NotificationViewModel(apiNotification = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Goods Detail View
+    viewModel { GoodsDetailViewModel(apiGodo = get(), apiShop = get(), apiPet = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
@@ -160,6 +163,11 @@ val remoteModule: Module = applicationContext {
     bean { createRetrofit<INotificationRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
     // notification api implement
     bean { ApiNotification(iNotificationRequest = get()) as ApiNotificationProvider }
+
+    // godo api interface
+    bean { createRetrofit<IGodoRequest>(client = get(), baseUrl = xlabRemoteBaseUrl) }
+    // godo api implement
+    bean { ApiGodo(iGodoRequest = get()) as ApiGodoProvider }
 }
 
 /**

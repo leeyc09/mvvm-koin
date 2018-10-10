@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.goodsDetail.GoodsDetailActivity">
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/buyBtn">
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/collapsingToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorFFFFFF"
+                app:layout_collapseMode="pin"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorFFFFFF"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/actionBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        layout="@layout/action_bar_my_shop"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                    <LinearLayout
+                        android:id="@+id/brandBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:background="@color/colorFFFFFF"
+                        android:layout_marginTop="16dp">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/brand"
+                            android:layout_marginStart="20dp"
+                            android:layout_gravity="center_vertical"/>
+
+                        <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+                            android:id="@+id/textViewBrand"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="13sp"
+                            android:textColor="@color/color000000"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="1dp"/>
+
+                        <ImageView
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:layout_marginStart="2dp"
+                            android:src="@drawable/arrow_see_more"
+                            android:layout_gravity="center_vertical"/>
+
+                    </LinearLayout>
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp">
+
+                        <android.support.v4.view.ViewPager
+                            android:id="@+id/imageViewPager"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            app:layout_constraintDimensionRatio="w, 1:1" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="@color/colorBlack03"
+                            app:layout_constraintStart_toStartOf="@id/imageViewPager"
+                            app:layout_constraintEnd_toEndOf="@id/imageViewPager"
+                            app:layout_constraintTop_toTopOf="@id/imageViewPager"
+                            app:layout_constraintBottom_toBottomOf="@id/imageViewPager"/>
+
+                        <android.support.design.widget.TabLayout
+                            android:id="@+id/tabLayoutDot"
+                            android:layout_width="wrap_content"
+                            android:layout_height="4dp"
+                            app:tabGravity="center"
+                            app:tabMode="fixed"
+                            app:tabMaxWidth="4dp"
+                            app:tabBackground="@drawable/dot_indicator_selector"
+                            app:tabIndicatorHeight="0dp"
+                            app:tabPaddingStart="4dp"
+                            app:tabPaddingEnd="4dp"
+                            android:foregroundGravity="center_horizontal"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/imageViewPager"
+                            android:layout_marginTop="10dp"/>
+
+                    </android.support.constraint.ConstraintLayout>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+                        android:id="@+id/textViewItemName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/color303030"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginTop="36dp"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginStart="20dp">
+
+                        <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                            android:id="@+id/textViewItemPrice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/color5300ED"/>
+
+                        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                            android:id="@+id/textViewPriceUnit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:textColor="@color/color5300ED"
+                            android:text="@string/price_unit"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="1dp"
+                            android:layout_marginTop="1dp"/>
+
+                    </LinearLayout>
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/matchingRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="48dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="47dp">
+
+                        <LinearLayout
+                            android:id="@+id/ratingOpenCloseBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_gravity="center">
+
+                            <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/item_rating"
+                                android:textSize="13sp"
+                                android:textColor="@color/color5300ED"
+                                android:paddingTop="16dp"
+                                android:paddingBottom="16dp"/>
+
+                            <ImageView
+                                android:id="@+id/imageViewRatingArrow"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/arrow_drop_down_down_grey"
+                                android:rotation="180"
+                                android:layout_gravity="center"/>
+
+                        </LinearLayout>
+
+                        <View
+                            android:id="@+id/ratingRecyclerViewLine"
+                            android:layout_width="match_parent"
+                            android:layout_height="0.5dp"
+                            android:background="@color/colorE2E2E2"/>
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/ratingRecyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:scrollbars="none"
+                            android:overScrollMode="never"/>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="16dp"
+                            android:background="@color/colorF5F5F5"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </android.support.design.widget.CollapsingToolbarLayout>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:id="@+id/tabLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"/>
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/detailViewPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </LinearLayout>
+
+        </android.support.v4.widget.NestedScrollView>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+        android:visibility="gone"
+        android:id="@+id/buyBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color000000"
+        android:textSize="13sp"
+        android:textColor="@color/colorFFFFFF"
+        android:text="@string/buy"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:paddingBottom="17dp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>

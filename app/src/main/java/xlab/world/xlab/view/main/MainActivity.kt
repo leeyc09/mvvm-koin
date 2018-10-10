@@ -15,6 +15,7 @@ import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.button.MatchButtonHelper
+import xlab.world.xlab.utils.view.dialog.DefaultDialog
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.dialog.DialogCreator
 import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
+    private lateinit var loginDialog: DefaultDialog
     private lateinit var postUploadTypeSelectDialog: TwoSelectBottomDialog
 
     private lateinit var matchButtonHelper: MatchButtonHelper
@@ -145,6 +147,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         // appBarLayout 애니메이션 없애기
         appBarLayout.stateListAnimator = null
 
+        loginDialog = DialogCreator.loginDialog(context = this)
         postUploadTypeSelectDialog = DialogCreator.postUploadTypeSelectDialog(context = this)
 
         // 프래그먼트 초기화
@@ -215,14 +218,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     RunActivity.combinedSearchActivity(context = this)
                 }
                 R.id.actionNotificationBtn -> { // 노티 버튼
-                    if (spHelper.accessToken.isEmpty()) // 게스트
+                    if (spHelper.accessToken.isEmpty()) { // 게스트
+                        loginDialog.show()
                         return
+                    }
 
                     RunActivity.notificationActivity(context = this)
                 }
                 R.id.actionUploadBtn -> { // 포스트 업로드 버튼
-                    if (spHelper.accessToken.isEmpty()) // 게스트
+                    if (spHelper.accessToken.isEmpty()) { // 게스트
+                        loginDialog.show()
                         return
+                    }
 
                     // 권한 체크
                     if (!permissionHelper.hasPermission(context = this, permissions = permissionHelper.cameraPermissions)) {
@@ -233,8 +240,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     postUploadTypeSelectDialog.show(supportFragmentManager, "postUploadTypeSelectDialog")
                 }
                 R.id.actionProfileBtn -> { // 프로필 버튼
-                    if (spHelper.accessToken.isEmpty()) // 게스트
+                    if (spHelper.accessToken.isEmpty()) { // 게스트
+                        loginDialog.show()
                         return
+                    }
 
                     RunActivity.profileActivity(context = this, userId = spHelper.userId)
                 }

@@ -3,6 +3,11 @@ package xlab.world.xlab.utils.support
 object AppConstants {
     const val LOCAL_HTML_URL = "file:///android_asset/html/"
 
+    // link data type
+    const val LINK_PROFILE = "profile"
+    const val LINK_POST = "post"
+    const val LINK_GOODS = "goods"
+
     // permission request code
     const val PERMISSION_REQUEST_CAMERA_CODE = 1
     const val PERMISSION_REQUEST_GALLERY_CODE = 2

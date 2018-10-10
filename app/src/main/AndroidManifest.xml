@@ -228,6 +228,10 @@
             android:name=".view.notification.NotificationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.goodsDetail.GoodsDetailActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
     </application>
 
 </manifest>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/colorFFFFFF"
+    android:paddingBottom="29dp">
+
+    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/share"
+        android:textSize="12sp"
+        android:textColor="@color/colorA4A4A4"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/copyLinkBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/copylink_black"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/copy_link"
+                android:textSize="12sp"
+                android:textColor="@color/color000000"
+                android:layout_gravity="center"
+                android:layout_marginStart="21dp"
+                android:layout_marginEnd="21dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="15dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/kakaoShareBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/kakaotalk_black"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/kakao"
+                android:textSize="12sp"
+                android:textColor="@color/color000000"
+                android:layout_gravity="center"
+                android:layout_marginStart="21dp"
+                android:layout_marginEnd="21dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="15dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -10,6 +10,7 @@ import xlab.world.xlab.view.comment.CommentActivity
 import xlab.world.xlab.view.follow.FollowerActivity
 import xlab.world.xlab.view.follow.FollowingActivity
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectActivity
+import xlab.world.xlab.view.goodsDetail.GoodsDetailActivity
 import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.notice.NoticeActivity
@@ -124,8 +125,9 @@ object RunActivity {
         context.startActivityForResult(intent, RequestCodeData.TOPIC_DETAIL)
     }
 
-    fun goodsDetailActivity(context: Activity, goodsCd: String) {
-        PrintLog.d("Run", "GoodsDetail", tag)
+    fun goodsDetailActivity(context: Activity, goodsCode: String) {
+        val intent = GoodsDetailActivity.newIntent(context = context, goodsCode = goodsCode)
+        context.startActivityForResult(intent, RequestCodeData.GOODS_DETAIL)
     }
 
     fun goodsSearchActivity(context: Activity, searchText: String, searchCode: String) {

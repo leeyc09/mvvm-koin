@@ -94,6 +94,13 @@ object DialogCreator {
         return dialog
     }
 
+    fun shareDialog(context: Activity, listener: ShareBottomDialog.Listener): ShareBottomDialog {
+        val dialog = ShareBottomDialog.newDialog()
+        dialog.handle(listener = listener)
+
+        return dialog
+    }
+
     fun genderSelectDialog(listener: GenderSelectDialog.Listener): GenderSelectDialog {
         val dialog = GenderSelectDialog.newDialog()
         dialog.handle(listener = listener)
