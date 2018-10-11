@@ -32,6 +32,7 @@ import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
 import xlab.world.xlab.view.resetPassword.UpdatePasswordActivity
 import xlab.world.xlab.view.search.CombinedSearchActivity
 import xlab.world.xlab.view.search.GoodsSearchActivity
+import xlab.world.xlab.view.search.SearchBrandGoodsActivity
 import xlab.world.xlab.view.search.SearchHashTagPostsActivity
 import xlab.world.xlab.view.setting.SettingActivity
 import xlab.world.xlab.view.topicDetail.TopicPetDetailActivity
@@ -218,6 +219,11 @@ object RunActivity {
     fun youtubePlayerActivity(context: Activity, youTubeVideoId: String) {
         val intent = YouTubeStandalonePlayer.createVideoIntent(context, context.resources.getString(R.string.app_api_key), youTubeVideoId)
         context.startActivity(intent)
+    }
+
+    fun searchBrandGoodsActivity(context: Activity, brandName: String, brandCode: String) {
+        val intent = SearchBrandGoodsActivity.newIntent(context = context, brandName = brandName, brandCode = brandCode)
+        context.startActivityForResult(intent, RequestCodeData.GOODS_BRAND_SEARCH)
     }
 
     fun myShoppingActivity(context: Activity) {

@@ -279,6 +279,9 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.brandName?.let {
                     textViewBrand.setText(it, TextView.BufferType.SPANNABLE)
                 }
+                uiData.brandCode?.let {
+                    textViewBrand.tag = it
+                }
                 uiData.goodsMainImages?.let {
                     imageViewPager.adapter = ViewImagePagerAdapter(context = this, imageUrlList = it)
                     setTabLayoutDot()
@@ -347,10 +350,9 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
 
                 }
                 R.id.brandBtn -> { // 브랜드 상품 보기
-//                    val intent = GoodsBrandActivity.newIntent(this,
-//                            brandName = textViewBrand.text.toString(),
-//                            brandCode = goodsDetailData.goods.brandCd)
-//                    startActivityForResult(intent, RequestCodeData.GOODS_BRAND_SEARCH)
+                    RunActivity.searchBrandGoodsActivity(context = this,
+                            brandName = textViewBrand.text.toString(),
+                            brandCode = textViewBrand.tag as String)
                 }
                 R.id.ratingOpenCloseBtn -> { // 제품 평가하기 펼치기&접기
                     goodsDetailViewModel.ratingOpenClose(authorization = spHelper.authorization,

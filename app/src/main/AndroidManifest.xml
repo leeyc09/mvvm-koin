@@ -183,6 +183,18 @@
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
         <activity
+            android:name=".view.search.GoodsSearchActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.search.CombinedSearchActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.search.SearchBrandGoodsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
             android:name=".view.resetPassword.UpdatePasswordActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme"
@@ -197,14 +209,6 @@
             android:theme="@style/customNoActionBarTheme" />
         <activity
             android:name=".view.notice.NoticeActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/customNoActionBarTheme" />
-        <activity
-            android:name=".view.search.GoodsSearchActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/customNoActionBarTheme" />
-        <activity
-            android:name=".view.search.CombinedSearchActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
         <activity

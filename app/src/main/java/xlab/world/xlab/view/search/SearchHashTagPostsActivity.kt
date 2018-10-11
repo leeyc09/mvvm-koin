@@ -22,7 +22,6 @@ import xlab.world.xlab.utils.view.toast.DefaultToast
 
 class SearchHashTagPostsActivity : AppCompatActivity(), View.OnClickListener {
     private val searchViewModel: SearchViewModel by viewModel()
-    private val spHelper: SPHelper by inject()
 
     private var resultCode = Activity.RESULT_CANCELED
 

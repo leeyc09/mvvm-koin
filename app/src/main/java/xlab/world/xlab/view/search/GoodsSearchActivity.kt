@@ -228,9 +228,8 @@ class GoodsSearchActivity : AppCompatActivity(), View.OnClickListener {
         goodsRecyclerView.addItemDecoration(CustomItemDecoration(context = this, left = 0.5f, right = 0.5f))
         (goodsRecyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
-        val searchText = intent.getStringExtra(IntentPassName.SEARCH_TEXT)
-        val searchCode = intent.getStringExtra(IntentPassName.SEARCH_CODE)
-        editTextTagHelper.addTag(text = searchText, code = searchCode)
+        editTextTagHelper.addTag(text = intent.getStringExtra(IntentPassName.SEARCH_TEXT),
+                code = intent.getStringExtra(IntentPassName.SEARCH_CODE))
     }
 
     private fun onBindEvent() {

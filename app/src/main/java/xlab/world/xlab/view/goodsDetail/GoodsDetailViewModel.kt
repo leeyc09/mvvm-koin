@@ -113,8 +113,8 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                         }
 
                         uiData.value = UIModel(isLoading = false, buyBtnStr = buyBtnStr, buyBtnEnable = !it.goods.isSoldOut,
-                                brandName = it.goods.brandName, goodsMainImages = goodsMainImages, goodsName = it.goods.name,
-                                goodsPrice = goodsPrice, goodsPriceUnitVisibility = goodsPriceUnitVisibility,
+                                brandName = it.goods.brandName, brandCode = it.goods.brandCode, goodsMainImages = goodsMainImages,
+                                goodsName = it.goods.name, goodsPrice = goodsPrice, goodsPriceUnitVisibility = goodsPriceUnitVisibility,
                                 goodsDescriptionData = goodsDetailInfoData)
                     },
                     errorData = { errorData ->
@@ -409,7 +409,7 @@ data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = n
                    val goodsRatingData: GoodsDetailRatingData? = null, val goodsRatingUpdateIndex: Int? = null,
                    val ratingViewVisibility: Int? = null, val ratingArrowRotation: Float? = null,
                    val buyBtnStr: String? = null, val buyBtnEnable: Boolean? = null,
-                   val brandName: String? = null, val goodsMainImages: ArrayList<String>? = null,
+                   val brandName: String? = null, val brandCode: String? = null, val goodsMainImages: ArrayList<String>? = null,
                    val goodsName: String? = null, val goodsPrice: String? = null, val goodsPriceUnitVisibility: Int? = null,
                    val goodsDescriptionData: GoodsDetailInfoData? = null,
                    val goodsDescriptionUpdateIndex: Int? = null,
