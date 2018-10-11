@@ -15,30 +15,30 @@ class PetInfo(context: Context) {
     private val tag = "PetInfo"
 
     // pet type
-    val dogCode = context.getString(R.string.tag_pet_type_dog)
-    val catCode = context.getString(R.string.tag_pet_type_cat)
-    val petType = HashMap<String, String>() // code, name
+    val dogCode: String = context.getString(R.string.tag_pet_type_dog)
+    val catCode: String = context.getString(R.string.tag_pet_type_cat)
+    val petType: HashMap<String, String> = HashMap() // code, name
 
     // pet gender type
-    val femaleCode = context.getString(R.string.tag_pet_gender_female)
-    val maleode = context.getString(R.string.tag_pet_gender_male)
-    val petGender = HashMap<String, String>() // code, name
+    val femaleCode: String = context.getString(R.string.tag_pet_gender_female)
+    val maleode: String = context.getString(R.string.tag_pet_gender_male)
+    val petGender: HashMap<String, String> = HashMap() // code, name
 
     // pet hair type
-    private val hairShort = "PAD01"
-    private val hairLong = "PAD02"
-    private val hairCurl = "PAD03"
-    val petHairType = HashMap<String, String>() // code, name
+    private val hairShort: String = "PAD01"
+    private val hairLong: String = "PAD02"
+    private val hairCurl: String = "PAD03"
+    val petHairType: HashMap<String, String> = HashMap() // code, name
 
     // pet hair color
-    val petHairColor = HashMap<String, HairColorData>() // code, name
+    val petHairColor : HashMap<String, HairColorData> = HashMap() // code, name
 
     // pet size
-    private val sizeXSmall = "PAB01"
-    private val sizeSmall = "PAB02"
-    private val sizeMedium = "PAB03"
-    private val sizeLarge = "PAB04"
-    private val sizeXLarge = "PAB05"
+    private val sizeXSmall: String = "PAB01"
+    private val sizeSmall: String = "PAB02"
+    private val sizeMedium: String = "PAB03"
+    private val sizeLarge: String = "PAB04"
+    private val sizeXLarge: String = "PAB05"
     val petSize = HashMap<String, String>() // code, name
 
     // pet info list

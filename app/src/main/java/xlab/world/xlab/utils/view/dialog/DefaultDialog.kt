@@ -33,6 +33,11 @@ class DefaultDialog(context: Context,
         onBindEvent()
     }
 
+    override fun dismiss() {
+        tag = null
+        super.dismiss()
+    }
+
     private fun onSetup() {
         textViewBold.setText(textBold, TextView.BufferType.SPANNABLE)
         textViewRegular.setText(textRegular, TextView.BufferType.SPANNABLE)

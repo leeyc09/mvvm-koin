@@ -83,7 +83,7 @@ class SearchHashTagAdapter(private val context: Context,
             hashTagStr.setSpan(charStyle, 0, searchHashTagData.searchText.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             textViewHashTag.setText(hashTagStr, TextView.BufferType.SPANNABLE)
 
-            textViewHashTagCnt.setText(SupportData.applyPriceFormat(item.hashTagCnt), TextView.BufferType.SPANNABLE)
+            textViewHashTagCnt.setText(SupportData.applyPriceFormat(price = item.hashTagCnt), TextView.BufferType.SPANNABLE)
 
             mainLayout.tag = "${item.hashTag} "
             mainLayout.setOnClickListener(selectListener)

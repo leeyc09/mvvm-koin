@@ -86,7 +86,7 @@ val viewModelModule: Module = applicationContext {
     // ViewModel for Notification View
     viewModel { NotificationViewModel(apiNotification = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Goods Detail View
-    viewModel { GoodsDetailViewModel(apiGodo = get(), apiShop = get(), apiPet = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { GoodsDetailViewModel(apiGodo = get(), apiShop = get(), apiPet = get(), apiUser = get(), apiUserActivity = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

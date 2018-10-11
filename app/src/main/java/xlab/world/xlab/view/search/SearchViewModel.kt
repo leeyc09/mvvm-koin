@@ -110,7 +110,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                     responseData = {
                         PrintLog.d("searchPosts success", it.toString(), tag)
                         val postsData = PostThumbnailData(total = it.total, nextPage = page + 1)
-                        it.searchPosts?.forEach { post ->
+                        it.postsData?.forEach { post ->
                             postsData.items.add(PostThumbnailListData(
                                     dataType = AppConstants.ADAPTER_CONTENT,
                                     postId = post.id,

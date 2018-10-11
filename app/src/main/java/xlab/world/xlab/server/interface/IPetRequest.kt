@@ -36,4 +36,8 @@ interface IPetRequest {
     @GET(ApiURL.PET_USED_ITEMS)
     fun getPetUsedGoods(@Query("page") page: Int,
                         @Query("petId") petId: String): Observable<ResPetUsedGoodsData>
+
+    @GET(ApiURL.PET_GOODS_DETAIL)
+    fun getGoodsDetailPet(@Header("Authorization") authorization: String,
+                          @Query("goodsCode") goodsCode: String): Observable<ResGoodsDetailPetData>
 }

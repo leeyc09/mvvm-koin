@@ -36,7 +36,7 @@ class PostsViewModel(private val apiPost: ApiPostProvider,
                     responseData = {
                         PrintLog.d("requestLikedPosts success", it.toString(), tag)
                         val postsThumbnailData = PostThumbnailData(total = it.total, nextPage = page + 1)
-                        it.likedPostsData?.forEach { post ->
+                        it.postsData?.forEach { post ->
                             postsThumbnailData.items.add(PostThumbnailListData(
                                     dataType = AppConstants.ADAPTER_CONTENT,
                                     postId = post.id,
@@ -70,7 +70,7 @@ class PostsViewModel(private val apiPost: ApiPostProvider,
                     responseData = {
                         PrintLog.d("requestSavedPosts success", it.toString(), tag)
                         val postsThumbnailData = PostThumbnailData(total = it.total, nextPage = page + 1)
-                        it.likedPostsData?.forEach { post ->
+                        it.postsData?.forEach { post ->
                             postsThumbnailData.items.add(PostThumbnailListData(
                                     dataType = AppConstants.ADAPTER_CONTENT,
                                     postId = post.id,

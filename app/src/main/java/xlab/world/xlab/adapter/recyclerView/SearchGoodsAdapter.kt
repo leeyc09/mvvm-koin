@@ -175,7 +175,7 @@ class SearchGoodsAdapter(private val context: Context,
                 }
             }
 
-            textViewPrice.setText(SupportData.applyPriceFormat(item.price), TextView.BufferType.SPANNABLE)
+            textViewPrice.setText(SupportData.applyPriceFormat(price = item.price), TextView.BufferType.SPANNABLE)
             textViewTitle.setText(item.title, TextView.BufferType.SPANNABLE)
             textViewBrand.setText(item.brand, TextView.BufferType.SPANNABLE)
 

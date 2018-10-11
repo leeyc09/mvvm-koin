@@ -100,26 +100,7 @@ class DefaultListener(private val context: Activity) {
             RunActivity.postDetailActivity(context = context, postId = view.tag as String, goComment = true)
         }
     }
-//    private val loginDialog = DefaultDialog(activity,
-//            activity.resources.getString(R.string.is_login_service),
-//            activity.resources.getString(R.string.is_login_service2),
-//            object: DefaultDialog.Listener {
-//                override fun onOkayTouch(tag: Any?) {
-//                    val intent = LoginActivity.newIntent(activity, false, null)
-//                    activity.startActivityForResult(intent, RequestCodeData.LOGIN_USER)
-//                }
-//            })
-//
 
-//
-//    // 로그인하기
-//    val loginDialogListener = object: DefaultDialog.DefaultDialogListener {
-//        override fun onOkayTouch(tag: Any?) {
-//            val intent = LoginActivity.newIntent(activity, false, null)
-//            activity.startActivityForResult(intent, RequestCodeData.LOGIN_USER)
-//        }
-//    }
-//
 //    // 장바구니
 //    val myCartListener = View.OnClickListener {
 //        // login check
@@ -131,13 +112,7 @@ class DefaultListener(private val context: Activity) {
 //        }
 //    }
 //
-//    // 상품 문의
-//    val goodsInquiryListener = View.OnClickListener { view ->
-//        if (view.tag is String) {
-//            val intent = GoodsInquiryInfoActivity.newIntent(activity, view.tag as String)
-//            activity.startActivity(intent)
-//        }
-//    }
+
 //
 //    // 쇼핑 정보 수정
 //    val myShopInfoEditListener = View.OnClickListener {

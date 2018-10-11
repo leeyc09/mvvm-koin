@@ -9,12 +9,12 @@ import android.webkit.WebViewClient
 import xlab.world.xlab.utils.support.PrintLog
 
 
-class DefaultWebViewClient(private val listener: WebViewClientListener,
+class DefaultWebViewClient(private val listener: Listener,
                            private val showInWebView: Boolean?,
                            private val finishURL: String?): WebViewClient() {
     private val tag = "DefaultWebViewClient"
 
-    interface WebViewClientListener {
+    interface Listener {
         fun onPageStarted(url: String?)
         fun shouldOverrideUrlLoading(url: String?): Boolean
         fun onPageFinished(url: String?)

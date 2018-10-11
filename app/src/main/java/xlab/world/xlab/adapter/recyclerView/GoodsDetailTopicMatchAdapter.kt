@@ -1,6 +1,7 @@
 package xlab.world.xlab.adapter.recyclerView
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.RecyclerView
@@ -90,14 +91,30 @@ class GoodsDetailTopicMatchAdapter(private val context: Context) : RecyclerView.
 
             (mainLayout.layoutParams as RecyclerView.LayoutParams).setMargins(offSetDIP, 0, 0, 0)
 
+            // topic profile 이미지
             Glide.with(context)
                     .load(item.imageURL)
                     .apply(glideOption)
                     .into(imageView)
+
+            // topic color
+            val topicColorDrawable = ColorDrawable(item.matchColor)
             Glide.with(context)
-                    .load(item.imageURL)
+                    .load(topicColorDrawable)
                     .apply(glideOption)
                     .into(imageViewOverlay)
+
+            // topic 이름
+            textViewName.setText(item.petName, TextView.BufferType.SPANNABLE)
+            textViewName.isSelected = item.matchingPercent < 50
+
+            // 매칭율이 50% 이상인 경우만 수치 노출
+            if (item.matchingPercent < 50) {
+                textViewMatch.visibility = View.GONE
+            } else {
+                textViewMatch.visibility = View.VISIBLE
+                textViewMatch.setText(String.format("${item.matchingPercent}%%"), TextView.BufferType.SPANNABLE)
+            }
         }
     }
 

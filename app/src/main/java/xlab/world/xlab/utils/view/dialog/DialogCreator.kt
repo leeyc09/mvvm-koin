@@ -40,6 +40,13 @@ object DialogCreator {
                 })
     }
 
+    fun ratingCancelDialog(context: Activity, listener: DefaultDialog.Listener): DefaultDialog {
+        return DefaultDialog(context = context,
+                textBold = context.resources.getString(R.string.dial_rating_cancel),
+                textRegular = context.resources.getString(R.string.dial_rating_cancel2),
+                listener = listener)
+    }
+
     fun deletePetDialog(context: Activity, listener: DefaultOneDialog.Listener): DefaultOneDialog {
         return DefaultOneDialog(context = context,
                 text = context.getString(R.string.dial_delete_topic),

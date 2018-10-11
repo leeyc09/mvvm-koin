@@ -3,6 +3,13 @@ package xlab.world.xlab.utils.support
 object AppConstants {
     const val LOCAL_HTML_URL = "file:///android_asset/html/"
 
+    // used goods from type
+    const val FROM_BUY    = 1
+    const val FROM_RATING = 2
+
+    // used goods type
+    const val GOODS_PET = 1
+
     // link data type
     const val LINK_PROFILE = "profile"
     const val LINK_POST = "post"

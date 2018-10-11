@@ -112,7 +112,7 @@
                     </android.support.constraint.ConstraintLayout>
 
                     <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
-                        android:id="@+id/textViewItemName"
+                        android:id="@+id/textViewGoodsName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="14sp"
@@ -128,7 +128,7 @@
                         android:layout_marginStart="20dp">
 
                         <xlab.world.xlab.utils.view.textView.TextViewBoldHan
-                            android:id="@+id/textViewItemPrice"
+                            android:id="@+id/textViewGoodsPrice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="24sp"
@@ -244,10 +244,9 @@
         android:id="@+id/buyBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/color000000"
+        android:background="@drawable/goods_buy_btn_background"
         android:textSize="13sp"
         android:textColor="@color/colorFFFFFF"
-        android:text="@string/buy"
         android:gravity="center"
         android:paddingTop="16dp"
         android:paddingBottom="17dp"

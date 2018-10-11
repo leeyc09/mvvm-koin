@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorFFFFFF"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="31dp">
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/used_user"
+            android:textSize="13sp"
+            android:textColor="@color/colorA4A4A4"
+            android:layout_gravity="center"
+            android:layout_marginStart="20dp"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularHan
+            android:id="@+id/textViewUserCnt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="13sp"
+            android:textColor="@color/colorBFBFBF"
+            android:layout_gravity="center"
+            android:layout_marginStart="6dp"/>
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/userRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:overScrollMode="never"
+        android:layout_marginTop="22dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="50dp">
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/item_post_tag"
+            android:textSize="13sp"
+            android:textColor="@color/colorA4A4A4"
+            android:layout_gravity="center"
+            android:layout_marginStart="20dp"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularHan
+            android:id="@+id/textViewPostCnt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="13sp"
+            android:textColor="@color/colorBFBFBF"
+            android:layout_gravity="center"
+            android:layout_marginStart="6dp"/>
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/moreBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_marginEnd="16dp">
+
+            <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/more_item"
+                android:textSize="13sp"
+                android:textColor="@color/color4A4A4A"
+                android:layout_gravity="center"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/arrow_see_more"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/postRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:overScrollMode="never"
+        android:layout_marginTop="18dp" />
+
+</LinearLayout>

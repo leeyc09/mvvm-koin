@@ -38,5 +38,8 @@ object TextConstants {
 
     const val EMPTY_GALLERY = "갤러리에 사진이 없습니다"
 
-    const val SELET_PET_BREED = "품종 선택"
+    const val SELECT_PET_BREED = "품종 선택"
+
+    const val SOLD_OUT = "입고예정"
+    const val BUY = "구매하기"
 }

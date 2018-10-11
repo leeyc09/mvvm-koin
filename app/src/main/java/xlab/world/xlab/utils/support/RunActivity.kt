@@ -185,14 +185,6 @@ object RunActivity {
         context.startActivity(intent)
     }
 
-    fun myShoppingActivity(context: Activity) {
-        PrintLog.d("Run", "MyShopping", tag)
-    }
-
-    fun shopInfoUpdateActivity(context: Activity) {
-        PrintLog.d("Run", "ShopInfoUpdate", tag)
-    }
-
     fun settingActivity(context: Activity) {
         val intent = SettingActivity.newIntent(context = context)
         context.startActivityForResult(intent, RequestCodeData.SETTING)
@@ -226,5 +218,25 @@ object RunActivity {
     fun youtubePlayerActivity(context: Activity, youTubeVideoId: String) {
         val intent = YouTubeStandalonePlayer.createVideoIntent(context, context.resources.getString(R.string.app_api_key), youTubeVideoId)
         context.startActivity(intent)
+    }
+
+    fun myShoppingActivity(context: Activity) {
+        PrintLog.d("Run", "MyShopping", tag)
+    }
+
+    fun shopInfoUpdateActivity(context: Activity) {
+        PrintLog.d("Run", "ShopInfoUpdate", tag)
+    }
+
+    fun goodsNecessaryInfoActivity(context: Activity, deliveryNo: String, goodsName: String, origin: String, maker: String) {
+        PrintLog.d("Run", "goodsNecessaryInfoActivity", tag)
+    }
+
+    fun goodsDeliveryInfoActivity(context: Activity, deliveryNo: String) {
+        PrintLog.d("Run", "GoodsDeliveryInfoActivity", tag)
+    }
+
+    fun goodsInquiryActivity(context: Activity, deliveryNo: String) {
+        PrintLog.d("Run", "GoodsInquiryActivity", tag)
     }
 }

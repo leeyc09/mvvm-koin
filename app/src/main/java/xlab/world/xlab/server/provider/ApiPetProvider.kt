@@ -34,8 +34,13 @@ interface ApiPetProvider {
     fun updateTopicHidden(scheduler: SchedulerProvider, authorization: String, petId: String,
                           responseData: (ResUpdateTopicToggleData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
+    // topic pet 사용 상품 가져오기
     fun requestPetUsedGoods(scheduler: SchedulerProvider, petId: String, page: Int,
                             responseData: (ResPetUsedGoodsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // 상품 상세 관련 pet 정보 가져오기
+    fun requestGoodsDetailPets(scheduler: SchedulerProvider, authorization: String, goodsCode: String,
+                               responseData: (ResGoodsDetailPetData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiPet(private val iPetRequest: IPetRequest): ApiPetProvider {
@@ -108,6 +113,17 @@ class ApiPet(private val iPetRequest: IPetRequest): ApiPetProvider {
     override fun requestPetUsedGoods(scheduler: SchedulerProvider, petId: String, page: Int,
                                      responseData: (ResPetUsedGoodsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPetRequest.getPetUsedGoods(petId = petId, page = page)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestGoodsDetailPets(scheduler: SchedulerProvider, authorization: String, goodsCode: String,
+                                        responseData: (ResGoodsDetailPetData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iPetRequest.getGoodsDetailPet(authorization = authorization, goodsCode = goodsCode)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

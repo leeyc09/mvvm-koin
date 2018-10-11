@@ -121,7 +121,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                 PrintLog.d("existChangedData", resultData.toString(), tag)
                 uiData.value = UIModel(saveEnable = resultData)
                 petType?.let {
-                    uiData.value = UIModel(breedName = TextConstants.SELET_PET_BREED, isBreedSelect = false,
+                    uiData.value = UIModel(breedName = TextConstants.SELECT_PET_BREED, isBreedSelect = false,
                             breedDetailVisibility = View.GONE,
                             hairTypeVisibility = View.GONE, hairColorVisibility = View.GONE)
                 }

@@ -82,6 +82,8 @@
     <string name="dial_cancel2">입력한 내용이 저장되지 않습니다.</string>
     <string name="dial_delete_topic">토픽을 삭제하시겠어요?</string>
     <string name="dial_logout">로그아웃 하시겠어요?</string>
+    <string name="dial_rating_cancel">평가를 취소하시겠어요?</string>
+    <string name="dial_rating_cancel2">변경사항이 프로필에 반영됩니다.</string>
 
     <!-- TODO: OnBoarding -->
     <string name="skip_onBoarding">건너뛰기</string>
@@ -265,7 +267,6 @@
     <string name="stats_text">가 만족합니다</string>
     <string name="item_detail">상세정보</string>
     <string name="delivery_free_price">무료배송</string>
-    <string name="delivery_default_price">2,500원</string>
     <string name="delivery_allow_num_price1">3,000원</string>
     <string name="delivery_allow_num_price2">5,000원</string>
     <string name="item_info_necessary">필수 표기 정보</string>
@@ -273,13 +274,9 @@
     <string name="item_info_inquiry">제품 문의</string>
     <string name="item_post_user">이 제품을 사용하는 사람들</string>
     <string name="item_post_tag">태그된 포스트</string>
-    <string name="is_rating_cancel">평가를 취소하시겠어요?</string>
-    <string name="is_rating_cancel2">변경사항이 프로필에 반영됩니다.</string>
     <string name="price_unit">원</string>
     <string name="add_cart">카트담기</string>
     <string name="buy_now">바로구매</string>
-    <string name="buy">구매하기</string>
-    <string name="soldOut">입고예정</string>
 
     <!-- TODO: Necessary Info -->
     <string name="model_name">품명 및 모델명</string>

@@ -24,7 +24,7 @@ class ShopLoginDialog(context: Context,
     private val tag = "ShopLogin"
 
     private lateinit var webViewClient: DefaultWebViewClient
-    private val webViewClientListener = object: DefaultWebViewClient.WebViewClientListener {
+    private val webViewClientListener = object: DefaultWebViewClient.Listener {
         override fun onPageStarted(url: String?) {
         }
         override fun shouldOverrideUrlLoading(url: String?): Boolean {

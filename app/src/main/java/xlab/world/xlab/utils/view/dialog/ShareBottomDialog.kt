@@ -24,6 +24,11 @@ class ShareBottomDialog: BottomSheetDialogFragment(), View.OnClickListener {
         return inflater.inflate(R.layout.dialog_share_bottom, container, false)
     }
 
+    override fun dismiss() {
+        tag = null
+        super.dismiss()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         isCancelable = true
 

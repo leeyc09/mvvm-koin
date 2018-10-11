@@ -1,6 +1,7 @@
 package xlab.world.xlab.server.provider
 
 import io.reactivex.disposables.Disposable
+import xlab.world.xlab.data.request.ReqUsedGoodsData
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.`interface`.IPostRequest
 import xlab.world.xlab.server.`interface`.IUserActivityRequest
@@ -28,6 +29,14 @@ interface ApiUserActivityProvider {
     // topic 사용한 goods 요청
     fun requestTopicUsedGoods(scheduler: SchedulerProvider, userId: String, goodsType: Int, page: Int,
                               responseData: (ResUsedGoodsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // 사용한 상품 등록
+    fun requestPostUsedGoods(scheduler: SchedulerProvider, authorization: String, reqUsedGoodsData: ReqUsedGoodsData,
+                             responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // 사용한 상품 삭제
+    fun requestDeleteUsedGoods(scheduler: SchedulerProvider, authorization: String, goodsCode: String, topicId: String,
+                               responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiUserActivity(private val iUserActivityRequest: IUserActivityRequest): ApiUserActivityProvider {
@@ -78,6 +87,28 @@ class ApiUserActivity(private val iUserActivityRequest: IUserActivityRequest): A
     override fun requestTopicUsedGoods(scheduler: SchedulerProvider, userId: String, goodsType: Int, page: Int,
                                        responseData: (ResUsedGoodsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserActivityRequest.getUsedGoods(userId = userId, goodsType = goodsType, page = page)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestPostUsedGoods(scheduler: SchedulerProvider, authorization: String, reqUsedGoodsData: ReqUsedGoodsData,
+                                      responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserActivityRequest.postUsedGoods(authorization = authorization, reqUsedItemData = reqUsedGoodsData)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestDeleteUsedGoods(scheduler: SchedulerProvider, authorization: String, goodsCode: String, topicId: String,
+                                        responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserActivityRequest.deleteUsedGoods(authorization = authorization, goodsCode = goodsCode, topicId = topicId)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

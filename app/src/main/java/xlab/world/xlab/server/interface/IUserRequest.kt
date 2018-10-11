@@ -76,4 +76,8 @@ interface IUserRequest {
     fun userSearch(@Header("Authorization") authorization: String,
                    @Query("query") searchText: String,
                    @Query("page") page: Int): Observable<ResUserDefaultData>
+
+    @GET(ApiURL.USER_USED_ITEM)
+    fun getGoodsUsedUser(@Query("goodsCode") goodsCode: String,
+                         @Query("page") page: Int): Observable<ResGoodsUsedUserData>
 }

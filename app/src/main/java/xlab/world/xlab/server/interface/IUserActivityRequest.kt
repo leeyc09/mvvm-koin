@@ -2,7 +2,9 @@ package xlab.world.xlab.server.`interface`
 
 import io.reactivex.Observable
 import retrofit2.http.*
+import xlab.world.xlab.data.request.ReqUsedGoodsData
 import xlab.world.xlab.data.response.ResLikeSavePostData
+import xlab.world.xlab.data.response.ResMessageData
 import xlab.world.xlab.data.response.ResThumbnailPostsData
 import xlab.world.xlab.data.response.ResUsedGoodsData
 import xlab.world.xlab.server.ApiURL
@@ -24,6 +26,15 @@ interface IUserActivityRequest {
     @GET(ApiURL.ACTIVITY_POST_SAVE)
     fun getSavedPosts(@Header("Authorization") authorization: String,
                       @Query("page") page: Int): Observable<ResThumbnailPostsData>
+
+    @POST(ApiURL.ACTIVITY_USED_ITEM)
+    fun postUsedGoods(@Header("Authorization") authorization: String,
+                      @Body reqUsedItemData: ReqUsedGoodsData): Observable<ResMessageData>
+
+    @DELETE(ApiURL.ACTIVITY_USED_ITEM)
+    fun deleteUsedGoods(@Header("Authorization") authorization: String,
+                        @Query("goodsCode") goodsCode: String,
+                        @Query("topicId") topicId: String): Observable<ResMessageData>
 
     @GET(ApiURL.ACTIVITY_USED_ITEM)
     fun getUsedGoods(@Query("userId") userId: String,
