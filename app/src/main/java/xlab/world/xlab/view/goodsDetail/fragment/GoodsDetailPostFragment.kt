@@ -17,14 +17,17 @@ import xlab.world.xlab.adapter.recyclerView.PostThumbnailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.IntentPassName
 import xlab.world.xlab.utils.support.PrintLog
+import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.goodsDetail.GoodsDetailViewModel
+import xlab.world.xlab.view.search.SearchViewModel
 
 class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
     private val goodsDetailViewModel: GoodsDetailViewModel by viewModel()
+    private val searchViewModel: SearchViewModel by viewModel()
 
     private var needInitUserData
         get() = arguments?.getBoolean("needInitUserData") ?: true
@@ -99,6 +102,7 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
+        // TODO: GoodsDetailViewModel
         // UI 이벤트 observe
         goodsDetailViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
@@ -122,15 +126,27 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
                 uiData.goodsUsedUserTotal?.let {
                     setBundleGoodsUsedUserTotal(total = it)
                 }
-                uiData.taggedPostsData?.let {
+            }
+        })
+
+        // TODO: SearchViewModel
+        // UI 이벤트 observe
+        searchViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.isLoading?.let {
+                    if (it && !progressDialog!!.isShowing)
+                        progressDialog!!.show()
+                    else if (!it && progressDialog!!.isShowing)
+                        progressDialog!!.dismiss()
+                }
+                uiData.toastMessage?.let {
+                    defaultToast?.showToast(message = it)
+                }
+                uiData.searchPostsData?.let {
                     taggedPostAdapter?.updateData(postThumbnailData = it)
+                    setBundleTagPostsTotal(total = it.total)
+                    setBundleMoreBtnVisibility(visibility = if (it.total > 6) View.VISIBLE else View.GONE)
                     needInitPostsData = false
-                }
-                uiData.taggedPostsTotal?.let {
-                    setBundleTagPostsTotal(total = it)
-                }
-                uiData.postsMoreVisibility?.let {
-                    setBundleMoreBtnVisibility(visibility = it)
                 }
             }
         })
@@ -140,7 +156,7 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.moreBtn -> { // 포스트 더보기
-
+                    RunActivity.goodstaggedPostsActivity(context = context as Activity, goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE))
                 }
             }
         }
@@ -179,7 +195,7 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
 
     fun loadTaggedPosts() {
         context?.let {
-            goodsDetailViewModel.loadTaggedPostsData(goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE))
+            searchViewModel.searchGoodsTaggedPosts(goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE), page = 1, limitCnt = 5)
         } ?:let { needInitPostsData = true }
     }
 

@@ -297,41 +297,6 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
         }
     }
 
-    fun loadTaggedPostsData(goodsCode: String) {
-        // 네트워크 연결 확인
-        if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
-            return
-        }
-
-        uiData.value = UIModel(isLoading = true)
-        launch {
-            apiShop.requestGoodsTaggedPosts(scheduler = scheduler, goodsCode = goodsCode, page = 1,
-                    responseData = {
-                        PrintLog.d("requestGoodsTaggedPosts success", it.toString(), tag)
-                        val taggedPostsData = PostThumbnailData()
-
-                        it.postsData?.forEachIndexed postsData@ { index, post ->
-                            if (index > 5) return@postsData
-                            taggedPostsData.items.add(PostThumbnailListData(
-                                    dataType = AppConstants.ADAPTER_CONTENT,
-                                    postId = post.id,
-                                    postType = post.postType,
-                                    imageURL = post.postFile.firstOrNull(),
-                                    youTubeVideoID = post.youTubeVideoID))
-                        }
-                        uiData.value = UIModel(isLoading = false, taggedPostsData = taggedPostsData, goodsUsedUserTotal = it.total,
-                                postsMoreVisibility = if (it.total > 6) View.VISIBLE else View.GONE)
-                    },
-                    errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false)
-                        errorData?.let {
-                            PrintLog.d("requestGoodsTaggedPosts fail", errorData.message, tag)
-                        }
-                    })
-        }
-    }
-
     fun goodsRating(selectRatingData: GoodsDetailRatingAdapter.RatingTag,
                     goodsRatingData: GoodsDetailRatingListData, authorization: String) {
         if (selectRatingData.rating == goodsRatingData.rating) { // rating 취소

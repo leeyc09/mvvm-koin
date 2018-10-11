@@ -30,10 +30,7 @@ import xlab.world.xlab.view.register.LocalRegisterActivity
 import xlab.world.xlab.view.register.SocialRegisterActivity
 import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
 import xlab.world.xlab.view.resetPassword.UpdatePasswordActivity
-import xlab.world.xlab.view.search.CombinedSearchActivity
-import xlab.world.xlab.view.search.GoodsSearchActivity
-import xlab.world.xlab.view.search.SearchBrandGoodsActivity
-import xlab.world.xlab.view.search.SearchHashTagPostsActivity
+import xlab.world.xlab.view.search.*
 import xlab.world.xlab.view.setting.SettingActivity
 import xlab.world.xlab.view.topicDetail.TopicPetDetailActivity
 import xlab.world.xlab.view.topicEdit.TopicPetEditActivity
@@ -224,6 +221,11 @@ object RunActivity {
     fun searchBrandGoodsActivity(context: Activity, brandName: String, brandCode: String) {
         val intent = SearchBrandGoodsActivity.newIntent(context = context, brandName = brandName, brandCode = brandCode)
         context.startActivityForResult(intent, RequestCodeData.GOODS_BRAND_SEARCH)
+    }
+
+    fun goodstaggedPostsActivity(context: Activity, goodsCode: String) {
+        val intent = GoodsTaggedPostsActivity.newIntent(context = context, goodsCode = goodsCode)
+        context.startActivityForResult(intent, RequestCodeData.GOODS_TAGGED_POST)
     }
 
     fun myShoppingActivity(context: Activity) {

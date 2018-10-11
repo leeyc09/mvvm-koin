@@ -34,6 +34,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
     val searchPostsEventData = SingleLiveEvent<SearchEvent>()
     val searchUserEventData = SingleLiveEvent<SearchEvent>()
     val searchGoodsEventData = SingleLiveEvent<SearchEvent>()
+    val searchGoodsTaggedPostsEventData = SingleLiveEvent<SearchEvent>()
     val uiData = MutableLiveData<UIModel>()
 
     fun changeSearchSortType(goodsData: SearchGoodsListData, sortType: Int) {
@@ -227,6 +228,43 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
                             PrintLog.d("searchGoods fail", errorData.message, tag)
+                        }
+                    })
+        }
+    }
+
+    fun searchGoodsTaggedPosts(goodsCode: String,  page: Int, limitCnt: Int? = null) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        searchGoodsTaggedPostsEventData.value = SearchEvent(status = true)
+        launch {
+            apiShop.requestGoodsTaggedPosts(scheduler = scheduler, goodsCode = goodsCode, page = page,
+                    responseData = {
+                        PrintLog.d("requestGoodsTaggedPosts success", it.toString(), tag)
+                        val taggedPostsData = PostThumbnailData(total = it.total, nextPage = page + 1)
+
+                        it.postsData?.forEachIndexed postsData@ { index, post ->
+                            limitCnt?.let { limitCnt ->
+                                if (index > limitCnt) return@postsData
+                            }
+                            taggedPostsData.items.add(PostThumbnailListData(
+                                    dataType = AppConstants.ADAPTER_CONTENT,
+                                    postId = post.id,
+                                    postType = post.postType,
+                                    imageURL = post.postFile.firstOrNull(),
+                                    youTubeVideoID = post.youTubeVideoID))
+                        }
+                        uiData.value = UIModel(isLoading = false, searchPostsData = taggedPostsData)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.d("requestGoodsTaggedPosts fail", errorData.message, tag)
                         }
                     })
         }
