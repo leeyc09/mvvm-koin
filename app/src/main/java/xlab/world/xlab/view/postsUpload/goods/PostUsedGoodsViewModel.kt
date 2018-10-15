@@ -58,7 +58,7 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
                         PrintLog.d("requestTopicUsedGoods success", it.toString(), tag)
                         PrintLog.d("selectedUsedGoodsData", selectedUsedGoodsData.toString(), tag)
                         val usedGoodsData = SelectUsedGoodsData(total = it.total, nextPage = page + 1)
-                        it.usedGoods?.forEach { goods ->
+                        it.goods?.forEach { goods ->
                             var isSelect = false
                             selectedUsedGoodsData.forEach selectedUsedGoodsData@ { selectedGoods ->
                                 if (goods.code == selectedGoods.goodsCode) {

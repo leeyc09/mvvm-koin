@@ -113,6 +113,9 @@
     <string name="toast_no_exist_gallery_image">갤러리에 사진이 없습니다</string>
     <string name="toast_shop_profile_update_success">쇼핑 정보가 수정되었습니다</string>
 
+    <!-- TODO: No Exist Data -->
+    <string name="empty_recent_view_goods">최근 본 제품이 없어요</string>
+
     <!-- TODO: OnBoarding -->
     <string name="skip_onBoarding">건너뛰기</string>
     <string name="end_onBoarding">시작하기</string>

@@ -27,4 +27,8 @@ interface IShopRequest {
     @GET(ApiURL.SHOP_TAGGED_POSTS)
     fun getGoodsTaggedPosts(@Query("goodsCd") goodsCode: String,
                             @Query("page") page: Int): Observable<ResThumbnailPostsData>
+
+    @GET(ApiURL.SHOP_VIEW_GOODS)
+    fun getRecnetViewGoods(@Header("Authorization") authorization: String,
+                           @Query("page") page: Int): Observable<ResGoodsThumbnailData>
 }

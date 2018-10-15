@@ -22,11 +22,11 @@ import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.goodsDetail.GoodsDetailViewModel
-import xlab.world.xlab.view.search.SearchViewModel
+import xlab.world.xlab.view.posts.PostsViewModel
 
 class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
     private val goodsDetailViewModel: GoodsDetailViewModel by viewModel()
-    private val searchViewModel: SearchViewModel by viewModel()
+    private val postsViewModel: PostsViewModel by viewModel()
 
     private var needInitUserData
         get() = arguments?.getBoolean("needInitUserData") ?: true
@@ -128,9 +128,9 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
             }
         })
 
-        // TODO: SearchViewModel
+        // TODO: PostsViewModel
         // UI 이벤트 observe
-        searchViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+        postsViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
                     if (it && !progressDialog!!.isShowing)
@@ -141,7 +141,7 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast?.showToast(message = it)
                 }
-                uiData.searchPostsData?.let {
+                uiData.postsData?.let {
                     taggedPostAdapter?.updateData(postThumbnailData = it)
                     setBundleTagPostsTotal(total = it.total)
                     setBundleMoreBtnVisibility(visibility = if (it.total > 6) View.VISIBLE else View.GONE)
@@ -194,7 +194,7 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
 
     fun loadTaggedPosts() {
         context?.let {
-            searchViewModel.searchGoodsTaggedPosts(goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE), page = 1, limitCnt = 5)
+            postsViewModel.loadGoodsTaggedPosts(goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE), page = 1, limitCnt = 5)
         } ?:let { needInitPostsData = true }
     }
 

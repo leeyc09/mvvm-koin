@@ -195,7 +195,7 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
 
                 }
                 R.id.recentShowGoodsBtn -> { // 최근 본 상품
-
+                    RunActivity.recentViewGoodsActivity(context = this)
                 }
                 R.id.editShopInfoBtn -> { // 쇼핑 정보 수정
                     RunActivity.shopProfileEditActivity(context = this)

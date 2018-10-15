@@ -28,6 +28,7 @@ import xlab.world.xlab.view.postsUpload.filter.ImageFilterViewModel
 import xlab.world.xlab.view.postsUpload.goods.PostUsedGoodsViewModel
 import xlab.world.xlab.view.profile.ProfileViewModel
 import xlab.world.xlab.view.profileEdit.ProfileEditViewModel
+import xlab.world.xlab.view.recentView.RecentViewViewModel
 import xlab.world.xlab.view.register.RegisterViewModel
 import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
 import xlab.world.xlab.view.search.SearchViewModel
@@ -72,7 +73,7 @@ val viewModelModule: Module = applicationContext {
     // ViewModel for Setting View
     viewModel { SettingViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Posts View
-    viewModel { PostsViewModel(apiPost = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { PostsViewModel(apiShop = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Withdraw View
     viewModel { WithDrawViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Notice View
@@ -93,6 +94,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { GoodsInfoVewModel(scheduler = get()) }
     // ViewModel for My Shopping View
     viewModel { MyShoppingViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Recent View View
+    viewModel { RecentViewViewModel(apiShop = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

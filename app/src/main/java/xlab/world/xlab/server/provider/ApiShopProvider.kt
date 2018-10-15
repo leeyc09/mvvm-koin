@@ -28,6 +28,10 @@ interface ApiShopProvider {
     // 상품 태그한 포스트 가져오기
     fun requestGoodsTaggedPosts(scheduler: SchedulerProvider, goodsCode: String, page: Int,
                                 responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // 최근 본 상품 가져오기
+    fun requestRecentViewGoods(scheduler: SchedulerProvider, authorization: String, page: Int,
+                               responseData: (ResGoodsThumbnailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
@@ -80,6 +84,17 @@ class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
     override fun requestGoodsTaggedPosts(scheduler: SchedulerProvider, goodsCode: String, page: Int,
                                          responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iShopRequest.getGoodsTaggedPosts(goodsCode = goodsCode, page = page)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestRecentViewGoods(scheduler: SchedulerProvider, authorization: String, page: Int,
+                                        responseData: (ResGoodsThumbnailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iShopRequest.getRecnetViewGoods(authorization = authorization, page = page)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

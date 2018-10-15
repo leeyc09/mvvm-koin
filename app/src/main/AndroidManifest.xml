@@ -195,7 +195,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
         <activity
-            android:name=".view.search.GoodsTaggedPostsActivity"
+            android:name=".view.posts.GoodsTaggedPostsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
         <activity
@@ -261,6 +261,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".view.recentView.RecentViewGoodsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
     </application>
 
 </manifest>

@@ -28,7 +28,7 @@ interface ApiUserActivityProvider {
 
     // topic 사용한 goods 요청
     fun requestTopicUsedGoods(scheduler: SchedulerProvider, userId: String, goodsType: Int, page: Int,
-                              responseData: (ResUsedGoodsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+                              responseData: (ResGoodsThumbnailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
     // 사용한 상품 등록
     fun requestPostUsedGoods(scheduler: SchedulerProvider, authorization: String, reqUsedGoodsData: ReqUsedGoodsData,
@@ -85,7 +85,7 @@ class ApiUserActivity(private val iUserActivityRequest: IUserActivityRequest): A
     }
 
     override fun requestTopicUsedGoods(scheduler: SchedulerProvider, userId: String, goodsType: Int, page: Int,
-                                       responseData: (ResUsedGoodsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+                                       responseData: (ResGoodsThumbnailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserActivityRequest.getUsedGoods(userId = userId, goodsType = goodsType, page = page)
                 .with(scheduler)
                 .subscribe({

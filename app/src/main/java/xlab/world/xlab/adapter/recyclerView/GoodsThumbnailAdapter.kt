@@ -5,7 +5,6 @@ import android.graphics.drawable.ColorDrawable
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,23 +14,22 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import xlab.world.xlab.R
-import xlab.world.xlab.data.adapter.ProfileTopicGoodsData
-import xlab.world.xlab.data.adapter.ProfileTopicGoodsListData
-import xlab.world.xlab.data.adapter.ProfileTopicListData
+import xlab.world.xlab.data.adapter.GoodsThumbnailData
+import xlab.world.xlab.data.adapter.GoodsThumbnailListData
 import xlab.world.xlab.utils.support.AppConstants
 
-class ProfileTopicGoodsAdapter(private val context: Context,
-                               private val moreItemListener: View.OnClickListener?,
-                               private val goodsListener: View.OnClickListener) : RecyclerView.Adapter<ProfileTopicGoodsAdapter.ViewHolder>() {
+class GoodsThumbnailAdapter(private val context: Context,
+                            private val moreItemListener: View.OnClickListener?,
+                            private val goodsListener: View.OnClickListener) : RecyclerView.Adapter<GoodsThumbnailAdapter.ViewHolder>() {
 
-    private val profileTopicGoodsData: ProfileTopicGoodsData = ProfileTopicGoodsData()
+    private val goodsThumbnailData: GoodsThumbnailData = GoodsThumbnailData()
     var dataLoading: Boolean
-        get() = this.profileTopicGoodsData.isLoading
-        set(value) { this.profileTopicGoodsData.isLoading = value }
+        get() = this.goodsThumbnailData.isLoading
+        set(value) { this.goodsThumbnailData.isLoading = value }
     var dataTotal: Int = -1
-        get() = this.profileTopicGoodsData.total
+        get() = this.goodsThumbnailData.total
     var dataNextPage: Int = 1
-        get() = this.profileTopicGoodsData.nextPage
+        get() = this.goodsThumbnailData.nextPage
 
     private val imagePlaceHolder = ColorDrawable(ResourcesCompat.getColor(context.resources, R.color.colorE2E2E2, null))
     private val glideOption = RequestOptions()
@@ -39,29 +37,29 @@ class ProfileTopicGoodsAdapter(private val context: Context,
             .placeholder(imagePlaceHolder)
             .error(imagePlaceHolder)
 
-    fun updateData(profileTopicGoodsData: ProfileTopicGoodsData) {
-        this.profileTopicGoodsData.items.clear()
-        this.profileTopicGoodsData.items.addAll(profileTopicGoodsData.items)
+    fun updateData(goodsThumbnailData: GoodsThumbnailData) {
+        this.goodsThumbnailData.items.clear()
+        this.goodsThumbnailData.items.addAll(goodsThumbnailData.items)
 
-        this.profileTopicGoodsData.isLoading = false
-        this.profileTopicGoodsData.total = profileTopicGoodsData.total
-        this.profileTopicGoodsData.nextPage = 2
+        this.goodsThumbnailData.isLoading = false
+        this.goodsThumbnailData.total = goodsThumbnailData.total
+        this.goodsThumbnailData.nextPage = 2
 
         notifyDataSetChanged()
     }
 
-    fun addData(profileTopicGoodsData: ProfileTopicGoodsData) {
+    fun addData(goodsThumbnailData: GoodsThumbnailData) {
         val size: Int = itemCount
-        this.profileTopicGoodsData.items.addAll(profileTopicGoodsData.items)
+        this.goodsThumbnailData.items.addAll(goodsThumbnailData.items)
 
-        this.profileTopicGoodsData.isLoading = false
-        this.profileTopicGoodsData.nextPage += 1
+        this.goodsThumbnailData.isLoading = false
+        this.goodsThumbnailData.nextPage += 1
 
         notifyItemRangeChanged(size, itemCount)
     }
 
     override fun getItemViewType(position: Int): Int {
-        return this.profileTopicGoodsData.items[position].dataType
+        return this.goodsThumbnailData.items[position].dataType
     }
 
     override
@@ -80,12 +78,12 @@ class ProfileTopicGoodsAdapter(private val context: Context,
 
     override
     fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.display(item = profileTopicGoodsData.items[position], position = position)
+        holder.display(item = goodsThumbnailData.items[position], position = position)
     }
 
     override
     fun getItemCount(): Int {
-        return profileTopicGoodsData.items.size
+        return goodsThumbnailData.items.size
     }
 
     // header View Holder
@@ -93,7 +91,7 @@ class ProfileTopicGoodsAdapter(private val context: Context,
         private val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
         private val moreLayout: LinearLayout = view.findViewById(R.id.moreLayout)
 
-        override fun display(item: ProfileTopicGoodsListData, position: Int) {
+        override fun display(item: GoodsThumbnailListData, position: Int) {
             textViewTitle.setText(item.headerTitle, TextView.BufferType.SPANNABLE)
 
             // 더보기 이벤트 있는경우 리스너 설정 & 보이기
@@ -113,7 +111,7 @@ class ProfileTopicGoodsAdapter(private val context: Context,
         private val imageViewGoodsTag: ImageView = view.findViewById(R.id.imageViewGoodsTag)
         private val percentLayout: LinearLayout = view.findViewById(R.id.percentLayout)
 
-        override fun display(item: ProfileTopicGoodsListData, position: Int) {
+        override fun display(item: GoodsThumbnailListData, position: Int) {
             // goods tag 이미지
             imageViewGoodsTag.visibility = View.GONE
 
@@ -133,6 +131,6 @@ class ProfileTopicGoodsAdapter(private val context: Context,
     }
 
     abstract class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        abstract fun display(item: ProfileTopicGoodsListData, position: Int)
+        abstract fun display(item: GoodsThumbnailListData, position: Int)
     }
 }

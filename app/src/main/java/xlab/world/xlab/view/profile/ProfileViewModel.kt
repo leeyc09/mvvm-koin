@@ -128,9 +128,9 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         launch {
             apiUserActivity.requestTopicUsedGoods(scheduler = scheduler, userId = userId, goodsType = goodsType, page = page,
                     responseData = {
-                        val topicUsedGoodsData = ProfileTopicGoodsData(total = it.total, nextPage = page + 1)
-                        it.usedGoods?.forEach { goods ->
-                            topicUsedGoodsData.items.add(ProfileTopicGoodsListData(
+                        val topicUsedGoodsData = GoodsThumbnailData(total = it.total, nextPage = page + 1)
+                        it.goods?.forEach { goods ->
+                            topicUsedGoodsData.items.add(GoodsThumbnailListData(
                                     dataType = AppConstants.ADAPTER_CONTENT,
                                     goodsImage = goods.image,
                                     goodsCd = goods.code
@@ -139,7 +139,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
 
                         // 첫 페이지 & used goods 존재 -> 헤더 설정
                         if (topicUsedGoodsData.items.isNotEmpty() && page == 1) {
-                            topicUsedGoodsData.items.add(0, ProfileTopicGoodsListData(
+                            topicUsedGoodsData.items.add(0, GoodsThumbnailListData(
                                     dataType = AppConstants.ADAPTER_HEADER,
                                     headerTitle = context.getString(R.string.goods)))
                         }
@@ -282,5 +282,5 @@ data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = n
                    val profileType: Int? = null, val topicData: ProfileTopicData? = null,
                    val profileImage: String? = null, val nickName: String? = null, val introduction: String? = null,
                    val followerCnt: Int? = null, val followingCnt: Int? = null, val followState: Boolean? = null,
-                   val topicUsedGoodsData: ProfileTopicGoodsData? = null,
+                   val topicUsedGoodsData: GoodsThumbnailData? = null,
                    val postsThumbData: PostThumbnailData? = null, val postsDetailData: PostDetailData? = null)

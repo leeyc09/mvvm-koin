@@ -23,6 +23,7 @@ import xlab.world.xlab.view.notification.NotificationActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
 import xlab.world.xlab.view.petBreed.PetBreedActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
+import xlab.world.xlab.view.posts.GoodsTaggedPostsActivity
 import xlab.world.xlab.view.posts.LikedPostsActivity
 import xlab.world.xlab.view.posts.SavedPostsActivity
 import xlab.world.xlab.view.postsUpload.content.PostUploadContentActivity
@@ -31,6 +32,7 @@ import xlab.world.xlab.view.postsUpload.goods.PostUploadUsedGoodsActivity
 import xlab.world.xlab.view.postsUpload.picture.PostUploadPictureActivity
 import xlab.world.xlab.view.profile.ProfileActivity
 import xlab.world.xlab.view.profileEdit.ProfileEditActivity
+import xlab.world.xlab.view.recentView.RecentViewGoodsActivity
 import xlab.world.xlab.view.register.LocalRegisterActivity
 import xlab.world.xlab.view.register.SocialRegisterActivity
 import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
@@ -257,5 +259,10 @@ object RunActivity {
     fun goodsInquiryActivity(context: Activity, deliveryNo: String) {
         val intent = GoodsInquiryActivity.newIntent(context = context, deliveryNo = deliveryNo)
         context.startActivity(intent)
+    }
+
+    fun recentViewGoodsActivity(context: Activity) {
+        val intent = RecentViewGoodsActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.RECENT_VIEW_GOODS)
     }
 }

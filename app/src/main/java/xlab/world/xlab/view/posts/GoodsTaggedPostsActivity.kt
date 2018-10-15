@@ -1,4 +1,4 @@
-package xlab.world.xlab.view.search
+package xlab.world.xlab.view.posts
 
 import android.app.Activity
 import android.content.Context
@@ -21,7 +21,7 @@ import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 
 class GoodsTaggedPostsActivity : AppCompatActivity(), View.OnClickListener {
-    private val searchViewModel: SearchViewModel by viewModel()
+    private val postsViewModel: PostsViewModel by viewModel()
 
     private var resultCode = Activity.RESULT_CANCELED
 
@@ -60,13 +60,13 @@ class GoodsTaggedPostsActivity : AppCompatActivity(), View.OnClickListener {
                     this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.POST_DETAIL -> { // 포스트 상세
-                        searchViewModel.searchGoodsTaggedPosts(goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), page = 1)
+                        postsViewModel.loadGoodsTaggedPosts(goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), page = 1)
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
                 this.resultCode = ResultCodeData.LOGIN_SUCCESS
-                searchViewModel.searchGoodsTaggedPosts(goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), page = 1)
+                postsViewModel.loadGoodsTaggedPosts(goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), page = 1)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
                 setResult(ResultCodeData.LOGOUT_SUCCESS)
@@ -97,7 +97,7 @@ class GoodsTaggedPostsActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView.layoutManager = GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(CustomItemDecoration(context = this, offset = 0.5f))
 
-        searchViewModel.searchGoodsTaggedPosts(goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), page = 1)
+        postsViewModel.loadGoodsTaggedPosts(goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), page = 1)
     }
 
     private fun onBindEvent() {
@@ -105,14 +105,14 @@ class GoodsTaggedPostsActivity : AppCompatActivity(), View.OnClickListener {
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = postsAdapter.dataLoading, total = postsAdapter.dataTotal) {_->
-                searchViewModel.searchGoodsTaggedPosts(goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), page = postsAdapter.dataNextPage)
+                postsViewModel.loadGoodsTaggedPosts(goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), page = postsAdapter.dataNextPage)
             }
         }
     }
 
     private fun observeViewModel() {
         // UI 이벤트 observe
-        searchViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+        postsViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
                     if (it && !progressDialog.isShowing)
@@ -123,7 +123,7 @@ class GoodsTaggedPostsActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
-                uiData.searchPostsData?.let {
+                uiData.postsData?.let {
                     if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
                         postsAdapter.updateData(postThumbnailData = it)
                         actionBarNumber.setText(it.total.toString(), TextView.BufferType.SPANNABLE)
@@ -135,7 +135,7 @@ class GoodsTaggedPostsActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // search post 이벤트 observe
-        searchViewModel.searchGoodsTaggedPostsEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+        postsViewModel.goodsTaggedPostsEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let { _ ->
                 eventData.status?.let { isLoading ->
                     postsAdapter.dataLoading = isLoading

@@ -1,7 +1,6 @@
 package xlab.world.xlab.view.profile.fragment
 
 import android.app.Activity
-import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
@@ -11,9 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_profile_pet.*
 import org.koin.android.architecture.ext.viewModel
-import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
-import xlab.world.xlab.adapter.recyclerView.ProfileTopicGoodsAdapter
+import xlab.world.xlab.adapter.recyclerView.GoodsThumbnailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.ViewFunction
@@ -31,7 +29,7 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
             arguments?.putBoolean("needInitData", value)
         }
 
-    private var profileTopicGoodsAdapter: ProfileTopicGoodsAdapter? = null
+    private var goodsThumbnailAdapter: GoodsThumbnailAdapter? = null
 
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
@@ -58,14 +56,14 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
 
         // topic goods recycler view & adapter 초기화
-        profileTopicGoodsAdapter = profileTopicGoodsAdapter ?: ProfileTopicGoodsAdapter(context = context!!,
+        goodsThumbnailAdapter = goodsThumbnailAdapter ?: GoodsThumbnailAdapter(context = context!!,
                 moreItemListener = null,
                 goodsListener = defaultListener!!.goodsListener)
-        recyclerView.adapter = profileTopicGoodsAdapter
+        recyclerView.adapter = goodsThumbnailAdapter
         val gridLayoutManager = GridLayoutManager(context, 3, GridLayoutManager.VERTICAL, false)
         gridLayoutManager.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when(profileTopicGoodsAdapter!!.getItemViewType(position = position)) {
+                return when(goodsThumbnailAdapter!!.getItemViewType(position = position)) {
                     AppConstants.ADAPTER_HEADER -> 3
                     AppConstants.ADAPTER_CONTENT -> 1
                     else -> 1
@@ -90,8 +88,8 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
-            ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = profileTopicGoodsAdapter!!.dataLoading, total = profileTopicGoodsAdapter!!.dataTotal) { _ ->
-                profileViewModel.loadTopicUsedGoodsData(context = context!!, userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = profileTopicGoodsAdapter!!.dataNextPage)
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = goodsThumbnailAdapter!!.dataLoading, total = goodsThumbnailAdapter!!.dataTotal) { _ ->
+                profileViewModel.loadTopicUsedGoodsData(context = context!!, userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = goodsThumbnailAdapter!!.dataNextPage)
             }
         }
     }
@@ -114,11 +112,11 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
                         // used goods 없으면 no used goods 띄우기
                         setBundleVisibilityData(noGoodsLayout = if (it.items.isEmpty()) View.VISIBLE else View.GONE)
 
-                        profileTopicGoodsAdapter?.updateData(profileTopicGoodsData = it)
+                        goodsThumbnailAdapter?.updateData(goodsThumbnailData = it)
                         swipeRefreshLayout.isRefreshing = false
                     }
                     else
-                        profileTopicGoodsAdapter?.addData(profileTopicGoodsData = it)
+                        goodsThumbnailAdapter?.addData(goodsThumbnailData = it)
                 }
             }
         })
@@ -127,7 +125,7 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
         profileViewModel.loadTopicUsedGoodsEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadTopicUsedGoodsEvent ->
             loadTopicUsedGoodsEvent?.let { _ ->
                 loadTopicUsedGoodsEvent.status?.let { isLoading ->
-                    profileTopicGoodsAdapter?.dataLoading = isLoading
+                    goodsThumbnailAdapter?.dataLoading = isLoading
                     needInitData = false
                 }
             }
