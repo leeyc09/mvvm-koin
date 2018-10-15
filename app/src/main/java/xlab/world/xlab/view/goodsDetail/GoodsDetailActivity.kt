@@ -24,10 +24,7 @@ import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.toast.AddCartToast
-import xlab.world.xlab.utils.view.dialog.DefaultDialog
-import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
-import xlab.world.xlab.utils.view.dialog.DialogCreator
-import xlab.world.xlab.utils.view.dialog.ShareBottomDialog
+import xlab.world.xlab.utils.view.dialog.*
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
@@ -50,6 +47,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var suggestAddTopicDialog: DefaultDialog
     private lateinit var shareDialog: ShareBottomDialog
     private lateinit var ratingCancelDialog: DefaultDialog
+    private lateinit var buyGoodsOptionDialog: BuyGoodsOptionDialog
 
     private lateinit var tabLayoutHelper: TabLayoutHelper
 
@@ -64,7 +62,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var defaultListener: DefaultListener
     private val shareDialogListener = object: ShareBottomDialog.Listener {
         override fun onCopyLink(tag: Any?) {
-            defaultToast.showToast(resources.getString(R.string.copy_link_success))
+            defaultToast.showToast(resources.getString(R.string.toast_copy_link_success))
         }
 
         override fun onShareKakao(tag: Any?) {
@@ -82,6 +80,14 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
             goodsDetailViewModel.ratingCancel(position = tag as Int,
                     goodsRatingData = goodsDetailRatingAdapter.getItem(position = tag),
                     authorization = spHelper.authorization)
+        }
+    }
+    private val buyGoodsListener = object: BuyGoodsOptionDialog.Listener {
+        override fun addCart(count: Int) {
+            goodsDetailViewModel.addCart(authorization = spHelper.authorization, count = count)
+        }
+
+        override fun buyNow(count: Int) {
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -142,7 +148,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
 //                        }
                     }
                     RequestCodeData.COMPLETE_BUYING -> { // 결제 완료
-                        goodsDetailViewModel.loadGoodsDetailData(goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), needDescription = false)
+                        goodsDetailViewModel.loadGoodsDetailData(context = this, goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), needDescription = false)
                         goodsDetailViewModel.loadGoodsPetData(authorization = spHelper.authorization)
                         goodsDetailInfoFragment.loadGoodsDescription()
                     }
@@ -150,7 +156,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
                 this.resultCode = ResultCodeData.LOGIN_SUCCESS
-                goodsDetailViewModel.loadGoodsDetailData(goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), needDescription = false)
+                goodsDetailViewModel.loadGoodsDetailData(context = this, goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), needDescription = false)
                 goodsDetailViewModel.loadGoodsPetData(authorization = spHelper.authorization)
                 goodsDetailInfoFragment.loadGoodsDescription()
                 goodsDetailStatsFragment.loadGoodsStatsData()
@@ -175,6 +181,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         suggestAddTopicDialog = DialogCreator.suggestAddTopicDialog(context = this)
         shareDialog = DialogCreator.shareDialog(context = this, listener = shareDialogListener)
         ratingCancelDialog = DialogCreator.ratingCancelDialog(context = this, listener = ratingCancelListener)
+        buyGoodsOptionDialog = DialogCreator.buyGoodsOptionDialog(listener = buyGoodsListener)
 
         defaultListener = DefaultListener(context = this)
 
@@ -215,7 +222,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         (ratingRecyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         ratingRecyclerView.isNestedScrollingEnabled = false
 
-        goodsDetailViewModel.loadGoodsDetailData(goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), needDescription = false)
+        goodsDetailViewModel.loadGoodsDetailData(context = this, goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), needDescription = false)
         goodsDetailViewModel.loadGoodsPetData(authorization = spHelper.authorization)
     }
 
@@ -240,6 +247,16 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
+                }
+                uiData.cartToastShow?.let {
+                    addCartToast.showToast()
+                }
+                uiData.isGuest?.let {
+                    if (it) loginDialog.show()
+                }
+                uiData.buyOptionDialogShow?.let {
+                    buyGoodsOptionDialog.setUnitPirce(price = it)
+                    buyGoodsOptionDialog.show(supportFragmentManager, "buyGoodsOptionDialog")
                 }
                 uiData.topicMatchData?.let {
                     matchingRecyclerView.visibility =
@@ -325,11 +342,6 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         // rating open & close 이벤트 observe
         goodsDetailViewModel.ratingOpenCloseEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let { _->
-                eventData.isGuest?.let {
-                    if (it) {
-                        loginDialog.show()
-                    }
-                }
                 eventData.noTopic?.let {
                 }
             }
@@ -359,12 +371,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                             currentArrowRotation = imageViewRatingArrow.rotation)
                 }
                 R.id.buyBtn -> { // 구매하기 버튼
-                    // login check
-//                    if (SPHelper(this).accessToken == "") { // guest mode
-//                        loginDialog.show()
-//                        return
-//                    }
-//                    buyGoodsOptionDialog.show(supportFragmentManager, "BuyGoodsOptionDialog")
+                    goodsDetailViewModel.buyButtonAction(authorization = spHelper.authorization)
                 }
             }
         }

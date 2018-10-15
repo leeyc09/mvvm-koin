@@ -91,7 +91,7 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = profileTopicGoodsAdapter!!.dataLoading, total = profileTopicGoodsAdapter!!.dataTotal) { _ ->
-                profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = profileTopicGoodsAdapter!!.dataNextPage)
+                profileViewModel.loadTopicUsedGoodsData(context = context!!, userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = profileTopicGoodsAdapter!!.dataNextPage)
             }
         }
     }
@@ -144,7 +144,7 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
 
     fun reloadPetUsedGoodsData(loadingBar: Boolean?) {
         context?.let {
-            profileViewModel.loadTopicUsedGoodsData(userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1, loadingBar = loadingBar)
+            profileViewModel.loadTopicUsedGoodsData(context = context!!, userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 

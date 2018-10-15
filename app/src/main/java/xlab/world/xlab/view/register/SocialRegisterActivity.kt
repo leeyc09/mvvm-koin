@@ -77,8 +77,8 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         // 닉네임 숫자 or 문자만 가능하게
         editTextNick.filters = arrayOf(letterOrDigitInputFilter)
 
-        registerViewModel.contentTextSet(policy1 = defaultListener.clausePolicyListener, policy2 = defaultListener.personalInfoPolicyListener)
-        registerViewModel.nickNameRegexCheck(nickName = getNickNameText())
+        registerViewModel.contentTextSet(context = this, policy1 = defaultListener.clausePolicyListener, policy2 = defaultListener.personalInfoPolicyListener)
+        registerViewModel.nickNameRegexCheck(context = this, nickName = getNickNameText())
     }
 
     private fun onBindEvent() {
@@ -100,7 +100,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
 
         // 닉네임 입력 이벤트
         ViewFunction.onTextChange(editText = editTextNick) { _ ->
-            registerViewModel.nickNameRegexCheck(nickName = getNickNameText())
+            registerViewModel.nickNameRegexCheck(context = this, nickName = getNickNameText())
         }
     }
 
@@ -152,7 +152,8 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
                 }
                 R.id.finishBtn -> { // 회원가입 완료 버튼
                     ViewFunction.hideKeyboard(context = this, view = v)
-                    registerViewModel.requestRegister(loginType = userData.loginType, email = userData.email,
+                    registerViewModel.requestRegister(context = this,
+                            loginType = userData.loginType, email = userData.email,
                             password = "", nickName = getNickNameText(), socialId = userData.socialID)
                 }
             }

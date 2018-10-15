@@ -5,14 +5,12 @@ import xlab.world.xlab.data.adapter.UserDefaultData
 import xlab.world.xlab.data.adapter.UserDefaultListData
 import xlab.world.xlab.data.adapter.UserRecommendData
 import xlab.world.xlab.data.adapter.UserRecommendListData
-import xlab.world.xlab.data.response.ResUserDefaultData
 import xlab.world.xlab.server.provider.ApiFollowProvider
 import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PetInfo
 import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.TextConstants
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
@@ -31,7 +29,7 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
                    userData: UserDefaultListData?, recommendUserData: UserRecommendListData?, followCnt: Int? = null) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -62,7 +60,7 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
     fun loadFollower(authorization: String, userId: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -96,7 +94,7 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
     fun loadFollowing(authorization: String, userId: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -130,7 +128,7 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
     fun loadRecommendUser(authorization: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 

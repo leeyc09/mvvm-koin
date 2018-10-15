@@ -11,8 +11,13 @@ import xlab.world.xlab.view.follow.FollowerActivity
 import xlab.world.xlab.view.follow.FollowingActivity
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectActivity
 import xlab.world.xlab.view.goodsDetail.GoodsDetailActivity
+import xlab.world.xlab.view.goodsInfo.GoodsDeliveryActivity
+import xlab.world.xlab.view.goodsInfo.GoodsInquiryActivity
+import xlab.world.xlab.view.goodsInfo.GoodsNecessaryActivity
 import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
+import xlab.world.xlab.view.myShopping.MyShoppingActivity
+import xlab.world.xlab.view.myShopping.ShopProfileEditActivity
 import xlab.world.xlab.view.notice.NoticeActivity
 import xlab.world.xlab.view.notification.NotificationActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
@@ -223,28 +228,34 @@ object RunActivity {
         context.startActivityForResult(intent, RequestCodeData.GOODS_BRAND_SEARCH)
     }
 
-    fun goodstaggedPostsActivity(context: Activity, goodsCode: String) {
+    fun goodsTaggedPostsActivity(context: Activity, goodsCode: String) {
         val intent = GoodsTaggedPostsActivity.newIntent(context = context, goodsCode = goodsCode)
         context.startActivityForResult(intent, RequestCodeData.GOODS_TAGGED_POST)
     }
 
     fun myShoppingActivity(context: Activity) {
-        PrintLog.d("Run", "MyShopping", tag)
+        val intent = MyShoppingActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.MY_SHOP)
     }
 
-    fun shopInfoUpdateActivity(context: Activity) {
-        PrintLog.d("Run", "ShopInfoUpdate", tag)
+    fun shopProfileEditActivity(context: Activity) {
+        val intent = ShopProfileEditActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.MY_SHOP_PROFILE_EDIT)
     }
 
-    fun goodsNecessaryInfoActivity(context: Activity, deliveryNo: String, goodsName: String, origin: String, maker: String) {
-        PrintLog.d("Run", "goodsNecessaryInfoActivity", tag)
+    fun goodsNecessaryActivity(context: Activity, deliveryNo: String, goodsName: String, origin: String, maker: String) {
+        val intent = GoodsNecessaryActivity.newIntent(context = context, deliveryNo = deliveryNo,
+                goodsName = goodsName, origin = origin, maker = maker)
+        context.startActivity(intent)
     }
 
-    fun goodsDeliveryInfoActivity(context: Activity, deliveryNo: String) {
-        PrintLog.d("Run", "GoodsDeliveryInfoActivity", tag)
+    fun goodsDeliveryActivity(context: Activity, deliveryNo: String) {
+        val intent = GoodsDeliveryActivity.newIntent(context = context, deliveryNo = deliveryNo)
+        context.startActivity(intent)
     }
 
     fun goodsInquiryActivity(context: Activity, deliveryNo: String) {
-        PrintLog.d("Run", "GoodsInquiryActivity", tag)
+        val intent = GoodsInquiryActivity.newIntent(context = context, deliveryNo = deliveryNo)
+        context.startActivity(intent)
     }
 }

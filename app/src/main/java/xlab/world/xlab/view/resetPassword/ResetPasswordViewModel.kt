@@ -1,7 +1,9 @@
 package xlab.world.xlab.view.resetPassword
 
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
 import io.reactivex.Flowable
+import xlab.world.xlab.R
 import xlab.world.xlab.data.request.ReqConfirmEmailData
 import xlab.world.xlab.data.request.ReqPasswordData
 import xlab.world.xlab.server.provider.ApiUserProvider
@@ -30,14 +32,14 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
     private var stopped = AtomicBoolean()
 
     // 메일 인증 시도
-    fun requestConfirmEmail(email: String) {
+    fun requestConfirmEmail(context: Context, email: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
         if (!DataRegex.emailRegex(email)) { // 이메일 정규식 확인
-            uiData.postValue(UIModel(toastMessage = TextConstants.LOGIN_WRONG_EMAIL_PATTERN))
+            uiData.postValue(UIModel(toastMessage = context.getString(R.string.toast_email_format_wrong)))
             return
         }
 
@@ -101,7 +103,7 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
     fun requestConfirmCode(email: String, code: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.value = UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT)
+            uiData.value = UIModel(toastMessage = networkCheck.networkErrorMsg)
             return
         }
         uiData.value = UIModel(isLoading = true)
@@ -126,10 +128,10 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
         }
     }
     // 비밀번호 체크 요쳥
-    fun requestConfirmPasswrod(authorization: String, password: String) {
+    fun requestConfirmPassword(context: Context, authorization: String, password: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -142,7 +144,7 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
                         requestConfirmPasswrodEvent.postValue(ResetPasswordEvent(status = true))
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false, toastMessage = TextConstants.WRONG_PASSWORD)
+                        uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_wrong_password))
                         errorData?.let {
                             PrintLog.d("requestConfirmPassword fail", errorData.message, tag)
                         }
@@ -151,10 +153,10 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
     }
 
     // 비빌번호 변경 요청
-    fun requestChangePassword(authorization: String, password: String) {
+    fun requestChangePassword(context: Context, authorization: String, password: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -164,7 +166,7 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
             apiUser.requestChangePassword(scheduler = scheduler, authorization = authorization, reqNewPasswordData = reqNewPasswordData,
                     responseData = {
                         PrintLog.d("requestChangePassword success", "", tag)
-                        uiData.value = UIModel(isLoading = false, toastMessage = TextConstants.COMPLETE_CHANGE_PASSWORD)
+                        uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_reset_password_success))
                         requestChangePasswordEvent.postValue(ResetPasswordEvent(status = true))
                     },
                     errorData = { errorData ->

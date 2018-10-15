@@ -39,7 +39,7 @@ class OnBoardingFragment: Fragment() {
         // textView 바인드
         textView = rootView.findViewById(R.id.textView)
 
-        onBoardingViewModel.contentTextSet(index = getIndex(),
+        onBoardingViewModel.contentTextSet(context = context!!, index = getIndex(),
                 boldFont = fontColorSpan.notoBold000000, regularFont = fontColorSpan.notoRegular000000)
     }
 

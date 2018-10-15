@@ -1,7 +1,9 @@
 package xlab.world.xlab.view.profile
 
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
 import io.reactivex.Observable
+import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.server.provider.*
 import xlab.world.xlab.utils.rx.SchedulerProvider
@@ -9,7 +11,6 @@ import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.TextConstants
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
@@ -47,7 +48,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
     fun loadUserTopicData(userId: String, page: Int, topicDataCount: Int, loginUserId: String, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -85,10 +86,10 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         }
     }
 
-    fun loadUserData(authorization: String, userId: String, loadingBar: Boolean? = true) {
+    fun loadUserData(context: Context, authorization: String, userId: String, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -106,7 +107,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                                 followState = it.isFollowing)
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, toastMessage = TextConstants.NO_EXIST_USER)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, toastMessage = context.getString(R.string.toast_no_exist_user))
                         loadUserDataEvent.postValue(ProfileEvent(status = false))
                         errorData?.let {
                             PrintLog.d("requestProfileMain fail", errorData.message, tag)
@@ -115,10 +116,10 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         }
     }
 
-    fun loadTopicUsedGoodsData(userId: String, goodsType: Int, page: Int, loadingBar: Boolean? = true) {
+    fun loadTopicUsedGoodsData(context: Context, userId: String, goodsType: Int, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -140,7 +141,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                         if (topicUsedGoodsData.items.isNotEmpty() && page == 1) {
                             topicUsedGoodsData.items.add(0, ProfileTopicGoodsListData(
                                     dataType = AppConstants.ADAPTER_HEADER,
-                                    headerTitle = TextConstants.USED_GOODS_HEADER))
+                                    headerTitle = context.getString(R.string.goods)))
                         }
 
                         PrintLog.d("requestTopicUsedGoods success", topicUsedGoodsData.toString(), tag)
@@ -158,7 +159,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
     fun loadUserPostsThumbData(userId: String, page:Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -198,7 +199,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
     fun loadUserPostsDetailData(authorization: String, userId: String, page: Int, loginUserId: String, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -255,7 +256,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
     fun userFollow(authorization: String, userId: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 

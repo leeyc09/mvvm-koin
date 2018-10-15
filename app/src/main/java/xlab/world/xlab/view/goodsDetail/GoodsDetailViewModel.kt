@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Color
 import android.view.View
 import io.reactivex.Observable
+import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.GoodsDetailInfoAdapter
 import xlab.world.xlab.adapter.recyclerView.GoodsDetailRatingAdapter
 import xlab.world.xlab.data.adapter.*
@@ -38,12 +39,12 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
     val goodsRatingEventData = SingleLiveEvent<GoodsRatingEvent>()
     val uiData = MutableLiveData<UIModel>()
 
-    fun loadGoodsDetailData(goodsCode: String, needDescription: Boolean) {
+    fun loadGoodsDetailData(context: Context, goodsCode: String, needDescription: Boolean) {
         this.goodsCode = goodsCode
 
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -54,8 +55,8 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                         PrintLog.d("requestGoodsDetail success", it.toString(), tag)
                         goodsData = it.copy()
                         val buyBtnStr =
-                                if (it.goods.isSoldOut) TextConstants.SOLD_OUT
-                                else TextConstants.BUY
+                                if (it.goods.isSoldOut) context.getString(R.string.sold_out)
+                                else context.getString(R.string.buy)
                         val goodsMainImages = arrayListOf(it.goods.mainImage)
                         val goodsPrice =
                                 if (it.goods.price > 0) SupportData.applyPriceFormat(price = it.goods.price)
@@ -134,7 +135,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
 
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -179,7 +180,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             Observable.create<ArrayList<Any>> {
                 if (SupportData.isGuest(authorization = authorization)) { // 게스트
-                    ratingOpenCloseEventData.postValue(RatingOpenCloseEvent(isGuest = true))
+                    uiData.postValue(UIModel(isGuest = true))
                     it.onComplete()
                     return@create
                 }
@@ -228,7 +229,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
     fun loadGoodsStatsData(authorization: String, goodsCode: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -269,7 +270,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
     fun loadUsedUserData(goodsCode: String, page: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -306,7 +307,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
 
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -344,7 +345,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
     fun ratingCancel(position: Int, goodsRatingData: GoodsDetailRatingListData, authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -364,12 +365,54 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                     })
         }
     }
+
+    fun buyButtonAction(authorization: String) {
+        launch {
+            Observable.create<Int> {
+                if (SupportData.isGuest(authorization = authorization)) { // 게스트
+                    uiData.postValue(UIModel(isGuest = true))
+                    it.onComplete()
+                    return@create
+                }
+
+                it.onNext(goodsData!!.goods.price)
+                it.onComplete()
+
+            }.with(scheduler).subscribe {
+                uiData.value = UIModel(buyOptionDialogShow = it)
+            }
+        }
+    }
+
+    fun addCart(authorization: String, count: Int) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            apiGodo.requestAddCart(scheduler = scheduler, authorization = authorization, goodsNo = goodsData!!.goods.no, count = count,
+                    responseData = {
+                        PrintLog.d("requestAddCart success", it.toString(), tag)
+                        uiData.value = UIModel(isLoading = false, cartToastShow = true)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.d("requestAddCart fail", errorData.message, tag)
+                        }
+                    })
+        }
+    }
 }
 
 data class GoodsRatingEvent(val ratingCancelPosition: Int? = null)
-data class RatingOpenCloseEvent(val isGuest: Boolean? = null, val noTopic: Boolean? = null)
+data class RatingOpenCloseEvent(val noTopic: Boolean? = null)
 data class GoodsDetailEvent(val status: Boolean? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val cartToastShow: Boolean? = null,
+                   val isGuest: Boolean? = null, val buyOptionDialogShow: Int? = null,
                    val topicMatchData: GoodsDetailTopicMatchData? = null,
                    val goodsRatingData: GoodsDetailRatingData? = null, val goodsRatingUpdateIndex: Int? = null,
                    val ratingViewVisibility: Int? = null, val ratingArrowRotation: Float? = null,

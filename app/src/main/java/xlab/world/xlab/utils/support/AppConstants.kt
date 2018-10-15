@@ -3,6 +3,13 @@ package xlab.world.xlab.utils.support
 object AppConstants {
     const val LOCAL_HTML_URL = "file:///android_asset/html/"
 
+    // kakao plus chat
+    const val KAKO_PLUS_CHAT = "http://plus.kakao.com/talk/bot/"
+
+    // cs company delivery code
+    const val CS_XLAB = "7"
+    const val CS_HOLAPET = "2"
+
     // used goods from type
     const val FROM_BUY    = 1
     const val FROM_RATING = 2

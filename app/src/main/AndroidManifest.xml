@@ -240,6 +240,27 @@
             android:name=".view.goodsDetail.GoodsDetailActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.goodsInfo.GoodsNecessaryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.goodsInfo.GoodsDeliveryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.goodsInfo.GoodsInquiryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.myShopping.MyShoppingActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
+        <activity
+            android:name=".view.myShopping.ShopProfileEditActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

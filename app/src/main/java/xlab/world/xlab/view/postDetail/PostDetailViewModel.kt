@@ -1,6 +1,8 @@
 package xlab.world.xlab.view.postDetail
 
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
+import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.PostDetailData
 import xlab.world.xlab.data.adapter.PostDetailListData
 import xlab.world.xlab.server.provider.ApiFollowProvider
@@ -10,7 +12,6 @@ import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.TextConstants
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
@@ -25,10 +26,10 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
     val loadPostDetailEvent = SingleLiveEvent<LoadPostDetailEvent>()
     val uiData = MutableLiveData<UIModel>()
 
-    fun loadPostDetail(authorization: String, postId: String, userId: String) {
+    fun loadPostDetail(context: Context, authorization: String, postId: String, userId: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -67,7 +68,7 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
                         uiData.value = UIModel(isLoading = false, postDetailData = postDetailData)
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false, toastMessage = TextConstants.NO_EXIST_POST)
+                        uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_no_exist_post))
                         loadPostDetailEvent.postValue(LoadPostDetailEvent(isFail = true))
                         errorData?.let {
                             PrintLog.d("getPostDetail fail", errorData.message, tag)
@@ -79,7 +80,7 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
     fun deletePost(authorization: String, postId: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -103,7 +104,7 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
     fun likePost(authorization: String, position: Int, postData: PostDetailListData) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -127,10 +128,10 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
         }
     }
 
-    fun savePost(authorization: String, position: Int, postData: PostDetailListData) {
+    fun savePost(context: Context, authorization: String, position: Int, postData: PostDetailListData) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -141,7 +142,7 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
                         PrintLog.d("postSave success", it.status.toString(), tag)
                         postData.isSave = it.status
                         val toastMessage =
-                                if (postData.isSave) TextConstants.SAVED_POST
+                                if (postData.isSave) context.getString(R.string.toast_saved_success)
                                 else null
                         uiData.value = UIModel(isLoading = false, postUpdatePosition = position, toastMessage = toastMessage)
                     },
@@ -157,7 +158,7 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
     fun userFollow(authorization: String, position: Int, postData: PostDetailListData) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 

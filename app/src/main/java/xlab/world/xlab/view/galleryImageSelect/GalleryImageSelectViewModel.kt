@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.provider.MediaStore
 import io.reactivex.Observable
+import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.GalleryData
 import xlab.world.xlab.data.adapter.GalleryListData
 import xlab.world.xlab.utils.rx.SchedulerProvider
@@ -13,7 +14,6 @@ import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SupportData
-import xlab.world.xlab.utils.support.TextConstants
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 import java.io.File
@@ -141,7 +141,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                 PrintLog.d("loadGalleryImage", resultData.toString(), tag)
                 uiData.value = UIModel(galleryData = resultData)
                 if (resultData.items.isEmpty()) // 갤러리에 이미지가 없는경우
-                    uiData.value = UIModel(toastMessage = TextConstants.EMPTY_GALLERY)
+                    uiData.value = UIModel(toastMessage = context.getString(R.string.toast_no_exist_gallery_image))
                 else if (resultData.items.isNotEmpty() && page == 1) {
                     uiData.value = UIModel(imagePreviewData = PreviewData(data = resultData.items.first().data, matrix = Matrix()))
                     imagePreviewEvent.value = ImagePreviewEvent(updateIndex = 0)

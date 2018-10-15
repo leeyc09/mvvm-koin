@@ -1,11 +1,11 @@
 package xlab.world.xlab.view.postsUpload.content
 
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
 import android.graphics.Point
 import android.view.View
 import io.reactivex.Observable
-import okhttp3.MediaType
-import okhttp3.RequestBody
+import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.data.request.ReqPostUploadData
 import xlab.world.xlab.server.provider.ApiHashTagProvider
@@ -16,7 +16,6 @@ import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.hashTag.HashTagHelper
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
-import java.io.File
 
 class PostContentViewModel(private val apiPost: ApiPostProvider,
                            private val apiHashTag: ApiHashTagProvider,
@@ -110,7 +109,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
     fun loadRecentHashTagData(authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -138,7 +137,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
     fun loadSearchHashTagData(authorization: String, searchText: String, page: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -165,10 +164,10 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
         }
     }
 
-    fun loadPost(authorization: String) {
+    fun loadPost(context: Context, authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -195,7 +194,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
                                 youTubeVideoId = it.postsData.youTubeVideoID)
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false, toastMessage = TextConstants.NO_EXIST_POST)
+                        uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_no_exist_post))
                         loadPostEvent.value = LoadPostEventData(isFail = true)
                         errorData?.let {
                             PrintLog.d("getPostDetail fail", errorData.message, tag)
@@ -208,7 +207,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
                  goodsData: ArrayList<SelectUsedGoodsListData>, imagePaths: ArrayList<String>) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 

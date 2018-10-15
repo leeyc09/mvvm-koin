@@ -109,7 +109,7 @@ class WithdrawActivity : AppCompatActivity(), View.OnClickListener {
                     withdrawViewModel.enableWithdraw(withdrawReason = null, isAgree = agreeBtn.isSelected)
                 }
                 R.id.withdrawBtn -> { // 탈퇴하기
-                    withdrawViewModel.withdraw(otherReason = getOtherReason(), authorization = spHelper.authorization)
+                    withdrawViewModel.withdraw(context = this, otherReason = getOtherReason(), authorization = spHelper.authorization)
                 }
             }
         }

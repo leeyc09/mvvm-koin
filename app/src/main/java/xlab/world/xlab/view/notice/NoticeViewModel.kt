@@ -8,7 +8,6 @@ import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SupportData
-import xlab.world.xlab.utils.support.TextConstants
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
@@ -23,7 +22,7 @@ class NoticeViewModel(private val apiNotice: ApiNoticeProvider,
     fun loadNoticeData(authorization: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -56,7 +55,7 @@ class NoticeViewModel(private val apiNotice: ApiNoticeProvider,
     fun readNotice(authorization: String, noticeListData: NoticeListData, position: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 

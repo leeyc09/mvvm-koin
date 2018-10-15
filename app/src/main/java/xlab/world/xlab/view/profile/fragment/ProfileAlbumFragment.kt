@@ -87,7 +87,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                     postDetailViewModel.likePost(authorization = spHelper.authorization, position = position, postData = postDetailAdapter!!.getItem(position))
                 },
                 savePostEvent = { position ->
-                    postDetailViewModel.savePost(authorization = spHelper.authorization, position = position, postData = postDetailAdapter!!.getItem(position))
+                    postDetailViewModel.savePost(context = context!!, authorization = spHelper.authorization, position = position, postData = postDetailAdapter!!.getItem(position))
                 })
         changeViewTypeListener = changeViewTypeListener ?: View.OnClickListener { view ->
             if (recyclerView.layoutManager is GridLayoutManager) { // post thumbnail adapter

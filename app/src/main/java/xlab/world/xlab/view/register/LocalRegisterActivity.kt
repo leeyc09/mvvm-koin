@@ -72,7 +72,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
         // 닉네임 숫자 or 문자만 가능하게
         editTextNick.filters = arrayOf(letterOrDigitInputFilter)
 
-        registerViewModel.contentTextSet(policy1 = defaultListener.clausePolicyListener, policy2 = defaultListener.personalInfoPolicyListener)
+        registerViewModel.contentTextSet(context = this, policy1 = defaultListener.clausePolicyListener, policy2 = defaultListener.personalInfoPolicyListener)
         registerViewModel.inputDataRegex(email = getEmailText(), password = getPasswordText(), nickName = getNickNameText())
     }
 
@@ -102,7 +102,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
 
         // 이메일, 패스워드, 닉네임 입력 이벤트
         ViewFunction.onTextChange(editText = editTextMail) { _ ->
-            registerViewModel.emailRegexCheck(email = getEmailText())
+            registerViewModel.emailRegexCheck(context = this, email = getEmailText())
             registerViewModel.inputDataRegex(email = getEmailText(), password = getPasswordText(), nickName = getNickNameText())
         }
         ViewFunction.onTextChange(editText = editTextPassword) { _ ->
@@ -110,7 +110,7 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
             registerViewModel.inputDataRegex(email = getEmailText(), password = getPasswordText(), nickName = getNickNameText())
         }
         ViewFunction.onTextChange(editText = editTextNick) { _ ->
-            registerViewModel.nickNameRegexCheck(nickName = getNickNameText())
+            registerViewModel.nickNameRegexCheck(context = this, nickName = getNickNameText())
             registerViewModel.inputDataRegex(email = getEmailText(), password = getPasswordText(), nickName = getNickNameText())
         }
     }
@@ -182,7 +182,8 @@ class LocalRegisterActivity : AppCompatActivity(), View.OnClickListener, View.On
                 }
                 R.id.finishBtn -> { // 회원가입 완료 버튼
                     ViewFunction.hideKeyboard(context = this, view = v)
-                    registerViewModel.requestRegister(loginType = AppConstants.LOCAL_LOGIN, email = getEmailText(),
+                    registerViewModel.requestRegister(context = this,
+                            loginType = AppConstants.LOCAL_LOGIN, email = getEmailText(),
                             password = getPasswordText(), nickName = getNickNameText(), socialId = "")
                 }
             }

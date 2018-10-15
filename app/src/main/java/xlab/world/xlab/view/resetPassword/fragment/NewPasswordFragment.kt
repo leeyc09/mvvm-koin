@@ -93,7 +93,7 @@ class NewPasswordFragment: Fragment(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.finishBtn -> { // 비밀번호 변경 완료버튼
-                    resetPasswordViewModel.requestChangePassword(authorization = "Bearer ${getBundleAccessToken()}", password = getPassword())
+                    resetPasswordViewModel.requestChangePassword(context = context!!, authorization = "Bearer ${getBundleAccessToken()}", password = getPassword())
                 }
             }
         }

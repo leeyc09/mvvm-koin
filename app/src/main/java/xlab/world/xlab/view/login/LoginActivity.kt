@@ -261,7 +261,10 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                     originFacebookBtn.performClick()
                     // 페이스북 토큰 요청
                     socialAuth.getFacebookToken( { facebookToken ->
-                        loginViewModel.requestLogin(loginType = FACEBOOK_LOGIN, socialToken = facebookToken, fcmToken = spHelper.fcmToken)
+                        loginViewModel.requestLogin(context = this,
+                                loginType = FACEBOOK_LOGIN,
+                                socialToken = facebookToken,
+                                fcmToken = spHelper.fcmToken)
                     }, { _ ->
                         socialAuth.facebookLogout()
                     })
@@ -270,7 +273,10 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                     originKakaoBtn.performClick()
                     // 카카오 토큰 요청
                     socialAuth.getKakaoToken( { kakaoToken ->
-                        loginViewModel.requestLogin(loginType = KAKAO_LOGIN, socialToken = kakaoToken, fcmToken = spHelper.fcmToken)
+                        loginViewModel.requestLogin(context = this,
+                                loginType = KAKAO_LOGIN,
+                                socialToken = kakaoToken,
+                                fcmToken = spHelper.fcmToken)
                     }, { _ ->
                         socialAuth.kakaoLogout()
                     })
@@ -286,7 +292,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                     finish()
                 }
                 R.id.loginBtn -> { // 로컬 로그인 버튼
-                    loginViewModel.requestLogin(loginType = LOCAL_LOGIN,
+                    loginViewModel.requestLogin(context = this,
+                            loginType = LOCAL_LOGIN,
                             email = getEmailText(),
                             password = getPasswordText(),
                             fcmToken = spHelper.fcmToken)

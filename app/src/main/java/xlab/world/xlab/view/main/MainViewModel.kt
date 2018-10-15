@@ -1,11 +1,11 @@
 package xlab.world.xlab.view.main
 
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
 import android.graphics.Color
+import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
-import xlab.world.xlab.data.response.ResFeedData
 import xlab.world.xlab.data.response.ResGoodsSearchData
-import xlab.world.xlab.data.response.ResShopFeedData
 import xlab.world.xlab.server.ApiURL
 import xlab.world.xlab.server.provider.ApiPostProvider
 import xlab.world.xlab.server.provider.ApiShopProvider
@@ -30,7 +30,7 @@ class MainViewModel(private val apiPost: ApiPostProvider,
     fun loadAllFeedData(authorization: String, page: Int, topicColorList: Array<String>, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -79,7 +79,7 @@ class MainViewModel(private val apiPost: ApiPostProvider,
     fun loadFollowingFeedData(authorization: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -145,7 +145,7 @@ class MainViewModel(private val apiPost: ApiPostProvider,
     fun loadExploreFeedData(authorization: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -186,10 +186,10 @@ class MainViewModel(private val apiPost: ApiPostProvider,
         }
     }
 
-    fun loadShopFeedData(authorization: String, topicColorList: Array<String>, loadingBar: Boolean? = true) {
+    fun loadShopFeedData(context: Context, authorization: String, topicColorList: Array<String>, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -204,24 +204,24 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                         val livingGoods = getEachCategoryGoods(categoryGoods = it.livingGoods, topicColorList = topicColorList)
                         shopFeedData.items.add(ShopFeedListData(
                                 dataType = AppConstants.ADAPTER_CONTENT,
-                                categoryText = TextConstants.CATEGORY_LIVING,
-                                categoryCode = TextConstants.CATEGORY_LIVING_CODE,
+                                categoryText = context.getString(R.string.category_living),
+                                categoryCode = context.getString(R.string.category_living_code),
                                 goodsData = livingGoods
                         ))
                         // fashion 카테고리
                         val fashionGoods = getEachCategoryGoods(categoryGoods = it.fashionGoods, topicColorList = topicColorList)
                         shopFeedData.items.add(ShopFeedListData(
                                 dataType = AppConstants.ADAPTER_CONTENT,
-                                categoryText = TextConstants.CATEGORY_FASHION,
-                                categoryCode = TextConstants.CATEGORY_FASHION_CODE,
+                                categoryText = context.getString(R.string.category_fashion),
+                                categoryCode = context.getString(R.string.category_fashion_code),
                                 goodsData = fashionGoods
                         ))
                         // food 카테고리
                         val foodGoods = getEachCategoryGoods(categoryGoods = it.foodGoods, topicColorList = topicColorList)
                         shopFeedData.items.add(ShopFeedListData(
                                 dataType = AppConstants.ADAPTER_CONTENT,
-                                categoryText = TextConstants.CATEGORY_FOOD,
-                                categoryCode = TextConstants.CATEGORY_FOOD_CODE,
+                                categoryText = context.getString(R.string.category_food),
+                                categoryCode = context.getString(R.string.category_food_code),
                                 goodsData = foodGoods
                         ))
 

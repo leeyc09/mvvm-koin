@@ -190,7 +190,7 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
                     RunActivity.updatePasswordActivity(context = this)
                 }
                 R.id.updateShopAccountBtn -> { // shop 정보 편집
-                    RunActivity.shopInfoUpdateActivity(context = this)
+                    RunActivity.shopProfileEditActivity(context = this)
                 }
                 R.id.pushAlarmBtn -> { // 푸시 수신 on&off
                     settingViewModel.updatePushAlarm(authorization = spHelper.authorization)

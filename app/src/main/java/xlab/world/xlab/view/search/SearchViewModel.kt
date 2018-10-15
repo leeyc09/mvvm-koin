@@ -2,12 +2,10 @@ package xlab.world.xlab.view.search
 
 import android.arch.lifecycle.MutableLiveData
 import android.graphics.Color
-import android.view.View
 import io.reactivex.Observable
 import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.data.request.ReqGoodsSearchData
 import xlab.world.xlab.data.response.ResGoodsSearchData
-import xlab.world.xlab.data.response.ResUserDefaultData
 import xlab.world.xlab.server.ApiURL
 import xlab.world.xlab.server.provider.ApiPostProvider
 import xlab.world.xlab.server.provider.ApiShopProvider
@@ -55,7 +53,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
     fun requestCombinedSearchTotal(authorization: String, searchText: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -100,7 +98,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
     fun searchPosts(searchText: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -134,7 +132,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
     fun searchUsers(authorization: String, searchText: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -169,7 +167,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                     page: Int, topicColorList: Array<String>, withHeader: Boolean = true, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -236,7 +234,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
     fun searchGoodsTaggedPosts(goodsCode: String,  page: Int, limitCnt: Int? = null) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 

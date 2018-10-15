@@ -69,7 +69,7 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
                     postDetailViewModel.likePost(authorization = spHelper.authorization, position = position, postData = followingFeedAdapter!!.getItem(position))
                 },
                 savePostEvent = { position ->
-                    postDetailViewModel.savePost(authorization = spHelper.authorization, position = position, postData = followingFeedAdapter!!.getItem(position))
+                    postDetailViewModel.savePost(context = context!!, authorization = spHelper.authorization, position = position, postData = followingFeedAdapter!!.getItem(position))
                 })
 
         // following feed recycler view & adapter 초기화

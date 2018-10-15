@@ -1,7 +1,6 @@
 package xlab.world.xlab.utils.listener
 
 import android.app.Activity
-import android.support.v4.app.FragmentManager
 import android.support.v4.content.res.ResourcesCompat
 import android.text.TextPaint
 import android.text.style.ClickableSpan
@@ -11,7 +10,6 @@ import xlab.world.xlab.R
 import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SPHelper
-import xlab.world.xlab.utils.view.dialog.DefaultDialog
 import xlab.world.xlab.utils.view.dialog.DialogCreator
 import xlab.world.xlab.utils.view.hashTag.HashTagHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
@@ -53,7 +51,7 @@ class DefaultListener(private val context: Activity) {
     val questionMatchListener = View.OnClickListener {
         val defaultToast = DefaultToast(context = context)
         if (spHelper.accessToken == "") { // guest mode
-            defaultToast.showToast(context.resources.getString(R.string.question_match_toast))
+            defaultToast.showToast(context.resources.getString(R.string.toast_question_match))
         } else {
             suggestAddTopicDialog.show()
         }

@@ -90,7 +90,8 @@ class PasswordConfirmFragment: Fragment(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.nextBtn -> { // 기존 비밀번호 확인 버튼
-                    resetPasswordViewModel.requestConfirmPasswrod(authorization = spHelper.authorization, password = getPassword())
+                    resetPasswordViewModel.requestConfirmPassword(context = context!!,
+                            authorization = spHelper.authorization, password = getPassword())
                 }
             }
         }

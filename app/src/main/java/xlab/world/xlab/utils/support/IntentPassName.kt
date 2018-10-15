@@ -23,4 +23,8 @@ object IntentPassName {
     const val YOUTUBE_VIDEO_ID = "YOUTUBE_VIDEO_ID"
     const val SELECTED_USED_GOODS = "SELECTED_USED_GOODS"
     const val GOODS_CODE = "GOODS_CODE"
+    const val DELIVER_NO = "DELIVER_NO"
+    const val GOODS_NAME = "GOODS_NAME"
+    const val GOODS_ORIGIN = "GOODS_ORIGIN"
+    const val GOODS_MAKER = "GOODS_MAKER"
 }

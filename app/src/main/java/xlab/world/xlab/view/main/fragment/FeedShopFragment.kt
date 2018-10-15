@@ -140,7 +140,7 @@ class FeedShopFragment: Fragment() {
 
     fun reloadFeedData(loadingBar: Boolean?) {
         context?.let {
-            mainViewModel.loadShopFeedData(authorization = spHelper.authorization, topicColorList = resources.getStringArray(R.array.topicColorStringList), loadingBar = loadingBar)
+            mainViewModel.loadShopFeedData(context = context!!, authorization = spHelper.authorization, topicColorList = resources.getStringArray(R.array.topicColorStringList), loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 

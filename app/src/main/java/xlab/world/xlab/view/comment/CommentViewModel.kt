@@ -10,7 +10,6 @@ import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SupportData
-import xlab.world.xlab.utils.support.TextConstants
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
@@ -29,7 +28,7 @@ class CommentViewModel(private val apiPost: ApiPostProvider,
     fun loadCommentData(postId: String, page: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -67,7 +66,7 @@ class CommentViewModel(private val apiPost: ApiPostProvider,
     fun postCommentData(authorization: String, postId: String, comment: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -94,7 +93,7 @@ class CommentViewModel(private val apiPost: ApiPostProvider,
     fun deleteComment(authorization: String, postId: String, position: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -118,7 +117,7 @@ class CommentViewModel(private val apiPost: ApiPostProvider,
     fun checkMyPost(authorization: String, postId: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 

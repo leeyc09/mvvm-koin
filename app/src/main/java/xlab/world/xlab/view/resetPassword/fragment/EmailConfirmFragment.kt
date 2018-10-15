@@ -130,7 +130,7 @@ class EmailConfirmFragment: Fragment(), View.OnClickListener {
                 R.id.confirmRequestBtn -> { // 인증번호 요청
                     // 타이머 종료
                     resetPasswordViewModel.stopTimer()
-                    resetPasswordViewModel.requestConfirmEmail(email = getEmail())
+                    resetPasswordViewModel.requestConfirmEmail(context = context!!, email = getEmail())
                 }
                 R.id.nextBtn -> { // 인증코드 확인 버튼
                     resetPasswordViewModel.requestConfirmCode(email = getEmail(), code = getCode())

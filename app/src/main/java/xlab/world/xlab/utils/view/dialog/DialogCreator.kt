@@ -121,4 +121,11 @@ object DialogCreator {
 
         return dialog
     }
+
+    fun buyGoodsOptionDialog(listener: BuyGoodsOptionDialog.Listener): BuyGoodsOptionDialog {
+        val dialog = BuyGoodsOptionDialog.newDialog()
+        dialog.handle(listener = listener)
+
+        return dialog
+    }
 }

@@ -15,13 +15,13 @@ class PetInfo(context: Context) {
     private val tag = "PetInfo"
 
     // pet type
-    val dogCode: String = context.getString(R.string.tag_pet_type_dog)
-    val catCode: String = context.getString(R.string.tag_pet_type_cat)
+    val dogCode: String = context.getString(R.string.dog_code)
+    val catCode: String = context.getString(R.string.cat_code)
     val petType: HashMap<String, String> = HashMap() // code, name
 
     // pet gender type
-    val femaleCode: String = context.getString(R.string.tag_pet_gender_female)
-    val maleode: String = context.getString(R.string.tag_pet_gender_male)
+    val femaleCode: String = context.getString(R.string.pet_female_code)
+    val maleode: String = context.getString(R.string.pet_male_code)
     val petGender: HashMap<String, String> = HashMap() // code, name
 
     // pet hair type

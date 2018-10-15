@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorFFFFFF">
+
+    <LinearLayout
+        android:id="@+id/noOptionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        app:layout_constraintBottom_toTopOf="@id/totalLayout">
+
+        <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/goods_buy_number_str"
+            android:textSize="13sp"
+            android:textColor="@color/color000000"
+            android:layout_gravity="center_vertical"/>
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:background="@color/colorBFBFBF"
+                android:layout_marginStart="13dp"
+                android:layout_marginEnd="13dp"
+                app:layout_constraintTop_toTopOf="@id/goodsMinusBtn"
+                app:layout_constraintStart_toStartOf="@id/goodsMinusBtn"
+                app:layout_constraintEnd_toEndOf="@id/goodsPlusBtn"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0.5dp"
+                android:background="@color/colorBFBFBF"
+                android:layout_marginStart="13dp"
+                android:layout_marginEnd="13dp"
+                app:layout_constraintBottom_toBottomOf="@id/goodsMinusBtn"
+                app:layout_constraintStart_toStartOf="@id/goodsMinusBtn"
+                app:layout_constraintEnd_toEndOf="@id/goodsPlusBtn"/>
+
+            <ImageView
+                android:id="@+id/goodsMinusBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/stepper_minus" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularHan
+                android:id="@+id/textViewGoodsCountNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="14sp"
+                android:textColor="@color/color000000"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/goodsMinusBtn"/>
+
+            <ImageView
+                android:id="@+id/goodsPlusBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/stepper_plus"
+                app:layout_constraintStart_toEndOf="@id/textViewGoodsCountNum"/>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/totalLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/colorFFFFFF"
+        app:layout_constraintBottom_toTopOf="@id/buyLayout">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/colorE2E2E2"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="21dp">
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularHan
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/total_str"
+                android:textSize="13sp"
+                android:textColor="@color/colorA4A4A4"
+                android:layout_gravity="center_vertical"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularHan
+                android:id="@+id/textViewBuyTotalNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="13sp"
+                android:textColor="@color/colorA4A4A4"
+                android:layout_gravity="center_vertical"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularHan
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/goods_unit"
+                android:textSize="13sp"
+                android:textColor="@color/colorA4A4A4"
+                android:layout_gravity="center_vertical"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                android:id="@+id/textViewBuyTotalPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="15sp"
+                android:textColor="@color/color5300ED"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/price_unit"
+                android:textSize="13sp"
+                android:textColor="@color/color5300ED"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="horizontal">
+
+        <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+            android:id="@+id/addCartBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/color4A4A4A"
+            android:textSize="13sp"
+            android:textColor="@color/colorFFFFFF"
+            android:text="@string/add_cart"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:paddingBottom="17dp"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+            android:id="@+id/buyNowBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/color000000"
+            android:textSize="13sp"
+            android:textColor="@color/colorFFFFFF"
+            android:text="@string/buy_now"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:paddingBottom="17dp"/>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

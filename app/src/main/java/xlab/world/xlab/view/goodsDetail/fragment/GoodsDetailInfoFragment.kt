@@ -11,7 +11,6 @@ import kotlinx.android.synthetic.main.swipe_recycler_view.*
 import org.koin.android.architecture.ext.viewModel
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.GoodsDetailInfoAdapter
-import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.IntentPassName
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
@@ -38,7 +37,7 @@ class GoodsDetailInfoFragment: Fragment() {
     }
     private val necessaryInfoListener = View.OnClickListener { view ->
         val necessaryInfo = view.tag as GoodsDetailInfoAdapter.NecessaryInfo
-        RunActivity.goodsNecessaryInfoActivity(context = context as Activity,
+        RunActivity.goodsNecessaryActivity(context = context as Activity,
                 deliveryNo = necessaryInfo.deliveryNo,
                 goodsName = necessaryInfo.goodsName,
                 origin = necessaryInfo.origin,
@@ -46,7 +45,7 @@ class GoodsDetailInfoFragment: Fragment() {
     }
     private val deliveryListener = View.OnClickListener { view ->
         val necessaryInfo = view.tag as GoodsDetailInfoAdapter.NecessaryInfo
-        RunActivity.goodsDeliveryInfoActivity(context = context as Activity, deliveryNo = necessaryInfo.deliveryNo)
+        RunActivity.goodsDeliveryActivity(context = context as Activity, deliveryNo = necessaryInfo.deliveryNo)
     }
     private val goodsInquiryListener = View.OnClickListener { view ->
         val necessaryInfo = view.tag as GoodsDetailInfoAdapter.NecessaryInfo
@@ -114,7 +113,7 @@ class GoodsDetailInfoFragment: Fragment() {
 
     fun loadGoodsDescription() {
         context?.let {
-            goodsDetailViewModel.loadGoodsDetailData(goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE), needDescription = true)
+            goodsDetailViewModel.loadGoodsDetailData(context = context!!, goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE), needDescription = true)
         } ?:let { needInitData = true }
     }
 

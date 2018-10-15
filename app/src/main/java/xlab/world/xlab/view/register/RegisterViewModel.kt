@@ -1,10 +1,12 @@
 package xlab.world.xlab.view.register
 
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ClickableSpan
 import io.reactivex.Observable
+import xlab.world.xlab.R
 import xlab.world.xlab.data.request.ReqRegisterData
 import xlab.world.xlab.server.provider.ApiUserProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
@@ -22,10 +24,10 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
     val uiData = MutableLiveData<UIModel>()
 
     // 약관 내용 터 업데이트 이벤트
-    fun contentTextSet(policy1: ClickableSpan, policy2: ClickableSpan) {
+    fun contentTextSet(context: Context, policy1: ClickableSpan, policy2: ClickableSpan) {
         launch {
             Observable.create<SpannableString> {
-                val agreementStr = SpannableString(TextConstants.REGISTER_AGREEMENT)
+                val agreementStr = SpannableString(context.getString(R.string.register_agreement))
                 agreementStr.setSpan(policy1, 5, 9, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 agreementStr.setSpan(policy2, 12, 21, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
@@ -52,12 +54,12 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
         }
     }
     // 이메일 체크
-    fun emailRegexCheck(email: String) {
+    fun emailRegexCheck(context: Context, email: String) {
         launch {
             Observable.create<RegexResultData> {
                 val emailRegex = DataRegex.emailRegex(email)
                 val emailRegexText =
-                        if (!emailRegex) TextConstants.EMAIL_REGEX_TEXT
+                        if (!emailRegex) context.getString(R.string.toast_email_format_wrong)
                         else null
 
                 it.onNext(RegexResultData(text = emailRegexText, result = emailRegex))
@@ -81,11 +83,11 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
         }
     }
     // 닉네임 체크
-    fun nickNameRegexCheck(nickName: String) {
+    fun nickNameRegexCheck(context: Context, nickName: String) {
         launch {
             Observable.create<RegexResultData> {
                 val nickNameRegex = DataRegex.nickNameRegex(nickName)
-                val nickNameRegexText = TextConstants.NICK_LENGTH_REGEX_TEXT
+                val nickNameRegexText = context.getString(R.string.confirm_nick_length)
 
                 it.onNext(RegexResultData(text = nickNameRegexText, result = nickNameRegex))
                 it.onComplete()
@@ -96,10 +98,10 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
         }
     }
     // 회원 가입 요청
-    fun requestRegister(loginType: Int, email: String, password: String, nickName: String, socialId: String) {
+    fun requestRegister(context: Context, loginType: Int, email: String, password: String, nickName: String, socialId: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.value = UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT)
+            uiData.value = UIModel(toastMessage = networkCheck.networkErrorMsg)
             return
         }
 
@@ -123,14 +125,14 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                                 val duplicateError = errorMessage[1].replace(ApiCallBackConstants.EXIST_USER_DATA, "").trim().split("__")
                                 if (duplicateError.size > 1) { // 이메일, 닉네임 중복
                                     uiData.value = UIModel(emailRegex = false, nickNameRegex = false,
-                                            emailRegexText = TextConstants.DUPLICATE_EMAIL, nickNameRegexText = TextConstants.DUPLICATE_NICK)
+                                            emailRegexText = context.getString(R.string.used_email), nickNameRegexText = context.getString(R.string.used_nick))
                                 } else { // 이메일, 닉네임 둘 중 하나 중복
                                     when (duplicateError[0].trim()) {
                                         ApiCallBackConstants.EMAIL_DUPLICATE_CHAR -> { // 이메일 중복
-                                            uiData.value = UIModel(emailRegex = false, emailRegexText = TextConstants.DUPLICATE_EMAIL)
+                                            uiData.value = UIModel(emailRegex = false, emailRegexText = context.getString(R.string.used_email))
                                         }
                                         ApiCallBackConstants.NICK_NAME_DUPLICATE_CHAR -> { // 닉네임 중복
-                                            uiData.value = UIModel(nickNameRegex = false, nickNameRegexText = TextConstants.DUPLICATE_NICK)
+                                            uiData.value = UIModel(nickNameRegex = false, nickNameRegexText = context.getString(R.string.used_nick))
                                         }
                                     }
                                 }

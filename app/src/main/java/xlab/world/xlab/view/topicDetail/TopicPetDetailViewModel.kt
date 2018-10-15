@@ -13,7 +13,6 @@ import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PetInfo
 import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.TextConstants
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
@@ -116,7 +115,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
     private fun loadPetData(userId: String, petNo: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -143,7 +142,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
     fun loadPetUsedGoodsData(page: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 

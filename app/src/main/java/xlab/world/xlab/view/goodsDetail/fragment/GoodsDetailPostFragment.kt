@@ -16,7 +16,6 @@ import xlab.world.xlab.adapter.recyclerView.GoodsDetailUsedUserAdapter
 import xlab.world.xlab.adapter.recyclerView.PostThumbnailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.IntentPassName
-import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
@@ -156,7 +155,7 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.moreBtn -> { // 포스트 더보기
-                    RunActivity.goodstaggedPostsActivity(context = context as Activity, goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE))
+                    RunActivity.goodsTaggedPostsActivity(context = context as Activity, goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE))
                 }
             }
         }

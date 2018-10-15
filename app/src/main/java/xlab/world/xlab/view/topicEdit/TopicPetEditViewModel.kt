@@ -1,10 +1,12 @@
 package xlab.world.xlab.view.topicEdit
 
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
 import android.view.View
 import io.reactivex.Observable
 import okhttp3.MediaType
 import okhttp3.RequestBody
+import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.PetHairFeatureData
 import xlab.world.xlab.data.adapter.PetHairFeatureListData
 import xlab.world.xlab.data.request.ReqPetData
@@ -38,10 +40,10 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
         uiData.value = UIModel(petImage = newPetImage.last())
     }
 
-    fun loadPetData(userId: String, petNo: Int, topicColorList: Array<String>) {
+    fun loadPetData(context: Context, userId: String, petNo: Int, topicColorList: Array<String>) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -67,7 +69,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                                 petBirth = SupportData.birthDayForm(year = it.birthYear, month = it.birthMonth, day = it.birthDay),
                                 petWeight = String.format("%.1f", it.weight))
 
-                        setBreedDetailData(breedIndex = it.breed, petData = recentPetData.copy())
+                        setBreedDetailData(context = context, breedIndex = it.breed, petData = recentPetData.copy())
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
@@ -79,7 +81,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
     }
 
     // 변경된 데이터 있는지 확인
-    fun enableSaveData(topicColor: String? = null, petType: String? = null, petName: String? = null,
+    fun enableSaveData(context: Context, topicColor: String? = null, petType: String? = null, petName: String? = null,
                          petGender: String? = null, petNeutered: Boolean? = null, petWeight: Float? = null) {
         launch {
             Observable.create<Boolean> {
@@ -121,7 +123,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                 PrintLog.d("existChangedData", resultData.toString(), tag)
                 uiData.value = UIModel(saveEnable = resultData)
                 petType?.let {
-                    uiData.value = UIModel(breedName = TextConstants.SELECT_PET_BREED, isBreedSelect = false,
+                    uiData.value = UIModel(breedName = context.getString(R.string.pet_breed_select), isBreedSelect = false,
                             breedDetailVisibility = View.GONE,
                             hairTypeVisibility = View.GONE, hairColorVisibility = View.GONE)
                 }
@@ -151,7 +153,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
         }
     }
 
-    fun setBreedDetailData(breedIndex: String, petData: ResUserPetData?) {
+    fun setBreedDetailData(context: Context, breedIndex: String, petData: ResUserPetData?) {
         launch {
             Observable.create<BreedData> {
                 val petBreedData = when (recentPetData.type) {
@@ -222,7 +224,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                         hairTypeData = it.hairTypeData, hairTypeVisibility = it.hairTypeData?.let{_->View.VISIBLE}?:let{_->View.GONE},
                         hairColorData = it.hairColorData, hairColorVisibility = it.hairColorData?.let{_->View.VISIBLE}?:let{_->View.GONE})
 
-                enableSaveData()
+                enableSaveData(context = context)
             }
         }
     }
@@ -268,7 +270,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
     fun savePet(authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -333,7 +335,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
     fun deletePet(authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 

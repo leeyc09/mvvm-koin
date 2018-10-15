@@ -143,7 +143,7 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
         // 닉네임, 소개, 출생연도 입력 이벤트
         ViewFunction.onTextChange(editText = editTextNick) { _ ->
             if (editTextNick.hasFocus()) {
-                registerViewModel.nickNameRegexCheck(nickName = getNickNameText())
+                registerViewModel.nickNameRegexCheck(context = this, nickName = getNickNameText())
                 profileEditViewModel.existChangedData(nickName = getNickNameText())
             }
         }

@@ -1,7 +1,9 @@
 package xlab.world.xlab.view.login
 
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
 import io.reactivex.Observable
+import xlab.world.xlab.R
 import xlab.world.xlab.data.request.ReqLoginData
 import xlab.world.xlab.data.response.ResCheckValidTokenData
 import xlab.world.xlab.data.response.ResUserLoginData
@@ -29,7 +31,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     fun requestLoginByAccessToken(authorization: String, fcmToken: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -62,7 +64,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     fun generateNewToken(authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.value = UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT)
+            uiData.value = UIModel(toastMessage = networkCheck.networkErrorMsg)
             return
         }
         uiData.value = UIModel(isLoading = true)
@@ -95,15 +97,16 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
         }
     }
     // 로그인 요청
-    fun requestLogin(loginType: Int, email: String = "", password: String = "", socialToken: String = "", fcmToken: String = "") {
+    fun requestLogin(context: Context,loginType: Int, email: String = "", password: String = "",
+                     socialToken: String = "", fcmToken: String = "") {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.value = UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT)
+            uiData.value = UIModel(toastMessage = networkCheck.networkErrorMsg)
             return
         }
         if (loginType == AppConstants.LOCAL_LOGIN) { // 로컬 로그인 요청일 경우 -> 이메일 정규식 확인
             if (!DataRegex.emailRegex(email)) {
-                uiData.value = UIModel(toastMessage = TextConstants.LOGIN_WRONG_EMAIL_PATTERN)
+                uiData.value = UIModel(toastMessage = context.getString(R.string.toast_email_format_wrong))
                 return
             }
         }

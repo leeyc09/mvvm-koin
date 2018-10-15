@@ -69,13 +69,13 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
                     RequestCodeData.POST_UPLOAD, // 포스트 수정
                     RequestCodeData.TAG_POST, // 포스트 태그
                     RequestCodeData.GOODS_DETAIL -> { // 상품 상세
-                        postDetailViewModel.loadPostDetail(authorization = spHelper.authorization, postId = postId, userId = spHelper.userId)
+                        postDetailViewModel.loadPostDetail(context = this, authorization = spHelper.authorization, postId = postId, userId = spHelper.userId)
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
                 this.resultCode = ResultCodeData.LOGIN_SUCCESS
-                postDetailViewModel.loadPostDetail(authorization = spHelper.authorization, postId = postId, userId = spHelper.userId)
+                postDetailViewModel.loadPostDetail(context = this, authorization = spHelper.authorization, postId = postId, userId = spHelper.userId)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
                 setResult(ResultCodeData.LOGOUT_SUCCESS)
@@ -114,7 +114,7 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
                     postDetailViewModel.likePost(authorization = spHelper.authorization, position = position, postData = postDetailAdapter.getItem(position))
                 },
                 savePostEvent = { position ->
-                    postDetailViewModel.savePost(authorization = spHelper.authorization, position = position, postData = postDetailAdapter.getItem(position))
+                    postDetailViewModel.savePost(context = this, authorization = spHelper.authorization, position = position, postData = postDetailAdapter.getItem(position))
                 })
         userDefaultListener = UserDefaultListener(context = this,
                 followUserEvent = { position ->
@@ -136,7 +136,7 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
-        postDetailViewModel.loadPostDetail(authorization = spHelper.authorization, postId = postId, userId = spHelper.userId)
+        postDetailViewModel.loadPostDetail(context = this, authorization = spHelper.authorization, postId = postId, userId = spHelper.userId)
     }
 
     private fun onBindEvent() {

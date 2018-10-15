@@ -97,7 +97,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.PROFILE_EDIT -> { // 프로필 수정
-                        profileViewModel.loadUserData(authorization = spHelper.authorization, userId = userId, loadingBar = null)
+                        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = userId, loadingBar = null)
                     }
                     RequestCodeData.USED_GOODS, // 사용한 제품 더보기
                     RequestCodeData.FOLLOW, // 팔로우, 팔로잉
@@ -109,7 +109,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     RequestCodeData.POST_COMMENT, // 댓글
                     RequestCodeData.GOODS_DETAIL, // 상품 상세
                     RequestCodeData.MY_SHOP -> {
-                        profileViewModel.loadUserData(authorization = spHelper.authorization, userId = userId, loadingBar = null)
+                        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = userId, loadingBar = null)
                         profileViewModel.loadUserTopicData(userId = userId, page = 1, topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
                         profileAlbumFragment.reloadPetUsedGoodsData(loadingBar = null)
                         profilePetFragment.reloadPetUsedGoodsData(loadingBar = null)
@@ -131,7 +131,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
                 this.resultCode = ResultCodeData.LOGIN_SUCCESS
                 profileViewModel.setProfileType(profileUserId = userId, loginUserId = spHelper.userId, loadingBar = null)
-                profileViewModel.loadUserData(authorization = spHelper.authorization, userId = userId, loadingBar = null)
+                profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = userId, loadingBar = null)
                 profileViewModel.loadUserTopicData(userId = userId, page = 1, topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
@@ -183,7 +183,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         topicRecyclerView.addItemDecoration(CustomItemDecoration(context = this, right = 4f))
 
         profileViewModel.setProfileType(profileUserId = userId, loginUserId = spHelper.userId)
-        profileViewModel.loadUserData(authorization = spHelper.authorization, userId = userId)
+        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = userId)
         profileViewModel.loadUserTopicData(userId = userId, page = 1, topicDataCount = 0, loginUserId = spHelper.userId)
     }
 

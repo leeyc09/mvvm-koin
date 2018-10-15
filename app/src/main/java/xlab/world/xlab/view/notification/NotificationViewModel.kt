@@ -5,13 +5,11 @@ import io.reactivex.Observable
 import xlab.world.xlab.data.adapter.ShopNotificationData
 import xlab.world.xlab.data.adapter.SocialNotificationData
 import xlab.world.xlab.data.adapter.SocialNotificationListData
-import xlab.world.xlab.data.response.ResSocialNotificationData
 import xlab.world.xlab.server.provider.ApiNotificationProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.TextConstants
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
@@ -26,7 +24,7 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
     fun loadSocialNotificationData(authorization: String, page: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -69,7 +67,7 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
     fun loadShopNotificationData(authorization: String, page: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 

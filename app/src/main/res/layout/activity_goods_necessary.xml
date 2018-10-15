@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".view.goodsInfo.GoodsNecessaryActivity">
+
+    <include
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/action_bar_default"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="16dp">
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/model_name"
+            android:textSize="12sp"
+            android:textColor="@color/colorA4A4A4"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:id="@+id/textViewGoodsName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:textSize="12sp"
+            android:textColor="@color/color000000"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorE2E2E2"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="16dp">
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/long_necessary"
+            android:textSize="12sp"
+            android:textColor="@color/colorA4A4A4"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:text="@string/long_necessary_answer"
+            android:textSize="12sp"
+            android:textColor="@color/color000000"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorE2E2E2"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="16dp">
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/origin"
+            android:textSize="12sp"
+            android:textColor="@color/colorA4A4A4"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:id="@+id/textViewOrigin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:textSize="12sp"
+            android:textColor="@color/color000000"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorE2E2E2"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="16dp">
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/maker"
+            android:textSize="12sp"
+            android:textColor="@color/colorA4A4A4"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:id="@+id/textViewMaker"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:textSize="12sp"
+            android:textColor="@color/color000000"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorE2E2E2"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="16dp">
+
+        <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/call_number"
+            android:textSize="12sp"
+            android:textColor="@color/colorA4A4A4"/>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp">
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/holapetPhoneLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/about_goods"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorA4A4A4"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="2dp">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/esc_company"
+                        android:textSize="12sp"
+                        android:textColor="@color/color000000"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularHan
+                        android:id="@+id/textViewGoodsCall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/esc_company_phone_num"
+                        android:textSize="12sp"
+                        android:textColor="@color/color5300ED"
+                        android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/about_service"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorA4A4A4"
+                    android:layout_marginTop="15dp"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="2dp">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/petxlab_company"
+                        android:textSize="12sp"
+                        android:textColor="@color/color000000"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularHan
+                        android:id="@+id/textViewServiceCall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/xlab_cs_num"
+                        android:textSize="12sp"
+                        android:textColor="@color/color5300ED"
+                        android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/xlabPhoneLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="2dp">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/petxlab_company"
+                        android:textSize="12sp"
+                        android:textColor="@color/color000000"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularHan
+                        android:id="@+id/textViewServiceCall2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/xlab_cs_num"
+                        android:textSize="12sp"
+                        android:textColor="@color/color5300ED"
+                        android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorE2E2E2"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="8dp"/>
+
+</LinearLayout>

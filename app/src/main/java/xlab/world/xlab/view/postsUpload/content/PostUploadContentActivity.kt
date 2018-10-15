@@ -241,7 +241,7 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
                         postContentViewModel.initViewModelData(imagePaths = intent.getStringArrayListExtra(IntentPassName.IMAGE_PATH_LIST),
                                 youTubeVideoId = intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID))
                     } else { // 포스트 업데이트
-                        postContentViewModel.loadPost(authorization = spHelper.authorization)
+                        postContentViewModel.loadPost(context = this, authorization = spHelper.authorization)
                     }
                 }
             }

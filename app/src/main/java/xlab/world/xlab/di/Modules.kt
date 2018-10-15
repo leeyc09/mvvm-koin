@@ -15,7 +15,9 @@ import xlab.world.xlab.view.comment.CommentViewModel
 import xlab.world.xlab.view.follow.FollowViewModel
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
 import xlab.world.xlab.view.goodsDetail.GoodsDetailViewModel
+import xlab.world.xlab.view.goodsInfo.GoodsInfoVewModel
 import xlab.world.xlab.view.main.MainViewModel
+import xlab.world.xlab.view.myShopping.MyShoppingViewModel
 import xlab.world.xlab.view.notice.NoticeViewModel
 import xlab.world.xlab.view.notification.NotificationViewModel
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
@@ -87,6 +89,10 @@ val viewModelModule: Module = applicationContext {
     viewModel { NotificationViewModel(apiNotification = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Goods Detail View
     viewModel { GoodsDetailViewModel(apiGodo = get(), apiShop = get(), apiPet = get(), apiUser = get(), apiUserActivity = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Goods Info View
+    viewModel { GoodsInfoVewModel(scheduler = get()) }
+    // ViewModel for My Shopping View
+    viewModel { MyShoppingViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

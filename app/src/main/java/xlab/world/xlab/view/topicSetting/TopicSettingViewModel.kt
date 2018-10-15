@@ -5,7 +5,6 @@ import xlab.world.xlab.data.adapter.TopicSettingData
 import xlab.world.xlab.data.adapter.TopicSettingListData
 import xlab.world.xlab.server.provider.ApiPetProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
-import xlab.world.xlab.utils.support.TextConstants
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.view.AbstractViewModel
@@ -22,7 +21,7 @@ class TopicSettingViewModel(private val apiPet: ApiPetProvider,
     fun loadUserPetsData(userId: String, page: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -57,7 +56,7 @@ class TopicSettingViewModel(private val apiPet: ApiPetProvider,
     fun changeTopicToggle(authorization: String, position: Int, topicData: TopicSettingListData) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 

@@ -35,7 +35,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
     fun loadProfileEditData(authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
@@ -114,7 +114,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
     fun changeProfileData(authorization: String, userId: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = TextConstants.CHECK_NETWORK_CONNECT))
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
