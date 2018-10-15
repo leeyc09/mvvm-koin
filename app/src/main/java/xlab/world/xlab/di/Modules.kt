@@ -11,6 +11,7 @@ import xlab.world.xlab.server.`interface`.*
 import xlab.world.xlab.server.provider.*
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
+import xlab.world.xlab.view.cart.CartViewModel
 import xlab.world.xlab.view.comment.CommentViewModel
 import xlab.world.xlab.view.follow.FollowViewModel
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
@@ -96,6 +97,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { MyShoppingViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Recent View View
     viewModel { RecentViewViewModel(apiShop = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Cart View
+    viewModel { CartViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

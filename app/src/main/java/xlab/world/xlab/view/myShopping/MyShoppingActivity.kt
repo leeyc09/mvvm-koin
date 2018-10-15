@@ -192,7 +192,7 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
                     finish()
                 }
                 R.id.actionCartBtn -> { // 카트
-
+                    RunActivity.cartActivity(context = this)
                 }
                 R.id.recentShowGoodsBtn -> { // 최근 본 상품
                     RunActivity.recentViewGoodsActivity(context = this)

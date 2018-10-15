@@ -115,6 +115,7 @@
 
     <!-- TODO: No Exist Data -->
     <string name="empty_recent_view_goods">최근 본 제품이 없어요</string>
+    <string name="empty_cart">카트에 담긴 제품이 없습니다</string>
 
     <!-- TODO: OnBoarding -->
     <string name="skip_onBoarding">건너뛰기</string>
@@ -552,7 +553,6 @@
     <string name="my_cart_title">카트</string>
     <string name="select_all">전체 선택</string>
     <string name="payment_price">결제금액</string>
-    <string name="no_cart">카트에 담긴 제품이 없습니다</string>
     <string name="cart_delivery">배송</string>
     <string name="plus_unit">"+"</string>
     <string name="xlab_delivery">슬랩 배송</string>

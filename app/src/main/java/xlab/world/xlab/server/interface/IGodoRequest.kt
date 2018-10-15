@@ -15,11 +15,17 @@ interface IGodoRequest {
                           @Query("name") name: String,
                           @Query("email") email: String): Observable<ResMessageData>
 
+    @GET(ApiURL.SHOP_MY_CART)
+    fun getMyCart(@Header("Authorization") authorization: String): Observable<ResCartData>
+
     @POST(ApiURL.SHOP_MY_CART_ADD)
     fun addMyCart(@Header("Authorization") authorization: String,
                   @Query("goodsNo") goodsNo: String,
                   @Query("count") count: Int): Observable<ResAddCartData>
 
+    @POST(ApiURL.SHOP_MY_CART_DELETE)
+    fun deleteMyCart(@Header("Authorization") authorization: String,
+                     @Query("sno") sno: String): Observable<ResMessageData>
 
     @GET(ApiURL.SHOP_ORDER_STATUS_NUM)
     fun getOrderStatusNum(@Header("Authorization") authorization: String): Observable<ResOrderStatusCntData>

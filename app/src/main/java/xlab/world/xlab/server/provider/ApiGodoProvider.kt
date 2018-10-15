@@ -16,9 +16,17 @@ interface ApiGodoProvider {
     fun requestUpdateShopProfile(scheduler: SchedulerProvider, authorization: String, name: String, email: String,
                                  responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
+    // cart 목록 요청
+    fun requestGetCart(scheduler: SchedulerProvider, authorization: String,
+                       responseData: (ResCartData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
     // cart 추가 요청
     fun requestAddCart(scheduler: SchedulerProvider, authorization: String, goodsNo: String, count: Int,
                        responseData: (ResAddCartData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // cart 삭제 요청
+    fun requestDeleteCart(scheduler: SchedulerProvider, authorization: String, sno: String,
+                          responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
     // order status 갯수 요청
     fun requestOrderStatusCnt(scheduler: SchedulerProvider, authorization: String,
@@ -47,9 +55,32 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
                     errorData(errorHandle<ResMessageErrorData>(it))
                 })
     }
+
+    override fun requestGetCart(scheduler: SchedulerProvider, authorization: String,
+                                responseData: (ResCartData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iGodoRequest.getMyCart(authorization = authorization)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
     override fun requestAddCart(scheduler: SchedulerProvider, authorization: String, goodsNo: String, count: Int,
                                 responseData: (ResAddCartData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.addMyCart(authorization = authorization, goodsNo = goodsNo, count = count)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestDeleteCart(scheduler: SchedulerProvider, authorization: String, sno: String,
+                                   responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iGodoRequest.deleteMyCart(authorization = authorization, sno = sno)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

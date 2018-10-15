@@ -156,21 +156,6 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
                     })
         }
     }
-
-//    private fun getTopicBreed(petData: ArrayList<ResUserDefaultData.UserPetInfo>?): ArrayList<String>{
-//        // topic(pet) 종 이름 가져오기
-//        val topicBreed = ArrayList<String>()
-//        petData?.forEach { pet ->
-//            val breedStr = when (pet.type) {
-//                petInfo.dogCode -> petInfo.dogBreedInfo[pet.breed.toInt()].nameKor
-//                petInfo.catCode -> petInfo.catBreedInfo[pet.breed.toInt()].nameKor
-//                else -> ""
-//            }
-//            if (breedStr.isNotEmpty())
-//                topicBreed.add(breedStr)
-//        }
-//        return topicBreed
-//    }
 }
 
 data class FollowEvent(val status: Boolean? = null)

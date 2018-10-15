@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/mainLayout">
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/deliveryCompanyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp">
+
+        <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+            android:id="@+id/textViewDeliveryCompany"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textSize="18sp"
+            android:textColor="@color/color000000"
+            android:layout_gravity="center"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+            android:id="@+id/textViewDeliveryCompanyName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textSize="13sp"
+            android:textColor="@color/colorBFBFBF"
+            android:layout_marginStart="4dp"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/selectBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/circle_checkbox_button"
+        android:layout_marginStart="20dp"/>
+
+    <LinearLayout
+        android:id="@+id/goodsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imageViewGoods"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:scaleType="fitXY"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginEnd="8dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+                    android:id="@+id/textViewTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="펫모닝 [PMD-114] 동물 쫄쫄이 toy (임의발송)"
+                    android:textSize="13sp"
+                    android:textColor="@color/color6D6D6D"
+                    android:layout_marginTop="8dp"/>
+
+                <ImageView
+                    android:id="@+id/deleteBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/delete_list"
+                    android:padding="8dp"
+                    android:layout_marginStart="12dp"/>
+
+            </LinearLayout>
+
+            <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+                android:id="@+id/textViewOption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="블랙 ∙ L"
+                android:textSize="12sp"
+                android:textColor="@color/colorBFBFBF"
+                android:layout_marginTop="2dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="14dp">
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center">
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0.5dp"
+                        android:background="@color/colorBFBFBF"
+                        android:layout_marginStart="13dp"
+                        android:layout_marginEnd="13dp"
+                        app:layout_constraintTop_toTopOf="@id/goodsMinusBtn"
+                        app:layout_constraintStart_toStartOf="@id/goodsMinusBtn"
+                        app:layout_constraintEnd_toEndOf="@id/goodsPlusBtn"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0.5dp"
+                        android:background="@color/colorBFBFBF"
+                        android:layout_marginStart="13dp"
+                        android:layout_marginEnd="13dp"
+                        app:layout_constraintBottom_toBottomOf="@id/goodsMinusBtn"
+                        app:layout_constraintStart_toStartOf="@id/goodsMinusBtn"
+                        app:layout_constraintEnd_toEndOf="@id/goodsPlusBtn"/>
+
+                    <ImageView
+                        android:id="@+id/goodsMinusBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/stepper_minus" />
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularHan
+                        android:id="@+id/textViewGoodsCnt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="14sp"
+                        android:textColor="@color/color000000"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/goodsMinusBtn"/>
+
+                    <ImageView
+                        android:id="@+id/goodsPlusBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/stepper_plus"
+                        app:layout_constraintStart_toEndOf="@id/textViewGoodsCnt"/>
+
+                </android.support.constraint.ConstraintLayout>
+
+                <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                    android:id="@+id/textViewPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="17,000"
+                    android:textSize="14sp"
+                    android:textColor="@color/color000000"
+                    android:layout_gravity="center"/>
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/price_unit"
+                    android:textSize="14sp"
+                    android:textColor="@color/color000000"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="20dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/priceLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="24.5dp">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/colorD8D8D8" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8.5dp"
+            android:paddingBottom="43dp">
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/goods"
+                android:textSize="12sp"
+                android:textColor="@color/colorBFBFBF"
+                android:layout_gravity="center" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                android:id="@+id/textViewTotalGoodsPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/color4A4A4A"
+                android:layout_marginStart="3dp"
+                android:layout_gravity="center" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/price_unit"
+                android:textSize="12sp"
+                android:textColor="@color/color4A4A4A"
+                android:layout_gravity="center" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularHan
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/plus_unit"
+                android:textSize="14sp"
+                android:textColor="@color/colorA4A4A4"
+                android:layout_marginStart="4dp"
+                android:layout_gravity="center"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cart_delivery"
+                android:textSize="12sp"
+                android:textColor="@color/colorBFBFBF"
+                android:layout_marginStart="4dp"
+                android:layout_gravity="center" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                android:id="@+id/textViewTotalDeliveryPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/color4A4A4A"
+                android:layout_marginStart="3dp"
+                android:layout_gravity="center" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/price_unit"
+                android:textSize="12sp"
+                android:textColor="@color/color4A4A4A"
+                android:layout_gravity="center" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/total_str"
+                android:textSize="13sp"
+                android:textColor="@color/colorA4A4A4"
+                android:gravity="end"
+                android:layout_gravity="center"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                android:id="@+id/textViewTotalPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="@color/color4A4A4A"
+                android:layout_marginStart="3dp"
+                android:layout_gravity="center" />
+
+            <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/price_unit"
+                android:textSize="13sp"
+                android:textColor="@color/color4A4A4A"
+                android:layout_marginStart="2dp"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

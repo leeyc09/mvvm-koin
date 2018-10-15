@@ -359,7 +359,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                     shareDialog.show(supportFragmentManager, "shareDialog")
                 }
                 R.id.actionCartBtn -> { // 장바구니
-
+                    RunActivity.cartActivity(context = this)
                 }
                 R.id.brandBtn -> { // 브랜드 상품 보기
                     RunActivity.searchBrandGoodsActivity(context = this,

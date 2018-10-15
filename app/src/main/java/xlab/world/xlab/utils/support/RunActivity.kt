@@ -6,6 +6,7 @@ import com.google.android.youtube.player.YouTubeStandalonePlayer
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.SelectUsedGoodsListData
 import xlab.world.xlab.data.response.ResUserLoginData
+import xlab.world.xlab.view.cart.CartActivity
 import xlab.world.xlab.view.comment.CommentActivity
 import xlab.world.xlab.view.follow.FollowerActivity
 import xlab.world.xlab.view.follow.FollowingActivity
@@ -264,5 +265,10 @@ object RunActivity {
     fun recentViewGoodsActivity(context: Activity) {
         val intent = RecentViewGoodsActivity.newIntent(context = context)
         context.startActivityForResult(intent, RequestCodeData.RECENT_VIEW_GOODS)
+    }
+
+    fun cartActivity(context: Activity) {
+        val intent = CartActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.MY_CART)
     }
 }
