@@ -27,4 +27,7 @@ object IntentPassName {
     const val GOODS_NAME = "GOODS_NAME"
     const val GOODS_ORIGIN = "GOODS_ORIGIN"
     const val GOODS_MAKER = "GOODS_MAKER"
+    const val INTENT_FROM = "INTENT_FROM"
+    const val SNO_LIST = "SNO_LIST"
+    const val ORDER_NO = "ORDER_NO"
 }

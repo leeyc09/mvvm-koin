@@ -17,19 +17,15 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.CartAdapter
 import xlab.world.xlab.data.adapter.CartListData
 import xlab.world.xlab.utils.listener.DefaultListener
-import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.RequestCodeData
-import xlab.world.xlab.utils.support.ResultCodeData
-import xlab.world.xlab.utils.support.SPHelper
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.webView.BuyGoodsWebViewActivity
 
 class CartActivity : AppCompatActivity(), View.OnClickListener {
     private val cartViewModel: CartViewModel by viewModel()
     private val spHelper: SPHelper by inject()
-
-    private var resultCode = Activity.RESULT_CANCELED
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
@@ -71,8 +67,7 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
 
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
+                cartViewModel.setResultCodeOK()
                 when (requestCode) {
                     RequestCodeData.GOODS_DETAIL -> { // 제품 상세
                         cartViewModel.loadCartData(authorization = spHelper.authorization, page = 1)
@@ -174,6 +169,10 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.paymentPrice?.let {
                     textViewTotalPayPrice.setText(it, TextView.BufferType.SPANNABLE)
                 }
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
             }
         })
 
@@ -185,32 +184,28 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         })
+
+        // buy goods 이벤트 observe
+        cartViewModel.buySelectedGoodsEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.goodsSnoList?.let {
+                    RunActivity.buyGoodsWebViewActivity(context = this, snoList = it, from = AppConstants.FROM_CART)
+                }
+            }
+        })
     }
 
     override fun onClick(v: View?) {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    cartViewModel.actionBackAction()
                 }
                 R.id.allSelectBtn -> { // 전체 선택
                     cartViewModel.selectAllCartData(isSelectAll = allSelectBtn.isSelected)
                 }
                 R.id.buyingBtn -> { // 구매하기
-//                    val buyGoodsList = ArrayList<Int>()
-//                    myCartData.items.forEach { item ->
-//                        if (item.isSelect) {
-//                            buyGoodsList.add(item.sno.toInt())
-//                        }
-//                    }
-//                    if (buyGoodsList.isNotEmpty()) {
-//                        val intent = BuyGoodsWebViewActivity.newIntent(this,
-//                                sno = buyGoodsList,
-//                                from = BuyGoodsWebViewActivity.fromCart)
-//
-//                        startActivityForResult(intent, RequestCodeData.GOODS_BUYING)
-//                    }
+                    cartViewModel.buySelectedGoods()
                 }
             }
         }

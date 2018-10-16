@@ -1,5 +1,6 @@
 package xlab.world.xlab.view.cart
 
+import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
 import io.reactivex.Observable
 import xlab.world.xlab.data.adapter.CartData
@@ -19,8 +20,16 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
     val tag = "Cart"
     private var cartData: CartData = CartData()
 
+    private var resultCode = Activity.RESULT_CANCELED
+
     val loadCartEvent = SingleLiveEvent<CartEvent>()
+    val buySelectedGoodsEvent = SingleLiveEvent<BuySelectedModel>()
     val uiData = MutableLiveData<UIModel>()
+
+    fun setResultCodeOK() {
+        if (this.resultCode == Activity.RESULT_CANCELED)
+            this.resultCode = Activity.RESULT_OK
+    }
 
     fun selectAllCartData(isSelectAll: Boolean) {
         launch {
@@ -79,7 +88,8 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
             apiGodo.requestUpdateCart(scheduler = scheduler, authorization = authorization, sno = cartListData.sno, count = cnt,
                     responseData = {
                         cartListData.goodsCnt = cnt
-                        PrintLog.d("viewModel cartData", cartData.toString(), tag)
+                        setResultCodeOK()
+
                         uiData.value = UIModel(isLoading = false, cartDataUpdate = true)
                     },
                     errorData = { errorData ->
@@ -109,6 +119,7 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
                         cartData.items.forEach { data ->
                             if (data.isSelect) selectCnt++
                         }
+                        setResultCodeOK()
 
                         uiData.value = UIModel(isLoading = false, cartDataUpdate = true,
                                 selectCnt = selectCnt.toString(), totalCnt = cartData.total.toString(), selectAll = selectCnt == cartData.total)
@@ -204,13 +215,39 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
             }
         }
     }
+
+    fun buySelectedGoods() {
+        launch {
+            Observable.create<ArrayList<Int>> {
+                val buyGoodsList = ArrayList<Int>()
+
+                cartData.items.forEach { item ->
+                    if (item.isSelect) buyGoodsList.add(item.sno.toInt())
+                }
+
+                if (buyGoodsList.isNotEmpty())
+                    it.onNext(buyGoodsList)
+                it.onComplete()
+
+            }.with(scheduler).subscribe {
+                PrintLog.d("buySelectedGoods list", it.toString(), tag)
+                buySelectedGoodsEvent.value = BuySelectedModel(goodsSnoList = it)
+            }
+        }
+    }
+
+    fun actionBackAction() {
+        uiData.postValue(UIModel(resultCode = resultCode))
+    }
 }
 
 data class CartEvent(val status: Boolean? = null)
+data class BuySelectedModel(val goodsSnoList: ArrayList<Int>? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val cartData: CartData? = null,
                    val cartDataUpdate: Boolean? = null, val cartDataUpdateIndex: Int? = null,
                    val selectCnt: String? = null, val totalCnt: String? = null,
                    val selectAll: Boolean? = null,
                    val totalGoodsPrice: String? = null, val totalDeliveryPrice: String? = null,
-                   val paymentPrice: String? = null)
+                   val paymentPrice: String? = null,
+                   val resultCode: Int? = null)

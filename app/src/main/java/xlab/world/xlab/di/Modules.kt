@@ -37,6 +37,7 @@ import xlab.world.xlab.view.setting.SettingViewModel
 import xlab.world.xlab.view.topicDetail.TopicPetDetailViewModel
 import xlab.world.xlab.view.topicEdit.TopicPetEditViewModel
 import xlab.world.xlab.view.topicSetting.TopicSettingViewModel
+import xlab.world.xlab.view.webView.BuyGoodsViewModel
 import xlab.world.xlab.view.withdraw.WithDrawViewModel
 
 /**
@@ -99,6 +100,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { RecentViewViewModel(apiShop = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Cart View
     viewModel { CartViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Buy Goods View
+    viewModel { BuyGoodsViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
@@ -120,8 +123,8 @@ val utilModule: Module = applicationContext {
     bean { GPUImageFilterData() }
 }
 
-//const val xlabRemoteBaseUrl = ApiURL.XLAB_API_URL_SSL
-const val xlabRemoteBaseUrl = "http://192.168.1.11:8080"
+const val xlabRemoteBaseUrl = ApiURL.XLAB_API_URL_SSL
+//const val xlabRemoteBaseUrl = "http://192.168.1.11:8080"
 val remoteModule: Module = applicationContext {
     // provided web components
     bean { createOkHttpClient() }

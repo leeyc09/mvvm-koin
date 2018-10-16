@@ -329,7 +329,7 @@ class CameraHelper(private val context: Context,
                 camera!!.startPreview()
                 isCameraReloading = false
             }
-            }
+        }
     }
 
     private inner class MediaPrepareTask: AsyncTask<Void, Void, Boolean>() {

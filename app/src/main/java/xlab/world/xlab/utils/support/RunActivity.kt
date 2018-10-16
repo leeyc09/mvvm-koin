@@ -43,6 +43,7 @@ import xlab.world.xlab.view.setting.SettingActivity
 import xlab.world.xlab.view.topicDetail.TopicPetDetailActivity
 import xlab.world.xlab.view.topicEdit.TopicPetEditActivity
 import xlab.world.xlab.view.topicSetting.TopicSettingActivity
+import xlab.world.xlab.view.webView.BuyGoodsWebViewActivity
 import xlab.world.xlab.view.webView.DefaultWebViewActivity
 import xlab.world.xlab.view.webView.PolicyActivity
 import xlab.world.xlab.view.withdraw.WithdrawActivity
@@ -270,5 +271,10 @@ object RunActivity {
     fun cartActivity(context: Activity) {
         val intent = CartActivity.newIntent(context = context)
         context.startActivityForResult(intent, RequestCodeData.MY_CART)
+    }
+
+    fun buyGoodsWebViewActivity(context: Activity, snoList: ArrayList<Int>, from: Int) {
+        val intent = BuyGoodsWebViewActivity.newIntent(context = context, snoList = snoList, from = from)
+        context.startActivityForResult(intent, RequestCodeData.GOODS_BUYING)
     }
 }

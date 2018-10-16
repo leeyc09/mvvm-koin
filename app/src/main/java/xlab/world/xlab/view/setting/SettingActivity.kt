@@ -158,12 +158,12 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
             logoutEventData?.let { _ ->
                 logoutEventData.status?.let { isSuccess ->
                     if (isSuccess) {
-                        spHelper.logout()
-                        RunActivity.loginActivity(context = this@SettingActivity, isComePreLoadActivity = true, linkData = null)
-
-                        setResult(ResultCodeData.LOGOUT_SUCCESS)
-                        finish()
-//                        shopLogoutDialog.requestLogout(userId = spHelper.userId)
+//                        spHelper.logout()
+//                        RunActivity.loginActivity(context = this@SettingActivity, isComePreLoadActivity = true, linkData = null)
+//
+//                        setResult(ResultCodeData.LOGOUT_SUCCESS)
+//                        finish()
+                        shopLogoutDialog.requestLogout(userId = spHelper.userId)
                     }
                 }
             }

@@ -8,16 +8,16 @@ object PrintLog {
     // Log for debug
     fun d(title:String, log: String, tag: String? = null) {
         if (BuildConfig.DEBUG)
-            Log.d(tag ?: defaultTag, "$title => $log")
+            Log.d(defaultTag ?: defaultTag, "$title => $log")
     }
     // Log for error
     fun e(title:String, log: String, tag: String? = null) {
         if (BuildConfig.DEBUG)
-            Log.e(tag ?: defaultTag, "$title => $log")
+            Log.e(defaultTag ?: defaultTag, "$title => $log")
     }
     // Log for information
     fun i(title:String, log: String, tag: String? = null) {
         if (BuildConfig.DEBUG)
-            Log.i(tag ?: defaultTag, "$title => $log")
+            Log.i(defaultTag ?: defaultTag, "$title => $log")
     }
 }

@@ -10,6 +10,10 @@ object AppConstants {
     const val CS_XLAB = "7"
     const val CS_HOLAPET = "2"
 
+    // buy goods from intent type
+    const val FROM_GOODS_DETAIL = 0
+    const val FROM_CART = 1
+
     // used goods from type
     const val FROM_BUY    = 1
     const val FROM_RATING = 2
