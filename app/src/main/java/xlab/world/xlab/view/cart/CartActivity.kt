@@ -15,6 +15,7 @@ import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.CartAdapter
+import xlab.world.xlab.data.adapter.CartListData
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.RequestCodeData
@@ -37,15 +38,16 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var defaultListener: DefaultListener
     private val selectListener = View.OnClickListener { view ->
-        cartViewModel.selectCartData(cartData = cartAdapter.getItem(position = view.tag as Int),
-                selectCnt = textViewSelectCnt.text.toString().toInt())
+        cartViewModel.selectCartData(cartListData = view.tag as CartListData)
     }
     private val deleteListener = View.OnClickListener { view ->
-        cartViewModel.deleteCartData(authorization = spHelper.authorization, sno = view.tag as String)
+        cartViewModel.deleteCartData(authorization = spHelper.authorization, cartListData = view.tag as CartListData)
     }
     private val goodsMinusListener = View.OnClickListener { view ->
+        cartViewModel.cartGoodsCntMinus(authorization = spHelper.authorization, cartListData = view.tag as CartListData)
     }
     private val goodsPlusListener = View.OnClickListener { view ->
+        cartViewModel.cartGoodsCntPlus(authorization = spHelper.authorization, cartListData = view.tag as CartListData)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,14 +75,8 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
                     this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.GOODS_DETAIL -> { // 제품 상세
-//                        loadCartData ({ cartData ->
-//                            myCartAdapter.updateData(cartData)
-//                            textViewSelectNum.setText(myCartData.total.toString(), TextView.BufferType.SPANNABLE)
-//                            textViewTotalNum.setText(myCartData.total.toString(), TextView.BufferType.SPANNABLE)
-//                            allSelectBtn.isSelected = true
-//                            setTotalPrice()
-//                        },{
-//                        })
+                        cartViewModel.loadCartData(authorization = spHelper.authorization, page = 1)
+                        cartViewModel.loadCartData(authorization = spHelper.authorization, page = 1)
                     }
                     RequestCodeData.GOODS_BUYING -> { // 구매하기
 //                        data?.let {
@@ -90,7 +86,7 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
 //                        }
                     }
                     RequestCodeData.COMPLETE_BUYING -> { // 결제 완료
-//                        reloadAllData { max, current -> }
+                        cartViewModel.loadCartData(authorization = spHelper.authorization, page = 1)
                     }
                 }
             }
@@ -149,13 +145,12 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
                     defaultToast.showToast(message = it)
                 }
                 uiData.cartData?.let {
-                    if (it.nextPage <= 2) // 요청한 page => 첫페이지
-                        cartAdapter.updateData(cartData = it)
-                    else
-                        cartAdapter.addData(cartData = it)
+                    cartAdapter.linkData(cartData = it)
                 }
                 uiData.cartDataUpdate?.let {
-                    if (it) cartAdapter.notifyDataSetChanged()
+                    cartAdapter.notifyDataSetChanged()
+                    cartViewModel.setTotalPrice()
+                    cartAdapter.print()
                 }
                 uiData.cartDataUpdateIndex?.let {
                     cartAdapter.notifyItemChanged(it)
@@ -165,9 +160,19 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 uiData.selectCnt?.let {
                     textViewSelectCnt.setText(it, TextView.BufferType.SPANNABLE)
+                    textViewOrderGoodsNum.setText(it, TextView.BufferType.SPANNABLE)
                 }
                 uiData.totalCnt?.let {
                     textViewTotalCnt.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.totalGoodsPrice?.let {
+                    textViewTotalOrderPrice.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.totalDeliveryPrice?.let {
+                    textViewTotalDeliverPrice.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.paymentPrice?.let {
+                    textViewTotalPayPrice.setText(it, TextView.BufferType.SPANNABLE)
                 }
             }
         })
@@ -177,18 +182,6 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
             eventData?.let { _ ->
                 eventData.status?.let { isLoading ->
                     cartAdapter.dataLoading = isLoading
-                }
-            }
-        })
-
-        // delete cart 이벤트 observe
-        cartViewModel.deleteCartEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.status?.let { isSuccess ->
-                    if (isSuccess && this.resultCode == Activity.RESULT_CANCELED)
-                        this.resultCode = Activity.RESULT_OK
-
-                    cartViewModel.loadCartData(authorization = spHelper.authorization, page = 1)
                 }
             }
         })
@@ -202,14 +195,7 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
                     finish()
                 }
                 R.id.allSelectBtn -> { // 전체 선택
-//                    allSelectBtn.isSelected =
-//                            myCartAdapter.setAllItemSelect(!allSelectBtn.isSelected)
-//                    val selectedNum =
-//                            if (allSelectBtn.isSelected) myCartData.total
-//                            else 0
-//
-//                    textViewSelectNum.setText(selectedNum.toString(), TextView.BufferType.SPANNABLE)
-//                    setTotalPrice()
+                    cartViewModel.selectAllCartData(isSelectAll = allSelectBtn.isSelected)
                 }
                 R.id.buyingBtn -> { // 구매하기
 //                    val buyGoodsList = ArrayList<Int>()

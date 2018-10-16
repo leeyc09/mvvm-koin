@@ -18,6 +18,7 @@ import com.bumptech.glide.request.RequestOptions
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.utils.support.AppConstants
+import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SupportData
 
 class CartAdapter(private val context: Context,
@@ -27,7 +28,7 @@ class CartAdapter(private val context: Context,
                   private val goodsMinusListener: View.OnClickListener,
                   private val goodsPlusListener: View.OnClickListener) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
 
-    private val cartData: CartData = CartData()
+    private var cartData: CartData = CartData()
     var dataLoading: Boolean
         get() = this.cartData.isLoading
         set(value) { this.cartData.isLoading = value }
@@ -44,25 +45,13 @@ class CartAdapter(private val context: Context,
 
     fun getItem(position: Int): CartListData = cartData.items[position]
 
-    fun updateData(cartData: CartData) {
-        this.cartData.items.clear()
-        this.cartData.items.addAll(cartData.items)
-
-        this.cartData.isLoading = false
-        this.cartData.total = cartData.total
-        this.cartData.nextPage = 2
-
+    fun linkData(cartData: CartData) {
+        this.cartData = cartData
         notifyDataSetChanged()
     }
 
-    fun addData(cartData: CartData) {
-        val size: Int = itemCount
-        this.cartData.items.addAll(cartData.items)
-
-        this.cartData.isLoading = false
-        this.cartData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
+    fun print() {
+        PrintLog.d("adapter cartData", cartData.toString(), "Cart")
     }
 
     override
@@ -165,12 +154,12 @@ class CartAdapter(private val context: Context,
                     setPriceLayout(deliveryNo = item.deliverySno)
                 }
 
-                deleteBtn.tag = item.sno
+                deleteBtn.tag = item
                 deleteBtn.setOnClickListener(deleteListener)
             }
 
             // 클릭 이벤트
-            selectBtn.tag = position
+            selectBtn.tag = item
             selectBtn.setOnClickListener(selectListener)
 
             goodsListener?.let {
@@ -178,10 +167,10 @@ class CartAdapter(private val context: Context,
                 goodsLayout.setOnClickListener(goodsListener)
             }
 
-            goodsMinusBtn.tag = position
+            goodsMinusBtn.tag = item
             goodsMinusBtn.setOnClickListener(goodsMinusListener)
 
-            goodsPlusBtn.tag = position
+            goodsPlusBtn.tag = item
             goodsPlusBtn.setOnClickListener(goodsPlusListener)
         }
 

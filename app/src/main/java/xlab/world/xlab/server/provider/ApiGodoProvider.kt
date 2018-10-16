@@ -24,6 +24,10 @@ interface ApiGodoProvider {
     fun requestAddCart(scheduler: SchedulerProvider, authorization: String, goodsNo: String, count: Int,
                        responseData: (ResAddCartData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
+    // cart 업데이트 요청
+    fun requestUpdateCart(scheduler: SchedulerProvider, authorization: String, sno: String, count: Int,
+                          responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
     // cart 삭제 요청
     fun requestDeleteCart(scheduler: SchedulerProvider, authorization: String, sno: String,
                           responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
@@ -70,6 +74,17 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestAddCart(scheduler: SchedulerProvider, authorization: String, goodsNo: String, count: Int,
                                 responseData: (ResAddCartData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.addMyCart(authorization = authorization, goodsNo = goodsNo, count = count)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestUpdateCart(scheduler: SchedulerProvider, authorization: String, sno: String, count: Int,
+                                   responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iGodoRequest.updateMyCart(authorization = authorization, sno = sno, count = count)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

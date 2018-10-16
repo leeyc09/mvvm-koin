@@ -23,6 +23,11 @@ interface IGodoRequest {
                   @Query("goodsNo") goodsNo: String,
                   @Query("count") count: Int): Observable<ResAddCartData>
 
+    @POST(ApiURL.SHOP_MY_CART_UPDATE)
+    fun updateMyCart(@Header("Authorization") authorization: String,
+                     @Query("sno") sno: String,
+                     @Query("count") count: Int): Observable<ResMessageData>
+
     @POST(ApiURL.SHOP_MY_CART_DELETE)
     fun deleteMyCart(@Header("Authorization") authorization: String,
                      @Query("sno") sno: String): Observable<ResMessageData>
