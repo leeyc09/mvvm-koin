@@ -25,7 +25,7 @@ class SPHelper(context: Context) {
 
     fun login(accessToken: String, userType: Int, userId: String, socialId: String,
               userLevel: Int, userEmail: String, push: Boolean) {
-        PrintLog.d("user login", "save user login data", tag)
+        PrintLog.d("user login", "save user login data")
         this.accessToken = accessToken
         this.userType = userType
         this.userId = userId
@@ -41,7 +41,7 @@ class SPHelper(context: Context) {
     }
 
     fun logout() {
-        PrintLog.d("user logout", "remove user login data", tag)
+        PrintLog.d("user logout", "remove user login data")
         pref.edit().remove(TOKEN).apply()
         pref.edit().remove(USER_ID).apply()
         pref.edit().remove(SOCIAL_ID).apply()
@@ -57,56 +57,56 @@ class SPHelper(context: Context) {
     var onBoard: Boolean
         get() = pref.getBoolean(ON_BOARD, false)
         set(onBoard) {
-            PrintLog.d("New onBoard", onBoard.toString(), tag)
+            PrintLog.d("New onBoard", onBoard.toString())
             pref.edit().putBoolean(ON_BOARD, onBoard).apply()
         }
 
     var fcmToken: String
         get() = pref.getString(FCM_TOKEN, "")!!
         set(fcmToken)  {
-            PrintLog.d("New fcmToken", fcmToken, tag)
+            PrintLog.d("New fcmToken", fcmToken)
             pref.edit().putString(FCM_TOKEN, fcmToken).apply()
         }
 
     var accessToken: String
         get() = pref.getString(TOKEN, "")!!
         set(accessToken)  {
-            PrintLog.d("New accessToken", accessToken, tag)
+            PrintLog.d("New accessToken", accessToken)
             pref.edit().putString(TOKEN, accessToken).apply()
         }
 
     var userId: String
         get() = pref.getString(USER_ID, "")!!
         set(userId)  {
-            PrintLog.d("New userId", userId, tag)
+            PrintLog.d("New userId", userId)
             pref.edit().putString(USER_ID, userId).apply()
         }
 
     var socialId: String
         get() = pref.getString(SOCIAL_ID, "")!!
         set(socialId)  {
-            PrintLog.d("New socialId", socialId, tag)
+            PrintLog.d("New socialId", socialId)
             pref.edit().putString(SOCIAL_ID, socialId).apply()
         }
 
     var userType: Int
         get() = pref.getInt(USER_TYPE, LOCAL_LOGIN)
         set(userType)  {
-            PrintLog.d("New userType", userType.toString(), tag)
+            PrintLog.d("New userType", userType.toString())
             pref.edit().putInt(USER_TYPE, userType).apply()
         }
 
     var userLevel: Int
         get() = pref.getInt(USER_LEVEL, NORMAL_USER_LEVEL)
         set(userLevel)  {
-            PrintLog.d("New userLevel", userLevel.toString(), tag)
+            PrintLog.d("New userLevel", userLevel.toString())
             pref.edit().putInt(USER_LEVEL, userLevel).apply()
         }
 
     var userEmail: String
         get() = pref.getString(USER_EMAIL, "")!!
         set(userEmail)  {
-            PrintLog.d("New userEmail", userEmail, tag)
+            PrintLog.d("New userEmail", userEmail)
             pref.edit().putString(USER_EMAIL, userEmail).apply()
         }
 

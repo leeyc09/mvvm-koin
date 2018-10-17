@@ -32,7 +32,7 @@ class RecentViewViewModel(private val apiShop: ApiShopProvider,
         launch {
             apiShop.requestRecentViewGoods(scheduler = scheduler, authorization = authorization, page = page,
                     responseData = {
-                        PrintLog.d("requestRecentViewGoods success", it.toString(), tag)
+                        PrintLog.d("requestRecentViewGoods success", it.toString())
                         val recentViewGoodsData = GoodsThumbnailData(total = it.total, nextPage = page + 1)
                         it.goods?.forEach { goods ->
                             recentViewGoodsData.items.add((GoodsThumbnailListData(
@@ -54,7 +54,7 @@ class RecentViewViewModel(private val apiShop: ApiShopProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestRecentViewGoods fail", errorData.message, tag)
+                            PrintLog.d("requestRecentViewGoods fail", errorData.message)
                         }
                     })
         }

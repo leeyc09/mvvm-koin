@@ -22,8 +22,8 @@ class PostDetailListener(context: Activity,
 
     private val postDeleteDialog = DefaultDialog(
             context = context,
-            textBold = context.resources.getString(R.string.dial_delete_post),
-            textRegular = context.resources.getString(R.string.dial_delete_post2),
+            textBold = context.getString(R.string.dial_delete_post),
+            textRegular = context.getString(R.string.dial_delete_post2),
             listener = object: DefaultDialog.Listener {
                 override fun onOkayTouch(tag: Any?) {
                     if (tag is Int) {

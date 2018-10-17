@@ -29,7 +29,7 @@ class WithDrawViewModel(private val apiUser: ApiUserProvider,
                 it.onNext((this.withdrawReason != null) && isAgree)
                 it.onComplete()
             }.with(scheduler).subscribe {
-                PrintLog.d("enableWithdraw", it.toString(), tag)
+                PrintLog.d("enableWithdraw", it.toString())
                 uiData.value = UIModel(enableWithdraw = it)
             }
         }
@@ -51,7 +51,7 @@ class WithDrawViewModel(private val apiUser: ApiUserProvider,
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("requestWithdraw fail", errorData.message, tag)
+                            PrintLog.d("requestWithdraw fail", errorData.message)
                         }
                         uiData.value = UIModel(isLoading = false)
                     })

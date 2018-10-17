@@ -46,7 +46,7 @@ class CameraAPI(private val cameraInterface: CameraInterface) {
                 }
             }
         } catch (e: CameraAccessException) {
-            PrintLog.e("cameraCharacteristic", e.message!!, tag)
+            PrintLog.e("cameraCharacteristic", e.message!!)
         }
 
         return null
@@ -58,7 +58,7 @@ class CameraAPI(private val cameraInterface: CameraInterface) {
                 cameraManager.openCamera(cameraId, cameraDeviceStatesCallback, null)
             }
         } catch (e: CameraAccessException) {
-            PrintLog.e("cameraDevice", e.message!!, tag)
+            PrintLog.e("cameraDevice", e.message!!)
         }
     }
 
@@ -66,7 +66,7 @@ class CameraAPI(private val cameraInterface: CameraInterface) {
         try {
             cameraDevice.createCaptureSession(Collections.singletonList(surface), captureSessionCallback, null)
         } catch (e: CameraAccessException) {
-            PrintLog.e("cameraDevice", e.message!!, tag)
+            PrintLog.e("cameraDevice", e.message!!)
         }
     }
 
@@ -75,7 +75,7 @@ class CameraAPI(private val cameraInterface: CameraInterface) {
             previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
             previewRequestBuilder.addTarget(surface)
         } catch (e: CameraAccessException) {
-            PrintLog.e("cameraDevice", e.message!!, tag)
+            PrintLog.e("cameraDevice", e.message!!)
         }
     }
 
@@ -115,7 +115,7 @@ class CameraAPI(private val cameraInterface: CameraInterface) {
                     session.setRepeatingRequest(previewRequestBuilder.build(), captureCallback, null)
                 }
             } catch (e: CameraAccessException) {
-                PrintLog.e("captureSessionCallback onConfigured", e.message!!, tag)
+                PrintLog.e("captureSessionCallback onConfigured", e.message!!)
             }
         }
         override fun onConfigureFailed(session: CameraCaptureSession?) {

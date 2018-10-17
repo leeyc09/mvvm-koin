@@ -10,10 +10,17 @@ object ApiURL {
     // TODO: xlab shop api server url
     private const val XLAB_GODO_DOMAIN = "shop.xlab.io"
     private const val XLAB_GODO_MOBILE_DOMAIN = "m.$XLAB_GODO_DOMAIN"
-    const val XLAB_GODO_URL_SSL =  "$MAIN_SCHEME_SSL://$XLAB_GODO_DOMAIN"
-    const val XLAB_GODO_MOBILE_URL_SSL =  "$MAIN_SCHEME_SSL://$XLAB_GODO_MOBILE_DOMAIN"
-//    const val XLAB_GODO_MOBILE_URL =  "$MAIN_SCHEME://$XLAB_GODO_MOBILE_DOMAIN"
+    private const val XLAB_GODO_URL_SSL =  "$MAIN_SCHEME_SSL://$XLAB_GODO_DOMAIN"
+    private const val XLAB_GODO_MOBILE_URL_SSL =  "$MAIN_SCHEME_SSL://$XLAB_GODO_MOBILE_DOMAIN"
     const val GODO_IMAGE_HEADER_URL = "$XLAB_GODO_URL_SSL/data/goods/"
+
+    // TODO: xlab godo web page url
+    const val GODO_LOGIN_PAGE = "$XLAB_GODO_MOBILE_URL_SSL/member/login.php"
+    const val GODO_ORDER_PAGE = "$XLAB_GODO_MOBILE_URL_SSL/order/order.php?cartIdx="
+    const val GODO_MAIN_PAGE = "$XLAB_GODO_MOBILE_URL_SSL/main"
+    const val GODO_CART_PAGE = "$XLAB_GODO_MOBILE_URL_SSL/order/cart.php"
+    const val GODO_BUY_GOODS_FINISH_PAGE = "$XLAB_GODO_MOBILE_URL_SSL/order/order_end.php"
+    const val GODO_BUY_GOODS_FINISH_WITH_ORDER_NO_PAGE = "$GODO_BUY_GOODS_FINISH_PAGE?orderNo="
 
     // TODO: xlab shop member
     private const val GODO_MEM = "/api/mem"
@@ -24,7 +31,7 @@ object ApiURL {
     const val GODO_GOODS_DETIAL_CD = "$GODO_GOODS/view_cd.php"
 
     // TODO: xlab api server url
-    const val XLAB_API_DOMEN = "xlab.io"
+    private const val XLAB_API_DOMEN = "xlab.io"
     const val XLAB_API_URL_SSL = "$MAIN_SCHEME_SSL://$XLAB_API_DOMEN"
 
     // TODO: User

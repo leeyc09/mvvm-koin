@@ -69,18 +69,8 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
             Activity.RESULT_OK -> {
                 cartViewModel.setResultCodeOK()
                 when (requestCode) {
-                    RequestCodeData.GOODS_DETAIL -> { // 제품 상세
-                        cartViewModel.loadCartData(authorization = spHelper.authorization, page = 1)
-                        cartViewModel.loadCartData(authorization = spHelper.authorization, page = 1)
-                    }
+                    RequestCodeData.GOODS_DETAIL, // 제품 상세
                     RequestCodeData.GOODS_BUYING -> { // 구매하기
-//                        data?.let {
-//                            val orderNo = data.getStringExtra(BuyGoodsWebViewActivity.orderNoStr)
-//                            val intent = CompleteBuyingActivity.newIntent(this, orderNo)
-//                            startActivityForResult(intent, RequestCodeData.COMPLETE_BUYING)
-//                        }
-                    }
-                    RequestCodeData.COMPLETE_BUYING -> { // 결제 완료
                         cartViewModel.loadCartData(authorization = spHelper.authorization, page = 1)
                     }
                 }
@@ -142,10 +132,15 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.cartData?.let {
                     cartAdapter.linkData(cartData = it)
                 }
+                uiData.cartLayoutVisibility?.let {
+                    cartLayout.visibility = it
+                }
+                uiData.noCartLayoutVisibility?.let {
+                    noCartLayout.visibility = it
+                }
                 uiData.cartDataUpdate?.let {
                     cartAdapter.notifyDataSetChanged()
                     cartViewModel.setTotalPrice()
-                    cartAdapter.print()
                 }
                 uiData.cartDataUpdateIndex?.let {
                     cartAdapter.notifyItemChanged(it)

@@ -8,6 +8,7 @@ import xlab.world.xlab.data.adapter.SelectUsedGoodsListData
 import xlab.world.xlab.data.response.ResUserLoginData
 import xlab.world.xlab.view.cart.CartActivity
 import xlab.world.xlab.view.comment.CommentActivity
+import xlab.world.xlab.view.completePurchase.CompletePurchaseActivity
 import xlab.world.xlab.view.follow.FollowerActivity
 import xlab.world.xlab.view.follow.FollowingActivity
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectActivity
@@ -223,7 +224,7 @@ object RunActivity {
     }
 
     fun youtubePlayerActivity(context: Activity, youTubeVideoId: String) {
-        val intent = YouTubeStandalonePlayer.createVideoIntent(context, context.resources.getString(R.string.app_api_key), youTubeVideoId)
+        val intent = YouTubeStandalonePlayer.createVideoIntent(context, context.getString(R.string.app_api_key), youTubeVideoId)
         context.startActivity(intent)
     }
 
@@ -276,5 +277,14 @@ object RunActivity {
     fun buyGoodsWebViewActivity(context: Activity, snoList: ArrayList<Int>, from: Int) {
         val intent = BuyGoodsWebViewActivity.newIntent(context = context, snoList = snoList, from = from)
         context.startActivityForResult(intent, RequestCodeData.GOODS_BUYING)
+    }
+
+    fun completePurchaseActivity(context: Activity, orderNo: String) {
+        val intent = CompletePurchaseActivity.newIntent(context = context, orderNo = orderNo)
+        context.startActivityForResult(intent, RequestCodeData.COMPLETE_BUYING)
+    }
+
+    fun orderDetailActivity(context: Activity, orderNo: String) {
+        PrintLog.d("runActivity", "order detail")
     }
 }

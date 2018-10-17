@@ -21,10 +21,7 @@ import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.server.ApiURL
 import xlab.world.xlab.utils.asyncTask.DownloadFileTask
-import xlab.world.xlab.utils.support.AppConstants
-import xlab.world.xlab.utils.support.IntentPassName
-import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.SPHelper
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.utils.view.webView.DefaultWebViewClient
@@ -39,14 +36,6 @@ class BuyGoodsWebViewActivity : AppCompatActivity(), View.OnClickListener {
     private val spHelper: SPHelper by inject()
 
     private var isLogin = true
-//    private var snoList = ArrayList<Int>()
-
-    private val loginUrl = "${ApiURL.XLAB_GODO_MOBILE_URL_SSL}/member/login.php"
-    private val orderUrl = "${ApiURL.XLAB_GODO_MOBILE_URL_SSL}/order/order.php?cartIdx="
-    private val mainUrl = "${ApiURL.XLAB_GODO_MOBILE_URL_SSL}/main"
-    private val cartUrl = "${ApiURL.XLAB_GODO_MOBILE_URL_SSL}/order/cart.php"
-    private val finishAddressUrl = "${ApiURL.XLAB_GODO_MOBILE_URL_SSL}/order/order_end.php"
-    private val orderNoContainUrl = "$finishAddressUrl?orderNo="
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
@@ -61,7 +50,7 @@ class BuyGoodsWebViewActivity : AppCompatActivity(), View.OnClickListener {
         }
         override fun shouldOverrideUrlLoading(url: String?): Boolean {
             url?.let { _ ->
-                return buyGoodsViewModel.webViewPageLoading(authorization = spHelper.authorization, userId = spHelper.userId,
+                return buyGoodsViewModel.webViewPageLoading(authorization = spHelper.authorization, userId = "kdu0136",//spHelper.userId,
                         context = this@BuyGoodsWebViewActivity, url = url)
             }
             return false
@@ -101,7 +90,7 @@ class BuyGoodsWebViewActivity : AppCompatActivity(), View.OnClickListener {
         // web view 초기화
         webView.settings.javaScriptEnabled = true
         webView.webChromeClient = WebChromeClient()
-        webViewClient = DefaultWebViewClient(webViewClientListener, null, finishAddressUrl)
+        webViewClient = DefaultWebViewClient(webViewClientListener, null, ApiURL.GODO_BUY_GOODS_FINISH_PAGE)
         webView.webViewClient = webViewClient
 
         buyGoodsViewModel.setBuyGoodsData(snoList = intent.getIntegerArrayListExtra(IntentPassName.SNO_LIST),
@@ -168,9 +157,7 @@ class BuyGoodsWebViewActivity : AppCompatActivity(), View.OnClickListener {
                     webView.postUrl(it.url, it.postData.toByteArray())
                 }
                 eventData.finishOrderNo?.let {
-                    intent.putExtra(IntentPassName.ORDER_NO, it)
-                    setResult(Activity.RESULT_OK, intent)
-                    finish()
+                    RunActivity.completePurchaseActivity(context = this, orderNo = it)
                 }
             }
         })

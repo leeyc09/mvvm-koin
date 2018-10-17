@@ -94,7 +94,7 @@ class CameraHelper(private val context: Context,
                 }
             })
         } catch (e: Exception) {
-            PrintLog.e("takePicture", e.message!!, tag)
+            PrintLog.e("takePicture", e.message!!)
             picturePath("")
         }
     }
@@ -109,7 +109,7 @@ class CameraHelper(private val context: Context,
         try {
             mediaRecorder!!.stop() // stop the recording
         } catch (e: RuntimeException) {
-            PrintLog.e("RuntimeException", e.message!!, tag)
+            PrintLog.e("RuntimeException", e.message!!)
             outputFile!!.delete()
         }
         releaseMediaRecorder() // release the media recorder object
@@ -121,7 +121,7 @@ class CameraHelper(private val context: Context,
         try {
             val path = SupportData.moveFile(outputFile!!, SupportData.createReleaseFile(AppConstants.MEDIA_VIDEO)!!)
         } catch (e: IOException) {
-            PrintLog.e("IOException", e.message!!, tag)
+            PrintLog.e("IOException", e.message!!)
         }
     }
 
@@ -149,7 +149,7 @@ class CameraHelper(private val context: Context,
 
             flashModeImage(flashDrawable)
         } catch (e: Exception) {
-            PrintLog.e("changeFlashMode", e.message!!, tag)
+            PrintLog.e("changeFlashMode", e.message!!)
             flashModeImage(null)
         }
     }
@@ -168,7 +168,7 @@ class CameraHelper(private val context: Context,
 
     fun cameraReload() {
         if (!isCameraReloading) {
-            PrintLog.d("cameraReload", "", tag)
+            PrintLog.d("cameraReload", "")
             isCameraReloading = true
             CameraPrepareTask().execute()
         }
@@ -188,7 +188,7 @@ class CameraHelper(private val context: Context,
                 cameraBestSize = size
             }
         }
-        PrintLog.d("cameraBestSize", "w: " + cameraBestSize!!.width + "  h: " + cameraBestSize!!.height, tag)
+        PrintLog.d("cameraBestSize", "w: " + cameraBestSize!!.width + "  h: " + cameraBestSize!!.height)
 
         camcorderProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH)
         camcorderProfile!!.videoFrameWidth = 640
@@ -205,7 +205,7 @@ class CameraHelper(private val context: Context,
 
     private fun releaseCamera() {
         if (camera != null) {
-            PrintLog.d("releaseCamera", "", tag)
+            PrintLog.d("releaseCamera", "")
             camera!!.stopPreview()
             camera!!.setPreviewCallback(null)
             camera!!.release()
@@ -278,7 +278,7 @@ class CameraHelper(private val context: Context,
             // set output file
             outputFile = SupportData.createTmpFile(AppConstants.MEDIA_VIDEO)
             if (outputFile == null) {
-                PrintLog.d("outputFile", "null", tag)
+                PrintLog.d("outputFile", "null")
                 return false
             }
             mediaRecorder!!.setOutputFile(outputFile!!.path)
@@ -287,11 +287,11 @@ class CameraHelper(private val context: Context,
             try {
                 mediaRecorder!!.prepare()
             } catch (e: IllegalStateException) {
-                PrintLog.e("IllegalStateException preparing MediaRecorder", e.message!!, tag)
+                PrintLog.e("IllegalStateException preparing MediaRecorder", e.message!!)
                 releaseMediaRecorder()
                 return false
             } catch (e: IOException) {
-                PrintLog.e("IOException preparing MediaRecorder", e.message!!, tag)
+                PrintLog.e("IOException preparing MediaRecorder", e.message!!)
                 releaseMediaRecorder()
                 return false
             }
@@ -312,7 +312,7 @@ class CameraHelper(private val context: Context,
                 cameraPrepare()
                 true
             } catch (e: Exception) {
-                PrintLog.e("takePicture", e.message!!, tag)
+                PrintLog.e("takePicture", e.message!!)
                 false
             }
         }
@@ -324,7 +324,7 @@ class CameraHelper(private val context: Context,
                 try {
                     camera!!.setPreviewTexture(surfaceTexture)
                 } catch (e: IOException) {
-                    PrintLog.e(this.javaClass.name, e.message!!, tag)
+                    PrintLog.e(this.javaClass.name, e.message!!)
                 }
                 camera!!.startPreview()
                 isCameraReloading = false
@@ -336,7 +336,7 @@ class CameraHelper(private val context: Context,
 
         override fun doInBackground(vararg params: Void?): Boolean {
             val prepareVideoRecorder = prepareVideoRecorder()
-            PrintLog.d("prepareVideoRecorder", prepareVideoRecorder.toString(), tag)
+            PrintLog.d("prepareVideoRecorder", prepareVideoRecorder.toString())
             if (prepareVideoRecorder) {
                 mediaRecorder!!.start()
                 isRecording = true
@@ -348,7 +348,7 @@ class CameraHelper(private val context: Context,
         }
 
         override fun onPostExecute(result: Boolean?) {
-            PrintLog.d("result", result.toString(), tag)
+            PrintLog.d("result", result.toString())
             super.onPostExecute(result)
         }
     }

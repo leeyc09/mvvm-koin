@@ -31,7 +31,7 @@ class NoticeViewModel(private val apiNotice: ApiNoticeProvider,
         launch {
             apiNotice.requestNoticeData(scheduler = scheduler, authorization = authorization, page = page,
                     responseData = {
-                        PrintLog.d("requestNoticeData success", it.toString(), tag)
+                        PrintLog.d("requestNoticeData success", it.toString())
                         val noticeData = NoticeData(total = it.total, nextPage = page + 1)
                         it.notices?.forEach { notice ->
                             noticeData.items.add(NoticeListData(
@@ -46,7 +46,7 @@ class NoticeViewModel(private val apiNotice: ApiNoticeProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("requestNoticeData fail", errorData.message, tag)
+                            PrintLog.d("requestNoticeData fail", errorData.message)
                         }
                     })
         }
@@ -70,7 +70,7 @@ class NoticeViewModel(private val apiNotice: ApiNoticeProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("updateReadNotice fail", errorData.message, tag)
+                            PrintLog.d("updateReadNotice fail", errorData.message)
                         }
                     })
         }

@@ -41,13 +41,13 @@ class TopicSettingViewModel(private val apiPet: ApiPetProvider,
                             ))
                         }
 
-                        PrintLog.d("getUserPetList success", topicSettingData.toString(), tag)
+                        PrintLog.d("getUserPetList success", topicSettingData.toString())
                         uiData.value = UIModel(isLoading = false, petData = topicSettingData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("getUserPetList fail", errorData.message, tag)
+                            PrintLog.d("getUserPetList fail", errorData.message)
                         }
                     })
         }
@@ -70,7 +70,7 @@ class TopicSettingViewModel(private val apiPet: ApiPetProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("updateTopicHidden fail", errorData.message, tag)
+                            PrintLog.d("updateTopicHidden fail", errorData.message)
                         }
                     })
         }

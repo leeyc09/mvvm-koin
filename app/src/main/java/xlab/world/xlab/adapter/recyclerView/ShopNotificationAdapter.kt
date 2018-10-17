@@ -111,12 +111,12 @@ class ShopNotificationAdapter(private val context: Context,
             var contentStr = ""
             when (item.type) {
                 AppConstants.SHOP_NOTIFICATION_LEAD_DECIDE -> { // lead decide
-                    titleStr = context.resources.getString(R.string.noti_shop_lead_decide)
-                    contentStr = context.resources.getString(R.string.noti_shop_lead_decide2)
+                    titleStr = context.getString(R.string.noti_shop_lead_decide)
+                    contentStr = context.getString(R.string.noti_shop_lead_decide2)
                 }
                 AppConstants.SHOP_NOTIFICATION_LEAD_RATING -> { // lead rating
-                    titleStr = context.resources.getString(R.string.noti_shop_lead_rating)
-                    contentStr = context.resources.getString(R.string.noti_shop_lead_rating2)
+                    titleStr = context.getString(R.string.noti_shop_lead_rating)
+                    contentStr = context.getString(R.string.noti_shop_lead_rating2)
                 }
             }
 

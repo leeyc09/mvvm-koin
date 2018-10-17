@@ -37,7 +37,7 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiPost.getPostDetail(scheduler = scheduler, authorization = authorization, postId = postId,
                     responseData = {
-                        PrintLog.d("getPostDetail success", it.toString(), tag)
+                        PrintLog.d("getPostDetail success", it.toString())
 
                         val postDetailData = PostDetailData()
                         postDetailData.items.add(PostDetailListData(
@@ -71,7 +71,7 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
                         uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_no_exist_post))
                         loadPostDetailEvent.postValue(LoadPostDetailEvent(isFail = true))
                         errorData?.let {
-                            PrintLog.d("getPostDetail fail", errorData.message, tag)
+                            PrintLog.d("getPostDetail fail", errorData.message)
                         }
                     })
         }
@@ -88,14 +88,14 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiPost.postDelete(scheduler = scheduler, authorization = authorization, postId = postId,
                     responseData = {
-                        PrintLog.d("postDelete success", "", tag)
+                        PrintLog.d("postDelete success", "")
                         uiData.value = UIModel(isLoading = false)
                         postDeleteEvent.postValue(PostDeleteEvent(isSuccess = true))
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("postDelete fail", errorData.message, tag)
+                            PrintLog.d("postDelete fail", errorData.message)
                         }
                     })
         }
@@ -112,7 +112,7 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiUserActivity.postLike(scheduler = scheduler, authorization = authorization, postId = postData.postId,
                     responseData = {
-                        PrintLog.d("postLike success", it.status.toString(), tag)
+                        PrintLog.d("postLike success", it.status.toString())
                         postData.isLike = it.status
                         postData.likeNum +=
                                 if (postData.isLike) 1
@@ -122,7 +122,7 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("postLike fail", errorData.message, tag)
+                            PrintLog.d("postLike fail", errorData.message)
                         }
                     })
         }
@@ -139,7 +139,7 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiUserActivity.postSave(scheduler = scheduler, authorization = authorization, postId = postData.postId,
                     responseData = {
-                        PrintLog.d("postSave success", it.status.toString(), tag)
+                        PrintLog.d("postSave success", it.status.toString())
                         postData.isSave = it.status
                         val toastMessage =
                                 if (postData.isSave) context.getString(R.string.toast_saved_success)
@@ -149,7 +149,7 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("postSave fail", errorData.message, tag)
+                            PrintLog.d("postSave fail", errorData.message)
                         }
                     })
         }
@@ -166,14 +166,14 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiFollow.requestFollow(scheduler = scheduler, authorization = authorization, userId = postData.userId,
                     responseData = {
-                        PrintLog.d("follow success", it.status.toString(), tag)
+                        PrintLog.d("follow success", it.status.toString())
                         postData.isFollowing = it.status
                         uiData.value = UIModel(isLoading = false, postUpdatePosition = position)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("follow fail", errorData.message, tag)
+                            PrintLog.d("follow fail", errorData.message)
                         }
                     })
         }

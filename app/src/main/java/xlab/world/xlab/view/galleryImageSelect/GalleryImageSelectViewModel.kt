@@ -44,7 +44,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
     fun updateBitmap(bitmap: Bitmap) {
         selectDataList.forEachIndexed { index, data ->
             if (data.isPreview) {
-                PrintLog.d("Bitmap update Index", index.toString(), tag)
+                PrintLog.d("Bitmap update Index", index.toString())
                 selectBitmapList[index] = bitmap
             }
         }
@@ -138,7 +138,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                     it.onComplete()
                 }
             }.with(scheduler).subscribe { resultData ->
-                PrintLog.d("loadGalleryImage", resultData.toString(), tag)
+                PrintLog.d("loadGalleryImage", resultData.toString())
                 uiData.value = UIModel(galleryData = resultData)
                 if (resultData.items.isEmpty()) // 갤러리에 이미지가 없는경우
                     uiData.value = UIModel(toastMessage = context.getString(R.string.toast_no_exist_gallery_image))

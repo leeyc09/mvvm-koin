@@ -23,7 +23,7 @@ class SocialAuth {
     }
 
     fun getKakaoToken(result:(String) -> Unit, error: (String) -> Unit) {
-        PrintLog.d("function", "kakao login", tag)
+        PrintLog.d("function", "kakao login")
         kakaoCallbackManager ?: let {
             kakaoCallbackManager = KakaoSessionCallback(result, error)
             Session.getCurrentSession()
@@ -38,7 +38,7 @@ class SocialAuth {
             result(Session.getCurrentSession().tokenInfo.accessToken)
         }
         override fun onSessionOpenFailed(exception: KakaoException) {
-            PrintLog.d("kakao onSessionOpenFailed", exception.message!!, tag)
+            PrintLog.d("kakao onSessionOpenFailed", exception.message!!)
             error(exception.message!!)
         }
     }
@@ -49,24 +49,24 @@ class SocialAuth {
             result(loginResult.accessToken.token)
         }
         override fun onCancel() {
-            PrintLog.d("facebook onCancel", "onCancel", tag)
+            PrintLog.d("facebook onCancel", "onCancel")
             error("onCancel")
         }
         override fun onError(exception: FacebookException) {
-            PrintLog.d("facebook onError", exception.message!!, tag)
+            PrintLog.d("facebook onError", exception.message!!)
             error(exception.message!!)
         }
     }
 
     fun facebookLogout() {
-        PrintLog.d("facebook logout", "success", tag)
+        PrintLog.d("facebook logout", "success")
         LoginManager.getInstance().logOut()
     }
 
     fun kakaoLogout() {
         UserManagement.requestLogout(object : LogoutResponseCallback() {
             override fun onCompleteLogout() {
-                PrintLog.d("kakao logout", "success", tag)
+                PrintLog.d("kakao logout", "success")
             }
         })
     }

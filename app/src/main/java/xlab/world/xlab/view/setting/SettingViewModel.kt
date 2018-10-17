@@ -27,12 +27,12 @@ class SettingViewModel(private val apiUser: ApiUserProvider,
         launch {
             apiUser.requestSetting(scheduler = scheduler, authorization = authorization,
                     responseData = {
-                        PrintLog.d("requestSetting success", it.toString(), tag)
+                        PrintLog.d("requestSetting success", it.toString())
                         uiData.value = UIModel(isLoading = false, pushAlarm = it.setting.push)
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("requestSetting fail", errorData.message, tag)
+                            PrintLog.d("requestSetting fail", errorData.message)
                         }
                         uiData.value = UIModel(isLoading = false)
                     })
@@ -54,7 +54,7 @@ class SettingViewModel(private val apiUser: ApiUserProvider,
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("requestPushUpdate fail", errorData.message, tag)
+                            PrintLog.d("requestPushUpdate fail", errorData.message)
                         }
                         uiData.value = UIModel(isLoading = false)
                     })
@@ -77,7 +77,7 @@ class SettingViewModel(private val apiUser: ApiUserProvider,
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("requestLogout fail", errorData.message, tag)
+                            PrintLog.d("requestLogout fail", errorData.message)
                         }
                         uiData.value = UIModel(isLoading = false)
                     })

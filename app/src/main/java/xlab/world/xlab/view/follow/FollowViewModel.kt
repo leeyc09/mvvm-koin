@@ -38,7 +38,7 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
             val userId = userData?.userId ?: recommendUserData?.userId
             apiFollow.requestFollow(scheduler = scheduler, authorization = authorization, userId = userId!!,
                     responseData = {
-                        PrintLog.d("follow success", it.status.toString(), tag)
+                        PrintLog.d("follow success", it.status.toString())
                         userData?.isFollowing = it.status
                         recommendUserData?.isFollowing = it.status
                         uiData.value = UIModel(isLoading = false, userUpdatePosition = position)
@@ -51,7 +51,7 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("follow fail", errorData.message, tag)
+                            PrintLog.d("follow fail", errorData.message)
                         }
                     })
         }
@@ -79,13 +79,13 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
                                     isFollowing = follower.isFollowing))
                         }
 
-                        PrintLog.d("requestGetFollower success", followerData.toString(), tag)
+                        PrintLog.d("requestGetFollower success", followerData.toString())
                         uiData.value = UIModel(isLoading = false, userData = followerData, followCnt = it.total)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestGetFollower fail", errorData.message, tag)
+                            PrintLog.d("requestGetFollower fail", errorData.message)
                         }
                     })
         }
@@ -103,7 +103,7 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
         launch {
             apiFollow.requestGetFollowing(scheduler = scheduler, authorization = authorization, userId = userId, page = page,
                     responseData = {
-                        PrintLog.d("requestGetFollowing success", it.toString(), tag)
+                        PrintLog.d("requestGetFollowing success", it.toString())
                         val followingData = UserDefaultData(total = it.total, nextPage = page + 1)
                         it.userData?.forEach { following ->
                             val topicBreed = petInfo.getTopicBreed(following.petData)
@@ -119,7 +119,7 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestGetFollowing fail", errorData.message, tag)
+                            PrintLog.d("requestGetFollowing fail", errorData.message)
                         }
                     })
         }
@@ -145,13 +145,13 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
                                     isFollowing = recommend.isFollowing))
                         }
 
-                        PrintLog.d("requestRecommendUser success", recommendUserData.toString(), tag)
+                        PrintLog.d("requestRecommendUser success", recommendUserData.toString())
                         uiData.value = UIModel(isLoading = false, recommendUserData = recommendUserData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestRecommendUser fail", errorData.message, tag)
+                            PrintLog.d("requestRecommendUser fail", errorData.message)
                         }
                     })
         }

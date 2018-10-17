@@ -4,6 +4,8 @@ import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import io.reactivex.Observable
 import xlab.world.xlab.R
+import xlab.world.xlab.data.adapter.GoodsOrderData
+import xlab.world.xlab.data.adapter.GoodsOrderListData
 import xlab.world.xlab.data.response.ResShopProfileData
 import xlab.world.xlab.server.provider.ApiGodoProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
@@ -17,6 +19,7 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
                           private val networkCheck: NetworkCheck,
                           private val scheduler: SchedulerProvider): AbstractViewModel() {
     val tag = "MyShopping"
+    private var goodsOrderData: GoodsOrderData = GoodsOrderData()
 
     private var initProfileData = ResShopProfileData()
     private var recentProfileData = ResShopProfileData()
@@ -35,7 +38,7 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestShopProfile(scheduler = scheduler, authorization = authorization,
                     responseData = {
-                        PrintLog.d("requestShopProfile success", it.toString(), tag)
+                        PrintLog.d("requestShopProfile success", it.toString())
                         initProfileData.name = it.name
                         initProfileData.email = it.email
                         uiData.value = UIModel(isLoading = false,
@@ -45,7 +48,7 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestShopProfile fail", errorData.message, tag)
+                            PrintLog.d("requestShopProfile fail", errorData.message)
                         }
                     })
         }
@@ -62,14 +65,14 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestUpdateShopProfile(scheduler = scheduler, authorization = authorization, name = recentProfileData.name, email = recentProfileData.email,
                     responseData = {
-                        PrintLog.d("requestUpdateShopProfile success", it.toString(), tag)
+                        PrintLog.d("requestUpdateShopProfile success", it.toString())
                         uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_shop_profile_update_success))
                         updateProfileEventData.value = MyShopEvent(status = true)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestUpdateShopProfile fail", errorData.message, tag)
+                            PrintLog.d("requestUpdateShopProfile fail", errorData.message)
                         }
                     })
         }
@@ -86,7 +89,7 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestOrderStatusCnt(scheduler = scheduler, authorization = authorization,
                     responseData = {
-                        PrintLog.d("requestOrderStatusCnt success", it.toString(), tag)
+                        PrintLog.d("requestOrderStatusCnt success", it.toString())
                         uiData.value = UIModel(isLoading = false,
                                 completePaymentCnt = it.orderStatusCnt[0].toString(), completePaymentEnable = it.orderStatusCnt[0] > 0,
                                 deliveryCnt = it.orderStatusCnt[1].toString(), deliveryEnable = it.orderStatusCnt[1] > 0,
@@ -96,7 +99,54 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestOrderStatusCnt fail", errorData.message, tag)
+                            PrintLog.d("requestOrderStatusCnt fail", errorData.message)
+                        }
+                    })
+        }
+    }
+
+    fun loadOrderList(authorization: String) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            apiGodo.requestOrderList(scheduler = scheduler, authorization = authorization,
+                    responseData = {
+                        PrintLog.d("requestOrderList success", it.toString())
+                        val newGoodsOrderData = GoodsOrderData(total = it.total)
+                        it.goodsList?.forEach { goods->
+                            newGoodsOrderData.items.add(GoodsOrderListData(
+                                    sno = goods.sno,
+                                    orderNo = goods.orderNo,
+                                    orderStatus = goods.orderStatus,
+                                    invoiceNo = goods.invoiceNo,
+                                    orderYear = goods.orderYear,
+                                    orderMonth = goods.orderMonth,
+                                    orderDay = goods.orderDay,
+                                    code = goods.code,
+                                    image = goods.image,
+                                    brand = goods.brand,
+                                    name = goods.name,
+                                    option = null,
+                                    count = goods.count,
+                                    price = goods.price,
+                                    userHandleSno = goods.userHandleSno,
+                                    deliveryNo = goods.deliverySno
+                            ))
+                        }
+                        this.goodsOrderData.updateData(goodsOrderData = newGoodsOrderData)
+
+                        uiData.value = UIModel(isLoading = false, goodsOrderData = this.goodsOrderData,
+                                goodsOrderDataCnt = this.goodsOrderData.total.toString())
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.d("requestOrderList fail", errorData.message)
                         }
                     })
         }
@@ -144,4 +194,5 @@ data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = n
                    val completePaymentCnt: String? = null, val completePaymentEnable: Boolean? = null,
                    val deliveryCnt: String? = null, val deliveryEnable: Boolean? = null,
                    val cancelCnt: String? = null, val cancelEnable: Boolean? = null,
-                   val refundCnt: String? = null, val refundEnable: Boolean? = null)
+                   val refundCnt: String? = null, val refundEnable: Boolean? = null,
+                   val goodsOrderData: GoodsOrderData? = null, val goodsOrderDataCnt: String? = null)

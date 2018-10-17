@@ -57,7 +57,7 @@ class HashTagHelper(private val hashTagCharsColor: HashMap<Char, Int>,
                     clearSpannable(s!!)
                     setColorsToAllHashTags(s)
                 } catch (e: IndexOutOfBoundsException) {
-                    PrintLog.e("hash tag helper", e.message!!, tag)
+                    PrintLog.e("hash tag helper", e.message!!)
                 }
             }
             onHashTagWritingListener?.onEditTextState(state)
@@ -158,8 +158,8 @@ class HashTagHelper(private val hashTagCharsColor: HashMap<Char, Int>,
         spannable.getSpans(0, text.length, CharacterStyle::class.java).forEach { span ->
             val sign = text.substring(spannable.getSpanStart(span), spannable.getSpanStart(span) + 1)
             val tagText = text.substring(spannable.getSpanStart(span) + 1, spannable.getSpanEnd(span))
-            PrintLog.d("sign", sign, tag)
-            PrintLog.d("tagText", tagText, tag)
+            PrintLog.d("sign", sign)
+            PrintLog.d("tagText", tagText)
             if (sign.contains(AppConstants.HASH_TAG_SIGN)) {
                 hashTags.remove(tagText)
                 hashTags.add(tagText)

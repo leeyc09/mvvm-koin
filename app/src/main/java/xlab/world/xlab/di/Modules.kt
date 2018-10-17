@@ -13,6 +13,7 @@ import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.cart.CartViewModel
 import xlab.world.xlab.view.comment.CommentViewModel
+import xlab.world.xlab.view.completePurchase.CompletePurchaseViewModel
 import xlab.world.xlab.view.follow.FollowViewModel
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
 import xlab.world.xlab.view.goodsDetail.GoodsDetailViewModel
@@ -102,6 +103,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { CartViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Buy Goods View
     viewModel { BuyGoodsViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Complete Purchase View
+    viewModel { CompletePurchaseViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
@@ -123,8 +126,8 @@ val utilModule: Module = applicationContext {
     bean { GPUImageFilterData() }
 }
 
-const val xlabRemoteBaseUrl = ApiURL.XLAB_API_URL_SSL
-//const val xlabRemoteBaseUrl = "http://192.168.1.11:8080"
+//const val xlabRemoteBaseUrl = ApiURL.XLAB_API_URL_SSL
+const val xlabRemoteBaseUrl = "http://192.168.1.11:8080"
 val remoteModule: Module = applicationContext {
     // provided web components
     bean { createOkHttpClient() }

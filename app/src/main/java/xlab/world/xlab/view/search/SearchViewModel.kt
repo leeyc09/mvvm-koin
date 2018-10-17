@@ -64,7 +64,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("searchUser fail", errorData.message, tag)
+                            PrintLog.d("searchUser fail", errorData.message)
                         }
                     })
             // user total 가져오기
@@ -75,7 +75,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                     errorData = {
                         errorData ->
                         errorData?.let {
-                            PrintLog.d("searchPosts fail", errorData.message, tag)
+                            PrintLog.d("searchPosts fail", errorData.message)
                         }
                     })
             // goods total 가져오기
@@ -88,7 +88,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("searchGoods fail", errorData.message, tag)
+                            PrintLog.d("searchGoods fail", errorData.message)
                         }
                     })
         }
@@ -106,7 +106,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
         launch {
             apiPost.requestSearchPosts(scheduler = scheduler, searchText = searchText, page = page,
                     responseData = {
-                        PrintLog.d("searchPosts success", it.toString(), tag)
+                        PrintLog.d("searchPosts success", it.toString())
                         val postsData = PostThumbnailData(total = it.total, nextPage = page + 1)
                         it.postsData?.forEach { post ->
                             postsData.items.add(PostThumbnailListData(
@@ -122,7 +122,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("searchPosts fail", errorData.message, tag)
+                            PrintLog.d("searchPosts fail", errorData.message)
                         }
                     })
         }
@@ -138,10 +138,10 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
         uiData.value = UIModel(isLoading = loadingBar)
         searchUserEventData.value = SearchEvent(status = true)
         launch {
-            PrintLog.d("authorization", authorization, tag)
+            PrintLog.d("authorization", authorization)
             apiUser.requestSearchUser(authorization = authorization, scheduler = scheduler, searchText = searchText, page = page,
                     responseData = {
-                        PrintLog.d("searchUser success", it.toString(), tag)
+                        PrintLog.d("searchUser success", it.toString())
                         val userData = UserDefaultData(total = it.total, nextPage = page + 1)
                         it.userData?.forEach { user ->
                             val topicBreed = petInfo.getTopicBreed(user.petData)
@@ -156,7 +156,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("searchUser fail", errorData.message, tag)
+                            PrintLog.d("searchUser fail", errorData.message)
                         }
                     })
         }
@@ -180,7 +180,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
             apiShop.requestSearchGoods(scheduler = scheduler, authorization = authorization, reqGoodsSearchData = reqSearchData,
                     page = page, sortType = searchSortType,
                     responseData = {
-                        PrintLog.d("searchGoods success", it.toString(), tag)
+                        PrintLog.d("searchGoods success", it.toString())
                         // keyword data
                         val keywordData = GoodsKeywordData(total = it.keywordTotal)
                         it.keywordList?.let { keywordList ->
@@ -224,7 +224,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("searchGoods fail", errorData.message, tag)
+                            PrintLog.d("searchGoods fail", errorData.message)
                         }
                     })
         }

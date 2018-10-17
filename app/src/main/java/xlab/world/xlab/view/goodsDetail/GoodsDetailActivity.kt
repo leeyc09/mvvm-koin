@@ -88,6 +88,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         override fun buyNow(count: Int) {
+            goodsDetailViewModel.buyNow(authorization = spHelper.authorization, count = count)
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -141,13 +142,6 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                         goodsDetailPostFragment.loadTaggedPosts()
                     }
                     RequestCodeData.GOODS_BUYING -> { // 구매하기
-//                        data?.let {
-//                            val orderNo = data.getStringExtra(BuyGoodsWebViewActivity.orderNoStr)
-//                            val intent = CompleteBuyingActivity.newIntent(this, orderNo)
-//                            startActivityForResult(intent, RequestCodeData.COMPLETE_BUYING)
-//                        }
-                    }
-                    RequestCodeData.COMPLETE_BUYING -> { // 결제 완료
                         goodsDetailViewModel.loadGoodsDetailData(context = this, goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), needDescription = false)
                         goodsDetailViewModel.loadGoodsPetData(authorization = spHelper.authorization)
                         goodsDetailInfoFragment.loadGoodsDescription()
@@ -343,6 +337,15 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         goodsDetailViewModel.ratingOpenCloseEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let { _->
                 eventData.noTopic?.let {
+                }
+            }
+        })
+
+        // goods buy now 이벤트 observe
+        goodsDetailViewModel.buyNowEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _->
+                eventData.sno?.let {
+                    RunActivity.buyGoodsWebViewActivity(context = this, snoList = arrayListOf(it), from = AppConstants.FROM_GOODS_DETAIL)
                 }
             }
         })

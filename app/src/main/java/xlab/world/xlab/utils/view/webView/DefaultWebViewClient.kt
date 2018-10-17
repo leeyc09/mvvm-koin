@@ -24,20 +24,20 @@ class DefaultWebViewClient(private val listener: Listener,
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
         super.onPageStarted(view, url, favicon)
-        PrintLog.d("start URL", url!!, tag)
+        PrintLog.d("start URL", url!!)
         listener.onPageStarted(url)
     }
 
     @TargetApi(Build.VERSION_CODES.N)
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        PrintLog.d("check URL", request?.url.toString(), tag)
+        PrintLog.d("check URL", request?.url.toString())
         listener.shouldOverrideUrlLoading(request?.url.toString())
         return showInWebView ?: listener.shouldOverrideUrlLoading(request?.url.toString())
     }
 
     @SuppressWarnings("deprecation")
     override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-        PrintLog.d("check URL", url!!, tag)
+        PrintLog.d("check URL", url!!)
         listener.shouldOverrideUrlLoading(url)
 
         return showInWebView ?: listener.shouldOverrideUrlLoading(url)
@@ -45,9 +45,9 @@ class DefaultWebViewClient(private val listener: Listener,
 
     override fun onPageFinished(view: WebView?, url: String?) {
         super.onPageFinished(view, url)
-        PrintLog.d("onPageFinished URL", url!!, tag)
+        PrintLog.d("onPageFinished URL", url!!)
         if (finishURL != null) {
-            PrintLog.d("finish URL", finishURL, tag)
+            PrintLog.d("finish URL", finishURL)
             if (url.contains(finishURL))
                 listener.onWebViewFinished(parsingHtml)
             else

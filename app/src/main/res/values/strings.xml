@@ -98,6 +98,7 @@
     <string name="dial_rating_cancel2">변경사항이 프로필에 반영됩니다.</string>
     <string name="dial_report_user">신고하시겠어요?</string>
     <string name="dial_report_user2">검토 후 해당 계정이용이 정지됩니다.</string>
+    <string name="dial_order_cancel">주문을 취소하시겠어요?</string>
 
     <!-- TODO: Toast Message -->
     <string name="toast_email_format_wrong">이메일 형식을 확인해 주세요</string>
@@ -391,7 +392,6 @@
     <string name="order_list">주문내역</string>
     <string name="is_history_delete">해당 내역을 삭제하시겠어요?</string>
     <string name="is_history_delete2">다시 복구할 수 없습니다.</string>
-    <string name="is_order_cancel">주문을 취소하시겠어요?</string>
 
     <!-- TODO: Edit Shop Info -->
     <string name="phone_number">휴대폰번호</string>

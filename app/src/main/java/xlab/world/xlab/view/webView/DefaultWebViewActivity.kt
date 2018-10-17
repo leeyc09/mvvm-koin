@@ -36,11 +36,11 @@ class DefaultWebViewActivity : AppCompatActivity() {
         // 타이틀 set
         val title: String? = intent.getStringExtra(IntentPassName.PAGE_TITLE)
         title?.let {
-            PrintLog.d("title", title, tag)
+            PrintLog.d("title", title)
             actionBarTitle.visibility = View.VISIBLE
             actionBarTitle.setText(title, TextView.BufferType.SPANNABLE)
         }?:let {
-            PrintLog.d("title", "null", tag)
+            PrintLog.d("title", "null")
             actionBarTitle.visibility = View.GONE
         }
 

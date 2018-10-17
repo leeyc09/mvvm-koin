@@ -37,7 +37,7 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
                 it.onNext(selectedUsedGoodsData)
                 it.onComplete()
             }.with(scheduler).subscribe {
-                PrintLog.d("set selectedUsedGoodsData", it.toString(), tag)
+                PrintLog.d("set selectedUsedGoodsData", it.toString())
                 uiData.value = UIModel(selectedUsedGoodsData = it)
             }
         }
@@ -55,8 +55,8 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
         launch {
             apiUserActivity.requestTopicUsedGoods(scheduler = scheduler, userId = userId, goodsType = goodsType, page = page,
                     responseData = {
-                        PrintLog.d("requestTopicUsedGoods success", it.toString(), tag)
-                        PrintLog.d("selectedUsedGoodsData", selectedUsedGoodsData.toString(), tag)
+                        PrintLog.d("requestTopicUsedGoods success", it.toString())
+                        PrintLog.d("selectedUsedGoodsData", selectedUsedGoodsData.toString())
                         val usedGoodsData = SelectUsedGoodsData(total = it.total, nextPage = page + 1)
                         it.goods?.forEach { goods ->
                             var isSelect = false
@@ -80,7 +80,7 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestTopicUsedGoods fail", errorData.message, tag)
+                            PrintLog.d("requestTopicUsedGoods fail", errorData.message)
                         }
                     })
         }
@@ -109,7 +109,7 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
                 it.onNext(selectedUsedGoodsData)
                 it.onComplete()
             }.with(scheduler).subscribe {
-                PrintLog.d("update selectedUsedGoodsData", selectedUsedGoodsData.toString(), tag)
+                PrintLog.d("update selectedUsedGoodsData", selectedUsedGoodsData.toString())
                 uiData.value = UIModel(usedGoodsUpdateIndex = position,
                         updateSelectedUsedGoodsData = selectedUsedGoodsData,
                         selectedUsedGoodsScrollIndex = if (usedGoodsData.isSelect) selectedUsedGoodsData.size - 1 else null)
@@ -134,8 +134,8 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
                 it.onNext(updateUsedGoodsIndex)
                 it.onComplete()
             }.with(scheduler).subscribe {
-                PrintLog.d("update selectedUsedGoodsData", selectedUsedGoodsData.toString(), tag)
-                PrintLog.d("usedGoodsUpdateIndex", it.toString(), tag)
+                PrintLog.d("update selectedUsedGoodsData", selectedUsedGoodsData.toString())
+                PrintLog.d("usedGoodsUpdateIndex", it.toString())
                 uiData.value = UIModel(usedGoodsUpdateIndex = if (it == -1) null else it,
                         updateSelectedUsedGoodsData = selectedUsedGoodsData)
             }

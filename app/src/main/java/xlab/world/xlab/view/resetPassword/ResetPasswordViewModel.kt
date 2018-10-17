@@ -56,7 +56,7 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
                         requestConfirmEmailEvent.postValue(ResetPasswordEvent(status = false))
                         errorData?.let {
                             val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
-                            PrintLog.d("requestConfirmEmail fail", errorMessage.toString(), tag)
+                            PrintLog.d("requestConfirmEmail fail", errorMessage.toString())
                             if (errorMessage.size > 1)
                                 uiData.value = UIModel(toastMessage = errorMessage[1])
                         }
@@ -65,7 +65,7 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
     }
     // 인증코드 타이머 시작
     fun startTimer() {
-        PrintLog.d("timer", "start", tag)
+        PrintLog.d("timer", "start")
         launch {
             stopped.set(false)
             Flowable.interval(0, 1, TimeUnit.SECONDS)
@@ -84,10 +84,10 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
 
                         uiData.value = UIModel(timerText = "$minStr:$secStr")
                     }, {
-                        PrintLog.d("timer error", it.message!!, tag)
+                        PrintLog.d("timer error", it.message!!)
                         uiData.value = UIModel(isEndTimer = true)
                     }, {
-                        PrintLog.d("timer complete", "", tag)
+                        PrintLog.d("timer complete", "")
                         if (!stopped.get())
                             uiData.value = UIModel(isEndTimer = true)
                     })
@@ -95,7 +95,7 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
     }
     // 인증코드 타이머 종료
     fun stopTimer() {
-        PrintLog.d("timer", "stop", tag)
+        PrintLog.d("timer", "stop")
         stopped.set(true)
         elapsedTime.addAndGet(-elapsedTime.get())
     }
@@ -111,7 +111,7 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
             val reqConfirmEmailData = ReqConfirmEmailData(email = email, code = code)
             apiUser.requestConfirmEmailCode(scheduler = scheduler, reqConfirmEmailData = reqConfirmEmailData,
                     responseData = {
-                        PrintLog.d("requestConfirmEmail success", it.accessToken, tag)
+                        PrintLog.d("requestConfirmEmail success", it.accessToken)
                         uiData.value = UIModel(isLoading = false)
                         requestConfirmCodeEvent.postValue(RequestConfirmCodeEvent(accessToken = it.accessToken))
                     },
@@ -120,7 +120,7 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
                         requestConfirmCodeEvent.postValue(RequestConfirmCodeEvent(accessToken = ""))
                         errorData?.let {
                             val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
-                            PrintLog.d("requestConfirmEmail fail", errorMessage.toString(), tag)
+                            PrintLog.d("requestConfirmEmail fail", errorMessage.toString())
                             if (errorMessage.size > 1)
                                 uiData.value = UIModel(toastMessage = errorMessage[1])
                         }
@@ -146,7 +146,7 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_wrong_password))
                         errorData?.let {
-                            PrintLog.d("requestConfirmPassword fail", errorData.message, tag)
+                            PrintLog.d("requestConfirmPassword fail", errorData.message)
                         }
                     })
         }
@@ -165,14 +165,14 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
             val reqNewPasswordData = ReqPasswordData(password = password)
             apiUser.requestChangePassword(scheduler = scheduler, authorization = authorization, reqNewPasswordData = reqNewPasswordData,
                     responseData = {
-                        PrintLog.d("requestChangePassword success", "", tag)
+                        PrintLog.d("requestChangePassword success", "")
                         uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_reset_password_success))
                         requestChangePasswordEvent.postValue(ResetPasswordEvent(status = true))
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestChangePassword fail", errorData.message, tag)
+                            PrintLog.d("requestChangePassword fail", errorData.message)
                             uiData.value = UIModel(toastMessage = errorData.message)
                         }
                     })

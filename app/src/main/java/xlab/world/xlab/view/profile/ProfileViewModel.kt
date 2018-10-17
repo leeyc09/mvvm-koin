@@ -39,7 +39,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                         else AppConstants.OTHER_PROFILE)
                 it.onComplete()
             }.with(scheduler).subscribe {
-                PrintLog.d("setProfileType", it.toString(), tag)
+                PrintLog.d("setProfileType", it.toString())
                 uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, profileType = it)
             }
         }
@@ -74,13 +74,13 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                         if (loadedTopicSize >= topicData.total && userId == loginUserId)
                             topicData.items.add(ProfileTopicListData(dataType = AppConstants.ADAPTER_FOOTER))
 
-                        PrintLog.d("getUserPetList success", topicData.toString(), tag)
+                        PrintLog.d("getUserPetList success", topicData.toString())
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, topicData = topicData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("getUserPetList fail", errorData.message, tag)
+                            PrintLog.d("getUserPetList fail", errorData.message)
                         }
                     })
         }
@@ -97,7 +97,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         launch {
             apiUser.requestProfileMain(scheduler = scheduler, authorization = authorization, userId = userId,
                     responseData = {
-                        PrintLog.d("requestProfileMain success", it.toString(), tag)
+                        PrintLog.d("requestProfileMain success", it.toString())
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
                                 profileImage = it.profileImg,
                                 nickName = it.nickName,
@@ -110,7 +110,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, toastMessage = context.getString(R.string.toast_no_exist_user))
                         loadUserDataEvent.postValue(ProfileEvent(status = false))
                         errorData?.let {
-                            PrintLog.d("requestProfileMain fail", errorData.message, tag)
+                            PrintLog.d("requestProfileMain fail", errorData.message)
                         }
                     })
         }
@@ -144,13 +144,13 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                                     headerTitle = context.getString(R.string.goods)))
                         }
 
-                        PrintLog.d("requestTopicUsedGoods success", topicUsedGoodsData.toString(), tag)
+                        PrintLog.d("requestTopicUsedGoods success", topicUsedGoodsData.toString())
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, topicUsedGoodsData = topicUsedGoodsData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("requestTopicUsedGoods fail", errorData.message, tag)
+                            PrintLog.d("requestTopicUsedGoods fail", errorData.message)
                         }
                     })
         }
@@ -184,13 +184,13 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                             postsThumbData.items.add(0, PostThumbnailListData(dataType = AppConstants.ADAPTER_HEADER))
                         }
 
-                        PrintLog.d("requestUserPostsThumbnail success", postsThumbData.toString(), tag)
+                        PrintLog.d("requestUserPostsThumbnail success", postsThumbData.toString())
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, postsThumbData = postsThumbData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("requestUserPostsThumbnail fail", errorData.message, tag)
+                            PrintLog.d("requestUserPostsThumbnail fail", errorData.message)
                         }
                     })
         }
@@ -241,13 +241,13 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                             postsDetailData.items.add(0, PostDetailListData(dataType = AppConstants.ADAPTER_HEADER))
                         }
 
-                        PrintLog.d("requestUserPostsDetail success", postsDetailData.toString(), tag)
+                        PrintLog.d("requestUserPostsDetail success", postsDetailData.toString())
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, postsDetailData = postsDetailData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("requestUserPostsDetail fail", errorData.message, tag)
+                            PrintLog.d("requestUserPostsDetail fail", errorData.message)
                         }
                     })
         }
@@ -264,13 +264,13 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         launch {
             apiFollow.requestFollow(scheduler = scheduler, authorization = authorization, userId = userId,
                     responseData = {
-                        PrintLog.d("follow success", it.status.toString(), tag)
+                        PrintLog.d("follow success", it.status.toString())
                         uiData.value = UIModel(isLoading = false, followState = it.status)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("follow fail", errorData.message, tag)
+                            PrintLog.d("follow fail", errorData.message)
                         }
                     })
         }

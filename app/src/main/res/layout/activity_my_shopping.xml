@@ -32,6 +32,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -242,10 +244,9 @@
                     android:textColor="@color/color6D6D6D"/>
 
                 <xlab.world.xlab.utils.view.textView.TextViewRegularHan
-                    android:id="@+id/textViewOrderListNum"
+                    android:id="@+id/textViewOrderListCnt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0"
                     android:textSize="13sp"
                     android:textColor="@color/colorBFBFBF"
                     android:layout_marginStart="4dp"

@@ -36,7 +36,7 @@ class DefaultProgressDialog(context: Context): Dialog(context) {
     }
 
     override fun show() {
-        PrintLog.d("dialog", "show", tag)
+        PrintLog.d("dialog", "show")
         super.show()
 
         // 5초 이상 로딩중이면 로딩바 사라지게
@@ -45,7 +45,7 @@ class DefaultProgressDialog(context: Context): Dialog(context) {
             }
             override fun onFinish() {
                 if (isShowing) {
-                    PrintLog.d("dialog", "dismiss time out", tag)
+                    PrintLog.d("dialog", "dismiss time out")
                     dismiss()
                 }
             }
@@ -54,7 +54,7 @@ class DefaultProgressDialog(context: Context): Dialog(context) {
     }
 
     override fun dismiss() {
-        PrintLog.d("dialog", "dismiss", tag)
+        PrintLog.d("dialog", "dismiss")
         super.dismiss()
     }
 }

@@ -33,5 +33,12 @@ interface IGodoRequest {
                      @Query("sno") sno: String): Observable<ResMessageData>
 
     @GET(ApiURL.SHOP_ORDER_STATUS_NUM)
-    fun getOrderStatusNum(@Header("Authorization") authorization: String): Observable<ResOrderStatusCntData>
+    fun getOrderStatusCnt(@Header("Authorization") authorization: String): Observable<ResOrderStatusCntData>
+
+    @GET(ApiURL.SHOP_ORDER)
+    fun getOrderDetail(@Header("Authorization") authorization: String,
+                       @Query("orderNo") orderNo: String): Observable<ResOrderDetailData>
+
+    @GET(ApiURL.SHOP_ORDER_HISTORY)
+    fun getOrderHistory(@Header("Authorization") authorization: String): Observable<ResOrderHistoryData>
 }

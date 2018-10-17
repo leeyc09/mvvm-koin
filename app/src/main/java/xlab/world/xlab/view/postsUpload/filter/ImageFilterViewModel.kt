@@ -46,7 +46,7 @@ class ImageFilterViewModel(private val gpuImageFilterData: GPUImageFilterData,
                     bitmapList.add(bitmap)
                     selectFilterList.add(0)
                 }
-                PrintLog.d("imagePaths", this.imagePathList.toString(), tag)
+                PrintLog.d("imagePaths", this.imagePathList.toString())
 
                 it.onNext(this.imagePathList.size)
                 it.onComplete()
@@ -77,8 +77,8 @@ class ImageFilterViewModel(private val gpuImageFilterData: GPUImageFilterData,
     }
 
     fun changePreviewFilter(pagerIndex: Int, filterIndex: Int) {
-        PrintLog.d("pagerIndex", pagerIndex.toString(), tag)
-        PrintLog.d("filterIndex", filterIndex.toString(), tag)
+        PrintLog.d("pagerIndex", pagerIndex.toString())
+        PrintLog.d("filterIndex", filterIndex.toString())
         launch {
             Observable.create<Boolean> {
                 selectFilterList[pagerIndex] = filterIndex
@@ -99,7 +99,7 @@ class ImageFilterViewModel(private val gpuImageFilterData: GPUImageFilterData,
 
     fun deleteProfileImage() {
         imagePathList.forEach { filePath ->
-            PrintLog.d("deleteFile", filePath, tag)
+            PrintLog.d("deleteFile", filePath)
             SupportData.deleteFile(path = filePath)
         }
     }

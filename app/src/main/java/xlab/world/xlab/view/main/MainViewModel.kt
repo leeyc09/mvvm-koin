@@ -64,13 +64,13 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                             }
                         }
 
-                        PrintLog.d("getAllFeed success", allFeedData.toString(), tag)
+                        PrintLog.d("getAllFeed success", allFeedData.toString())
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, allFeedData = allFeedData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("getAllFeed fail", errorData.message, tag)
+                            PrintLog.d("getAllFeed fail", errorData.message)
                         }
                     })
         }
@@ -122,18 +122,18 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                             ))
                         }
 
-                        PrintLog.d("getFollowingFeed success", followingFeedData.toString(), tag)
+                        PrintLog.d("getFollowingFeed success", followingFeedData.toString())
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, followingFeedData = followingFeedData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("getFollowingFeed fail", errorData.message, tag)
+                            PrintLog.d("getFollowingFeed fail", errorData.message)
                             if (errorData.errorCode == HttpURLConnection.HTTP_BAD_REQUEST) {
                                 val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
                                 if (errorMessage.size > 1)
                                     if (errorMessage[1] == ApiCallBackConstants.N0_FOLLOWING_USER) {
-                                        PrintLog.d("getFollowingFeed fail", "no following user", tag)
+                                        PrintLog.d("getFollowingFeed fail", "no following user")
                                         uiData.value = UIModel(noFollowing = true)
                                     }
                             }
@@ -174,13 +174,13 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                             }
                         }
 
-                        PrintLog.d("getExploreFeed success", exploreFeedData.toString(), tag)
+                        PrintLog.d("getExploreFeed success", exploreFeedData.toString())
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, exploreFeedData = exploreFeedData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("getExploreFeed fail", errorData.message, tag)
+                            PrintLog.d("getExploreFeed fail", errorData.message)
                         }
                     })
         }
@@ -225,13 +225,13 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                                 goodsData = foodGoods
                         ))
 
-                        PrintLog.d("getShopFeed success", shopFeedData.toString(), tag)
+                        PrintLog.d("getShopFeed success", shopFeedData.toString())
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, shopFeedData = shopFeedData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("getShopFeed fail", errorData.message, tag)
+                            PrintLog.d("getShopFeed fail", errorData.message)
                         }
                     })
         }

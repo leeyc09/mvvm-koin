@@ -54,7 +54,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                         initPetData = it.valueCopy()
                         recentPetData = it.valueCopy()
 
-                        PrintLog.d("requestUserPet success", it.toString(), tag)
+                        PrintLog.d("requestUserPet success", it.toString())
 
                         var colorIndex = 0
                         topicColorList.takeWhile { color -> it.topicColor != color}.forEach{ _-> colorIndex++ }
@@ -74,7 +74,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestUserPet fail", errorData.message, tag)
+                            PrintLog.d("requestUserPet fail", errorData.message)
                         }
                     })
         }
@@ -105,10 +105,10 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                     recentPetData.weight = petWeight
                 }
 
-                PrintLog.d("isAddPet", isAddPet.toString(), tag)
-                PrintLog.d("initPetData", initPetData.toString(), tag)
-                PrintLog.d("recentData", recentPetData.toString(), tag)
-                PrintLog.d("newPetImage", newPetImage.toString(), tag)
+                PrintLog.d("isAddPet", isAddPet.toString())
+                PrintLog.d("initPetData", initPetData.toString())
+                PrintLog.d("recentData", recentPetData.toString())
+                PrintLog.d("newPetImage", newPetImage.toString())
 
                 val result =
                         if(isAddPet) newPetImage.isNotEmpty() && recentPetData.isFillData()
@@ -120,7 +120,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                 it.onNext(result)
                 it.onComplete()
             }.with(scheduler).subscribe { resultData ->
-                PrintLog.d("existChangedData", resultData.toString(), tag)
+                PrintLog.d("existChangedData", resultData.toString())
                 uiData.value = UIModel(saveEnable = resultData)
                 petType?.let {
                     uiData.value = UIModel(breedName = context.getString(R.string.pet_breed_select), isBreedSelect = false,
@@ -137,7 +137,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                 it.onNext(DataRegex.birthRegex(birthday = petBirth))
                 it.onComplete()
             }.with(scheduler).subscribe {
-                PrintLog.d("birthRegex", it.toString(), tag)
+                PrintLog.d("birthRegex", it.toString())
                 if (it) {
                     val birthSplit = petBirth.split("-")
                     recentPetData.birthYear = birthSplit[0].toInt()
@@ -182,9 +182,9 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                         breedData.hairTypeData = null
                     } else {
                         val hairTypeData = PetHairFeatureData()
-                        PrintLog.d("petBreedData.hairTypeCode", petBreedData.hairType.toString(), tag)
+                        PrintLog.d("petBreedData.hairTypeCode", petBreedData.hairType.toString())
                         petData?.let{_-> PrintLog.d("petData.hairType", petData.hairType, tag) }
-                        PrintLog.d("recentPetData.hairType", recentPetData.hairType, tag)
+                        PrintLog.d("recentPetData.hairType", recentPetData.hairType)
                         petBreedData.hairType.forEach { hairTypeCode ->
                             val isSelect = petData?.let {_->hairTypeCode == petData.hairType} ?:let {_->false}
                             hairTypeData.items.add(PetHairFeatureListData(
@@ -201,9 +201,9 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                         breedData.hairColorData = null
                     } else {
                         val hairColorData = PetHairFeatureData()
-                        PrintLog.d("petBreedData.hairColor", petBreedData.hairColor.toString(), tag)
+                        PrintLog.d("petBreedData.hairColor", petBreedData.hairColor.toString())
                         petData?.let{_-> PrintLog.d("petData.hairColor", petData.hairColor.toString(), tag) }
-                        PrintLog.d("recentPetData.hairColor", recentPetData.hairColor.toString(), tag)
+                        PrintLog.d("recentPetData.hairColor", recentPetData.hairColor.toString())
                         petBreedData.hairColor.forEach { hairColorCode ->
                             val filterData = petData?.let {_->petData.hairColor?.filter { c -> c == hairColorCode }} ?:ArrayList()
 //                            val filterData = recentPetData.hairColor?.filter { c -> c == hairColorCode }
@@ -218,7 +218,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                     it.onComplete()
                 }
             }.with(scheduler).subscribe {
-                PrintLog.d("setBreedDetailData", it.toString(), tag)
+                PrintLog.d("setBreedDetailData", it.toString())
                 uiData.value = UIModel(breedName = it.breedName, isBreedSelect = true,
                         breedDetailVisibility = if (it.hairTypeData == null && it.hairColorData == null) View.GONE else View.VISIBLE,
                         hairTypeData = it.hairTypeData, hairTypeVisibility = it.hairTypeData?.let{_->View.VISIBLE}?:let{_->View.GONE},
@@ -237,7 +237,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                 it.onNext(hairType)
                 it.onComplete()
             }.with(scheduler).subscribe {
-                PrintLog.d("hairColorSelect", it, tag)
+                PrintLog.d("hairColorSelect", it)
                 uiData.value = UIModel(hairTypeUpdateValue = it)
             }
         }
@@ -255,7 +255,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                 it.onNext(position)
                 it.onComplete()
             }.with(scheduler).subscribe {
-                PrintLog.d("petColorSelect", hairColorData.toString(), tag)
+                PrintLog.d("petColorSelect", hairColorData.toString())
                 uiData.value = UIModel(hairColorUpdateIndex = it)
             }
         }
@@ -306,27 +306,27 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
             if (isAddPet)
                 apiPet.requestAddPet(scheduler = scheduler, authorization = authorization, requestBody = reqPetData.getReqBody(),
                         responseData = {
-                            PrintLog.d("requestAddPet success", "", tag)
+                            PrintLog.d("requestAddPet success", "")
                             saveDeletePetEvent.value = TopicEditEventData(status = true)
                             uiData.value = UIModel(isLoading = false)
                         },
                         errorData = { errorData ->
                             uiData.value = UIModel(isLoading = false)
                             errorData?.let {
-                                PrintLog.d("requestAddPet fail", errorData.message, tag)
+                                PrintLog.d("requestAddPet fail", errorData.message)
                             }
                         })
             else
                 apiPet.requestUpdatePet(scheduler = scheduler, authorization = authorization, petId = recentPetData.id, requestBody = reqPetData.getReqBody(),
                         responseData = {
-                            PrintLog.d("requestAddPet success", "", tag)
+                            PrintLog.d("requestAddPet success", "")
                             saveDeletePetEvent.value = TopicEditEventData(status = true)
                             uiData.value = UIModel(isLoading = false)
                         },
                         errorData = { errorData ->
                             uiData.value = UIModel(isLoading = false)
                             errorData?.let {
-                                PrintLog.d("requestUpdatePet fail", errorData.message, tag)
+                                PrintLog.d("requestUpdatePet fail", errorData.message)
                             }
                         })
         }
@@ -343,14 +343,14 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
         launch {
             apiPet.requestDeletePet(scheduler = scheduler, authorization = authorization, petId = recentPetData.id,
                     responseData = {
-                        PrintLog.d("requestDeletePet success", "", tag)
+                        PrintLog.d("requestDeletePet success", "")
                         saveDeletePetEvent.value = TopicEditEventData(status = false)
                         uiData.value = UIModel(isLoading = false)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestDeletePet fail", errorData.message, tag)
+                            PrintLog.d("requestDeletePet fail", errorData.message)
                         }
                     })
         }

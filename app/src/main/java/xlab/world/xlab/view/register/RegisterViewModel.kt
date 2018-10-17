@@ -48,7 +48,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                         DataRegex.nickNameRegex(nickName))
                 it.onComplete()
             }.with(scheduler).subscribe { isEnable ->
-                PrintLog.d("inputDataRegex", isEnable.toString(), tag)
+                PrintLog.d("inputDataRegex", isEnable.toString())
                 uiData.value = UIModel(isRegisterBtnEnable = isEnable)
             }
         }
@@ -65,7 +65,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onNext(RegexResultData(text = emailRegexText, result = emailRegex))
                 it.onComplete()
             }.with(scheduler).subscribe { resultData ->
-                PrintLog.d("emailRegexCheck", resultData.result.toString(), tag)
+                PrintLog.d("emailRegexCheck", resultData.result.toString())
                 uiData.value = UIModel(emailRegexText = resultData.text, emailRegex = resultData.result)
             }
         }
@@ -77,7 +77,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onNext(arrayListOf(DataRegex.passwordLengthRegex(password), DataRegex.passwordTextRegex(password)))
                 it.onComplete()
             }.with(scheduler).subscribe { isEnable ->
-                PrintLog.d("passwordRegexCheck", isEnable.toString(), tag)
+                PrintLog.d("passwordRegexCheck", isEnable.toString())
                 uiData.value = UIModel(passwordLengthRegex = isEnable[0], passwordTextRegex = isEnable[1])
             }
         }
@@ -92,7 +92,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onNext(RegexResultData(text = nickNameRegexText, result = nickNameRegex))
                 it.onComplete()
             }.with(scheduler).subscribe { resultData ->
-                PrintLog.d("nickRegexCheck", resultData.result.toString(), tag)
+                PrintLog.d("nickRegexCheck", resultData.result.toString())
                 uiData.value = UIModel(nickNameRegexText = resultData.text, nickNameRegex = resultData.result)
             }
         }
@@ -109,8 +109,8 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
         val reqRegisterData = ReqRegisterData(loginType = loginType, email = email, password = password, nickName = nickName, socialID = socialId)
         apiUser.requestRegister(scheduler = scheduler, reqRegisterData = reqRegisterData,
                 responseData = {
-                    PrintLog.d("requestRegister", "success", tag)
-                    PrintLog.d("access token", it.accessToken, tag)
+                    PrintLog.d("requestRegister", "success")
+                    PrintLog.d("access token", it.accessToken)
                     requestRegisterEvent.postValue(RequestRegisterEvent(accessToken = it.accessToken))
                     uiData.value = UIModel(isLoading = false)
                 },
@@ -118,7 +118,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                     uiData.value = UIModel(isLoading = false, isRegisterBtnEnable = false)
                     errorData?.let {
                         val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
-                        PrintLog.d("requestRegister fail", errorData.message, tag)
+                        PrintLog.d("requestRegister fail", errorData.message)
                         if (errorMessage.size > 1) {
                             // 존재하는 유저 정보 에러 메세지
                             if(errorMessage[1].contains(ApiCallBackConstants.EXIST_USER_DATA)) {

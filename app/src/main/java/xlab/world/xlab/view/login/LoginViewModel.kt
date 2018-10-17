@@ -40,14 +40,14 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             // access token 만료 확인
             apiUser.checkValidToken(scheduler = scheduler, authorization = authorization, fcmToken = fcmToken,
                     responseData = { loginData -> // 만료 안된경우 -> 로그인데이터 받아옴
-                        PrintLog.d("checkValidToken success", loginData.toString(), tag)
+                        PrintLog.d("checkValidToken success", loginData.toString())
                         requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(loginData = loginData))
                         uiData.value = UIModel(isLoading = false)
                     }, errorData = { errorData ->
                 uiData.value = UIModel(isLoading = false)
                 errorData?.let {
                     val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
-                    PrintLog.d("checkValidToken fail", errorMessage.toString(), tag)
+                    PrintLog.d("checkValidToken fail", errorMessage.toString())
                     if (errorMessage.size > 1) {
                         if (errorMessage[1] == ApiCallBackConstants.TOKEN_EXPIRE) // 만료 에러 callback message
                             requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(isExpireToken = true))
@@ -75,13 +75,13 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                         // refresh token 으로 new access token 발행 요청
                         apiUser.generateToken(scheduler = scheduler, authorization = refreshTokenData.refreshToken,
                                 responseData = { newTokenData ->
-                                    PrintLog.d("generateToken success", newTokenData.accessToken, tag)
+                                    PrintLog.d("generateToken success", newTokenData.accessToken)
                                     uiData.value = UIModel(isLoading = false)
                                     generateTokenEvent.postValue(GenerateTokenEvent(newAccessToken = newTokenData.accessToken))
                                 },
                                 errorData = { errorData ->
                                     errorData?.let {
-                                        PrintLog.d("generateToken fail", errorData.message, tag)
+                                        PrintLog.d("generateToken fail", errorData.message)
                                     }
                                     uiData.value = UIModel(isLoading = false)
                                     generateTokenEvent.postValue(GenerateTokenEvent(isFailGenerateToken = true))
@@ -89,7 +89,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("getRefreshToken fail", errorData.message, tag)
+                            PrintLog.d("getRefreshToken fail", errorData.message)
                         }
                         uiData.value = UIModel(isLoading = false)
                         generateTokenEvent.postValue(GenerateTokenEvent(isFailGenerateToken = true))
@@ -118,7 +118,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             apiUser.requestLogin(scheduler = scheduler, reqLoginData = reqLoginData,
                     responseData = { loginData ->
                         loginData.needRegisterSocial = loginData.message != ApiCallBackConstants.SUCCESS_LOGIN
-                        PrintLog.d("requestLogin success", loginData.toString(), tag)
+                        PrintLog.d("requestLogin success", loginData.toString())
                         requestLoginEvent.postValue(RequestLoginEvent(loginData = loginData))
                         uiData.value = UIModel(isLoading = false)
                     },
@@ -126,7 +126,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                         uiData.value = UIModel(isLoading = false)
                         requestLoginEvent.postValue(RequestLoginEvent(isLoginFail = true))
                         errorData?.let {
-                            PrintLog.d("requestLogin fail", errorData.message, tag)
+                            PrintLog.d("requestLogin fail", errorData.message)
                             if (errorData.errorCode == HttpURLConnection.HTTP_BAD_REQUEST)
                                 uiData.value = UIModel(toastMessage = errorData.message)
                         }

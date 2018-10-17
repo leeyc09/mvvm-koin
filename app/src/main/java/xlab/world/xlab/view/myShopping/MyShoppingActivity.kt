@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import android.widget.TextView
 import kotlinx.android.synthetic.main.action_bar_my_shop.*
@@ -12,8 +13,15 @@ import kotlinx.android.synthetic.main.activity_my_shopping.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
+import xlab.world.xlab.adapter.recyclerView.GoodsOrderAdapter
+import xlab.world.xlab.data.adapter.GoodsOrderListData
+import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.*
+import xlab.world.xlab.utils.view.dialog.DefaultOneDialog
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
+import xlab.world.xlab.utils.view.dialog.DialogCreator
+import xlab.world.xlab.utils.view.dialog.OrderStateDialog
+import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 
 class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
@@ -24,7 +32,23 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
+    private lateinit var orderCancelDialog: DefaultOneDialog
+    private lateinit var orderStateDialog: OrderStateDialog
 
+    private lateinit var goodsOrderAdapter: GoodsOrderAdapter
+
+    private lateinit var defaultListener: DefaultListener
+    private val orderCancelDialogListener = object : DefaultOneDialog.Listener {
+        override fun onOkayTouch(tag: Any?) {
+        }
+    }
+    private val orderCancelListener = View.OnClickListener { view ->
+        orderCancelDialog.setTag(tag = view.tag as String)
+        orderCancelDialog.show()
+    }
+    private val moreListener = View.OnClickListener { view ->
+        orderStateDialog.showDialog(goods = view.tag as GoodsOrderListData)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_shopping)
@@ -52,6 +76,9 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
                 when (requestCode) {
                     RequestCodeData.RECENT_VIEW_GOODS, // 최근 본 제품
                     RequestCodeData.MY_CART -> { // 장바구니
+                        myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
 //                        progressDialog.show()
 //                        reloadAllData { max, current ->
 //                            if (max == current)
@@ -63,6 +90,9 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
                     }
                     RequestCodeData.STATUS_HISTORY, // 상태에 따른 리스트
                     RequestCodeData.ORDER_DETAIL -> { // 주문 상세
+                        myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
 //                        progressDialog.show()
 //                        reloadAllData { max, current ->
 //                            if (max == current)
@@ -70,6 +100,9 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
 //                        }
                     }
                     RequestCodeData.ORDER_REFUND -> { // 환불 신청
+                        myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
 //                        orderStateDialog.dismiss()
 //                        progressDialog.show()
 //                        reloadAllData { max, current ->
@@ -80,6 +113,9 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
 //                        }
                     }
                     RequestCodeData.ORDER_RETURN -> { // 반품 신청
+                        myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
 //                        orderStateDialog.dismiss()
 //                        progressDialog.show()
 //                        reloadAllData { max, current ->
@@ -90,6 +126,9 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
 //                        }
                     }
                     RequestCodeData.ORDER_CHANGE -> { // 교환 신청
+                        myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
 //                        orderStateDialog.dismiss()
 //                        progressDialog.show()
 //                        reloadAllData { max, current ->
@@ -121,9 +160,26 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
 
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
+        orderCancelDialog = DialogCreator.orderCancelDialog(context = this,
+                listener = orderCancelDialogListener)
+        orderStateDialog = OrderStateDialog(context = this)
+
+        defaultListener = DefaultListener(context = this)
+
+        // goods order adapter & recycler 초기화
+        goodsOrderAdapter = GoodsOrderAdapter(context = this,
+                orderDetailListener = defaultListener.orderDetailListener,
+                deliverTrackingListener = defaultListener.deliverTrackingListener,
+                orderCancelListener = orderCancelListener,
+                moreListener = moreListener)
+        orderRecyclerView.adapter = goodsOrderAdapter
+        orderRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        orderRecyclerView.addItemDecoration(CustomItemDecoration(context = this, bottom = 28f))
+        orderRecyclerView.isNestedScrollingEnabled = false
 
         myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
         myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
+        myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
     }
 
     private fun onBindEvent() {
@@ -180,6 +236,12 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.refundEnable?.let {
                     refundLayout.isEnabled = it
                     textViewRefundCnt.isEnabled = it
+                }
+                uiData.goodsOrderData?.let {
+                    goodsOrderAdapter.linkData(goodsOrderData = it)
+                }
+                uiData.goodsOrderDataCnt?.let {
+                    textViewOrderListCnt.setText(it, TextView.BufferType.SPANNABLE)
                 }
             }
         })

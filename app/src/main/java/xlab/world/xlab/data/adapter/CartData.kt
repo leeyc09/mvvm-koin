@@ -1,6 +1,5 @@
 package xlab.world.xlab.data.adapter
 
-import xlab.world.xlab.utils.support.PrintLog
 import java.io.Serializable
 
 data class CartData(var total:Int = -1,

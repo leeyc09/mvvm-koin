@@ -59,7 +59,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestProfileEdit fail", errorData.message, tag)
+                            PrintLog.d("requestProfileEdit fail", errorData.message)
                         }
                     })
         }
@@ -76,7 +76,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
                 it.onNext(birthRegex)
                 it.onComplete()
             }.with(scheduler).subscribe { resultData ->
-                PrintLog.d("birthRegexCheck", resultData.toString(), tag)
+                PrintLog.d("birthRegexCheck", resultData.toString())
                 uiData.value = UIModel(birthConfirmVisibility =
                 if (resultData) View.INVISIBLE
                 else View.VISIBLE)
@@ -93,8 +93,8 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
                 gender?.let {_-> recentProfileData.gender = gender }
                 birth?.let {_-> recentProfileData.birthYear = birth }
 
-                PrintLog.d("initProfileData", initProfileData.toString(), tag)
-                PrintLog.d("recentData", recentProfileData.toString(), tag)
+                PrintLog.d("initProfileData", initProfileData.toString())
+                PrintLog.d("recentData", recentProfileData.toString())
                 val birthRegex =
                         if (recentProfileData.birthYear.isEmpty()) initProfileData?.let{_->initProfileData!!.birthYear.isEmpty()}?: let{_->false}
                         else DataRegex.birthRegex(recentProfileData.birthYear.toInt())
@@ -104,7 +104,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
                         ?:let { _ ->false})
                 it.onComplete()
             }.with(scheduler).subscribe { resultData ->
-                PrintLog.d("existChangedData", resultData.toString(), tag)
+                PrintLog.d("existChangedData", resultData.toString())
                 uiData.value = UIModel(saveEnable = resultData)
             }
         }
@@ -150,7 +150,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestProfileUpdate fail", errorData.message, tag)
+                            PrintLog.d("requestProfileUpdate fail", errorData.message)
                         }
                     })
         }

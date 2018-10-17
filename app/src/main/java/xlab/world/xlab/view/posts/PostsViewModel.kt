@@ -35,7 +35,7 @@ class PostsViewModel(private val apiShop: ApiShopProvider,
         launch {
             apiUserActivity.requestLikedPosts(scheduler = scheduler, authorization = authorization, page = page,
                     responseData = {
-                        PrintLog.d("requestLikedPosts success", it.toString(), tag)
+                        PrintLog.d("requestLikedPosts success", it.toString())
                         val postsThumbnailData = PostThumbnailData(total = it.total, nextPage = page + 1)
                         it.postsData?.forEach { post ->
                             postsThumbnailData.items.add(PostThumbnailListData(
@@ -51,7 +51,7 @@ class PostsViewModel(private val apiShop: ApiShopProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("requestLikedPosts fail", errorData.message, tag)
+                            PrintLog.d("requestLikedPosts fail", errorData.message)
                         }
                     })
         }
@@ -69,7 +69,7 @@ class PostsViewModel(private val apiShop: ApiShopProvider,
         launch {
             apiUserActivity.requestSavedPosts(scheduler = scheduler, authorization = authorization, page = page,
                     responseData = {
-                        PrintLog.d("requestSavedPosts success", it.toString(), tag)
+                        PrintLog.d("requestSavedPosts success", it.toString())
                         val postsThumbnailData = PostThumbnailData(total = it.total, nextPage = page + 1)
                         it.postsData?.forEach { post ->
                             postsThumbnailData.items.add(PostThumbnailListData(
@@ -85,7 +85,7 @@ class PostsViewModel(private val apiShop: ApiShopProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("requestSavedPosts fail", errorData.message, tag)
+                            PrintLog.d("requestSavedPosts fail", errorData.message)
                         }
                     })
         }
@@ -103,7 +103,7 @@ class PostsViewModel(private val apiShop: ApiShopProvider,
         launch {
             apiShop.requestGoodsTaggedPosts(scheduler = scheduler, goodsCode = goodsCode, page = page,
                     responseData = {
-                        PrintLog.d("requestGoodsTaggedPosts success", it.toString(), tag)
+                        PrintLog.d("requestGoodsTaggedPosts success", it.toString())
                         val taggedPostsData = PostThumbnailData(total = it.total, nextPage = page + 1)
 
                         it.postsData?.forEachIndexed postsData@ { index, post ->
@@ -122,7 +122,7 @@ class PostsViewModel(private val apiShop: ApiShopProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestGoodsTaggedPosts fail", errorData.message, tag)
+                            PrintLog.d("requestGoodsTaggedPosts fail", errorData.message)
                         }
                     })
         }

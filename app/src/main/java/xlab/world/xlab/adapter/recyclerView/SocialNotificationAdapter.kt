@@ -127,23 +127,23 @@ class SocialNotificationAdapter(private val context: Context,
 
                     when (item.type) {
                         AppConstants.SOCIAL_NOTIFICATION_LIKE_POST-> { // like post
-                            contentStr += context.resources.getString(R.string.noti_social_like_post)
+                            contentStr += context.getString(R.string.noti_social_like_post)
                         }
                         AppConstants.SOCIAL_NOTIFICATION_POST_COMMENT -> { // post comment
-                            contentStr += context.resources.getString(R.string.noti_social_post_comment)
+                            contentStr += context.getString(R.string.noti_social_post_comment)
                             val comment =
                                     if (item.commentContent.length > 15) "${item.commentContent.substring(0, 15)}..."
                                     else item.commentContent
                             contentStr += "\"$comment\""
                         }
                         AppConstants.SOCIAL_NOTIFICATION_TAG -> { // post user tag
-                            contentStr += context.resources.getString(R.string.noti_social_tag)
+                            contentStr += context.getString(R.string.noti_social_tag)
                         }
                     }
                 }
                 AppConstants.SOCIAL_NOTIFICATION_FOLLOW -> { // user follow
                     thumbnailLayout.visibility = View.INVISIBLE
-                    contentStr += context.resources.getString(R.string.noti_social_follow)
+                    contentStr += context.getString(R.string.noti_social_follow)
                 }
             }
 

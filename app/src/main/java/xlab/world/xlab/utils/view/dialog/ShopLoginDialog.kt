@@ -62,7 +62,7 @@ class ShopLoginDialog(context: Context,
     }
 
     override fun dismiss() {
-        PrintLog.d("dialog", "dismiss", tag)
+        PrintLog.d("dialog", "dismiss")
         super.dismiss()
     }
 
@@ -80,7 +80,7 @@ class ShopLoginDialog(context: Context,
         super.show()
 
         val postData: String = "loginId=" + URLEncoder.encode(userId, "UTF-8")
-        webView.postUrl(ApiURL.SHOP_LOGIN, postData.toByteArray())
+        webView.postUrl(ApiURL.SHOP_LOGOUT, postData.toByteArray())
         webView.webChromeClient = WebChromeClient()
         webViewClient = DefaultWebViewClient(listener = webViewClientListener, showInWebView = true, finishURL = ApiURL.SHOP_LOGOUT)
         webView.webViewClient = webViewClient
@@ -89,7 +89,7 @@ class ShopLoginDialog(context: Context,
         val cookieManager = CookieManager.getInstance()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             cookieManager.removeSessionCookies { value ->
-                PrintLog.d("removeAllCookies", value.toString(), tag)
+                PrintLog.d("removeAllCookies", value.toString())
             }
         } else {
             cookieManager.removeSessionCookie()

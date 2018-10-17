@@ -108,7 +108,7 @@ class EditTextTagHelper (private val context: Context,
         tagList.remove(removeTagView)
         viewGroup.removeView(removeTagView)
         if (tagList.isEmpty())
-            editText.hint = context.resources.getString(R.string.search_item)
+            editText.hint = context.getString(R.string.search_item)
         tagChangeCallBack?.onTagChanged(statusRemove)
     }
 

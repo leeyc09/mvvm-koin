@@ -51,13 +51,13 @@ class CommentViewModel(private val apiPost: ApiPostProvider,
                                     uploadMinute = comment.uploadMinute
                             ))
                         }
-                        PrintLog.d("getComment success", commentData.toString(), tag)
+                        PrintLog.d("getComment success", commentData.toString())
                         uiData.value = UIModel(isLoading = false, commentData = commentData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("getComment fail", errorData.message, tag)
+                            PrintLog.d("getComment fail", errorData.message)
                         }
                     })
         }
@@ -76,7 +76,7 @@ class CommentViewModel(private val apiPost: ApiPostProvider,
             reqCommentData.addContent(comment)
             apiComment.postComment(scheduler = scheduler, authorization = authorization, postId = postId, requestBody = reqCommentData.getReqBody(),
                     responseData = {
-                        PrintLog.d("postComment success", "", tag)
+                        PrintLog.d("postComment success", "")
                         postCommentDataEvent.postValue(CommentEvent(status = true))
                         uiData.value = UIModel(isLoading = false)
                     },
@@ -84,7 +84,7 @@ class CommentViewModel(private val apiPost: ApiPostProvider,
                         postCommentDataEvent.postValue(CommentEvent(status = false))
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("postComment fail", errorData.message, tag)
+                            PrintLog.d("postComment fail", errorData.message)
                         }
                     })
         }
@@ -101,14 +101,14 @@ class CommentViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiComment.deleteComment(scheduler = scheduler, authorization = authorization, postId = postId, position = position,
                     responseData = {
-                        PrintLog.d("deleteComment success", "", tag)
+                        PrintLog.d("deleteComment success", "")
                         deleteCommentDataEvent.postValue(CommentEvent(status = true))
                         uiData.value = UIModel(isLoading = false)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("deleteComment fail", errorData.message, tag)
+                            PrintLog.d("deleteComment fail", errorData.message)
                         }
                     })
         }
@@ -131,14 +131,14 @@ class CommentViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiPost.checkMyPost(scheduler = scheduler, authorization = authorization, postId = postId,
                     responseData = {
-                        PrintLog.d("checkMyPost success", it.toString(), tag)
+                        PrintLog.d("checkMyPost success", it.toString())
                         uiData.value = UIModel(isLoading = false, profileImg = it.profileImg)
                         checkMyPostEvent.postValue(CommentEvent(status = it.isMyPost))
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("checkMyPost fail", errorData.message, tag)
+                            PrintLog.d("checkMyPost fail", errorData.message)
                         }
                     })
         }

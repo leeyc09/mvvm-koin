@@ -58,7 +58,7 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestSocialNotification fail", errorData.message, tag)
+                            PrintLog.d("requestSocialNotification fail", errorData.message)
                         }
                     })
         }

@@ -35,6 +35,14 @@ interface ApiGodoProvider {
     // order status 갯수 요청
     fun requestOrderStatusCnt(scheduler: SchedulerProvider, authorization: String,
                               responseData: (ResOrderStatusCntData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // order detail 요청
+    fun requestOrderDetail(scheduler: SchedulerProvider, authorization: String, orderNo: String,
+                           responseData: (ResOrderDetailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // order list 요청
+    fun requestOrderList(scheduler: SchedulerProvider, authorization: String,
+                         responseData: (ResOrderHistoryData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
@@ -106,7 +114,29 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
 
     override fun requestOrderStatusCnt(scheduler: SchedulerProvider, authorization: String,
                                        responseData: (ResOrderStatusCntData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
-        return iGodoRequest.getOrderStatusNum(authorization = authorization)
+        return iGodoRequest.getOrderStatusCnt(authorization = authorization)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestOrderDetail(scheduler: SchedulerProvider, authorization: String, orderNo: String,
+                                    responseData: (ResOrderDetailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iGodoRequest.getOrderDetail(authorization = authorization, orderNo = orderNo)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestOrderList(scheduler: SchedulerProvider, authorization: String,
+                                  responseData: (ResOrderHistoryData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iGodoRequest.getOrderHistory(authorization = authorization)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

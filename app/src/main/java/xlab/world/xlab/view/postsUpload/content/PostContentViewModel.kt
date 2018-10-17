@@ -55,7 +55,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
 
                 this.youTubeVideoId = youTubeVideoId
 
-                PrintLog.d("imagePathList", imagePathList.toString(), tag)
+                PrintLog.d("imagePathList", imagePathList.toString())
 
                 it.onNext(this.youTubeVideoId.isNotEmpty())
                 it.onComplete()
@@ -76,8 +76,8 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
     }
 
     fun changeHashTagState(hashTagNowState: Int) {
-        PrintLog.d("this hashTagNowState", this.hashTagNowState.toString(), tag)
-        PrintLog.d("hashTagNowState", hashTagNowState.toString(), tag)
+        PrintLog.d("this hashTagNowState", this.hashTagNowState.toString())
+        PrintLog.d("hashTagNowState", hashTagNowState.toString())
         if (this.hashTagNowState != hashTagNowState) {
             launch {
                 Observable.create<ArrayList<Int>> {
@@ -117,7 +117,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiHashTag.requestRecentHashTag(scheduler = scheduler, authorization = authorization,
                     responseData = {
-                        PrintLog.d("requestRecentHashTag success", it.toString(), tag)
+                        PrintLog.d("requestRecentHashTag success", it.toString())
                         val recentHashTagData = RecentHashTagData()
                         it.hashTagList?.forEach { hashTag ->
                             recentHashTagData.items.add(RecentHashTagListData(hashTag = hashTag))
@@ -128,7 +128,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestRecentHashTag fail", errorData.message, tag)
+                            PrintLog.d("requestRecentHashTag fail", errorData.message)
                         }
                     })
         }
@@ -146,7 +146,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiHashTag.searchHashTagCount(scheduler = scheduler, authorization = authorization, searchText = searchText,
                     responseData = {
-                        PrintLog.d("searchHashTagCount success", it.toString(), tag)
+                        PrintLog.d("searchHashTagCount success", it.toString())
                         if (lastSearchHasTag == searchText) { // 최종 검색 텍스트와 같을 경우만 데이터 반환
                             val searchHashTagData = SearchHashTagData(total = it.total, nextPage = page + 1, searchText = searchText)
                             it.hashTagData?.forEach { hashTagData ->
@@ -158,7 +158,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("searchHashTagCount fail", errorData.message, tag)
+                            PrintLog.d("searchHashTagCount fail", errorData.message)
                         }
                     })
         }
@@ -175,7 +175,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiPost.getPostDetail(scheduler = scheduler, authorization = authorization, postId = postId,
                     responseData = {
-                        PrintLog.d("getPostDetail success", it.toString(), tag)
+                        PrintLog.d("getPostDetail success", it.toString())
                         uiData.value = UIModel(isLoading = false)
 
                         val goodsData = ArrayList<SelectUsedGoodsListData>()
@@ -197,7 +197,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
                         uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_no_exist_post))
                         loadPostEvent.value = LoadPostEventData(isFail = true)
                         errorData?.let {
-                            PrintLog.d("getPostDetail fail", errorData.message, tag)
+                            PrintLog.d("getPostDetail fail", errorData.message)
                         }
                     })
         }
@@ -234,27 +234,27 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
             if (isPostUpload) // 포스트 업로드
                 apiPost.requestUploadPost(scheduler = scheduler, authorization = authorization, requestBody = reqPostUploadData.getReqBody(),
                         responseData = {
-                            PrintLog.d("requestUploadPost success", "", tag)
+                            PrintLog.d("requestUploadPost success", "")
                             uiData.value = UIModel(isLoading = false)
                             savePostEvent.value = PostContentEventData(status = true)
                         },
                         errorData = { errorData ->
                             uiData.value = UIModel(isLoading = false)
                             errorData?.let {
-                                PrintLog.d("requestUploadPost fail", errorData.message, tag)
+                                PrintLog.d("requestUploadPost fail", errorData.message)
                             }
                         })
             else // 포스트 업데이트
                 apiPost.requestUpdatePost(scheduler = scheduler, authorization = authorization, postId = postId, requestBody = reqPostUploadData.getReqBody(),
                         responseData = {
-                            PrintLog.d("requestUpdatePost success", "", tag)
+                            PrintLog.d("requestUpdatePost success", "")
                             uiData.value = UIModel(isLoading = false)
                             savePostEvent.value = PostContentEventData(status = true)
                         },
                         errorData = { errorData ->
                             uiData.value = UIModel(isLoading = false)
                             errorData?.let {
-                                PrintLog.d("requestUpdatePost fail", errorData.message, tag)
+                                PrintLog.d("requestUpdatePost fail", errorData.message)
                             }
                         })
         }
@@ -262,7 +262,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
 
     fun deleteProfileImage() {
         imagePathList.forEach { filePath ->
-            PrintLog.d("deleteFile", filePath, tag)
+            PrintLog.d("deleteFile", filePath)
             SupportData.deleteFile(path = filePath)
         }
     }

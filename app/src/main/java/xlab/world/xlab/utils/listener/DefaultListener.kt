@@ -13,6 +13,7 @@ import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.view.dialog.DialogCreator
 import xlab.world.xlab.utils.view.hashTag.HashTagHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.webView.DefaultWebViewActivity
 
 class DefaultListener(private val context: Activity) {
 
@@ -51,7 +52,7 @@ class DefaultListener(private val context: Activity) {
     val questionMatchListener = View.OnClickListener {
         val defaultToast = DefaultToast(context = context)
         if (spHelper.accessToken == "") { // guest mode
-            defaultToast.showToast(context.resources.getString(R.string.toast_question_match))
+            defaultToast.showToast(context.getString(R.string.toast_question_match))
         } else {
             suggestAddTopicDialog.show()
         }
@@ -99,6 +100,17 @@ class DefaultListener(private val context: Activity) {
         }
     }
 
+    // 주문 상세 화면
+    val orderDetailListener = View.OnClickListener { view ->
+        RunActivity.orderDetailActivity(context = context, orderNo = view.tag as String)
+    }
+
+    // 배송 추적
+    val deliverTrackingListener = View.OnClickListener { view ->
+        RunActivity.defaultWebViewActivity(context = context, pageTitle = null, webUrl = AppConstants.TRACKING_DELIVER_URL + view.tag as String,
+                zoomControl = true)
+    }
+
 //    // 장바구니
 //    val myCartListener = View.OnClickListener {
 //        // login check
@@ -109,7 +121,6 @@ class DefaultListener(private val context: Activity) {
 //            activity.startActivityForResult(intent, RequestCodeData.MY_CART)
 //        }
 //    }
-//
 
 //
 //    // 쇼핑 정보 수정
@@ -123,33 +134,10 @@ class DefaultListener(private val context: Activity) {
 //        }
 //    }
 //
-//    // 주문 상세 화면
-//    val orderDetailListener = View.OnClickListener { view ->
-//        // login check
-//        if (SPHelper(activity).accessToken == "") { // guest mode
-//            loginDialog.show()
-//        } else {
-//            if (view.tag is String) {
-//                val orderNo = view.tag as String
-//                val intent = OrderDetailActivity.newIntent(activity, orderNo)
-//                activity.startActivityForResult(intent, RequestCodeData.ORDER_DETAIL)
-//            }
-//        }
-//    }
 //
 //    // 최근 본 상품
 //    val recentViewGoodsListener = View.OnClickListener {
 //        val intent = RecentViewGoodsActivity.newIntent(activity)
 //        activity.startActivityForResult(intent, RequestCodeData.RECENT_VIEW_GOODS)
-//    }
-//
-//    // 배송 추적
-//    val deliverTrackingListener = View.OnClickListener { view ->
-//        if (view.tag is String) {
-//            val deliverNo = view.tag as String
-//            val intent = DefaultWebViewActivity.newIntent(activity,
-//                    pageTitle = null, webUrl = SupportData.TRACKING_DELIVER_URL + deliverNo, zoomControl = true)
-//            activity.startActivity(intent)
-//        }
 //    }
 }

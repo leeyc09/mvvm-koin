@@ -78,11 +78,11 @@ class PetInfo(context: Context) {
                 }
                 else {
                     petDataMap[rawData!![1]] = rawData!![0]
-                    PrintLog.d("petData",  "${rawData!![0]} - ${rawData!![1]}", tag)
+                    PrintLog.d("petData",  "${rawData!![0]} - ${rawData!![1]}")
                 }
             }
         } catch (e: FileNotFoundException) {
-            PrintLog.e("error csv convert", e.message!!, tag)
+            PrintLog.e("error csv convert", e.message!!)
         } finally {
             return petDataMap
         }
@@ -101,11 +101,11 @@ class PetInfo(context: Context) {
                 }
                 else {
                     petDataMap[rawData!![2]] = HairColorData(name = rawData!![0], colorCode = rawData!![1])
-                    PrintLog.d("petData",  "${rawData!![2]} - (${rawData!![0]}, ${rawData!![1]})", tag)
+                    PrintLog.d("petData",  "${rawData!![2]} - (${rawData!![0]}, ${rawData!![1]})")
                 }
             }
         } catch (e: FileNotFoundException) {
-            PrintLog.e("error csv convert", e.message!!, tag)
+            PrintLog.e("error csv convert", e.message!!)
         } finally {
             return petDataMap
         }
@@ -142,11 +142,11 @@ class PetInfo(context: Context) {
                             size = size
                     ))
                     dataType = AppConstants.ADAPTER_CONTENT
-                    PrintLog.d("breedInfo", breedInfoList.last().toString(), tag)
+                    PrintLog.d("breedInfo", breedInfoList.last().toString())
                 }
             }
         } catch (e: FileNotFoundException) {
-            PrintLog.e("error csv convert", e.message!!, tag)
+            PrintLog.e("error csv convert", e.message!!)
         } finally {
             return breedInfoList
         }

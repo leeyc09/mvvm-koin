@@ -30,19 +30,12 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
                         private val scheduler: SchedulerProvider): AbstractViewModel() {
     val tag = "BuyGoods"
 
-    private var resultCode: Int = Activity.RESULT_CANCELED
     private var intentFrom: Int = AppConstants.FROM_GOODS_DETAIL
 
     private var isLogin = true
     private var snoText = ""
     private var snoList = ArrayList<Int>()
 
-    private val loginUrl = "${ApiURL.XLAB_GODO_MOBILE_URL_SSL}/member/login.php"
-    private val orderUrl = "${ApiURL.XLAB_GODO_MOBILE_URL_SSL}/order/order.php?cartIdx="
-    private val mainUrl = "${ApiURL.XLAB_GODO_MOBILE_URL_SSL}/main"
-    private val cartUrl = "${ApiURL.XLAB_GODO_MOBILE_URL_SSL}/order/cart.php"
-    private val finishAddressUrl = "${ApiURL.XLAB_GODO_MOBILE_URL_SSL}/order/order_end.php"
-    private val orderNoContainUrl = "$finishAddressUrl?orderNo="
 
     val pageLoadingEventData = SingleLiveEvent<PageLoadingModel>()
     val uiData = MutableLiveData<UIModel>()
@@ -51,6 +44,7 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             Observable.create<String> {
                 this.snoList = snoList
+                this.intentFrom = intentFrom
                 snoText = "["
                 for ((index, sno) in snoList.withIndex()) {
                     snoText += sno.toString()
@@ -58,11 +52,11 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
                             if (index < snoList.size - 1) ","
                             else  "]"
                 }
-                it.onNext(orderUrl + snoText)
+                it.onNext(ApiURL.GODO_ORDER_PAGE + snoText)
                 it.onComplete()
             }.with(scheduler).subscribe {
                 // 프로그래스바 시작
-                PrintLog.d("webViewLoadUrl", it, tag)
+                PrintLog.d("webViewLoadUrl", it)
                 uiData.value = UIModel(isLoading = true, webViewLoadUrl = it, webViewVisibility = View.GONE)
             }
         }
@@ -71,9 +65,9 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
     fun webViewPageStarted(authorization: String, url: String) {
         launch {
             Observable.create<Int> {
-                if (url.contains(cartUrl) || url.contains(mainUrl)) { // 장바구니, 메인 (웹)페이지 준비 -> 구매화면 종료
+                if (url.contains(ApiURL.GODO_CART_PAGE) || url.contains(ApiURL.GODO_MAIN_PAGE)) { // 장바구니, 메인 (웹)페이지 준비 -> 구매화면 종료
                     actionBackAction(authorization = authorization)
-                } else if (url.contains(orderNoContainUrl)) { // 구매 완료 페이지 준비 -> 웹뷰 안보이게
+                } else if (url.contains(ApiURL.GODO_BUY_GOODS_FINISH_WITH_ORDER_NO_PAGE)) { // 구매 완료 페이지 준비 -> 웹뷰 안보이게
                     uiData.postValue(UIModel(webViewVisibility = View.GONE))
                 } else {}
 
@@ -92,21 +86,26 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
             return true
         } else if (url.startsWith("http:") || url.startsWith("https:")) { // http / https 요청
             when (true) {
-                url.contains(loginUrl) -> { // 로그인 페이지 로딩 -> 로그인 시도
+                url.contains(ApiURL.GODO_LOGIN_PAGE) -> { // 로그인 페이지 로딩 -> 로그인 시도
                     isLogin = false
                     uiData.postValue(UIModel(webViewVisibility = View.GONE))
                     val postData: String = "loginId=" + URLEncoder.encode(userId, "UTF-8")
                     pageLoadingEventData.postValue(PageLoadingModel(
                             webViewPostData = WebViewPostData(url = ApiURL.SHOP_LOGIN, postData = postData)))
                 }
-                url.contains(orderNoContainUrl) -> { // 구매 완료 페이지 로딩 -> 구매 화면 종료
-                    val orderNo = url.replace(orderNoContainUrl, "")
+                url.contains(ApiURL.GODO_BUY_GOODS_FINISH_WITH_ORDER_NO_PAGE) -> { // 구매 완료 페이지 로딩 -> 구매 화면 종료
+                    val orderNo = url.replace(ApiURL.GODO_BUY_GOODS_FINISH_WITH_ORDER_NO_PAGE, "")
+                    PrintLog.d("original url", url)
+                    PrintLog.d("replace url", ApiURL.GODO_BUY_GOODS_FINISH_WITH_ORDER_NO_PAGE)
+                    PrintLog.d("orderNo", orderNo)
                     if (intentFrom == AppConstants.FROM_GOODS_DETAIL) { // 상품 상세에서 넘어온 경우 -> 장바구니에서 해당 상품 삭제 필요
                         deleteCartData(authorization = authorization, sno = snoList.first().toString()) {
                             pageLoadingEventData.postValue(PageLoadingModel(finishOrderNo = orderNo))
+                            uiData.postValue(UIModel(resultCode = Activity.RESULT_OK))
                         }
                     } else {
                         pageLoadingEventData.postValue(PageLoadingModel(finishOrderNo = orderNo))
+                        uiData.postValue(UIModel(resultCode = Activity.RESULT_OK))
                     }
                 }
                 else -> { // 이외 -> 웹뷰 활성화 & 해당 주소로 웹뷰 이동
@@ -186,9 +185,9 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             Observable.create<Int> {
                 if (url == ApiURL.SHOP_LOGIN) { // 로그인 페이지 완료 -> 웹뷰 안보이게, 주문 페이지 다시 요청
-                    uiData.postValue(UIModel(webViewLoadUrl = orderUrl + snoText))
+                    uiData.postValue(UIModel(webViewLoadUrl = ApiURL.GODO_ORDER_PAGE + snoText))
                     it.onNext(View.GONE)
-                } else if (url == orderUrl + snoText && tIsLogin) { //isLogin) { // 주문 페이지 -> 웹뷰 활성화, 프로그래스바 종료
+                } else if (url == ApiURL.GODO_ORDER_PAGE + snoText && tIsLogin) { //isLogin) { // 주문 페이지 -> 웹뷰 활성화, 프로그래스바 종료
                     uiData.postValue(UIModel(isLoading = false))
                     it.onNext(View.VISIBLE)
                 }
@@ -286,14 +285,14 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
     fun actionBackAction(authorization: String) {
         if (intentFrom == AppConstants.FROM_GOODS_DETAIL) { // 상품 상세에서 넘어온 경우 -> 장바구니에서 해당 상품 삭제 필요
             deleteCartData(authorization = authorization, sno = snoList.first().toString()) {
-                uiData.postValue(UIModel(resultCode = resultCode))
+                uiData.postValue(UIModel(resultCode = Activity.RESULT_CANCELED))
             }
         } else {
-            uiData.postValue(UIModel(resultCode = resultCode))
+            uiData.postValue(UIModel(resultCode = Activity.RESULT_CANCELED))
         }
     }
 
-    fun deleteCartData(authorization: String, sno: String, success: (Boolean) -> Unit) {
+    private fun deleteCartData(authorization: String, sno: String, success: (Boolean) -> Unit) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
@@ -304,12 +303,13 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestDeleteCart(scheduler = scheduler, authorization = authorization, sno = sno,
                     responseData = {
+                        uiData.value = UIModel(isLoading = false)
                         success(true)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestDeleteCart fail", errorData.message, tag)
+                            PrintLog.d("requestDeleteCart fail", errorData.message)
                         }
                     })
         }

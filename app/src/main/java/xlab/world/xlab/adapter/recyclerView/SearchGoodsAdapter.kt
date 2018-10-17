@@ -112,9 +112,9 @@ class SearchGoodsAdapter(private val context: Context,
             textViewItemNum.setText(searchGoodsData.total.toString(), TextView.BufferType.SPANNABLE)
             // 검색 정렬 기준
             val sortStr = when (item.sortType) {
-                AppConstants.SORT_MATCH -> context.resources.getString(R.string.sort_match)
-                AppConstants.SORT_DOWN_PRICE -> context.resources.getString(R.string.sort_down_price)
-                AppConstants.SORT_UP_PRICE -> context.resources.getString(R.string.sort_up_price)
+                AppConstants.SORT_MATCH -> context.getString(R.string.sort_match)
+                AppConstants.SORT_DOWN_PRICE -> context.getString(R.string.sort_down_price)
+                AppConstants.SORT_UP_PRICE -> context.getString(R.string.sort_up_price)
                 else -> ""
             }
             textViewSort.setText(sortStr, TextView.BufferType.SPANNABLE)

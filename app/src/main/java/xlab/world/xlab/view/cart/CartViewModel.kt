@@ -2,6 +2,7 @@ package xlab.world.xlab.view.cart
 
 import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
+import android.view.View
 import io.reactivex.Observable
 import xlab.world.xlab.data.adapter.CartData
 import xlab.world.xlab.data.adapter.CartListData
@@ -95,7 +96,7 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestUpdateCart fail", errorData.message, tag)
+                            PrintLog.d("requestUpdateCart fail", errorData.message)
                         }
                     })
         }
@@ -113,7 +114,7 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
             apiGodo.requestDeleteCart(scheduler = scheduler, authorization = authorization, sno = cartListData.sno,
                     responseData = {
                         cartData.removeData(cartListData = cartListData)
-                        PrintLog.d("viewModel cartData", cartData.toString(), tag)
+                        PrintLog.d("viewModel cartData", cartData.toString())
                         // 선택 된 상품 갯수 계산
                         var selectCnt = 0
                         cartData.items.forEach { data ->
@@ -122,12 +123,14 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
                         setResultCodeOK()
 
                         uiData.value = UIModel(isLoading = false, cartDataUpdate = true,
+                                cartLayoutVisibility = if (this.cartData.items.isEmpty()) View.GONE else View.VISIBLE,
+                                noCartLayoutVisibility = if (this.cartData.items.isEmpty()) View.VISIBLE else View.GONE,
                                 selectCnt = selectCnt.toString(), totalCnt = cartData.total.toString(), selectAll = selectCnt == cartData.total)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestDeleteCart fail", errorData.message, tag)
+                            PrintLog.d("requestDeleteCart fail", errorData.message)
                         }
                     })
         }
@@ -145,7 +148,7 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestGetCart(scheduler = scheduler, authorization = authorization,
                     responseData = {
-                        PrintLog.d("requestGetCart success", it.toString(), tag)
+                        PrintLog.d("requestGetCart success", it.toString())
                         val newCartData = CartData(total = it.total, nextPage = page + 1)
                         var selectAll = true
                         it.cartData?.forEachIndexed { index, data ->
@@ -175,13 +178,15 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
                             this.cartData.addData(cartData = newCartData)
 
                         uiData.value = UIModel(isLoading = false, cartData = this.cartData,
+                                cartLayoutVisibility = if (this.cartData.items.isEmpty()) View.GONE else View.VISIBLE,
+                                noCartLayoutVisibility = if (this.cartData.items.isEmpty()) View.VISIBLE else View.GONE,
                                 selectCnt = it.total.toString(), totalCnt = it.total.toString(), selectAll = selectAll,
                                 cartDataUpdate = true)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestGetCart fail", errorData.message, tag)
+                            PrintLog.d("requestGetCart fail", errorData.message)
                         }
                     })
         }
@@ -230,7 +235,7 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
                 it.onComplete()
 
             }.with(scheduler).subscribe {
-                PrintLog.d("buySelectedGoods list", it.toString(), tag)
+                PrintLog.d("buySelectedGoods list", it.toString())
                 buySelectedGoodsEvent.value = BuySelectedModel(goodsSnoList = it)
             }
         }
@@ -244,7 +249,7 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
 data class CartEvent(val status: Boolean? = null)
 data class BuySelectedModel(val goodsSnoList: ArrayList<Int>? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
-                   val cartData: CartData? = null,
+                   val cartData: CartData? = null, val cartLayoutVisibility: Int? = null, val noCartLayoutVisibility: Int? = null,
                    val cartDataUpdate: Boolean? = null, val cartDataUpdateIndex: Int? = null,
                    val selectCnt: String? = null, val totalCnt: String? = null,
                    val selectAll: Boolean? = null,

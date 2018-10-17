@@ -148,21 +148,21 @@ class PreloadActivity: AppCompatActivity() {
     // 앱 정보 출
     private fun printAppInfo() {
         val tag = "AppInfo"
-        PrintLog.d("packageName", packageName, tag)
+        PrintLog.d("packageName", packageName)
         try {
             val packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
             packageInfo.signatures.forEach { signature ->
                 val md = MessageDigest.getInstance("SHA")
                 md.update(signature.toByteArray())
                 val keyHash = Base64.encodeToString(md.digest(), Base64.DEFAULT)
-                PrintLog.d("Key hash", keyHash, tag)
+                PrintLog.d("Key hash", keyHash)
             }
         } catch (e: PackageManager.NameNotFoundException) {
 
         } catch (e: NoSuchAlgorithmException) {
 
         }
-        PrintLog.d("App Version Code", BuildConfig.VERSION_CODE.toString(), tag)
-        PrintLog.d("App Version Name", BuildConfig.VERSION_NAME, tag)
+        PrintLog.d("App Version Code", BuildConfig.VERSION_CODE.toString())
+        PrintLog.d("App Version Name", BuildConfig.VERSION_NAME)
     }
 }

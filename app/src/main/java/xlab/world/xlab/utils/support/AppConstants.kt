@@ -2,6 +2,7 @@ package xlab.world.xlab.utils.support
 
 object AppConstants {
     const val LOCAL_HTML_URL = "file:///android_asset/html/"
+    const val TRACKING_DELIVER_URL = "https://www.doortodoor.co.kr/parcel/doortodoor.do?fsp_action=PARC_ACT_002&fsp_cmd=retrieveInvNoACT&invc_no="
 
     // kakao plus chat
     const val KAKO_PLUS_CHAT = "http://plus.kakao.com/talk/bot/"

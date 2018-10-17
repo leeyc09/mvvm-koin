@@ -43,15 +43,9 @@ class CartAdapter(private val context: Context,
             .placeholder(imagePlaceHolder)
             .error(imagePlaceHolder)
 
-    fun getItem(position: Int): CartListData = cartData.items[position]
-
     fun linkData(cartData: CartData) {
         this.cartData = cartData
         notifyDataSetChanged()
-    }
-
-    fun print() {
-        PrintLog.d("adapter cartData", cartData.toString(), "Cart")
     }
 
     override

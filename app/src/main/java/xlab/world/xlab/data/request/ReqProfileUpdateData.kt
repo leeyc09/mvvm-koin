@@ -12,23 +12,23 @@ data class ReqProfileUpdateData(private val builder: MultipartBody.Builder =
 
     fun addProfileImage(fileName: String, requestBody: RequestBody) {
         builder.addFormDataPart("profileImage", fileName, requestBody)
-        PrintLog.d("Profile Image File", fileName, tag)
+        PrintLog.d("Profile Image File", fileName)
     }
     fun addNickName(nickName: String) {
         builder.addFormDataPart("nickName", nickName)
-        PrintLog.d("Nick Name", nickName, tag)
+        PrintLog.d("Nick Name", nickName)
     }
     fun addIntroduction(introduction: String) {
         builder.addFormDataPart("introduction", introduction)
-        PrintLog.d("Introduction", introduction, tag)
+        PrintLog.d("Introduction", introduction)
     }
     fun addGender(gender: Int) {
         builder.addFormDataPart("gender", gender.toString())
-        PrintLog.d("Gender", gender.toString(), tag)
+        PrintLog.d("Gender", gender.toString())
     }
     fun addBirthYear(birthYear: String) {
         builder.addFormDataPart("birthYear", birthYear)
-        PrintLog.d("BirthYear", birthYear, tag)
+        PrintLog.d("BirthYear", birthYear)
     }
 
     fun getReqBody(): RequestBody = builder.build()

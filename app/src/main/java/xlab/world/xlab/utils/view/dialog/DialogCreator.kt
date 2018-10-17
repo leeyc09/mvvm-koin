@@ -19,8 +19,8 @@ object DialogCreator {
 
     fun suggestAddTopicDialog(context: Activity): DefaultDialog {
         return DefaultDialog(context = context,
-                textBold = context.resources.getString(R.string.dial_add_topic),
-                textRegular = context.resources.getString(R.string.dial_add_topic2),
+                textBold = context.getString(R.string.dial_add_topic),
+                textRegular = context.getString(R.string.dial_add_topic2),
                 listener = object: DefaultDialog.Listener {
                     override fun onOkayTouch(tag: Any?) {
                         RunActivity.petEditActivity(context = context, petNo = null)
@@ -30,8 +30,8 @@ object DialogCreator {
 
     fun editCancelDialog(context: Activity): DefaultDialog {
         return DefaultDialog(context = context,
-                textBold = context.resources.getString(R.string.dial_cancel),
-                textRegular = context.resources.getString(R.string.dial_cancel2),
+                textBold = context.getString(R.string.dial_cancel),
+                textRegular = context.getString(R.string.dial_cancel2),
                 listener = object: DefaultDialog.Listener{
                     override fun onOkayTouch(tag: Any?) {
                         context.setResult(Activity.RESULT_CANCELED)
@@ -42,14 +42,20 @@ object DialogCreator {
 
     fun ratingCancelDialog(context: Activity, listener: DefaultDialog.Listener): DefaultDialog {
         return DefaultDialog(context = context,
-                textBold = context.resources.getString(R.string.dial_rating_cancel),
-                textRegular = context.resources.getString(R.string.dial_rating_cancel2),
+                textBold = context.getString(R.string.dial_rating_cancel),
+                textRegular = context.getString(R.string.dial_rating_cancel2),
                 listener = listener)
     }
 
     fun deletePetDialog(context: Activity, listener: DefaultOneDialog.Listener): DefaultOneDialog {
         return DefaultOneDialog(context = context,
                 text = context.getString(R.string.dial_delete_topic),
+                listener = listener)
+    }
+
+    fun orderCancelDialog(context: Activity, listener: DefaultOneDialog.Listener): DefaultOneDialog {
+        return DefaultOneDialog(context = context,
+                text = context.getString(R.string.dial_order_cancel),
                 listener = listener)
     }
 

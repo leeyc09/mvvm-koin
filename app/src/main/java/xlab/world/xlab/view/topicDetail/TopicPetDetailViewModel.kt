@@ -55,7 +55,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
                             name = name, gender = gender, age = age, weight = weight))
                     it.onComplete()
                 }.with(scheduler).subscribe {
-                    PrintLog.d("changePetData", it.toString(), tag)
+                    PrintLog.d("changePetData", it.toString())
                     uiData.value = UIModel(petDetailData = it)
                 }
             }
@@ -79,7 +79,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
                 it.onNext(if (userId == loginUserId) View.VISIBLE else View.GONE)
                 it.onComplete()
             }.with(scheduler).subscribe {
-                PrintLog.d("setButtonVisible", it.toString(), tag)
+                PrintLog.d("setButtonVisible", it.toString())
                 uiData.value = UIModel(btnVisibility = it)
             }
         }
@@ -91,7 +91,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
                 it.onNext(if (total > 1) View.VISIBLE else View.GONE)
                 it.onComplete()
             }.with(scheduler).subscribe {
-                PrintLog.d("changePetTotal", it.toString(), tag)
+                PrintLog.d("changePetTotal", it.toString())
                 uiData.value = UIModel(petTotal = total, petCountVisibility = it)
             }
         }
@@ -124,7 +124,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
             apiPet.requestUserPet(scheduler = scheduler, userId = userId, petNo = petNo,
                     responseData = {
                         petData = it
-                        PrintLog.d("requestUserPet success", it.toString(), tag)
+                        PrintLog.d("requestUserPet success", it.toString())
                         loadPetDataEvent.value = LoadPetDataEvent(petData = it)
                         uiData.value = UIModel(isLoading = false, petImage = it.profileImage)
 
@@ -133,7 +133,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestUserPet fail", errorData.message, tag)
+                            PrintLog.d("requestUserPet fail", errorData.message)
                         }
                     })
         }
@@ -159,11 +159,11 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
                             ))
                         }
                         loadPetDataEvent.value = LoadPetDataEvent(petUsedGoods = petUsedGoods)
-                        PrintLog.d("requestPetUsedGoods success", petUsedGoods.toString(), tag)
+                        PrintLog.d("requestPetUsedGoods success", petUsedGoods.toString())
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("requestPetUsedGoods fail", errorData.message, tag)
+                            PrintLog.d("requestPetUsedGoods fail", errorData.message)
                         }
                     })
         }
