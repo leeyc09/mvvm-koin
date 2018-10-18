@@ -14,6 +14,7 @@ import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.cart.CartViewModel
 import xlab.world.xlab.view.comment.CommentViewModel
 import xlab.world.xlab.view.completePurchase.CompletePurchaseViewModel
+import xlab.world.xlab.view.crrDetail.CRRDetailViewModel
 import xlab.world.xlab.view.follow.FollowViewModel
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
 import xlab.world.xlab.view.goodsDetail.GoodsDetailViewModel
@@ -114,6 +115,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { OrderStateViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Order CRR(Change Refund Return) View
     viewModel { OrderCRRViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for CRR(Change Refund Return) Detail View
+    viewModel { CRRDetailViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

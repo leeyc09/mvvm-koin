@@ -52,6 +52,10 @@ interface ApiGodoProvider {
     // order CRR (Change Refund Return) 요청
     fun requestOrderCRR(scheduler: SchedulerProvider, authorization: String, requestBody: RequestBody,
                         responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // CRR(Change Refund Return) 상세 요청
+    fun requestCRRDetail(scheduler: SchedulerProvider, authorization: String, handleSno: String,
+                         responseData: (ResCRRDetailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
@@ -168,6 +172,17 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestOrderCRR(scheduler: SchedulerProvider, authorization: String, requestBody: RequestBody,
                                  responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.orderCRR(authorization = authorization, requestBody = requestBody)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestCRRDetail(scheduler: SchedulerProvider, authorization: String, handleSno: String,
+                                  responseData: (ResCRRDetailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iGodoRequest.getCRRDetail(authorization = authorization, handleSno = handleSno)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

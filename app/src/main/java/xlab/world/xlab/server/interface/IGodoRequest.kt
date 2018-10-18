@@ -51,4 +51,8 @@ interface IGodoRequest {
     @POST(ApiURL.SHOP_ORDER_REFUND_RETURN_CHANGE)
     fun orderCRR(@Header("Authorization") authorization: String,
                  @Body requestBody: RequestBody): Observable<ResMessageData>
+
+    @GET(ApiURL.SHOP_ORDER_CRR_DETAIL)
+    fun getCRRDetail(@Header("Authorization") authorization: String,
+                     @Query("sno") handleSno: String): Observable<ResCRRDetailData>
 }

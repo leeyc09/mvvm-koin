@@ -291,6 +291,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".view.crrDetail.CRRDetailActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/customNoActionBarTheme" />
     </application>
 
 </manifest>

@@ -240,8 +240,7 @@ class OrderStateDialog(private val context: Activity): Dialog(context), View.OnC
                 R.id.returnDetailBtn, // 반품상세
                 R.id.changeDetailBtn, // 교환상세
                 R.id.refundDetailBtn -> { // 환불상세
-//                    val intent = RequestDetailActivity.newIntent(context, item!!.userHandleSno)
-//                    activity.startActivity(intent)
+                    RunActivity.crrDetailActivity(context = context, handleSno = goods!!.userHandleSno)
                 }
             }
         }

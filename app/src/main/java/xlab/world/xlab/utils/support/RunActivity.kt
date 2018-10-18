@@ -10,6 +10,7 @@ import xlab.world.xlab.data.response.ResUserLoginData
 import xlab.world.xlab.view.cart.CartActivity
 import xlab.world.xlab.view.comment.CommentActivity
 import xlab.world.xlab.view.completePurchase.CompletePurchaseActivity
+import xlab.world.xlab.view.crrDetail.CRRDetailActivity
 import xlab.world.xlab.view.follow.FollowerActivity
 import xlab.world.xlab.view.follow.FollowingActivity
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectActivity
@@ -301,5 +302,12 @@ object RunActivity {
     fun orderCRRActivity(context: Activity, crrMode: Int, orderNo: String, sno: String) {
         val intent = OrderCRRActivity.newIntent(context = context, crrMode = crrMode, orderNo = orderNo, sno = sno)
         context.startActivityForResult(intent, crrMode)
+    }
+
+    fun crrDetailActivity(context: Activity, handleSno: String) {
+        if (handleSno.isNotEmpty()) {
+            val intent = CRRDetailActivity.newIntent(context = context, handleSno = handleSno)
+            context.startActivity(intent)
+        }
     }
 }
