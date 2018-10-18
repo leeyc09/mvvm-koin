@@ -13,11 +13,13 @@ import xlab.world.xlab.R
 import xlab.world.xlab.utils.support.IntentPassName
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
+import xlab.world.xlab.utils.view.toast.DefaultToast
 
 class CRRDetailActivity : AppCompatActivity(), View.OnClickListener {
     private val crrDetailViewModel: CRRDetailViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
+    private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,11 +38,15 @@ class CRRDetailActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
+        actionBtn.visibility = View.GONE
 
+        // Toast, Dialog 초기화
+        defaultToast = DefaultToast(context = this)
+        progressDialog = DefaultProgressDialog(context = this)
     }
 
     private fun onBindEvent() {
-
+        actionBackBtn.setOnClickListener(this) // 뒤로가기
     }
 
     private fun observeViewModel() {
