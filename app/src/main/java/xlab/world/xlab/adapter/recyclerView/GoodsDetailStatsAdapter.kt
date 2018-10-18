@@ -77,7 +77,7 @@ class GoodsDetailStatsAdapter(private val context: Context) : RecyclerView.Adapt
 
     // View Holder
     inner class ViewHolderBind(view: View) : ViewHolder(view) {
-        private val mainLayout: LinearLayout = view.findViewById(R.id.mainLayout)
+        private val mainLayout: ConstraintLayout = view.findViewById(R.id.mainLayout)
         private val topicImageLayout: FrameLayout = view.findViewById(R.id.topicImageLayout)
         private val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
 
@@ -101,6 +101,8 @@ class GoodsDetailStatsAdapter(private val context: Context) : RecyclerView.Adapt
         private val badPercentBar: View = view.findViewById(R.id.badPercentBar)
         private val textViewBadPercent: TextView = view.findViewById(R.id.textViewBadPercent)
         private val textViewBadPercentUnit: TextView = view.findViewById(R.id.textViewBadPercentUnit)
+
+        private val noStatsLayout: TextView = view.findViewById(R.id.noStatsLayout)
 
         override fun display(item: GoodsDetailStatsListData, position: Int) {
             val offSetDIP =
@@ -156,26 +158,31 @@ class GoodsDetailStatsAdapter(private val context: Context) : RecyclerView.Adapt
             val threeDIP = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, context.resources.displayMetrics).toInt()
 
             // percent bar 색상, 사이즈
-            imageViewGood.isSelected = biggest == goodRatio
-            goodPercentBar.isSelected = biggest == goodRatio
-            goodPercentBar.layoutParams.height = if (biggest == goodRatio) threeDIP else twoDIP
-            textViewGoodPercent.isSelected = biggest == goodRatio
-            textViewGoodPercent.textSize = if (biggest == goodRatio) 18f else 13f
-            textViewGoodPercentUnit.isSelected = biggest == goodRatio
+            imageViewGood.isSelected = biggest == goodRatio && goodRatio != 0f
+            goodPercentBar.isSelected = biggest == goodRatio && goodRatio != 0f
+            goodPercentBar.layoutParams.height = if (biggest == goodRatio && goodRatio != 0f) threeDIP else twoDIP
+            textViewGoodPercent.isSelected = biggest == goodRatio && goodRatio != 0f
+            textViewGoodPercent.textSize = if (biggest == goodRatio && goodRatio != 0f) 18f else 13f
+            textViewGoodPercentUnit.isSelected = biggest == goodRatio && goodRatio != 0f
 
-            imageViewSoso.isSelected = biggest == sosoRatio
-            sosoPercentBar.isSelected = biggest == sosoRatio
-            sosoPercentBar.layoutParams.height = if (biggest == sosoRatio) threeDIP else twoDIP
-            textViewSosoPercent.isSelected = biggest == sosoRatio
-            textViewSosoPercent.textSize = if (biggest == sosoRatio) 18f else 13f
-            textViewSosoPercentUnit.isSelected = biggest == sosoRatio
+            imageViewSoso.isSelected = biggest == sosoRatio && sosoRatio != 0f
+            sosoPercentBar.isSelected = biggest == sosoRatio && sosoRatio != 0f
+            sosoPercentBar.layoutParams.height = if (biggest == sosoRatio && sosoRatio != 0f) threeDIP else twoDIP
+            textViewSosoPercent.isSelected = biggest == sosoRatio && sosoRatio != 0f
+            textViewSosoPercent.textSize = if (biggest == sosoRatio && sosoRatio != 0f) 18f else 13f
+            textViewSosoPercentUnit.isSelected = biggest == sosoRatio && sosoRatio != 0f
 
-            imageViewBad.isSelected = biggest == badRatio
-            badPercentBar.isSelected = biggest == badRatio
-            badPercentBar.layoutParams.height = if (biggest == badRatio) threeDIP else twoDIP
-            textViewBadPercent.isSelected = biggest == badRatio
-            textViewBadPercent.textSize = if (biggest == badRatio) 18f else 13f
-            textViewBadPercentUnit.isSelected = biggest == badRatio
+            imageViewBad.isSelected = biggest == badRatio && badRatio != 0f
+            badPercentBar.isSelected = biggest == badRatio && badRatio != 0f
+            badPercentBar.layoutParams.height = if (biggest == badRatio && badRatio != 0f) threeDIP else twoDIP
+            textViewBadPercent.isSelected = biggest == badRatio && badRatio != 0f
+            textViewBadPercent.textSize = if (biggest == badRatio && badRatio != 0f) 18f else 13f
+            textViewBadPercentUnit.isSelected = biggest == badRatio && badRatio != 0f
+
+            // 평가 데이터 부족 텍스트
+            noStatsLayout.visibility =
+                    if (goodRatio + sosoRatio + badRatio == 0f) View.VISIBLE
+                    else View.GONE
         }
 
         private fun createTopicView(parent: ViewGroup, index: Int, image: String, num: Int?): FrameLayout {

@@ -144,7 +144,7 @@ class GoodsOrderAdapter(private val context: Context,
             textViewPrice.setText(SupportData.applyPriceFormat(price = item.price * item.count), TextView.BufferType.SPANNABLE)
 
             // 주문상태 & 추가정보 & 화살표
-            GodoData.orderStatusMap[item.orderStatus]?.let {
+            GodoData.orderStateMap[item.orderStatus]?.let {
                 textViewStatus.setText(it.str, TextView.BufferType.SPANNABLE)
                 textViewStatus.setTextColor(it.fontColor)
                 // 추가정보 있는 경우만 표기

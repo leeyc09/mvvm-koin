@@ -49,10 +49,10 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
         }
     }
 
-    fun selectCartData(cartListData: CartListData) {
+    fun selectCartData(cartIndex:Int) {
         launch {
             Observable.create<Int> {
-                cartListData.isSelect = !cartListData.isSelect
+                this.cartData.items[cartIndex].isSelect = !this.cartData.items[cartIndex].isSelect
                 // 선택 된 상품 갯수 계산
                 var selectCnt = 0
                 cartData.items.forEach { data ->
@@ -68,13 +68,13 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
         }
     }
 
-    fun cartGoodsCntPlus(authorization: String, cartListData: CartListData) {
-        updateCartData(authorization = authorization, cartListData = cartListData, cnt = cartListData.goodsCnt + 1)
+    fun cartGoodsCntPlus(authorization: String, cartIndex: Int) {
+        updateCartData(authorization = authorization, cartListData = this.cartData.items[cartIndex], cnt = this.cartData.items[cartIndex].goodsCnt + 1)
     }
 
-    fun cartGoodsCntMinus(authorization: String, cartListData: CartListData) {
-        if (cartListData.goodsCnt > 1)
-            updateCartData(authorization = authorization, cartListData = cartListData, cnt = cartListData.goodsCnt - 1)
+    fun cartGoodsCntMinus(authorization: String, cartIndex: Int) {
+        if (this.cartData.items[cartIndex].goodsCnt > 1)
+            updateCartData(authorization = authorization, cartListData = this.cartData.items[cartIndex], cnt = this.cartData.items[cartIndex].goodsCnt - 1)
     }
 
     private fun updateCartData(authorization: String, cartListData: CartListData, cnt: Int) {
@@ -102,7 +102,7 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
         }
     }
 
-    fun deleteCartData(authorization: String, cartListData: CartListData) {
+    fun deleteCartData(authorization: String, cartIndex:Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
@@ -111,9 +111,9 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
 
         uiData.value = UIModel(isLoading = true)
         launch {
-            apiGodo.requestDeleteCart(scheduler = scheduler, authorization = authorization, sno = cartListData.sno,
+            apiGodo.requestDeleteCart(scheduler = scheduler, authorization = authorization, sno = this.cartData.items[cartIndex].sno,
                     responseData = {
-                        cartData.removeData(cartListData = cartListData)
+                        cartData.removeData(index = cartIndex)
                         PrintLog.d("viewModel cartData", cartData.toString())
                         // 선택 된 상품 갯수 계산
                         var selectCnt = 0
@@ -166,7 +166,7 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
                                     goodsOption = null,
                                     goodsCnt = data.count,
                                     goodsPrice = data.price,
-                                    goodsInitCnt = data.price,
+                                    goodsInitCnt = data.count,
                                     deliverySno = data.deliverySno,
                                     isSelect = isSelect
                             )

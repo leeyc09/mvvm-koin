@@ -148,12 +148,12 @@ class CartAdapter(private val context: Context,
                     setPriceLayout(deliveryNo = item.deliverySno)
                 }
 
-                deleteBtn.tag = item
+                deleteBtn.tag = position//item
                 deleteBtn.setOnClickListener(deleteListener)
             }
 
             // 클릭 이벤트
-            selectBtn.tag = item
+            selectBtn.tag = position//item
             selectBtn.setOnClickListener(selectListener)
 
             goodsListener?.let {
@@ -161,10 +161,10 @@ class CartAdapter(private val context: Context,
                 goodsLayout.setOnClickListener(goodsListener)
             }
 
-            goodsMinusBtn.tag = item
+            goodsMinusBtn.tag = position//item
             goodsMinusBtn.setOnClickListener(goodsMinusListener)
 
-            goodsPlusBtn.tag = item
+            goodsPlusBtn.tag = position//item
             goodsPlusBtn.setOnClickListener(goodsPlusListener)
         }
 

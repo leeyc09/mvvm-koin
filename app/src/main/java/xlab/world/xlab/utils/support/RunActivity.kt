@@ -1,6 +1,7 @@
 package xlab.world.xlab.utils.support
 
 import android.app.Activity
+import android.content.Context
 import android.net.Uri
 import com.google.android.youtube.player.YouTubeStandalonePlayer
 import xlab.world.xlab.R
@@ -23,7 +24,9 @@ import xlab.world.xlab.view.myShopping.ShopProfileEditActivity
 import xlab.world.xlab.view.notice.NoticeActivity
 import xlab.world.xlab.view.notification.NotificationActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
+import xlab.world.xlab.view.orderCRR.OrderCRRActivity
 import xlab.world.xlab.view.orderDetail.OrderDetailActivity
+import xlab.world.xlab.view.orderStateDetail.OrderStateDetailActivity
 import xlab.world.xlab.view.petBreed.PetBreedActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
 import xlab.world.xlab.view.posts.GoodsTaggedPostsActivity
@@ -288,5 +291,15 @@ object RunActivity {
     fun orderDetailActivity(context: Activity, orderNo: String) {
         val intent = OrderDetailActivity.newIntent(context = context, orderNo = orderNo)
         context.startActivityForResult(intent, RequestCodeData.ORDER_DETAIL)
+    }
+
+    fun orderStateDetailActivity(context: Activity, state: Int) {
+        val intent = OrderStateDetailActivity.newIntent(context = context, state = state)
+        context.startActivityForResult(intent, RequestCodeData.STATUS_HISTORY)
+    }
+
+    fun orderCRRActivity(context: Activity, crrMode: Int, orderNo: String, sno: String) {
+        val intent = OrderCRRActivity.newIntent(context = context, crrMode = crrMode, orderNo = orderNo, sno = sno)
+        context.startActivityForResult(intent, crrMode)
     }
 }

@@ -14,6 +14,7 @@ import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.GoodsDetailStatsAdapter
 import xlab.world.xlab.adapter.recyclerView.SocialNotificationAdapter
+import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.IntentPassName
 import xlab.world.xlab.utils.support.SPHelper
@@ -26,6 +27,7 @@ import xlab.world.xlab.view.goodsDetail.GoodsDetailViewModel
 class GoodsDetailStatsFragment: Fragment() {
     private val goodsDetailViewModel: GoodsDetailViewModel by viewModel()
     private val spHelper: SPHelper by inject()
+    private val fontColorSpan: FontColorSpan by inject()
 
     private var needInitData
         get() = arguments?.getBoolean("needInitData") ?: true
@@ -112,7 +114,8 @@ class GoodsDetailStatsFragment: Fragment() {
 
     fun loadGoodsStatsData() {
         context?.let {
-            goodsDetailViewModel.loadGoodsStatsData(authorization = spHelper.authorization, goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE))
+            goodsDetailViewModel.loadGoodsStatsData(authorization = spHelper.authorization, goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE),
+                    boldFont = fontColorSpan.notoBold000000, regularFont = fontColorSpan.notoRegular000000)
         } ?:let { needInitData = true }
     }
 

@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.dialog_order_state.*
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.GoodsOrderListData
 import xlab.world.xlab.utils.support.AppConstants
+import xlab.world.xlab.utils.support.RequestCodeData
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SupportData
 import xlab.world.xlab.utils.view.toast.DefaultToast
@@ -198,8 +199,7 @@ class OrderStateDialog(private val context: Activity): Dialog(context), View.OnC
                     context.startActivity(intent)
                 }
                 R.id.requestRefundBtn -> { // 환불신청
-//                    val intent = RequestRefundReturnChangeActivity.newIntent(context, RequestCodeData.ORDER_REFUND, item!!.orderNo, item!!.sno)
-//                    activity.startActivityForResult(intent, RequestCodeData.ORDER_REFUND)
+                    RunActivity.orderCRRActivity(context = context, crrMode = RequestCodeData.ORDER_REFUND, orderNo = goods!!.orderNo, sno = goods!!.sno)
                 }
                 R.id.checkDeliveryBtn,
                 R.id.checkDeliveryBtn2,
@@ -217,12 +217,10 @@ class OrderStateDialog(private val context: Activity): Dialog(context), View.OnC
 //                    dismiss()
                 }
                 R.id.requestChangeBtn -> { // 교환신청
-//                    val intent = RequestRefundReturnChangeActivity.newIntent(context, RequestCodeData.ORDER_CHANGE, item!!.orderNo, item!!.sno)
-//                    activity.startActivityForResult(intent, RequestCodeData.ORDER_CHANGE)
+                    RunActivity.orderCRRActivity(context = context, crrMode = RequestCodeData.ORDER_CHANGE, orderNo = goods!!.orderNo, sno = goods!!.sno)
                 }
                 R.id.requestReturnBtn -> { // 반품신청
-//                    val intent = RequestRefundReturnChangeActivity.newIntent(context, RequestCodeData.ORDER_RETURN, item!!.orderNo, item!!.sno)
-//                    activity.startActivityForResult(intent, RequestCodeData.ORDER_RETURN)
+                    RunActivity.orderCRRActivity(context = context, crrMode = RequestCodeData.ORDER_RETURN, orderNo = goods!!.orderNo, sno = goods!!.sno)
                 }
                 R.id.decideBuyBtn,
                 R.id.decideBuyBtn2,

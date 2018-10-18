@@ -134,4 +134,11 @@ object DialogCreator {
 
         return dialog
     }
+
+    fun listSelectBottomDialog(listener: ListSelectBottomDialog.Listener): ListSelectBottomDialog {
+        val dialog = ListSelectBottomDialog.newDialog()
+        dialog.handle(listener = listener)
+
+        return dialog
+    }
 }

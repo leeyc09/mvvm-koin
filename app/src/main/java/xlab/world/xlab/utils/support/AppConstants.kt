@@ -7,6 +7,12 @@ object AppConstants {
     // kakao plus chat
     const val KAKO_PLUS_CHAT = "http://plus.kakao.com/talk/bot/"
 
+    // order state code
+    const val ORDER_STATE_STAND_BY_PAYMENT = 1
+    const val ORDER_STATE_STAND_DELIVERY = 2
+    const val ORDER_STATE_STAND_CANCEL = 3
+    const val ORDER_STATE_STAND_REFUND = 4
+
     // cs company delivery code
     const val CS_XLAB = "7"
     const val CS_HOLAPET = "2"

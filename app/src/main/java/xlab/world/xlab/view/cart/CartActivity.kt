@@ -34,16 +34,16 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var defaultListener: DefaultListener
     private val selectListener = View.OnClickListener { view ->
-        cartViewModel.selectCartData(cartListData = view.tag as CartListData)
+        cartViewModel.selectCartData(cartIndex = view.tag as Int)
     }
     private val deleteListener = View.OnClickListener { view ->
-        cartViewModel.deleteCartData(authorization = spHelper.authorization, cartListData = view.tag as CartListData)
+        cartViewModel.deleteCartData(authorization = spHelper.authorization, cartIndex = view.tag as Int)
     }
     private val goodsMinusListener = View.OnClickListener { view ->
-        cartViewModel.cartGoodsCntMinus(authorization = spHelper.authorization, cartListData = view.tag as CartListData)
+        cartViewModel.cartGoodsCntMinus(authorization = spHelper.authorization, cartIndex = view.tag as Int)
     }
     private val goodsPlusListener = View.OnClickListener { view ->
-        cartViewModel.cartGoodsCntPlus(authorization = spHelper.authorization, cartListData = view.tag as CartListData)
+        cartViewModel.cartGoodsCntPlus(authorization = spHelper.authorization, cartIndex = view.tag as Int)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

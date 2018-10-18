@@ -1,6 +1,7 @@
 package xlab.world.xlab.server.provider
 
 import io.reactivex.disposables.Disposable
+import okhttp3.RequestBody
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.`interface`.IGodoRequest
 import xlab.world.xlab.server.errorHandle
@@ -33,8 +34,12 @@ interface ApiGodoProvider {
                           responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
     // order status 갯수 요청
-    fun requestOrderStatusCnt(scheduler: SchedulerProvider, authorization: String,
-                              responseData: (ResOrderStatusCntData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+    fun requestOrderStateCnt(scheduler: SchedulerProvider, authorization: String,
+                              responseData: (ResOrderStateCntData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // order state list 요청
+    fun requestOrderStateList(scheduler: SchedulerProvider, authorization: String, state: Int,
+                              responseData: (ResOrderHistoryData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
     // order detail 요청
     fun requestOrderDetail(scheduler: SchedulerProvider, authorization: String, orderNo: String,
@@ -43,6 +48,10 @@ interface ApiGodoProvider {
     // order list 요청
     fun requestOrderList(scheduler: SchedulerProvider, authorization: String,
                          responseData: (ResOrderHistoryData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // order CRR (Change Refund Return) 요청
+    fun requestOrderCRR(scheduler: SchedulerProvider, authorization: String, requestBody: RequestBody,
+                        responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
@@ -112,9 +121,20 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
                 })
     }
 
-    override fun requestOrderStatusCnt(scheduler: SchedulerProvider, authorization: String,
-                                       responseData: (ResOrderStatusCntData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
-        return iGodoRequest.getOrderStatusCnt(authorization = authorization)
+    override fun requestOrderStateCnt(scheduler: SchedulerProvider, authorization: String,
+                                       responseData: (ResOrderStateCntData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iGodoRequest.getOrderStateCnt(authorization = authorization)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestOrderStateList(scheduler: SchedulerProvider, authorization: String, state: Int,
+                                       responseData: (ResOrderHistoryData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iGodoRequest.getOrderStateHistory(authorization = authorization, state = state)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)
@@ -137,6 +157,17 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestOrderList(scheduler: SchedulerProvider, authorization: String,
                                   responseData: (ResOrderHistoryData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.getOrderHistory(authorization = authorization)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestOrderCRR(scheduler: SchedulerProvider, authorization: String, requestBody: RequestBody,
+                                 responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iGodoRequest.orderCRR(authorization = authorization, requestBody = requestBody)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

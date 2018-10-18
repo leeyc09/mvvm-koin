@@ -87,19 +87,19 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
 
         uiData.value = UIModel(isLoading = true)
         launch {
-            apiGodo.requestOrderStatusCnt(scheduler = scheduler, authorization = authorization,
+            apiGodo.requestOrderStateCnt(scheduler = scheduler, authorization = authorization,
                     responseData = {
-                        PrintLog.d("requestOrderStatusCnt success", it.toString())
+                        PrintLog.d("requestOrderStateCnt success", it.toString())
                         uiData.value = UIModel(isLoading = false,
-                                completePaymentCnt = it.orderStatusCnt[0].toString(), completePaymentEnable = it.orderStatusCnt[0] > 0,
-                                deliveryCnt = it.orderStatusCnt[1].toString(), deliveryEnable = it.orderStatusCnt[1] > 0,
-                                cancelCnt = it.orderStatusCnt[2].toString(), cancelEnable = it.orderStatusCnt[2] > 0,
-                                refundCnt = it.orderStatusCnt[3].toString(), refundEnable = it.orderStatusCnt[3] > 0)
+                                completePaymentCnt = it.orderStateCnt[0].toString(), completePaymentEnable = it.orderStateCnt[0] > 0,
+                                deliveryCnt = it.orderStateCnt[1].toString(), deliveryEnable = it.orderStateCnt[1] > 0,
+                                cancelCnt = it.orderStateCnt[2].toString(), cancelEnable = it.orderStateCnt[2] > 0,
+                                refundCnt = it.orderStateCnt[3].toString(), refundEnable = it.orderStateCnt[3] > 0)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestOrderStatusCnt fail", errorData.message)
+                            PrintLog.d("requestOrderStateCnt fail", errorData.message)
                         }
                     })
         }
@@ -122,7 +122,7 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
                             newGoodsOrderData.items.add(GoodsOrderListData(
                                     sno = goods.sno,
                                     orderNo = goods.orderNo,
-                                    orderStatus = goods.orderStatus,
+                                    orderStatus = goods.orderState,
                                     invoiceNo = goods.invoiceNo,
                                     orderYear = goods.orderYear,
                                     orderMonth = goods.orderMonth,

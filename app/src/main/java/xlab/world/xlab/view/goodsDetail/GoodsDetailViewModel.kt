@@ -3,6 +3,8 @@ package xlab.world.xlab.view.goodsDetail
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableString
 import android.view.View
 import io.reactivex.Observable
 import xlab.world.xlab.R
@@ -14,6 +16,7 @@ import xlab.world.xlab.data.response.ResGoodsDetailData
 import xlab.world.xlab.server.provider.*
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
+import xlab.world.xlab.utils.span.FontForegroundColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
@@ -227,7 +230,8 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
         }
     }
 
-    fun loadGoodsStatsData(authorization: String, goodsCode: String) {
+    fun loadGoodsStatsData(authorization: String, goodsCode: String,
+                           boldFont: FontForegroundColorSpan, regularFont: FontForegroundColorSpan) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
@@ -241,16 +245,35 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                         PrintLog.d("requestGoodsStats success", it.toString())
                         val goodsStatsData = GoodsDetailStatsData()
                         it.statsList?.forEach { stats ->
-                            val title =
-                                    if (stats.title == "") {
+                            val highlightStr =
+                                    if (stats.title.isEmpty()) {
                                         when (stats.topic.type) {
                                             petInfo.dogCode -> petInfo.dogBreedInfo[stats.topic.breed.toInt()].nameKor
                                             petInfo.catCode -> petInfo.catBreedInfo[stats.topic.breed.toInt()].nameKor
                                             else -> ""
                                         }
                                     } else stats.title
+
+                            val textStr = SpannableString(if (stats.title.isEmpty()) "다른 ${highlightStr}의 만족도" else "$highlightStr 만족도")
+
+                            if (stats.title.isEmpty()) {
+                                textStr.setSpan(regularFont, 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                textStr.setSpan(boldFont, 3, 3 + highlightStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                textStr.setSpan(regularFont, 3 + highlightStr.length, textStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            } else {
+                                textStr.setSpan(boldFont, 0, highlightStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                textStr.setSpan(regularFont, highlightStr.length, textStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            }
+//                            val title =
+//                                    if (stats.title == "") {
+//                                        when (stats.topic.type) {
+//                                            petInfo.dogCode -> petInfo.dogBreedInfo[stats.topic.breed.toInt()].nameKor
+//                                            petInfo.catCode -> petInfo.catBreedInfo[stats.topic.breed.toInt()].nameKor
+//                                            else -> ""
+//                                        }
+//                                    } else stats.title + " 만족도"
                             goodsStatsData.items.add(GoodsDetailStatsListData(
-                                    title = title,
+                                    title = textStr,
                                     topicImages = stats.topic.images,
                                     goodPercent = stats.good,
                                     sosoPercent = stats.soso,

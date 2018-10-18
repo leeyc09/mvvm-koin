@@ -46,7 +46,7 @@ class OrderDetailViewModel(private val apiGodo: ApiGodoProvider,
                             newOrderGoodsData.items.add(GoodsOrderListData(
                                     sno = goods.sno,
                                     orderNo = goods.orderNo,
-                                    orderStatus = goods.orderStatus,
+                                    orderStatus = goods.orderState,
                                     invoiceNo = goods.invoiceNo,
                                     orderYear = goods.orderYear,
                                     orderMonth = goods.orderMonth,

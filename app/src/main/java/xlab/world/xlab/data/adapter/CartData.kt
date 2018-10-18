@@ -23,8 +23,8 @@ data class CartData(var total:Int = -1,
         nextPage += 1
     }
 
-    fun removeData(cartListData: CartListData) {
-        items.remove(cartListData)
+    fun removeData(index: Int) {
+        items.removeAt(index)
 
         total -= 1
 

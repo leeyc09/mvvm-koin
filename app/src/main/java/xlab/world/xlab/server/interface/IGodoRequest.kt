@@ -1,6 +1,7 @@
 package xlab.world.xlab.server.`interface`
 
 import io.reactivex.Observable
+import okhttp3.RequestBody
 import retrofit2.http.*
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.ApiURL
@@ -33,7 +34,12 @@ interface IGodoRequest {
                      @Query("sno") sno: String): Observable<ResMessageData>
 
     @GET(ApiURL.SHOP_ORDER_STATUS_NUM)
-    fun getOrderStatusCnt(@Header("Authorization") authorization: String): Observable<ResOrderStatusCntData>
+    fun getOrderStateCnt(@Header("Authorization") authorization: String): Observable<ResOrderStateCntData>
+
+
+    @GET(ApiURL.SHOP_ORDER_STATUS_HISTORY)
+    fun getOrderStateHistory(@Header("Authorization") authorization: String,
+                             @Query("status") state: Int): Observable<ResOrderHistoryData>
 
     @GET(ApiURL.SHOP_ORDER)
     fun getOrderDetail(@Header("Authorization") authorization: String,
@@ -41,4 +47,8 @@ interface IGodoRequest {
 
     @GET(ApiURL.SHOP_ORDER_HISTORY)
     fun getOrderHistory(@Header("Authorization") authorization: String): Observable<ResOrderHistoryData>
+
+    @POST(ApiURL.SHOP_ORDER_REFUND_RETURN_CHANGE)
+    fun orderCRR(@Header("Authorization") authorization: String,
+                 @Body requestBody: RequestBody): Observable<ResMessageData>
 }

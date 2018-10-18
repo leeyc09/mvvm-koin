@@ -30,4 +30,7 @@ object IntentPassName {
     const val INTENT_FROM = "INTENT_FROM"
     const val SNO_LIST = "SNO_LIST"
     const val ORDER_NO = "ORDER_NO"
+    const val ORDER_STATE = "ORDER_STATE"
+    const val CRR_MODE = "CRR_MODE"
+    const val CART_SNO = "CART_SNO"
 }

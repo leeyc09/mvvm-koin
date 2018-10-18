@@ -12,7 +12,7 @@ data class ResOrderDetailData(@SerializedName("message") val message: String,
 
     data class Goods(@SerializedName("sno") val sno: String, // 주문 상품 시리얼 번호
                      @SerializedName("orderNo") val orderNo: String, // 주문 번호
-                     @SerializedName("orderStatus") val orderStatus: String, // 주문 상태
+                     @SerializedName("orderStatus") val orderState: String, // 주문 상태
                      @SerializedName("invoiceNo") val invoiceNo: String, // 송장번호
                      @SerializedName("orderYear") val orderYear: String, // 주문 날짜 (년)
                      @SerializedName("orderMonth") val orderMonth: String, // 주문 날짜 (월)
