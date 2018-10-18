@@ -1,9 +1,503 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorFFFFFF"
     tools:context=".view.orderDetail.OrderDetailActivity">
+
+    <include
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/action_bar_default" />
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scrollbars="none"
+        android:overScrollMode="never"
+        android:fillViewport="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/actionBar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.6dp"
+                android:background="@color/colorE2E2E2"
+                android:layout_marginTop="20dp"/>
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/delivery_place_info"
+                android:textSize="15sp"
+                android:textColor="@color/color000000"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="23.4dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/deliver_name"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorA4A4A4"/>
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:id="@+id/textViewReceiverName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/connect_number"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorA4A4A4"/>
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:id="@+id/textViewReceiverPhone"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/deliver_place"
+                    android:layout_weight="1"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorA4A4A4"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:orientation="vertical">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:id="@+id/textViewReceiverZoneCode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="13sp"
+                        android:textColor="@color/color000000"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:id="@+id/textViewReceiverAddress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="13sp"
+                        android:textColor="@color/color000000"
+                        android:layout_marginTop="2dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/receiverMemoLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/delivery_memo"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorA4A4A4"/>
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:id="@+id/textViewReceiverMemo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"/>
+
+            </LinearLayout>
+
+            <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/payment_info"
+                android:textSize="15sp"
+                android:textColor="@color/color000000"
+                android:layout_marginTop="64dp"
+                android:layout_marginStart="20dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/payment_type"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorA4A4A4"/>
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:id="@+id/textViewPaymentType"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/depositPriceLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/deposit_price"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorA4A4A4"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                        android:id="@+id/textViewDepositPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="13sp"
+                        android:textColor="@color/color5300ED"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/price_unit"
+                        android:textSize="13sp"
+                        android:textColor="@color/color5300ED"
+                        android:layout_marginStart="1dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/depositBankLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/deposit_bank"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorA4A4A4"/>
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:id="@+id/textViewDepositBank"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/depositAccountLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/deposit_account"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorA4A4A4" />
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:id="@+id/textViewDepositAccount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/depositAccountHolderLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/deposit_account_name"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorA4A4A4"/>
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:id="@+id/textViewAccountHolder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/depositNameLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/deposit_name"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorA4A4A4"/>
+
+                <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                    android:id="@+id/textViewDepositName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:textSize="13sp"
+                    android:textColor="@color/color000000"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/colorF5F5F5"
+                android:layout_marginTop="19dp">
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginTop="23dp">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/total_order_price"
+                        android:textSize="12sp"
+                        android:textColor="@color/color4A4A4A"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                        android:id="@+id/textViewTotalGoodsPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textColor="@color/color000000"
+                        app:layout_constraintEnd_toStartOf="@id/totalOrderPriceUnit"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginEnd="2dp"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:id="@+id/totalOrderPriceUnit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/price_unit"
+                        android:textSize="13sp"
+                        android:textColor="@color/color000000"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                </android.support.constraint.ConstraintLayout>
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginTop="8dp">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:id="@+id/totalDeliverPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/total_deliver_price"
+                        android:textSize="12sp"
+                        android:textColor="@color/color4A4A4A"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                        android:id="@+id/textViewTotalDeliveryPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textColor="@color/color000000"
+                        app:layout_constraintEnd_toStartOf="@id/totalDeliverPriceUnit"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginEnd="2dp"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:id="@+id/totalDeliverPriceUnit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/price_unit"
+                        android:textSize="13sp"
+                        android:textColor="@color/color000000"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                </android.support.constraint.ConstraintLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorE2E2E2"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginTop="23dp"/>
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginTop="11dp"
+                    android:paddingBottom="17dp">
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/payment_price"
+                        android:textSize="12sp"
+                        android:textColor="@color/color4A4A4A"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                        android:id="@+id/textViewTotalPaymentPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textColor="@color/color5300ED"
+                        app:layout_constraintEnd_toStartOf="@id/totalPayPrice"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginEnd="2dp"/>
+
+                    <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
+                        android:id="@+id/totalPayPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/price_unit"
+                        android:textSize="18sp"
+                        android:textColor="@color/color5300ED"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                </android.support.constraint.ConstraintLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
 
 </android.support.constraint.ConstraintLayout>

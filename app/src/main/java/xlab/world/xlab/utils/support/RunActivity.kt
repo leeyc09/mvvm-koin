@@ -23,6 +23,7 @@ import xlab.world.xlab.view.myShopping.ShopProfileEditActivity
 import xlab.world.xlab.view.notice.NoticeActivity
 import xlab.world.xlab.view.notification.NotificationActivity
 import xlab.world.xlab.view.onBoarding.OnBoardingActivity
+import xlab.world.xlab.view.orderDetail.OrderDetailActivity
 import xlab.world.xlab.view.petBreed.PetBreedActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
 import xlab.world.xlab.view.posts.GoodsTaggedPostsActivity
@@ -285,6 +286,7 @@ object RunActivity {
     }
 
     fun orderDetailActivity(context: Activity, orderNo: String) {
-        PrintLog.d("runActivity", "order detail")
+        val intent = OrderDetailActivity.newIntent(context = context, orderNo = orderNo)
+        context.startActivityForResult(intent, RequestCodeData.ORDER_DETAIL)
     }
 }

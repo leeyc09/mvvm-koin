@@ -23,6 +23,7 @@ import xlab.world.xlab.view.myShopping.MyShoppingViewModel
 import xlab.world.xlab.view.notice.NoticeViewModel
 import xlab.world.xlab.view.notification.NotificationViewModel
 import xlab.world.xlab.view.onBoarding.OnBoardingViewModel
+import xlab.world.xlab.view.orderDetail.OrderDetailViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
 import xlab.world.xlab.view.posts.PostsViewModel
 import xlab.world.xlab.view.postsUpload.content.PostContentViewModel
@@ -105,6 +106,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { BuyGoodsViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Complete Purchase View
     viewModel { CompletePurchaseViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Order Detail View
+    viewModel { OrderDetailViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {
