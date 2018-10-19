@@ -14,8 +14,8 @@ import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.view.webView.DefaultWebViewClient
 import java.net.URLEncoder
 
-class ShopLoginDialog(context: Context,
-                      private val listener: Listener): Dialog(context) {
+class ShopAccountDialog(context: Context,
+                        private val listener: Listener): Dialog(context) {
 
     interface Listener {
         fun isSuccessLogin(result: Boolean)

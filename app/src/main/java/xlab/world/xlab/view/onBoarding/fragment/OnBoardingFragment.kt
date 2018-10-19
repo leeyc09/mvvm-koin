@@ -39,6 +39,7 @@ class OnBoardingFragment: Fragment() {
         // textView 바인드
         textView = rootView.findViewById(R.id.textView)
 
+        // on boarding 내용 & 폰트 업데이트
         onBoardingViewModel.contentTextSet(context = context!!, index = getIndex(),
                 boldFont = fontColorSpan.notoBold000000, regularFont = fontColorSpan.notoRegular000000)
     }

@@ -2,6 +2,8 @@ package xlab.world.xlab.view.login
 
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
+import android.net.Uri
+import android.view.View
 import io.reactivex.Observable
 import xlab.world.xlab.R
 import xlab.world.xlab.data.request.ReqLoginData
@@ -18,14 +20,55 @@ import java.net.HttpURLConnection
 class LoginViewModel(private val apiUser: ApiUserProvider,
                      private val networkCheck: NetworkCheck,
                      private val scheduler: SchedulerProvider): AbstractViewModel() {
-
     val tag = "Login"
+
+    private var isComePreLoadActivity: Boolean = true
+    private var linkData: Uri? = null
 
     val requestLoginByAccessTokenEvent = SingleLiveEvent<RequestLoginByAccessTokenEvent>()
     val generateTokenEvent = SingleLiveEvent<GenerateTokenEvent>()
     val requestLoginEvent = SingleLiveEvent<RequestLoginEvent>()
     val uiData = MutableLiveData<UIModel>()
 
+    // view model data 초기화
+    fun initData(isComePreLoadActivity: Boolean, linkData: Uri?) {
+        launch {
+            Observable.create<ArrayList<Int>> {
+                this.isComePreLoadActivity = isComePreLoadActivity
+                this.linkData = linkData
+
+                // 앱 실행으로 로그인 화면으로 온 경우 -> 뒤로가기 비활성화, 둘러보기 활성화
+                // 다른 화면에서 로그인 화면으로 온 경우 -> 뒤로가기 버튼 활성화, 둘러보기 비활성화
+                val visibility = // [0] -> 뒤로가기, [1] -> 둘러보기
+                        if (isComePreLoadActivity) arrayListOf(View.INVISIBLE, View.VISIBLE)
+                        else arrayListOf(View.VISIBLE, View.INVISIBLE)
+
+                it.onNext(visibility)
+                it.onComplete()
+            }.with(scheduler = scheduler).subscribe {
+                PrintLog.d(title = "initData", log = it.toString(), tag = tag)
+                uiData.value = UIModel(backBtnVisibility = it[0], guestBtnVisibility = it[1])
+            }
+        }
+    }
+
+    // 키보드 보이기 유무에 따른 이벤트
+    fun keyboardLayoutEvent(keyBoardVisibility: Int) {
+        launch {
+            Observable.create<ArrayList<Int>> {
+                // 키보드 보일경우 회원가입, 둘러보기 비활성화 & 팝업 활성화
+                val visibility = // [0] -> 회원가입, 둘러보기, [1] -> 팝업
+                        if (keyBoardVisibility == View.VISIBLE) arrayListOf(View.INVISIBLE, keyBoardVisibility)
+                        else arrayListOf(View.VISIBLE, keyBoardVisibility)
+
+                it.onNext(visibility)
+                it.onComplete()
+            }.with(scheduler = scheduler).subscribe {
+                PrintLog.d(title = "keyboardLayoutEvent", log = it.toString(), tag = tag)
+                uiData.value = UIModel(registerLayoutVisibility = it[0], popupVisibility = it[1])
+            }
+        }
+    }
 
     // access token 로그인 시도
     fun requestLoginByAccessToken(authorization: String, fcmToken: String) {
@@ -143,4 +186,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
 data class RequestLoginByAccessTokenEvent(val loginData: ResCheckValidTokenData? = null, val isExpireToken: Boolean? = null)
 data class GenerateTokenEvent(val newAccessToken: String? = null, val isFailGenerateToken: Boolean? = null)
 data class RequestLoginEvent(val loginData: ResUserLoginData? = null, val isLoginFail: Boolean? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val isLoginBtnEnable: Boolean? = null)
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
+                   val backBtnVisibility: Int? = null, val guestBtnVisibility: Int? = null,
+                   val registerLayoutVisibility: Int? = null, val popupVisibility: Int? = null,
+                   val isLoginBtnEnable: Boolean? = null)

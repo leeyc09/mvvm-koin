@@ -18,7 +18,7 @@ import xlab.world.xlab.R
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultOneDialog
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
-import xlab.world.xlab.utils.view.dialog.ShopLoginDialog
+import xlab.world.xlab.utils.view.dialog.ShopAccountDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 
 class SettingActivity : AppCompatActivity(), View.OnClickListener {
@@ -30,7 +30,7 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
     private lateinit var logoutDialog: DefaultOneDialog
-    private lateinit var shopLogoutDialog: ShopLoginDialog
+    private lateinit var shopLogoutDialog: ShopAccountDialog
 
     private val logoutListener = object: DefaultOneDialog.Listener {
         override fun onOkayTouch(tag: Any?) {
@@ -38,7 +38,7 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private val shopLoginListener = object: ShopLoginDialog.Listener {
+    private val shopLoginListener = object: ShopAccountDialog.Listener {
         override fun isSuccessLogin(result: Boolean) {
             if (result) {
                 spHelper.logout()
@@ -113,7 +113,7 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
         logoutDialog = DefaultOneDialog(context = this,
                 text = getString(R.string.dial_logout),
                 listener = logoutListener)
-        shopLogoutDialog = ShopLoginDialog(context = this, listener = shopLoginListener)
+        shopLogoutDialog = ShopAccountDialog(context = this, listener = shopLoginListener)
 
         settingViewModel.loadUserSettingData(authorization = spHelper.authorization)
     }

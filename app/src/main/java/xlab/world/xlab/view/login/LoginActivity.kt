@@ -23,7 +23,7 @@ import xlab.world.xlab.utils.support.AppConstants.LOCAL_LOGIN
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.utils.support.IntentPassName
-import xlab.world.xlab.utils.view.dialog.ShopLoginDialog
+import xlab.world.xlab.utils.view.dialog.ShopAccountDialog
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
     private val loginViewModel: LoginViewModel by viewModel()
@@ -35,10 +35,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
     private val socialAuth: SocialAuth = SocialAuth()
 
     private lateinit var defaultToast: DefaultToast
-    private lateinit var progressDialog: DefaultProgressDialog
-    private lateinit var shopLoginDialog: ShopLoginDialog
 
-    private val shopLoginListener = object: ShopLoginDialog.Listener {
+    private lateinit var progressDialog: DefaultProgressDialog
+    private lateinit var shopAccountDialog: ShopAccountDialog
+
+    private val shopLoginListener = object: ShopAccountDialog.Listener {
         override fun isSuccessLogin(result: Boolean) {
             if (result) {
                 if (isComePreLoadActivity)  // 앱 실행으로 로그인 화면 온 경우
@@ -112,16 +113,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         isComePreLoadActivity = intent.getBooleanExtra(IntentPassName.IS_COME_PRELOAD_ACTIVITY, true)
         linkData = intent.data
 
-        // 앱 실행으로 로그인 화면으로 온 경우 -> 뒤로가기 비활성화, 둘러보기 활성화
-        // 다른 화면에서 로그인 화면으로 온 경우 -> 뒤로가기 버튼 활성화, 둘러보기 비활성화
-        actionBackBtn.visibility =
-                if (isComePreLoadActivity) View.INVISIBLE
-                else View.VISIBLE
-
-        guestBtn.visibility =
-                if (isComePreLoadActivity) View.VISIBLE
-                else View.INVISIBLE
-
         // 타이틀, 확인 버튼 비활성화
         actionBarTitle.visibility = View.GONE
         actionBtn.visibility = View.GONE
@@ -129,7 +120,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
-        shopLoginDialog = ShopLoginDialog(context = this, listener = shopLoginListener)
+        shopAccountDialog = ShopAccountDialog(context = this, listener = shopLoginListener)
 
         // 페이스북 email 읽기 권한 추가
         originFacebookBtn.setReadPermissions("email")
@@ -138,6 +129,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         socialAuth.facebookLogout()
         socialAuth.kakaoLogout()
 
+        loginViewModel.initData(isComePreLoadActivity = intent.getBooleanExtra(IntentPassName.IS_COME_PRELOAD_ACTIVITY, true),
+                linkData = intent.data)
         loginViewModel.isLoginEnable(email = getEmailText(), password = getPasswordText())
     }
 
@@ -156,10 +149,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
 
         // 키보드 보일경우 비밀번호 변경, 로그인 버튼 활성화 이벤트
         ViewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
-            registerLayout.visibility =
-                    if (visibility == View.VISIBLE) View.INVISIBLE
-                    else View.VISIBLE
-            layoutPopUp.visibility = visibility
+            loginViewModel.keyboardLayoutEvent(keyBoardVisibility = visibility)
         }
         // 이메일, 패스워드 지우기 이미지 활성화 이벤트
         ViewFunction.onFocusChange(editText = editTextMail) { hasFocus ->
@@ -200,6 +190,18 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 }
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
+                }
+                uiData.backBtnVisibility?.let {
+                    actionBackBtn.visibility = it
+                }
+                uiData.guestBtnVisibility?.let {
+                    guestBtn.visibility = it
+                }
+                uiData.registerLayoutVisibility?.let {
+                    registerLayout.visibility = it
+                }
+                uiData.popupVisibility?.let {
+                    layoutPopUp.visibility = it
                 }
                 uiData.isLoginBtnEnable?.let {
                     loginBtn.isEnabled = it
@@ -335,7 +337,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 userEmail = userEmail,
                 push = push)
 
-//        shopLoginDialog.requestLogin(userId = userId)
+//        shopAccountDialog.requestLogin(userId = userId)
         if (isComePreLoadActivity)  // 앱 실행으로 로그인 화면 온 경우
             RunActivity.mainActivity(context = this@LoginActivity, linkData = null)
         else  // 다른 화면에서 로그인 화면으로 온 경우

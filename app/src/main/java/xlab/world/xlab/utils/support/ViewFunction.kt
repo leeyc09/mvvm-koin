@@ -104,12 +104,12 @@ object ViewFunction {
     }
 
     // view pager page 변경 판단
-    fun onViewPagerChangePosition(viewPager: ViewPager, position: (Int) -> Unit) {
+    fun onViewPagerChangePosition(viewPager: ViewPager, index: (Int) -> Unit) {
         viewPager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {}
-            override fun onPageScrolled(index: Int, positionOffset: Float, positionOffsetPixels: Int) {}
-            override fun onPageSelected(index: Int) {
-                position(index)
+            override fun onPageScrolled(i: Int, positionOffset: Float, positionOffsetPixels: Int) {}
+            override fun onPageSelected(i: Int) {
+                index(i)
             }
         })
     }

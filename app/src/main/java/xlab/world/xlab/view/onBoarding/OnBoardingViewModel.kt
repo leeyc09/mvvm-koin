@@ -4,24 +4,45 @@ import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.text.Spannable
 import android.text.SpannableString
+import android.view.View
 import io.reactivex.Observable
 import xlab.world.xlab.R
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.span.FontForegroundColorSpan
+import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.view.AbstractViewModel
 
 class OnBoardingViewModel(private val scheduler: SchedulerProvider): AbstractViewModel() {
-    private val tag = "OnBoarding"
+    val tag = "OnBoarding"
 
     val uiData = MutableLiveData<UIModel>()
+
+    // view pager 위치에 따른 버튼 변경
+    fun buttonVisibility(index: Int, pagerSize: Int) {
+        launch {
+            Observable.create<ArrayList<Int>> {
+                // 첫페이지 ~ 마지막 이전 페이지 -> 건너뛰기 활성화 & 시작하기 비활성화
+                // 마지막 페이지 -> 시작하기 버튼 활성화
+                val btnVisibility = // [0] -> 건너뛰기, [1] -> 시작하기
+                        if (index < pagerSize - 1) arrayListOf(View.VISIBLE, View.INVISIBLE)
+                        else arrayListOf(View.INVISIBLE, View.VISIBLE)
+
+                it.onNext(btnVisibility)
+                it.onComplete()
+            }.with(scheduler = scheduler).subscribe {
+                PrintLog.d(title = "buttonVisibility", log = it.toString(), tag = tag)
+                uiData.value = UIModel(skipBtnVisibility = it[0], startBtnVisibility = it[1])
+            }
+        }
+    }
 
     // 내용 업데이트 이벤트
     fun contentTextSet(context: Context, index: Int,
                        boldFont: FontForegroundColorSpan, regularFont: FontForegroundColorSpan) {
         launch {
             Observable.create<SpannableString> {
-                // 인덱스에 따른 내용 폰트 적용
+                // 페이지에 따른 내용 폰트 적용
                 val spannableString = when (index){
                     0 -> {
                         val textStr = SpannableString(context.getString(R.string.onBoarding1))
@@ -56,4 +77,5 @@ class OnBoardingViewModel(private val scheduler: SchedulerProvider): AbstractVie
     }
 }
 
-data class UIModel(val contentStr: SpannableString? = null)
+data class UIModel(val skipBtnVisibility: Int? = null, val startBtnVisibility: Int? = null,
+                   val contentStr: SpannableString? = null)

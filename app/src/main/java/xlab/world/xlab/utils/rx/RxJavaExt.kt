@@ -7,8 +7,8 @@ import io.reactivex.Single
 /**
  * Use SchedulerProvider configuration for Single
  */
-fun <T> Single<T>.with(schedulerProvider: SchedulerProvider): Single<T> = observeOn(schedulerProvider.ui()).subscribeOn(schedulerProvider.io())
+fun <T> Single<T>.with(scheduler: SchedulerProvider): Single<T> = observeOn(scheduler.ui()).subscribeOn(scheduler.io())
 
-fun <T> Observable<T>.with(schedulerProvider: SchedulerProvider): Observable<T> = observeOn(schedulerProvider.ui()).subscribeOn(schedulerProvider.io())
+fun <T> Observable<T>.with(scheduler: SchedulerProvider): Observable<T> = observeOn(scheduler.ui()).subscribeOn(scheduler.io())
 
-fun Completable.with(schedulerProvider: SchedulerProvider): Completable = observeOn(schedulerProvider.ui()).subscribeOn(schedulerProvider.io())
+fun Completable.with(scheduler: SchedulerProvider): Completable = observeOn(scheduler.ui()).subscribeOn(scheduler.io())
