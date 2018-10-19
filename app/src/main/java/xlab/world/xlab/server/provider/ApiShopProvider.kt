@@ -9,6 +9,10 @@ import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
 
 interface ApiShopProvider {
+    // 상품 간단 정보 가져오기
+    fun requestGoodsSimple(scheduler: SchedulerProvider, goodsCode: String,
+                           responseData: (ResGoodsSimpleData) -> Unit, errorData: (ResMessageErrorData?) -> Unit):Disposable
+
     // 상품 상세 가져오기
     fun requestGoodsDetail(scheduler: SchedulerProvider, goodsCode: String,
                            responseData: (ResGoodsDetailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
@@ -35,6 +39,17 @@ interface ApiShopProvider {
 }
 
 class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
+    override fun requestGoodsSimple(scheduler: SchedulerProvider, goodsCode: String,
+                                    responseData: (ResGoodsSimpleData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iShopRequest.getGoodsSimple(goodsCode = goodsCode)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
     override fun requestGoodsDetail(scheduler: SchedulerProvider, goodsCode: String,
                                     responseData: (ResGoodsDetailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iShopRequest.getGoodsDetail(goodsCode = goodsCode)
@@ -94,7 +109,7 @@ class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
 
     override fun requestRecentViewGoods(scheduler: SchedulerProvider, authorization: String, page: Int,
                                         responseData: (ResGoodsThumbnailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
-        return iShopRequest.getRecnetViewGoods(authorization = authorization, page = page)
+        return iShopRequest.getRecentViewGoods(authorization = authorization, page = page)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

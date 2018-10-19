@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/mainLayout">
+
+    <ImageView
+        android:id="@+id/imageViewTopic"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="45dp"/>
+
+    <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+        android:id="@+id/textViewName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@color/color6D6D6D"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:layout_gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/imageViewTopic"
+        app:layout_constraintStart_toStartOf="@id/imageViewTopic"
+        app:layout_constraintEnd_toEndOf="@id/imageViewTopic"
+        android:layout_marginTop="2dp"/>
+
+    <ImageView
+        android:id="@+id/imageViewRatingBad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/rating_toggle_bad"
+        app:layout_constraintStart_toEndOf="@id/imageViewTopic"
+        app:layout_constraintTop_toTopOf="@id/imageViewTopic"
+        app:layout_constraintBottom_toBottomOf="@id/imageViewTopic"
+        android:layout_marginStart="38dp"/>
+
+    <ImageView
+        android:id="@+id/imageViewRatingSoSo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/rating_toggle_soso"
+        app:layout_constraintStart_toEndOf="@id/imageViewRatingBad"
+        app:layout_constraintTop_toTopOf="@id/imageViewTopic"
+        app:layout_constraintBottom_toBottomOf="@id/imageViewTopic"
+        android:layout_marginStart="16dp"/>
+
+    <ImageView
+        android:id="@+id/imageViewRatingGood"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/rating_toggle_good"
+        app:layout_constraintStart_toEndOf="@id/imageViewRatingSoSo"
+        app:layout_constraintTop_toTopOf="@id/imageViewTopic"
+        app:layout_constraintBottom_toBottomOf="@id/imageViewTopic"
+        android:layout_marginStart="16dp"/>
+
+</android.support.constraint.ConstraintLayout>

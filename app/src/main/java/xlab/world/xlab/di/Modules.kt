@@ -19,6 +19,7 @@ import xlab.world.xlab.view.follow.FollowViewModel
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
 import xlab.world.xlab.view.goodsDetail.GoodsDetailViewModel
 import xlab.world.xlab.view.goodsInfo.GoodsInfoVewModel
+import xlab.world.xlab.view.goodsRating.GoodsRatingViewModel
 import xlab.world.xlab.view.main.MainViewModel
 import xlab.world.xlab.view.myShopping.MyShoppingViewModel
 import xlab.world.xlab.view.notice.NoticeViewModel
@@ -100,7 +101,7 @@ val viewModelModule: Module = applicationContext {
     // ViewModel for Goods Info View
     viewModel { GoodsInfoVewModel(scheduler = get()) }
     // ViewModel for My Shopping View
-    viewModel { MyShoppingViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { MyShoppingViewModel(apiGodo = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Recent View View
     viewModel { RecentViewViewModel(apiShop = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Cart View
@@ -117,6 +118,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { OrderCRRViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for CRR(Change Refund Return) Detail View
     viewModel { CRRDetailViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Goods Rating View
+    viewModel { GoodsRatingViewModel(apiShop = get(), apiPet = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

@@ -11,8 +11,8 @@ data class ReqUsedGoodsData(@SerializedName("usedType") val usedType: Int,
                             @SerializedName("goodsType") val goodsType: Int,
                             @SerializedName("topic") val topic: Topic): Serializable {
 
-    data class Topic(@SerializedName("id") val id:String,
-                     @SerializedName("type") val type:String,
-                     @SerializedName("breed") val breed:String,
-                     @SerializedName("rating") val rating: Int): Serializable
+    data class Topic(@SerializedName("id") val id:String = "",
+                     @SerializedName("type") val type:String = "",
+                     @SerializedName("breed") val breed:String = "",
+                     @SerializedName("rating") val rating: Int = 0): Serializable
 }

@@ -10,6 +10,6 @@ data class ResGoodsThumbnailData(@SerializedName("message") val message: String,
 
     data class UsedGoods(@SerializedName(value = "code", alternate = ["goodsCode"]) val code: String,
                          @SerializedName(value = "image", alternate = ["goodsImage"]) val image: String,
-                         @SerializedName("goodsName") val name: String,
-                         @SerializedName("goodsBrand") val brand: String): Serializable
+                         @SerializedName(value = "name", alternate = ["goodsName"]) val name: String,
+                         @SerializedName(value = "brand", alternate = ["goodsBrand"]) val brand: String): Serializable
 }

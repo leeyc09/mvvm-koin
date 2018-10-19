@@ -118,6 +118,7 @@
     <string name="toast_order_cancel_success">해당 주문이 취소되었습니다</string>
     <string name="toast_receive_confirm_success">수취확인 처리되었습니다</string>
     <string name="toast_buy_decide_success">구매확정 처리되었습니다</string>
+    <string name="toast_rating_success">평가한 내역이 저장되었습니다.</string>
 
     <!-- TODO: No Exist Data -->
     <string name="empty_recent_view_goods">최근 본 제품이 없어요</string>
@@ -507,7 +508,6 @@
 
     <!-- TODO: Order Step -->
     <string name="goods_rating_title">제품을 평가해주세요</string>
-    <string name="rating_success">평가한 내역이 저장되었습니다.</string>
     <string name="reason">사유</string>
     <string name="reason_select">사유선택</string>
     <string name="detail_reason">상세사유</string>

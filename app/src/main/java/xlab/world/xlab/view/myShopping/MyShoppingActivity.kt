@@ -66,8 +66,7 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
             if (tag is GoodsOrderListData)
                 myShoppingViewModel.buyDecide(context = this@MyShoppingActivity,
                         authorization = spHelper.authorization,
-                        orderNo = tag.orderNo,
-                        sno = tag.sno)
+                        goods = tag)
         }
     }
 
@@ -101,11 +100,6 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
                         myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
                         myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
                         myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
-//                        progressDialog.show()
-//                        reloadAllData { max, current ->
-//                            if (max == current)
-//                                progressDialog.dismiss()
-//                        }
                     }
                     RequestCodeData.MY_SHOP_PROFILE_EDIT -> { // 쇼핑 정보 수정
                         myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
@@ -115,11 +109,6 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
                         myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
                         myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
                         myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
-//                        progressDialog.show()
-//                        reloadAllData { max, current ->
-//                            if (max == current)
-//                                progressDialog.dismiss()
-//                        }
                     }
                     RequestCodeData.ORDER_REFUND, // 환불 신청
                     RequestCodeData.ORDER_RETURN, // 반품 신청
@@ -130,8 +119,7 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
                         orderStateDialog.dismiss()
                     }
                     RequestCodeData.GOODS_RATING -> {
-//                        defaultToast.showToast(resources.getString(R.string.rating_success))
-//                        orderStateDialog.dismiss()
+                        orderStateDialog.dismiss()
                     }
                 }
             }
@@ -274,15 +262,14 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
         // buy decide confirm 이벤트 observe
         myShoppingViewModel.buyDecideEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let { _ ->
-                eventData.status?.let { isSuccess ->
-                    if (isSuccess) {
-                        if (this.resultCode == Activity.RESULT_CANCELED)
-                            this.resultCode = Activity.RESULT_OK
+                eventData.goods?.let {
+                    if (this.resultCode == Activity.RESULT_CANCELED)
+                        this.resultCode = Activity.RESULT_OK
 
-                        myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
-                        myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
-                        myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
-                    }
+                    myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
+                    myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
+                    myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
+                    myShoppingViewModel.addUsedGoods(authorization = spHelper.authorization, goods = it)
                 }
             }
         })

@@ -234,8 +234,7 @@ class OrderStateDialog(private val context: Activity,
                 R.id.goodsAssessmentBtn2,
                 R.id.goodsAssessmentBtn3,
                 R.id.goodsAssessmentBtn4 -> { // 제품평가
-//                    val intent = GoodsRatingActivity.newIntent(context, item!!.goodsCode)
-//                    activity.startActivityForResult(intent, RequestCodeData.GOODS_RATING)
+                    RunActivity.goodsRatingActivity(context = context, goodsCode = goods!!.code)
                 }
                 R.id.returnDetailBtn, // 반품상세
                 R.id.changeDetailBtn, // 교환상세

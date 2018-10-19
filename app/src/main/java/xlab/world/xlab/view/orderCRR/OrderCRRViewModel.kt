@@ -128,7 +128,7 @@ class OrderCRRViewModel(private val apiGodo: ApiGodoProvider,
 
                         uiData.value = UIModel(isLoading = false, crrGoodsData = this.crrGoodsData,
                                 crrGoodsSelectCnt = "1", crrGoodsTotalCnt = this.crrGoodsData.total.toString(),
-                                selectAll = false, finishBtnEnable= false)
+                                selectAll = this.crrGoodsData.total == 1, finishBtnEnable= false)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)

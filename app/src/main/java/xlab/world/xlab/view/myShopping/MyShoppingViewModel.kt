@@ -6,16 +6,20 @@ import io.reactivex.Observable
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.GoodsOrderData
 import xlab.world.xlab.data.adapter.GoodsOrderListData
+import xlab.world.xlab.data.request.ReqUsedGoodsData
 import xlab.world.xlab.data.response.ResShopProfileData
 import xlab.world.xlab.server.provider.ApiGodoProvider
+import xlab.world.xlab.server.provider.ApiUserActivityProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
+import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
 class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
+                          private val apiUserActivity: ApiUserActivityProvider,
                           private val networkCheck: NetworkCheck,
                           private val scheduler: SchedulerProvider): AbstractViewModel() {
     val tag = "MyShopping"
@@ -27,7 +31,8 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
     val updateProfileEventData = SingleLiveEvent<MyShopEvent>()
     val orderCancelEventData = SingleLiveEvent<MyShopEvent>()
     val orderReceiveConfirmEventData = SingleLiveEvent<MyShopEvent>()
-    val buyDecideEventData = SingleLiveEvent<MyShopEvent>()
+    val buyDecideEventData = SingleLiveEvent<BuyDecideEvent>()
+    val addUsedGoodsEventData = SingleLiveEvent<MyShopEvent>()
     val uiData = MutableLiveData<UIModel>()
 
     fun loadShopProfile(authorization: String) {
@@ -235,7 +240,7 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
         }
     }
 
-    fun buyDecide(context: Context, authorization: String, orderNo: String, sno: String) {
+    fun buyDecide(context: Context, authorization: String, goods: GoodsOrderListData) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
@@ -244,10 +249,10 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
 
         uiData.value = UIModel(isLoading = true)
         launch {
-            apiGodo.requestBuyDecide(scheduler = scheduler, authorization = authorization, orderNo = orderNo, sno = sno,
+            apiGodo.requestBuyDecide(scheduler = scheduler, authorization = authorization, orderNo = goods.orderNo, sno = goods.sno,
                     responseData = {
                         uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_buy_decide_success))
-                        buyDecideEventData.value = MyShopEvent(status = true)
+                        buyDecideEventData.value = BuyDecideEvent(goods = goods)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
@@ -257,8 +262,36 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
                     })
         }
     }
+
+    fun addUsedGoods(authorization: String, goods: GoodsOrderListData) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        launch {
+            val reqUsedGoodsData = ReqUsedGoodsData(
+                    usedType = AppConstants.FROM_BUY,
+                    goodsCode = goods.code,
+                    goodsName = goods.name,
+                    goodsBrand = goods.brand,
+                    goodsImage = goods.image,
+                    goodsType = AppConstants.GOODS_PET,
+                    topic = ReqUsedGoodsData.Topic())
+            apiUserActivity.requestPostUsedGoods(scheduler = scheduler, authorization = authorization, reqUsedGoodsData = reqUsedGoodsData,
+                    responseData = {
+                    },
+                    errorData = { errorData ->
+                        errorData?.let {
+                            PrintLog.d("requestPostUsedGoods fail", errorData.message)
+                        }
+                    })
+        }
+    }
 }
 
+data class BuyDecideEvent(val goods: GoodsOrderListData? = null)
 data class MyShopEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val actionBtnEnable: Boolean? = null, val cancelDialogShow: Boolean? = null,

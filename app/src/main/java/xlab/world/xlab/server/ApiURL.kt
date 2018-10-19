@@ -12,7 +12,6 @@ object ApiURL {
     private const val XLAB_GODO_MOBILE_DOMAIN = "m.$XLAB_GODO_DOMAIN"
     private const val XLAB_GODO_URL_SSL =  "$MAIN_SCHEME_SSL://$XLAB_GODO_DOMAIN"
     private const val XLAB_GODO_MOBILE_URL_SSL =  "$MAIN_SCHEME_SSL://$XLAB_GODO_MOBILE_DOMAIN"
-    const val GODO_IMAGE_HEADER_URL = "$XLAB_GODO_URL_SSL/data/goods/"
 
     // TODO: xlab godo web page url
     const val GODO_LOGIN_PAGE = "$XLAB_GODO_MOBILE_URL_SSL/member/login.php"

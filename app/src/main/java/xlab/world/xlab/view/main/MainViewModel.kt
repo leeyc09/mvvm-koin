@@ -55,7 +55,7 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                                             matchData = feedData.goods!!.topicMatch?.firstOrNull())
                                     allFeedData.items.add(AllFeedListData(
                                             dataType = feedData.dataType,
-                                            imageURL = ApiURL.GODO_IMAGE_HEADER_URL + feedData.goods.image,
+                                            imageURL = feedData.goods.image,
                                             matchingPercent = matchData.percent,
                                             matchColor = matchData.color,
                                             showQuestionMark = feedData.goods.topicMatch == null,
@@ -168,7 +168,7 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                                 AppConstants.FEED_GOODS -> { // 상품
                                     exploreFeedData.items.add(ExploreFeedListData(
                                             dataType = feedData.dataType,
-                                            imageURL = ApiURL.GODO_IMAGE_HEADER_URL + feedData.goods!!.image,
+                                            imageURL = feedData.goods!!.image,
                                             goodsCd = feedData.goods.code))
                                 }
                             }
@@ -258,7 +258,7 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                     dataType = AppConstants.ADAPTER_CONTENT,
                     sortType = AppConstants.SORT_MATCH,
                     goodsCd = goods.code,
-                    imageURL = ApiURL.GODO_IMAGE_HEADER_URL + goods.image,
+                    imageURL = goods.image,
                     price = goods.price,
                     title = goods.name,
                     brand = goods.brandName,

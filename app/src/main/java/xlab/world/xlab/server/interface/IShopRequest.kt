@@ -8,6 +8,9 @@ import xlab.world.xlab.server.ApiURL
 
 interface IShopRequest {
 
+    @GET(ApiURL.SHOP_GOODS)
+    fun getGoodsSimple(@Query("goodsCd") goodsCode: String): Observable<ResGoodsSimpleData>
+
     @GET(ApiURL.SHOP_GOODS_DETAIL)
     fun getGoodsDetail(@Query("goodsCd") goodsCode: String): Observable<ResGoodsDetailData>
 
@@ -29,6 +32,6 @@ interface IShopRequest {
                             @Query("page") page: Int): Observable<ResThumbnailPostsData>
 
     @GET(ApiURL.SHOP_VIEW_GOODS)
-    fun getRecnetViewGoods(@Header("Authorization") authorization: String,
+    fun getRecentViewGoods(@Header("Authorization") authorization: String,
                            @Query("page") page: Int): Observable<ResGoodsThumbnailData>
 }

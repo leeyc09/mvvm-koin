@@ -69,8 +69,7 @@ class OrderDetailActivity : AppCompatActivity(), View.OnClickListener {
             if (tag is GoodsOrderListData)
                 myShoppingViewModel.buyDecide(context = this@OrderDetailActivity,
                         authorization = spHelper.authorization,
-                        orderNo = tag.orderNo,
-                        sno = tag.sno)
+                        goods = tag)
         }
     }
 
@@ -106,8 +105,7 @@ class OrderDetailActivity : AppCompatActivity(), View.OnClickListener {
                         orderStateDialog.dismiss()
                     }
                     RequestCodeData.GOODS_RATING -> {
-//                        defaultToast.showToast(resources.getString(R.string.rating_success))
-//                        orderStateDialog.dismiss()
+                        orderStateDialog.dismiss()
                     }
                 }
             }
@@ -276,12 +274,11 @@ class OrderDetailActivity : AppCompatActivity(), View.OnClickListener {
         // buy decide confirm 이벤트 observe
         myShoppingViewModel.buyDecideEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let { _ ->
-                eventData.status?.let { isSuccess ->
-                    if (isSuccess) {
-                        orderDetailViewModel.setResultCodeOK()
-                        orderDetailViewModel.loadOrderDetail(authorization = spHelper.authorization,
-                                orderNo = intent.getStringExtra(IntentPassName.ORDER_NO))
-                    }
+                eventData.goods?.let {
+                    orderDetailViewModel.setResultCodeOK()
+                    orderDetailViewModel.loadOrderDetail(authorization = spHelper.authorization,
+                            orderNo = intent.getStringExtra(IntentPassName.ORDER_NO))
+                    myShoppingViewModel.addUsedGoods(authorization = spHelper.authorization, goods = it)
                 }
             }
         })

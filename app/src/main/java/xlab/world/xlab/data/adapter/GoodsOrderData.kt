@@ -9,7 +9,9 @@ data class GoodsOrderData(var total:Int = -1,
 
     fun updateData(goodsOrderData: GoodsOrderData) {
         items.clear()
-        items.addAll(goodsOrderData.items)
+        goodsOrderData.items.forEach {
+            items.add(it.copy())
+        }
 
         isLoading = false
         total = goodsOrderData.total
@@ -17,7 +19,9 @@ data class GoodsOrderData(var total:Int = -1,
     }
 
     fun addData(goodsOrderData: GoodsOrderData) {
-        items.addAll(goodsOrderData.items)
+        goodsOrderData.items.forEach {
+            items.add(it.copy())
+        }
 
         isLoading = false
         nextPage += 1

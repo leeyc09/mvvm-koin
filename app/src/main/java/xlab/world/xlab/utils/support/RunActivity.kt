@@ -18,6 +18,7 @@ import xlab.world.xlab.view.goodsDetail.GoodsDetailActivity
 import xlab.world.xlab.view.goodsInfo.GoodsDeliveryActivity
 import xlab.world.xlab.view.goodsInfo.GoodsInquiryActivity
 import xlab.world.xlab.view.goodsInfo.GoodsNecessaryActivity
+import xlab.world.xlab.view.goodsRating.GoodsRatingActivity
 import xlab.world.xlab.view.login.LoginActivity
 import xlab.world.xlab.view.main.MainActivity
 import xlab.world.xlab.view.myShopping.MyShoppingActivity
@@ -309,5 +310,10 @@ object RunActivity {
             val intent = CRRDetailActivity.newIntent(context = context, handleSno = handleSno)
             context.startActivity(intent)
         }
+    }
+
+    fun goodsRatingActivity(context: Activity, goodsCode: String) {
+        val intent = GoodsRatingActivity.newIntent(context = context, goodsCode = goodsCode)
+        context.startActivityForResult(intent, RequestCodeData.GOODS_RATING)
     }
 }

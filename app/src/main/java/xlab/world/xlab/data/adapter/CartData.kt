@@ -9,7 +9,9 @@ data class CartData(var total:Int = -1,
 
     fun updateData(cartData: CartData) {
         items.clear()
-        items.addAll(cartData.items)
+        cartData.items.forEach {
+            items.add(it.copy())
+        }
 
         isLoading = false
         total = cartData.total
@@ -17,7 +19,9 @@ data class CartData(var total:Int = -1,
     }
 
     fun addData(cartData: CartData) {
-        items.addAll(cartData.items)
+        cartData.items.forEach {
+            items.add(it.copy())
+        }
 
         isLoading = false
         nextPage += 1
