@@ -69,7 +69,7 @@ class PreloadActivity: AppCompatActivity() {
 
         PrintLog.d("accessToken", spHelper.accessToken)
         // 저장된 로그인 기록이 없는 경우 -> 로그인 화면으로
-        if(spHelper.accessToken == "") {
+        if(spHelper.accessToken.isEmpty()) {
             spHelper.logout()
             RunActivity.loginActivity(context = this, isComePreLoadActivity = true, linkData = linkData)
             finish()

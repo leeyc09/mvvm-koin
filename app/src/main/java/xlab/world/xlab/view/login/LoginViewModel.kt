@@ -43,20 +43,15 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                         PrintLog.d("checkValidToken success", loginData.toString())
                         requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(loginData = loginData))
                         uiData.value = UIModel(isLoading = false)
-                    }, errorData = { errorData ->
-                uiData.value = UIModel(isLoading = false)
-                errorData?.let {
-                    val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
-                    PrintLog.d("checkValidToken fail", errorMessage.toString())
-                    if (errorMessage.size > 1) {
-                        if (errorMessage[1] == ApiCallBackConstants.TOKEN_EXPIRE) // 만료 에러 callback message
-                            requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(isExpireToken = true))
-                        else
-                            requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(isExpireToken = false))
-                    } else {
-                        requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(isExpireToken = false))
-                    }
-                }
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            if (errorData.message == ApiCallBackConstants.TOKEN_EXPIRE) // 만료 에러 callback message
+                                requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(isExpireToken = true))
+                            else
+                                requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(isExpireToken = false))
+                        }
             })
         }
     }

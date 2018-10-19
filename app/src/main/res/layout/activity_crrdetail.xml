@@ -106,7 +106,7 @@
         android:layout_marginEnd="20dp">
 
         <xlab.world.xlab.utils.view.textView.TextViewRegularNoto
-            android:id="@+id/adminMemoTitle"
+            android:id="@+id/textViewAdminMemoTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
