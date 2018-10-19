@@ -59,6 +59,18 @@ object DialogCreator {
                 listener = listener)
     }
 
+    fun receiveConfirmDialog(context: Activity, listener: DefaultOneDialog.Listener): DefaultOneDialog {
+        return DefaultOneDialog(context = context,
+                text = context.getString(R.string.dial_check_receipt),
+                listener = listener)
+    }
+
+    fun buyDecideDialog(context: Activity, listener: DefaultOneDialog.Listener): DefaultOneDialog {
+        return DefaultOneDialog(context = context,
+                text = context.getString(R.string.dial_decide_buy),
+                listener = listener)
+    }
+
     fun postMoreDialog(context: Activity, listener: TwoSelectBottomDialog.Listener): TwoSelectBottomDialog {
         val dialog = TwoSelectBottomDialog.newDialog(
                 firstText = context.getString(R.string.edit),

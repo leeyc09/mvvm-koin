@@ -26,9 +26,11 @@ import xlab.world.xlab.utils.view.dialog.DialogCreator
 import xlab.world.xlab.utils.view.dialog.OrderStateDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.myShopping.MyShoppingViewModel
 
 class OrderDetailActivity : AppCompatActivity(), View.OnClickListener {
     private val orderDetailViewModel: OrderDetailViewModel by viewModel()
+    private val myShoppingViewModel: MyShoppingViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
     private lateinit var defaultToast: DefaultToast
@@ -41,6 +43,9 @@ class OrderDetailActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var defaultListener: DefaultListener
     private val orderCancelDialogListener = object : DefaultOneDialog.Listener {
         override fun onOkayTouch(tag: Any?) {
+            if (tag is String)
+                myShoppingViewModel.orderCancel(context = this@OrderDetailActivity,
+                        authorization = spHelper.authorization, orderNo = tag)
         }
     }
     private val orderCancelListener = View.OnClickListener { view ->
@@ -49,6 +54,24 @@ class OrderDetailActivity : AppCompatActivity(), View.OnClickListener {
     }
     private val moreListener = View.OnClickListener { view ->
         orderStateDialog.showDialog(goods = view.tag as GoodsOrderListData)
+    }
+    private val receiveConfirmListener = object : DefaultOneDialog.Listener {
+        override fun onOkayTouch(tag: Any?) {
+            if (tag is GoodsOrderListData)
+                myShoppingViewModel.orderReceiveConfirm(context = this@OrderDetailActivity,
+                        authorization = spHelper.authorization,
+                        orderNo = tag.orderNo,
+                        sno = tag.sno)
+        }
+    }
+    private val buyDecideListener = object : DefaultOneDialog.Listener {
+        override fun onOkayTouch(tag: Any?) {
+            if (tag is GoodsOrderListData)
+                myShoppingViewModel.buyDecide(context = this@OrderDetailActivity,
+                        authorization = spHelper.authorization,
+                        orderNo = tag.orderNo,
+                        sno = tag.sno)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,7 +122,9 @@ class OrderDetailActivity : AppCompatActivity(), View.OnClickListener {
         progressDialog = DefaultProgressDialog(context = this)
         orderCancelDialog = DialogCreator.orderCancelDialog(context = this,
                 listener = orderCancelDialogListener)
-        orderStateDialog = OrderStateDialog(context = this)
+        orderStateDialog = OrderStateDialog(context = this,
+                receiveConfirmListener = receiveConfirmListener,
+                buyDecideListener = buyDecideListener)
 
         defaultListener = DefaultListener(context = this)
 
@@ -123,6 +148,7 @@ class OrderDetailActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
+        // TODO: orderDetailViewModel
         // UI 이벤트 observe
         orderDetailViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
@@ -201,6 +227,61 @@ class OrderDetailActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 uiData.totalPaymentPrice?.let {
                     textViewTotalPaymentPrice.setText(it, TextView.BufferType.SPANNABLE)
+                }
+            }
+        })
+
+        // TODO: myShoppingViewModel
+        // UI 이벤트 observe
+        myShoppingViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.isLoading?.let {
+                    if (it && !progressDialog.isShowing)
+                        progressDialog.show()
+                    else if (!it && progressDialog.isShowing)
+                        progressDialog.dismiss()
+                }
+                uiData.toastMessage?.let {
+                    defaultToast.showToast(message = it)
+                }
+            }
+        })
+
+        // order cancel 이벤트 observe
+        myShoppingViewModel.orderCancelEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.status?.let { isSuccess ->
+                    if (isSuccess) {
+                        orderDetailViewModel.setResultCodeOK()
+                        orderDetailViewModel.loadOrderDetail(authorization = spHelper.authorization,
+                                orderNo = intent.getStringExtra(IntentPassName.ORDER_NO))
+                    }
+                }
+            }
+        })
+
+        // order receive confirm 이벤트 observe
+        myShoppingViewModel.orderReceiveConfirmEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.status?.let { isSuccess ->
+                    if (isSuccess) {
+                        orderDetailViewModel.setResultCodeOK()
+                        orderDetailViewModel.loadOrderDetail(authorization = spHelper.authorization,
+                                orderNo = intent.getStringExtra(IntentPassName.ORDER_NO))
+                    }
+                }
+            }
+        })
+
+        // buy decide confirm 이벤트 observe
+        myShoppingViewModel.buyDecideEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.status?.let { isSuccess ->
+                    if (isSuccess) {
+                        orderDetailViewModel.setResultCodeOK()
+                        orderDetailViewModel.loadOrderDetail(authorization = spHelper.authorization,
+                                orderNo = intent.getStringExtra(IntentPassName.ORDER_NO))
+                    }
                 }
             }
         })

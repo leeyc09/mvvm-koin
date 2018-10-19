@@ -27,17 +27,12 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
 
-class OrderStateDialog(private val context: Activity): Dialog(context), View.OnClickListener {
-//    ,
-//    private val orderDecideListener: DefaultOneDialog.Listener,
-//    private val receiveConfirmListener: DefaultOneDialog.Listener
+class OrderStateDialog(private val context: Activity,
+                       private val receiveConfirmListener: DefaultOneDialog.Listener,
+                       private val buyDecideListener: DefaultOneDialog.Listener): Dialog(context), View.OnClickListener {
 
-//    private var receiveConfirmDialog = DefaultOneDialog(context,
-//            context.resources.getString(R.string.is_check_receipt),
-//            receiveConfirmListener)
-//    private var decideBuyDialog = DefaultOneDialog(context,
-//            context.resources.getString(R.string.is_decide_buy),
-//            orderDecideListener)
+    private var receiveConfirmDialog: DefaultOneDialog? = null
+    private var buyDecideDialog: DefaultOneDialog? = null
 
     private var goods: GoodsOrderListData? = null
 
@@ -71,6 +66,11 @@ class OrderStateDialog(private val context: Activity): Dialog(context), View.OnC
     }
 
     fun onSetup() {
+        receiveConfirmDialog = receiveConfirmDialog ?:
+                DialogCreator.receiveConfirmDialog(context = context, listener = receiveConfirmListener)
+        buyDecideDialog = buyDecideDialog ?:
+                DialogCreator.buyDecideDialog(context = context, listener = buyDecideListener)
+
         goods?.let {
             // 상품 이미지
             Glide.with(context)
@@ -212,9 +212,9 @@ class OrderStateDialog(private val context: Activity): Dialog(context), View.OnC
                 R.id.checkReceiptBtn2,
                 R.id.checkReceiptBtn3,
                 R.id.checkReceiptBtn4 -> { // 수취확인
-//                    receiveConfirmDialog.setTag(goods!!)
-//                    receiveConfirmDialog.show()
-//                    dismiss()
+                    receiveConfirmDialog?.setTag(goods!!)
+                    receiveConfirmDialog?.show()
+                    dismiss()
                 }
                 R.id.requestChangeBtn -> { // 교환신청
                     RunActivity.orderCRRActivity(context = context, crrMode = RequestCodeData.ORDER_CHANGE, orderNo = goods!!.orderNo, sno = goods!!.sno)
@@ -226,9 +226,9 @@ class OrderStateDialog(private val context: Activity): Dialog(context), View.OnC
                 R.id.decideBuyBtn2,
                 R.id.decideBuyBtn3,
                 R.id.decideBuyBtn4 -> { // 구매확정
-//                    decideBuyDialog.setTag(goods!!)
-//                    decideBuyDialog.show()
-//                    dismiss()
+                    buyDecideDialog?.setTag(goods!!)
+                    buyDecideDialog?.show()
+                    dismiss()
                 }
                 R.id.goodsAssessmentBtn,
                 R.id.goodsAssessmentBtn2,

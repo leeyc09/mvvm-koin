@@ -56,6 +56,18 @@ interface ApiGodoProvider {
     // CRR(Change Refund Return) 상세 요청
     fun requestCRRDetail(scheduler: SchedulerProvider, authorization: String, handleSno: String,
                          responseData: (ResCRRDetailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // order cancel 요청
+    fun requestOrderCancel(scheduler: SchedulerProvider, authorization: String, orderNo: String,
+                           responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // 수취확인 요청
+    fun requestOrderReceiveConfirm(scheduler: SchedulerProvider, authorization: String, orderNo: String, sno: String,
+                                   responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // 구매 확정 요청
+    fun requestBuyDecide(scheduler: SchedulerProvider, authorization: String, orderNo: String, sno: String,
+                         responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
@@ -183,6 +195,39 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestCRRDetail(scheduler: SchedulerProvider, authorization: String, handleSno: String,
                                   responseData: (ResCRRDetailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.getCRRDetail(authorization = authorization, handleSno = handleSno)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestOrderCancel(scheduler: SchedulerProvider, authorization: String, orderNo: String,
+                                    responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iGodoRequest.orderCancel(authorization = authorization, orderNo = orderNo)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestOrderReceiveConfirm(scheduler: SchedulerProvider, authorization: String, orderNo: String, sno: String,
+                                            responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iGodoRequest.orderReceiveConfirm(authorization = authorization, orderNo = orderNo, sno = sno)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestBuyDecide(scheduler: SchedulerProvider, authorization: String, orderNo: String, sno: String,
+                                  responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iGodoRequest.buyDecide(authorization = authorization, orderNo = orderNo, sno = sno)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

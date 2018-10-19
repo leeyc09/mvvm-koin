@@ -40,6 +40,9 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var defaultListener: DefaultListener
     private val orderCancelDialogListener = object : DefaultOneDialog.Listener {
         override fun onOkayTouch(tag: Any?) {
+            if (tag is String)
+                myShoppingViewModel.orderCancel(context = this@MyShoppingActivity,
+                        authorization = spHelper.authorization, orderNo = tag)
         }
     }
     private val orderCancelListener = View.OnClickListener { view ->
@@ -49,6 +52,25 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
     private val moreListener = View.OnClickListener { view ->
         orderStateDialog.showDialog(goods = view.tag as GoodsOrderListData)
     }
+    private val receiveConfirmListener = object : DefaultOneDialog.Listener {
+        override fun onOkayTouch(tag: Any?) {
+            if (tag is GoodsOrderListData)
+                myShoppingViewModel.orderReceiveConfirm(context = this@MyShoppingActivity,
+                        authorization = spHelper.authorization,
+                        orderNo = tag.orderNo,
+                        sno = tag.sno)
+        }
+    }
+    private val buyDecideListener = object : DefaultOneDialog.Listener {
+        override fun onOkayTouch(tag: Any?) {
+            if (tag is GoodsOrderListData)
+                myShoppingViewModel.buyDecide(context = this@MyShoppingActivity,
+                        authorization = spHelper.authorization,
+                        orderNo = tag.orderNo,
+                        sno = tag.sno)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_shopping)
@@ -131,7 +153,9 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
         progressDialog = DefaultProgressDialog(context = this)
         orderCancelDialog = DialogCreator.orderCancelDialog(context = this,
                 listener = orderCancelDialogListener)
-        orderStateDialog = OrderStateDialog(context = this)
+        orderStateDialog = OrderStateDialog(context = this,
+                receiveConfirmListener = receiveConfirmListener,
+                buyDecideListener = buyDecideListener)
 
         defaultListener = DefaultListener(context = this)
 
@@ -211,6 +235,54 @@ class MyShoppingActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 uiData.goodsOrderDataCnt?.let {
                     textViewOrderListCnt.setText(it, TextView.BufferType.SPANNABLE)
+                }
+            }
+        })
+
+        // order cancel 이벤트 observe
+        myShoppingViewModel.orderCancelEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.status?.let { isSuccess ->
+                    if (isSuccess) {
+                        if (this.resultCode == Activity.RESULT_CANCELED)
+                            this.resultCode = Activity.RESULT_OK
+
+                        myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
+                    }
+                }
+            }
+        })
+
+        // order receive confirm 이벤트 observe
+        myShoppingViewModel.orderReceiveConfirmEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.status?.let { isSuccess ->
+                    if (isSuccess) {
+                        if (this.resultCode == Activity.RESULT_CANCELED)
+                            this.resultCode = Activity.RESULT_OK
+
+                        myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
+                    }
+                }
+            }
+        })
+
+        // buy decide confirm 이벤트 observe
+        myShoppingViewModel.buyDecideEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.status?.let { isSuccess ->
+                    if (isSuccess) {
+                        if (this.resultCode == Activity.RESULT_CANCELED)
+                            this.resultCode = Activity.RESULT_OK
+
+                        myShoppingViewModel.loadShopProfile(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderStateCnt(authorization = spHelper.authorization)
+                        myShoppingViewModel.loadOrderList(authorization = spHelper.authorization)
+                    }
                 }
             }
         })

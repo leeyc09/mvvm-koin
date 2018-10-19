@@ -25,6 +25,9 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
     private var recentProfileData = ResShopProfileData()
 
     val updateProfileEventData = SingleLiveEvent<MyShopEvent>()
+    val orderCancelEventData = SingleLiveEvent<MyShopEvent>()
+    val orderReceiveConfirmEventData = SingleLiveEvent<MyShopEvent>()
+    val buyDecideEventData = SingleLiveEvent<MyShopEvent>()
     val uiData = MutableLiveData<UIModel>()
 
     fun loadShopProfile(authorization: String) {
@@ -183,6 +186,75 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
             }.with(scheduler).subscribe {
                 uiData.value = UIModel(actionBtnEnable = it)
             }
+        }
+    }
+
+    fun orderCancel(context: Context, authorization: String, orderNo: String) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            apiGodo.requestOrderCancel(scheduler = scheduler, authorization = authorization, orderNo = orderNo,
+                    responseData = {
+                        uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_order_cancel_success))
+                        orderCancelEventData.value = MyShopEvent(status = true)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.d("requestOrderCancel fail", errorData.message)
+                        }
+                    })
+        }
+    }
+
+    fun orderReceiveConfirm(context: Context, authorization: String, orderNo: String, sno: String) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            apiGodo.requestOrderReceiveConfirm(scheduler = scheduler, authorization = authorization, orderNo = orderNo, sno = sno,
+                    responseData = {
+                        uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_receive_confirm_success))
+                        orderReceiveConfirmEventData.value = MyShopEvent(status = true)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.d("requestOrderReceiveConfirm fail", errorData.message)
+                        }
+                    })
+        }
+    }
+
+    fun buyDecide(context: Context, authorization: String, orderNo: String, sno: String) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            apiGodo.requestBuyDecide(scheduler = scheduler, authorization = authorization, orderNo = orderNo, sno = sno,
+                    responseData = {
+                        uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_buy_decide_success))
+                        buyDecideEventData.value = MyShopEvent(status = true)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.d("requestBuyDecide fail", errorData.message)
+                        }
+                    })
         }
     }
 }

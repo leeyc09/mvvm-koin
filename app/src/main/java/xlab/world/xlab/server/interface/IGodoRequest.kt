@@ -55,4 +55,18 @@ interface IGodoRequest {
     @GET(ApiURL.SHOP_ORDER_CRR_DETAIL)
     fun getCRRDetail(@Header("Authorization") authorization: String,
                      @Query("sno") handleSno: String): Observable<ResCRRDetailData>
+
+    @POST(ApiURL.SHOP_ORDER_CANCEL)
+    fun orderCancel(@Header("Authorization") authorization: String,
+                    @Query("orderNo") orderNo: String): Observable<ResMessageData>
+
+    @POST(ApiURL.SHOP_ORDER_RECEIVE_CONFIRM)
+    fun orderReceiveConfirm(@Header("Authorization") authorization: String,
+                            @Query("orderNo") orderNo: String,
+                            @Query("sno") sno: String): Observable<ResMessageData>
+
+    @POST(ApiURL.SHOP_ORDER_DECIDE)
+    fun buyDecide(@Header("Authorization") authorization: String,
+                  @Query("orderNo") orderNo: String,
+                  @Query("sno") sno: String): Observable<ResMessageData>
 }

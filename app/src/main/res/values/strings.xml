@@ -99,6 +99,8 @@
     <string name="dial_report_user">신고하시겠어요?</string>
     <string name="dial_report_user2">검토 후 해당 계정이용이 정지됩니다.</string>
     <string name="dial_order_cancel">주문을 취소하시겠어요?</string>
+    <string name="dial_check_receipt">수취확인 처리를 하시겠어요?</string>
+    <string name="dial_decide_buy">구매확정 처리를 하시겠어요?</string>
 
     <!-- TODO: Toast Message -->
     <string name="toast_email_format_wrong">이메일 형식을 확인해 주세요</string>
@@ -113,6 +115,9 @@
     <string name="toast_saved_success">저장되었습니다</string>
     <string name="toast_no_exist_gallery_image">갤러리에 사진이 없습니다</string>
     <string name="toast_shop_profile_update_success">쇼핑 정보가 수정되었습니다</string>
+    <string name="toast_order_cancel_success">해당 주문이 취소되었습니다</string>
+    <string name="toast_receive_confirm_success">수취확인 처리되었습니다</string>
+    <string name="toast_buy_decide_success">구매확정 처리되었습니다</string>
 
     <!-- TODO: No Exist Data -->
     <string name="empty_recent_view_goods">최근 본 제품이 없어요</string>
@@ -520,11 +525,6 @@
     <string name="goods_return_process">진행상태</string>
     <string name="cancel_detail">취소상세</string>
     <string name="goods_cancel_reason">취소사유</string>
-    <string name="request_cancel_toast">해당 주문이 취소되었습니다</string>
-    <string name="is_decide_buy">구매확정 처리를 하시겠어요?</string>
-    <string name="decide_buy_toast">구매확정 처리되었습니다</string>
-    <string name="is_check_receipt">수취확인 처리를 하시겠어요?</string>
-    <string name="check_receipt_toast">수취확인 처리되었습니다</string>
     <string name="refund_info_title">환불내역</string>
     <string name="payment_type">결제수단</string>
     <string name="refund_price">환불금액</string>
