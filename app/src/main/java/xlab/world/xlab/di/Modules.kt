@@ -33,6 +33,7 @@ import xlab.world.xlab.view.posts.PostsViewModel
 import xlab.world.xlab.view.postsUpload.content.PostContentViewModel
 import xlab.world.xlab.view.postsUpload.filter.ImageFilterViewModel
 import xlab.world.xlab.view.postsUpload.goods.PostUsedGoodsViewModel
+import xlab.world.xlab.view.preload.PreloadViewModel
 import xlab.world.xlab.view.profile.ProfileViewModel
 import xlab.world.xlab.view.profileEdit.ProfileEditViewModel
 import xlab.world.xlab.view.recentView.RecentViewViewModel
@@ -50,6 +51,8 @@ import xlab.world.xlab.view.withdraw.WithDrawViewModel
  *  Koin main module
  */
 val viewModelModule: Module = applicationContext {
+    // ViewModel for Preload View
+    viewModel { PreloadViewModel(scheduler = get()) }
     // ViewModel for OnBoarding View
     viewModel { OnBoardingViewModel(scheduler = get()) }
     // ViewModel for Login View

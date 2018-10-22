@@ -20,13 +20,13 @@ import java.net.HttpURLConnection
 class LoginViewModel(private val apiUser: ApiUserProvider,
                      private val networkCheck: NetworkCheck,
                      private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "Login"
+    private val viewModelTag = "Login"
 
     private var isComePreLoadActivity: Boolean = true
     private var linkData: Uri? = null
 
-    val requestLoginByAccessTokenEvent = SingleLiveEvent<RequestLoginByAccessTokenEvent>()
-    val generateTokenEvent = SingleLiveEvent<GenerateTokenEvent>()
+    val loginByAccessTokenData = SingleLiveEvent<LoginByAccessTokenModel>()
+    val generateTokenEvent = SingleLiveEvent<GenerateTokenModel>()
     val requestLoginEvent = SingleLiveEvent<RequestLoginEvent>()
     val uiData = MutableLiveData<UIModel>()
 
@@ -46,7 +46,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                 it.onNext(visibility)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
-                PrintLog.d(title = "initData", log = it.toString(), tag = tag)
+                PrintLog.d(title = "initData", log = it.toString(), tag = viewModelTag)
                 uiData.value = UIModel(backBtnVisibility = it[0], guestBtnVisibility = it[1])
             }
         }
@@ -64,13 +64,13 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                 it.onNext(visibility)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
-                PrintLog.d(title = "keyboardLayoutEvent", log = it.toString(), tag = tag)
+                PrintLog.d(title = "keyboardLayoutEvent", log = it.toString(), tag = viewModelTag)
                 uiData.value = UIModel(registerLayoutVisibility = it[0], popupVisibility = it[1])
             }
         }
     }
 
-    // access token 로그인 시도
+    // access token 으로 로그인 시도
     fun requestLoginByAccessToken(authorization: String, fcmToken: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
@@ -82,18 +82,19 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
         launch {
             // access token 만료 확인
             apiUser.checkValidToken(scheduler = scheduler, authorization = authorization, fcmToken = fcmToken,
-                    responseData = { loginData -> // 만료 안된경우 -> 로그인데이터 받아옴
-                        PrintLog.d("checkValidToken success", loginData.toString())
-                        requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(loginData = loginData))
+                    responseData = { // 만료 안된 경우 -> 로그인 데이터 받아옴
+                        PrintLog.d("checkValidToken success", it.toString(), viewModelTag)
+                        loginByAccessTokenData.postValue(LoginByAccessTokenModel(loginData = it))
                         uiData.value = UIModel(isLoading = false)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            if (errorData.message == ApiCallBackConstants.TOKEN_EXPIRE) // 만료 에러 callback message
-                                requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(isExpireToken = true))
+                            PrintLog.e("checkValidToken fail", errorData.message, viewModelTag)
+                            if (errorData.message == ApiCallBackConstants.TOKEN_EXPIRE) // 만료 된 경우 -> 만료 알림
+                                loginByAccessTokenData.postValue(LoginByAccessTokenModel(isExpireToken = true))
                             else
-                                requestLoginByAccessTokenEvent.postValue(RequestLoginByAccessTokenEvent(isExpireToken = false))
+                                loginByAccessTokenData.postValue(LoginByAccessTokenModel(isExpireToken = false))
                         }
             })
         }
@@ -110,27 +111,28 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             // refresh token 받기
             apiUser.getRefreshToken(scheduler = scheduler, authorization = authorization,
                     responseData = { refreshTokenData ->
-                        // refresh token 으로 new access token 발행 요청
+                        PrintLog.d("getRefreshToken success", refreshTokenData.refreshToken, viewModelTag)
+                        // refresh token 으로 access token 발행 요청
                         apiUser.generateToken(scheduler = scheduler, authorization = refreshTokenData.refreshToken,
                                 responseData = { newTokenData ->
                                     PrintLog.d("generateToken success", newTokenData.accessToken)
                                     uiData.value = UIModel(isLoading = false)
-                                    generateTokenEvent.postValue(GenerateTokenEvent(newAccessToken = newTokenData.accessToken))
+                                    generateTokenEvent.postValue(GenerateTokenModel(newAccessToken = newTokenData.accessToken))
                                 },
                                 errorData = { errorData ->
+                                    uiData.value = UIModel(isLoading = false)
+                                    generateTokenEvent.postValue(GenerateTokenModel(isFailGenerateToken = true))
                                     errorData?.let {
                                         PrintLog.d("generateToken fail", errorData.message)
                                     }
-                                    uiData.value = UIModel(isLoading = false)
-                                    generateTokenEvent.postValue(GenerateTokenEvent(isFailGenerateToken = true))
                                 })
                     },
                     errorData = { errorData ->
-                        errorData?.let {
-                            PrintLog.d("getRefreshToken fail", errorData.message)
-                        }
                         uiData.value = UIModel(isLoading = false)
-                        generateTokenEvent.postValue(GenerateTokenEvent(isFailGenerateToken = true))
+                        generateTokenEvent.postValue(GenerateTokenModel(isFailGenerateToken = true))
+                        errorData?.let {
+                            PrintLog.e("getRefreshToken fail", errorData.message)
+                        }
                     })
         }
     }
@@ -183,8 +185,8 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
     }
 }
 
-data class RequestLoginByAccessTokenEvent(val loginData: ResCheckValidTokenData? = null, val isExpireToken: Boolean? = null)
-data class GenerateTokenEvent(val newAccessToken: String? = null, val isFailGenerateToken: Boolean? = null)
+data class LoginByAccessTokenModel(val loginData: ResCheckValidTokenData? = null, val isExpireToken: Boolean? = null)
+data class GenerateTokenModel(val newAccessToken: String? = null, val isFailGenerateToken: Boolean? = null)
 data class RequestLoginEvent(val loginData: ResUserLoginData? = null, val isLoginFail: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val backBtnVisibility: Int? = null, val guestBtnVisibility: Int? = null,

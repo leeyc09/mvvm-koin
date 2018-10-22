@@ -40,7 +40,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
     private lateinit var shopAccountDialog: ShopAccountDialog
 
     private val shopLoginListener = object: ShopAccountDialog.Listener {
-        override fun isSuccessLogin(result: Boolean) {
+        override fun webViewFinish(result: Boolean) {
             if (result) {
                 if (isComePreLoadActivity)  // 앱 실행으로 로그인 화면 온 경우
                     RunActivity.mainActivity(context = this@LoginActivity, linkData = null)
@@ -210,7 +210,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         })
 
         // access token 로그인 시도 이벤트 observe
-        loginViewModel.requestLoginByAccessTokenEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { checkValidTokenEvent ->
+        loginViewModel.loginByAccessTokenData.observe(owner = this, observer = android.arch.lifecycle.Observer { checkValidTokenEvent ->
             checkValidTokenEvent?.let { _ ->
                 checkValidTokenEvent.loginData?.let { loginData -> // 로그인 성공
                     successLogin(accessToken = loginData.accessToken,

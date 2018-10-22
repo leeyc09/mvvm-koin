@@ -18,11 +18,11 @@ object PrintLog {
     // Log for error
     fun e(title:String, log: String, tag: String? = null) {
         if (BuildConfig.DEBUG)
-            Log.e(defaultTag ?: defaultTag, "$title => $log")
+            Log.e("$defaultTag $tag", "$title => $log")
     }
     // Log for information
     fun i(title:String, log: String, tag: String? = null) {
         if (BuildConfig.DEBUG)
-            Log.i(defaultTag ?: defaultTag, "$title => $log")
+            Log.i("$defaultTag $tag", "$title => $log")
     }
 }

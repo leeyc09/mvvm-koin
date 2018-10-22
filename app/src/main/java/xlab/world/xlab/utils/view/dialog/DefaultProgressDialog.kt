@@ -10,7 +10,6 @@ import xlab.world.xlab.R
 import xlab.world.xlab.utils.support.PrintLog
 
 class DefaultProgressDialog(context: Context): Dialog(context) {
-    private val tag = "Progress"
     private val dialogMaxLifeTime = 5000L
 
     override
@@ -36,25 +35,20 @@ class DefaultProgressDialog(context: Context): Dialog(context) {
     }
 
     override fun show() {
-        PrintLog.d("dialog", "show")
         super.show()
 
-        // 5초 이상 로딩중이면 로딩바 사라지게
+        // dialogMaxLifeTime 초 이상 로딩중이면 로딩바 사라지게
         val toastCountDown = object: CountDownTimer(dialogMaxLifeTime, dialogMaxLifeTime) {
             override fun onTick(millisUntilFinished: Long) {
             }
             override fun onFinish() {
-                if (isShowing) {
-                    PrintLog.d("dialog", "dismiss time out")
-                    dismiss()
-                }
+                if (isShowing) { dismiss() }
             }
         }
         toastCountDown.start()
     }
 
     override fun dismiss() {
-        PrintLog.d("dialog", "dismiss")
         super.dismiss()
     }
 }

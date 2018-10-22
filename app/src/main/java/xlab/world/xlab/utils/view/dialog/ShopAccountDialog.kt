@@ -18,24 +18,18 @@ class ShopAccountDialog(context: Context,
                         private val listener: Listener): Dialog(context) {
 
     interface Listener {
-        fun isSuccessLogin(result: Boolean)
+        fun webViewFinish(result: Boolean)
     }
 
     private val tag = "ShopLogin"
 
     private lateinit var webViewClient: DefaultWebViewClient
     private val webViewClientListener = object: DefaultWebViewClient.Listener {
-        override fun onPageStarted(url: String?) {
-        }
-        override fun shouldOverrideUrlLoading(url: String?): Boolean {
-            return true
-        }
-        override fun onPageFinished(url: String?) {
-            url?.let { _ ->
-            }
-        }
+        override fun onPageStarted(url: String?) {}
+        override fun shouldOverrideUrlLoading(url: String?): Boolean { return true }
+        override fun onPageFinished(url: String?) {}
         override fun onWebViewFinished(url: String?) {
-            listener.isSuccessLogin(true)
+            listener.webViewFinish(true)
             dismiss()
         }
     }
@@ -61,11 +55,6 @@ class ShopAccountDialog(context: Context,
         mainLayout.setOnClickListener {}
     }
 
-    override fun dismiss() {
-        PrintLog.d("dialog", "dismiss")
-        super.dismiss()
-    }
-
     fun requestLogin(userId: String) {
         super.show()
 
@@ -89,7 +78,7 @@ class ShopAccountDialog(context: Context,
         val cookieManager = CookieManager.getInstance()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             cookieManager.removeSessionCookies { value ->
-                PrintLog.d("removeAllCookies", value.toString())
+                PrintLog.d("removeAllCookies", value.toString(), tag)
             }
         } else {
             cookieManager.removeSessionCookie()

@@ -39,7 +39,7 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private val shopLoginListener = object: ShopAccountDialog.Listener {
-        override fun isSuccessLogin(result: Boolean) {
+        override fun webViewFinish(result: Boolean) {
             if (result) {
                 spHelper.logout()
                 RunActivity.loginActivity(context = this@SettingActivity, isComePreLoadActivity = true, linkData = null)
@@ -158,11 +158,6 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
             logoutEventData?.let { _ ->
                 logoutEventData.status?.let { isSuccess ->
                     if (isSuccess) {
-//                        spHelper.logout()
-//                        RunActivity.loginActivity(context = this@SettingActivity, isComePreLoadActivity = true, linkData = null)
-//
-//                        setResult(ResultCodeData.LOGOUT_SUCCESS)
-//                        finish()
                         shopLogoutDialog.requestLogout(userId = spHelper.userId)
                     }
                 }
