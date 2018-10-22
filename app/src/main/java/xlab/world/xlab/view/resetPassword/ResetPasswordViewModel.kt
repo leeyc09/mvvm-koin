@@ -2,6 +2,7 @@ package xlab.world.xlab.view.resetPassword
 
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
+import android.view.View
 import io.reactivex.Flowable
 import xlab.world.xlab.R
 import xlab.world.xlab.data.request.ReqConfirmEmailData
@@ -18,18 +19,18 @@ import java.util.concurrent.atomic.AtomicLong
 class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
                              private val networkCheck: NetworkCheck,
                              private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "ResetPassword"
+    private val viewModelTag = "ResetPassword"
 
-    val requestConfirmEmailEvent = SingleLiveEvent<ResetPasswordEvent>()
-    val requestConfirmCodeEvent = SingleLiveEvent<RequestConfirmCodeEvent>()
-    val requestConfirmPasswrodEvent = SingleLiveEvent<ResetPasswordEvent>()
-    val requestChangePasswordEvent = SingleLiveEvent<ResetPasswordEvent>()
+    val confirmEmailData = SingleLiveEvent<Boolean?>()
+    val confirmCodeData = SingleLiveEvent<String?>()
+    val confirmPasswordData = SingleLiveEvent<Boolean?>()
+    val requestChangePasswordEvent = SingleLiveEvent<Boolean?>()
     val uiData = MutableLiveData<UIModel>()
 
     // 인증코드 타이머
     private val timerSec: Long = 600L
     private var elapsedTime = AtomicLong()
-    private var stopped = AtomicBoolean()
+    private var timerStopped = AtomicBoolean()
 
     // 메일 인증 시도
     fun requestConfirmEmail(context: Context, email: String) {
@@ -38,6 +39,7 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
+
         if (!DataRegex.emailRegex(email)) { // 이메일 정규식 확인
             uiData.postValue(UIModel(toastMessage = context.getString(R.string.toast_email_format_wrong)))
             return
@@ -48,28 +50,41 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
             val reqConfirmEmailData = ReqConfirmEmailData(email = email, code = "")
             apiUser.requestConfirmEmail(scheduler = scheduler, reqConfirmEmailData = reqConfirmEmailData,
                     responseData = {
-                        uiData.value = UIModel(isLoading = false)
-                        requestConfirmEmailEvent.postValue(ResetPasswordEvent(status = true))
+                        uiData.value = UIModel(isLoading = false, confirmCodeVisibility = View.VISIBLE,
+                                mailRequestVisibility = View.INVISIBLE, mailReRequestVisibility = View.VISIBLE)
+                        confirmEmailData.value = true
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false)
-                        requestConfirmEmailEvent.postValue(ResetPasswordEvent(status = false))
+                        uiData.value = UIModel(isLoading = false, confirmCodeVisibility = View.INVISIBLE,
+                                mailRequestVisibility = View.VISIBLE, mailReRequestVisibility = View.INVISIBLE)
+                        confirmEmailData.value = false
                         errorData?.let {
-                            val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
-                            PrintLog.d("requestConfirmEmail fail", errorMessage.toString())
-                            if (errorMessage.size > 1)
-                                uiData.value = UIModel(toastMessage = errorMessage[1])
+                            PrintLog.e("requestConfirmEmail fail", errorData.message)
+                            uiData.value = UIModel(toastMessage = errorData.getErrorDetail())
                         }
                     })
         }
     }
+
+    // 메일 인증 다음 버튼 활성화
+    fun emailConfirmNextEnable(code: String) {
+        PrintLog.d("emailConfirmNextEnable", (code.length == 6).toString(), viewModelTag)
+        uiData.postValue(UIModel(nextEnable = code.length == 6))
+    }
+
+    // 비밀번호 인증 다음 버튼 활성화
+    fun passwordConfirmNextEnable(password: String) {
+        PrintLog.d("passwordConfirmNextEnable", (password.isNotEmpty()).toString(), viewModelTag)
+        uiData.postValue(UIModel(nextEnable = password.isNotEmpty()))
+    }
+
     // 인증코드 타이머 시작
     fun startTimer() {
-        PrintLog.d("timer", "start")
+        PrintLog.d("timer", "start", viewModelTag)
         launch {
-            stopped.set(false)
+            timerStopped.set(false)
             Flowable.interval(0, 1, TimeUnit.SECONDS)
-                    .takeWhile { !stopped.get() && it + 1 < timerSec }
+                    .takeWhile { !timerStopped.get() && it + 1 < timerSec }
                     .map { elapsedTime.addAndGet(1) }
                     .subscribe({
                         val leftSec = timerSec - it
@@ -82,23 +97,28 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
                                 if (sec > 9) sec.toString()
                                 else "0$sec"
 
-                        uiData.value = UIModel(timerText = "$minStr:$secStr")
+                        uiData.postValue(UIModel(timerText = "$minStr:$secStr"))
                     }, {
-                        PrintLog.d("timer error", it.message!!)
-                        uiData.value = UIModel(isEndTimer = true)
+                        PrintLog.e("timer error", it.message!!, viewModelTag)
+                        uiData.postValue(UIModel(timerEndDialog = true, confirmCodeVisibility = View.INVISIBLE,
+                                mailRequestVisibility = View.VISIBLE, mailReRequestVisibility = View.INVISIBLE))
                     }, {
-                        PrintLog.d("timer complete", "")
-                        if (!stopped.get())
-                            uiData.value = UIModel(isEndTimer = true)
+                        PrintLog.d("timer complete", "", viewModelTag)
+                        if (!timerStopped.get()) {
+                            uiData.postValue(UIModel(timerEndDialog = true, confirmCodeVisibility = View.INVISIBLE,
+                                    mailRequestVisibility = View.VISIBLE, mailReRequestVisibility = View.INVISIBLE))
+                        }
                     })
         }
     }
+
     // 인증코드 타이머 종료
     fun stopTimer() {
-        PrintLog.d("timer", "stop")
-        stopped.set(true)
+        PrintLog.d("timer", "stop", viewModelTag)
+        timerStopped.set(true)
         elapsedTime.addAndGet(-elapsedTime.get())
     }
+
     // 인증코드 확인 요청
     fun requestConfirmCode(email: String, code: String) {
         // 네트워크 연결 확인
@@ -111,13 +131,12 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
             val reqConfirmEmailData = ReqConfirmEmailData(email = email, code = code)
             apiUser.requestConfirmEmailCode(scheduler = scheduler, reqConfirmEmailData = reqConfirmEmailData,
                     responseData = {
-                        PrintLog.d("requestConfirmEmail success", it.accessToken)
+                        PrintLog.d("requestConfirmEmail success", it.toString())
                         uiData.value = UIModel(isLoading = false)
-                        requestConfirmCodeEvent.postValue(RequestConfirmCodeEvent(accessToken = it.accessToken))
+                        confirmCodeData.value = it.accessToken
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
-                        requestConfirmCodeEvent.postValue(RequestConfirmCodeEvent(accessToken = ""))
                         errorData?.let {
                             val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
                             PrintLog.d("requestConfirmEmail fail", errorMessage.toString())
@@ -127,6 +146,7 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
                     })
         }
     }
+
     // 비밀번호 체크 요쳥
     fun requestConfirmPassword(context: Context, authorization: String, password: String) {
         // 네트워크 연결 확인
@@ -141,12 +161,12 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
             apiUser.requestConfirmPassword(scheduler = scheduler, authorization = authorization, reqPasswordData = reqPasswordData,
                     responseData = {
                         uiData.value = UIModel(isLoading = false)
-                        requestConfirmPasswrodEvent.postValue(ResetPasswordEvent(status = true))
+                        confirmPasswordData.value = true
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_wrong_password))
                         errorData?.let {
-                            PrintLog.d("requestConfirmPassword fail", errorData.message)
+                            PrintLog.e("requestConfirmPassword fail", errorData.message)
                         }
                     })
         }
@@ -165,14 +185,14 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
             val reqNewPasswordData = ReqPasswordData(password = password)
             apiUser.requestChangePassword(scheduler = scheduler, authorization = authorization, reqNewPasswordData = reqNewPasswordData,
                     responseData = {
-                        PrintLog.d("requestChangePassword success", "")
+                        PrintLog.d("requestChangePassword success", "", viewModelTag)
                         uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_reset_password_success))
-                        requestChangePasswordEvent.postValue(ResetPasswordEvent(status = true))
+                        requestChangePasswordEvent.value = true
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestChangePassword fail", errorData.message)
+                            PrintLog.e("requestChangePassword fail", errorData.message, viewModelTag)
                             uiData.value = UIModel(toastMessage = errorData.message)
                         }
                     })
@@ -180,7 +200,8 @@ class ResetPasswordViewModel(private val apiUser: ApiUserProvider,
     }
 }
 
-data class RequestConfirmCodeEvent(val accessToken: String? = null)
-data class ResetPasswordEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
-                   val timerText: String? = null, val isEndTimer: Boolean? = null)
+                   val confirmCodeVisibility: Int? = null,
+                   val mailRequestVisibility: Int? = null,val mailReRequestVisibility: Int? = null,
+                   val timerText: String? = null, val timerEndDialog: Boolean? = null,
+                   val nextEnable: Boolean? = null)

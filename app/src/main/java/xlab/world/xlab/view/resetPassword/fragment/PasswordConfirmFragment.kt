@@ -41,7 +41,7 @@ class PasswordConfirmFragment: Fragment(), View.OnClickListener {
         defaultToast = DefaultToast(context = context!!)
         progressDialog = DefaultProgressDialog(context = context!!)
 
-        nextBtn.isEnabled = false
+        resetPasswordViewModel.passwordConfirmNextEnable(password = getPassword())
     }
 
     private fun onBindEvent() {
@@ -49,7 +49,7 @@ class PasswordConfirmFragment: Fragment(), View.OnClickListener {
 
         // 다음버튼 활성화
         ViewFunction.onTextChange(editText = editTextPassword) { password ->
-            nextBtn.isEnabled = password.isNotEmpty()
+            resetPasswordViewModel.passwordConfirmNextEnable(password = password)
         }
 
         ViewFunction.onKeyboardActionTouch(editText = editTextPassword, putActionID = EditorInfo.IME_ACTION_DONE) { isTouch ->
@@ -71,16 +71,17 @@ class PasswordConfirmFragment: Fragment(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.nextEnable?.let {
+                    nextBtn.isEnabled = it
+                }
             }
         })
 
         // confirm password 이벤트 observe
-        resetPasswordViewModel.requestConfirmPasswrodEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { requestConfirmPasswrodEvent ->
-            requestConfirmPasswrodEvent?.let { _ ->
-                requestConfirmPasswrodEvent.status?.let {
-                    if (it) { // 비밀번호 체크 성공
-                        (context as UpdatePasswordActivity).runNewPasswordFragment()
-                    }
+        resetPasswordViewModel.confirmPasswordData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isSuccess ->
+                if (isSuccess) { // 비밀번호 체크 성공
+                    (context as UpdatePasswordActivity).runNewPasswordFragment()
                 }
             }
         })

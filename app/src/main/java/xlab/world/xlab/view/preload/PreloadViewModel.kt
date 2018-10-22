@@ -10,8 +10,8 @@ import xlab.world.xlab.view.SingleLiveEvent
 class PreloadViewModel(private val scheduler: SchedulerProvider): AbstractViewModel() {
     private val viewModelTag = "PreLoad"
 
-    val onBoardingData = SingleLiveEvent<OnBoardingModel>()
-    val loginRecordModelData = SingleLiveEvent<LoginRecordModel>()
+    val onBoardingData = SingleLiveEvent<Boolean?>()
+    val loginRecordModelData = SingleLiveEvent<Boolean?>()
 
     // onBoarding 화면 본적 없는 경우 -> onBoarding 화면으로
     // 본적 있는 경우 -> Login check
@@ -23,7 +23,7 @@ class PreloadViewModel(private val scheduler: SchedulerProvider): AbstractViewMo
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("needOnBoardingPage", it.toString(), viewModelTag)
-                onBoardingData.postValue(OnBoardingModel(needOnBoardingPage = it))
+                onBoardingData.postValue(it)
             }
         }
     }
@@ -38,11 +38,8 @@ class PreloadViewModel(private val scheduler: SchedulerProvider): AbstractViewMo
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("hasLoginRecord", it.toString(), viewModelTag)
-                loginRecordModelData.postValue(LoginRecordModel(hasLoginRecord = it))
+                loginRecordModelData.postValue(it)
             }
         }
     }
 }
-
-data class OnBoardingModel(val needOnBoardingPage: Boolean? = null)
-data class LoginRecordModel(val hasLoginRecord: Boolean? = null)

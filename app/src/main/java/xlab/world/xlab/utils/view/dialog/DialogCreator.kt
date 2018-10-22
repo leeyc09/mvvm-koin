@@ -47,6 +47,12 @@ object DialogCreator {
                 listener = listener)
     }
 
+    fun timeOverDialog(context: Activity) : DefaultOneDialog {
+        return DefaultOneDialog(context = context,
+                text = context.getString(R.string.dial_end_confirm_timer),
+                listener = null)
+    }
+
     fun deletePetDialog(context: Activity, listener: DefaultOneDialog.Listener): DefaultOneDialog {
         return DefaultOneDialog(context = context,
                 text = context.getString(R.string.dial_delete_topic),

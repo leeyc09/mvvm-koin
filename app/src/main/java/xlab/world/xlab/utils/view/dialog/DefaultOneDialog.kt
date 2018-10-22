@@ -8,9 +8,6 @@ import android.widget.TextView
 import kotlinx.android.synthetic.main.dialog_default_one.*
 import xlab.world.xlab.R
 
-/**
- * Created by dongunkim on 2018. 3. 5..
- */
 class DefaultOneDialog(context: Context,
                        private val text: String,
                        private val listener: Listener?): Dialog(context), View.OnClickListener {

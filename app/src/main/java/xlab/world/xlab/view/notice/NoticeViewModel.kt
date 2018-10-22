@@ -1,6 +1,7 @@
 package xlab.world.xlab.view.notice
 
 import android.arch.lifecycle.MutableLiveData
+import android.view.View
 import xlab.world.xlab.data.adapter.NoticeData
 import xlab.world.xlab.data.adapter.NoticeListData
 import xlab.world.xlab.server.provider.ApiNoticeProvider
@@ -14,10 +15,32 @@ import xlab.world.xlab.view.SingleLiveEvent
 class NoticeViewModel(private val apiNotice: ApiNoticeProvider,
                       private val networkCheck: NetworkCheck,
                       private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "Notice"
+    private val viewModelTag = "Notice"
 
     val loadNoticeventData = SingleLiveEvent<NoticeEvent>()
     val uiData = MutableLiveData<UIModel>()
+
+    fun loadExistNewNotification(authorization: String) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        launch {
+            apiNotice.requestNewNotice(scheduler = scheduler, authorization = authorization,
+                    responseData = {
+                        PrintLog.d("requestNewNotice success", it.toString(), viewModelTag)
+                        uiData.value = UIModel(newNoticeDotVisibility = if (it.existNew) View.VISIBLE else View.GONE)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(newNoticeDotVisibility = View.GONE)
+                        errorData?.let {
+                            PrintLog.e("requestNewNotice fail", errorData.message, viewModelTag)
+                        }
+                    })
+        }
+    }
 
     fun loadNoticeData(authorization: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
@@ -80,4 +103,5 @@ class NoticeViewModel(private val apiNotice: ApiNoticeProvider,
 
 data class NoticeEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
-                   val noticeData: NoticeData? = null, val noticeUpdatePosition: Int? = null)
+                   val noticeData: NoticeData? = null, val noticeUpdatePosition: Int? = null,
+                   val newNoticeDotVisibility: Int? = null)

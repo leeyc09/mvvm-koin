@@ -1,6 +1,7 @@
 package xlab.world.xlab.view.notification
 
 import android.arch.lifecycle.MutableLiveData
+import android.view.View
 import io.reactivex.Observable
 import xlab.world.xlab.data.adapter.ShopNotificationData
 import xlab.world.xlab.data.adapter.SocialNotificationData
@@ -16,10 +17,32 @@ import xlab.world.xlab.view.SingleLiveEvent
 class NotificationViewModel(private val apiNotification: ApiNotificationProvider,
                             private val networkCheck: NetworkCheck,
                             private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "Notification"
+    private val viewModelTag = "Notification"
 
     val loadNotificationEventData = SingleLiveEvent<NotificationEvent>()
     val uiData = MutableLiveData<UIModel>()
+
+    fun loadExistNewNotification(authorization: String) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        launch {
+            apiNotification.requestNewNotification(scheduler = scheduler, authorization = authorization,
+                    responseData = {
+                        PrintLog.d("requestNewNotification success", it.toString(), viewModelTag)
+                        uiData.value = UIModel(newNotificationDotVisibility = if (it.existNew) View.VISIBLE else View.GONE)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(newNotificationDotVisibility = View.GONE)
+                        errorData?.let {
+                            PrintLog.e("requestNewNotification fail", errorData.message, viewModelTag)
+                        }
+                    })
+        }
+    }
 
     fun loadSocialNotificationData(authorization: String, page: Int) {
         // 네트워크 연결 확인
@@ -89,4 +112,5 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
 data class NotificationEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val socialNotificationData: SocialNotificationData? = null,
-                   val shopNotificationData: ShopNotificationData? = null)
+                   val shopNotificationData: ShopNotificationData? = null,
+                   val newNotificationDotVisibility: Int? = null)

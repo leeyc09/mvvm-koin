@@ -21,6 +21,7 @@ import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
 
 class NewPasswordFragment: Fragment(), View.OnClickListener {
     private val resetPasswordViewModel: ResetPasswordViewModel by viewModel()
+    private val registerViewModel: RegisterViewModel by viewModel()
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
@@ -44,15 +45,15 @@ class NewPasswordFragment: Fragment(), View.OnClickListener {
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = context!!)
         progressDialog = DefaultProgressDialog(context = context!!)
+
+        registerViewModel.passwordRegexCheck(password = getPassword())
     }
 
     private fun onBindEvent() {
         finishBtn.setOnClickListener(this) // 비밀번호 변경 완료버튼
 
         ViewFunction.onTextChange(editText = editTextPassword) { password ->
-            textViewConfirmPasswordText.isSelected = DataRegex.passwordTextRegex(password = password)
-            textViewConfirmPasswordLength.isSelected = DataRegex.passwordLengthRegex(password = password)
-            finishBtn.isEnabled = textViewConfirmPasswordText.isSelected && textViewConfirmPasswordLength.isSelected
+            registerViewModel.passwordRegexCheck(password = password)
         }
 
         ViewFunction.onKeyboardActionTouch(editText = editTextPassword, putActionID = EditorInfo.IME_ACTION_DONE) { isTouch ->
@@ -62,6 +63,7 @@ class NewPasswordFragment: Fragment(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
+        // TODO: ResetPassword View Model
         // UI 이벤트 observe
         resetPasswordViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
@@ -77,13 +79,27 @@ class NewPasswordFragment: Fragment(), View.OnClickListener {
             }
         })
 
-        // 비밀번호 변경 Event
-        resetPasswordViewModel.requestChangePasswordEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { requestChangePasswordEvent ->
-            requestChangePasswordEvent?.let { _ ->
-                requestChangePasswordEvent.status?.let {
-                    if (it) { // 비밀번호 변경 성공
-                        (context as AppCompatActivity).finish()
-                    }
+        // 비밀번호 변경 이벤트 observe
+        resetPasswordViewModel.requestChangePasswordEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isSuccess ->
+                if (isSuccess) { // 비밀번호 변경 성공
+                    (context as AppCompatActivity).finish()
+                }
+            }
+        })
+
+        // TODO: Register View Model
+        // UI 이벤트 observe
+        registerViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.passwordLengthRegex?.let {
+                    textViewConfirmPasswordLength.isSelected = it
+                }
+                uiData.passwordTextRegex?.let {
+                    textViewConfirmPasswordText.isSelected = it
+                }
+                uiData.passwordRegex?.let {
+                    finishBtn.isEnabled = it
                 }
             }
         })

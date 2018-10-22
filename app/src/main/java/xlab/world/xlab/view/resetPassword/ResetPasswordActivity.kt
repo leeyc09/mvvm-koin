@@ -21,11 +21,6 @@ import xlab.world.xlab.view.resetPassword.fragment.NewPasswordFragment
 
 class ResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
 
-    private var initEmail: String = ""
-
-    private lateinit var defaultToast: DefaultToast
-    private lateinit var progressDialog: DefaultProgressDialog
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reset_password)
@@ -42,19 +37,13 @@ class ResetPasswordActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
-        initEmail = intent.getStringExtra(IntentPassName.USER_EMAIL)
-
         // 타이틀, 확인 버튼 비활성화
         actionBarTitle.visibility = View.GONE
         actionBtn.visibility = View.GONE
 
         // 프래그먼트 초기화
-        val emailConfirmFragment = EmailConfirmFragment.newFragment(initEmail)
+        val emailConfirmFragment = EmailConfirmFragment.newFragment(email = intent.getStringExtra(IntentPassName.USER_EMAIL))
         supportFragmentManager.beginTransaction().replace(R.id.fragmentLayout, emailConfirmFragment).commit()
-
-        // Toast, Dialog 초기화
-        defaultToast = DefaultToast(context = this)
-        progressDialog = DefaultProgressDialog(context = this)
     }
 
     private fun onBindEvent() {

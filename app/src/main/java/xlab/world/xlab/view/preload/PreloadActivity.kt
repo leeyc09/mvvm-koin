@@ -73,28 +73,25 @@ class PreloadActivity: AppCompatActivity() {
 
     private fun observeViewModel() {
         // TODO: PreLoad View Model
-        // data 이벤트 observe
+        // on boarding page 전환 이벤트 observe
         preloadViewModel.onBoardingData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let {_->
-                eventData.needOnBoardingPage?.let {
-                    if (it) {
-                        spHelper.logout()
-                        RunActivity.onBoarding(context = this)
-                        finish()
-                    } else {
-                        preloadViewModel.loginRecordCheck(accessToken = spHelper.accessToken)
-                    }
+            eventData?.let { needOnBoardingPage ->
+                if (needOnBoardingPage) {
+                    spHelper.logout()
+                    RunActivity.onBoarding(context = this)
+                    finish()
+                } else {
+                    preloadViewModel.loginRecordCheck(accessToken = spHelper.accessToken)
                 }
             }
         })
+        // 자동 로그인 이벤트 observe
         preloadViewModel.loginRecordModelData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let {_->
-                eventData.hasLoginRecord?.let {
-                    if (it) { // 로그인 기록 있는 경우
-                        loginViewModel.requestLoginByAccessToken(authorization = spHelper.authorization, fcmToken = spHelper.fcmToken)
-                    } else { // 로그인 기록 없는 경우
-                        shopAccountDialog.requestLogout(userId = spHelper.userId)
-                    }
+            eventData?.let { hasLoginRecord ->
+                if (hasLoginRecord) { // 로그인 기록 있는 경우
+                    loginViewModel.requestLoginByAccessToken(authorization = spHelper.authorization, fcmToken = spHelper.fcmToken)
+                } else { // 로그인 기록 없는 경우
+                    shopAccountDialog.requestLogout(userId = spHelper.userId)
                 }
             }
         })
@@ -111,9 +108,6 @@ class PreloadActivity: AppCompatActivity() {
                 }
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
-                    spHelper.logout()
-                    RunActivity.loginActivity(context = this, isComePreLoadActivity = true, linkData = null)
-                    finish()
                 }
             }
         })

@@ -1,5 +1,6 @@
 package xlab.world.xlab.view.login
 
+import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.net.Uri
@@ -15,6 +16,7 @@ import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
+import java.io.Serializable
 import java.net.HttpURLConnection
 
 class LoginViewModel(private val apiUser: ApiUserProvider,
@@ -27,7 +29,8 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
 
     val loginByAccessTokenData = SingleLiveEvent<LoginByAccessTokenModel>()
     val generateTokenEvent = SingleLiveEvent<GenerateTokenModel>()
-    val requestLoginEvent = SingleLiveEvent<RequestLoginEvent>()
+    val loginData = SingleLiveEvent<LoginModel>()
+    val finishViewData = SingleLiveEvent<FinishModel>()
     val uiData = MutableLiveData<UIModel>()
 
     // view model data 초기화
@@ -48,6 +51,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             }.with(scheduler = scheduler).subscribe {
                 PrintLog.d(title = "initData", log = it.toString(), tag = viewModelTag)
                 uiData.value = UIModel(backBtnVisibility = it[0], guestBtnVisibility = it[1])
+                finishViewData.value = FinishModel(runGuestMode = this.linkData?.let{_->true}?:let{_->null})
             }
         }
     }
@@ -91,7 +95,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
                             PrintLog.e("checkValidToken fail", errorData.message, viewModelTag)
-                            if (errorData.message == ApiCallBackConstants.TOKEN_EXPIRE) // 만료 된 경우 -> 만료 알림
+                            if (errorData.message == ApiCallBackConstants.TOKEN_EXPIRE) // 만료 된 경우 -> refresh token 으로 갱신 시도
                                 loginByAccessTokenData.postValue(LoginByAccessTokenModel(isExpireToken = true))
                             else
                                 loginByAccessTokenData.postValue(LoginByAccessTokenModel(isExpireToken = false))
@@ -99,6 +103,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             })
         }
     }
+
     // 토큰 갱신
     fun generateNewToken(authorization: String) {
         // 네트워크 연결 확인
@@ -136,14 +141,16 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                     })
         }
     }
+
     // 로그인 요청
-    fun requestLogin(context: Context,loginType: Int, email: String = "", password: String = "",
+    fun requestLogin(context: Context, loginType: Int, email: String = "", password: String = "",
                      socialToken: String = "", fcmToken: String = "") {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.value = UIModel(toastMessage = networkCheck.networkErrorMsg)
             return
         }
+
         if (loginType == AppConstants.LOCAL_LOGIN) { // 로컬 로그인 요청일 경우 -> 이메일 정규식 확인
             if (!DataRegex.emailRegex(email)) {
                 uiData.value = UIModel(toastMessage = context.getString(R.string.toast_email_format_wrong))
@@ -157,18 +164,19 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             val reqLoginData = ReqLoginData(loginType = loginType, email = email, password = password, socialToken = socialToken, fcmToken = fcmToken)
             apiUser.requestLogin(scheduler = scheduler, reqLoginData = reqLoginData,
                     responseData = { loginData ->
+                        // response message 가 SUCCESS_LOGIN 아닐 경우 -> social 회원가입 진행 필요
                         loginData.needRegisterSocial = loginData.message != ApiCallBackConstants.SUCCESS_LOGIN
-                        PrintLog.d("requestLogin success", loginData.toString())
-                        requestLoginEvent.postValue(RequestLoginEvent(loginData = loginData))
+                        PrintLog.d("requestLogin success", loginData.toString(), viewModelTag)
+                        this.loginData.postValue(LoginModel(loginData = loginData))
                         uiData.value = UIModel(isLoading = false)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
-                        requestLoginEvent.postValue(RequestLoginEvent(isLoginFail = true))
+                        loginData.postValue(LoginModel(isLoginFail = true))
                         errorData?.let {
-                            PrintLog.d("requestLogin fail", errorData.message)
+                            PrintLog.e("requestLogin fail", errorData.message, viewModelTag)
                             if (errorData.errorCode == HttpURLConnection.HTTP_BAD_REQUEST)
-                                uiData.value = UIModel(toastMessage = errorData.message)
+                                uiData.value = UIModel(toastMessage = errorData.getErrorDetail())
                         }
             })
         }
@@ -180,15 +188,38 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             Observable.create<Boolean> {
                 it.onNext(email.isNotEmpty() && password.isNotEmpty())
                 it.onComplete()
-            }.with(scheduler).subscribe{ isEnable -> uiData.value = UIModel(isLoginBtnEnable = isEnable) }
+            }.with(scheduler).subscribe{ isEnable -> uiData.value = UIModel(loginBtnEnable = isEnable) }
         }
+    }
+
+    // 화면 전환 이벤트
+    fun finishView() {
+        launch {
+            Observable.create<ArrayList<Any?>> {
+                // 앱 실행으로 로그인 화면 온 경우 -> 메인 화면으로
+                // 다른 화면에서 로그인 화면으로 온 경우 -> 이전 화면으로
+                val resultData = arrayListOf(if (isComePreLoadActivity) true else null,
+                        if (isComePreLoadActivity) null else ResultCodeData.LOGIN_SUCCESS)
+
+                it.onNext(resultData)
+                it.onComplete()
+            }.with(scheduler = scheduler).subscribe {
+                finishViewData.value = FinishModel(runMainActivity = it[0] as Boolean?)
+                uiData.value = UIModel(resultCode = it[1] as Int?)
+            }
+        }
+    }
+
+    fun actionBackAction() {
+        uiData.postValue(UIModel(resultCode = Activity.RESULT_CANCELED))
     }
 }
 
-data class LoginByAccessTokenModel(val loginData: ResCheckValidTokenData? = null, val isExpireToken: Boolean? = null)
+data class LoginByAccessTokenModel(val loginData: ResCheckValidTokenData? = null, val isExpireToken: Boolean? = null): Serializable
 data class GenerateTokenModel(val newAccessToken: String? = null, val isFailGenerateToken: Boolean? = null)
-data class RequestLoginEvent(val loginData: ResUserLoginData? = null, val isLoginFail: Boolean? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
+data class LoginModel(val loginData: ResUserLoginData? = null, val isLoginFail: Boolean? = null)
+data class FinishModel(val runMainActivity: Boolean? = null, val runGuestMode: Boolean? = null)
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
                    val backBtnVisibility: Int? = null, val guestBtnVisibility: Int? = null,
                    val registerLayoutVisibility: Int? = null, val popupVisibility: Int? = null,
-                   val isLoginBtnEnable: Boolean? = null)
+                   val loginBtnEnable: Boolean? = null)

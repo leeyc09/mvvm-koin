@@ -1,5 +1,6 @@
 package xlab.world.xlab.view.resetPassword.fragment
 
+import android.app.Activity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -8,11 +9,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_email_confirm.*
 import org.koin.android.architecture.ext.viewModel
-import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultOneDialog
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
+import xlab.world.xlab.utils.view.dialog.DialogCreator
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.resetPassword.ResetPasswordActivity
 import xlab.world.xlab.view.resetPassword.ResetPasswordViewModel
@@ -47,7 +48,9 @@ class EmailConfirmFragment: Fragment(), View.OnClickListener {
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = context!!)
         progressDialog = DefaultProgressDialog(context = context!!)
-        timeOverDialog = DefaultOneDialog(context = context!!, text = getString(R.string.dial_end_confirm_timer), listener = null)
+        timeOverDialog = DialogCreator.timeOverDialog(context = context as Activity)
+
+        resetPasswordViewModel.emailConfirmNextEnable(code = getCode())
     }
 
     private fun onBindEvent() {
@@ -55,8 +58,8 @@ class EmailConfirmFragment: Fragment(), View.OnClickListener {
         nextBtn.setOnClickListener(this) // 인증번호 확인 버튼
 
         // 다음버튼 활성화
-        ViewFunction.onTextChange(editText = editTextCode) { code ->
-            nextBtn.isEnabled = code.length == 6
+        ViewFunction.onTextChange(editText = editTextCode) {
+            resetPasswordViewModel.emailConfirmNextEnable(code = getCode())
         }
     }
 
@@ -73,53 +76,47 @@ class EmailConfirmFragment: Fragment(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.confirmCodeVisibility?.let {
+                    confirmCodeLayout.visibility = it
+                }
+                uiData.mailRequestVisibility?.let {
+                    textViewMailRequest.visibility = it
+                }
+                uiData.mailReRequestVisibility?.let{
+                    textViewMailReRequest.visibility = it
+                }
                 uiData.timerText?.let {
                     textViewTimer.setText(it, TextView.BufferType.SPANNABLE)
                 }
-                uiData.isEndTimer?.let {
-                    if (it) {
-                        timeOverDialog.show()
-                        confirmCodeLayout.visibility = View.GONE
-                        textViewMailRequest.visibility = View.VISIBLE
-                        textViewMailReRequest.visibility = View.INVISIBLE
-                    }
+                uiData.timerEndDialog?.let {
+                    editTextCode.setText("")
+                    timeOverDialog.show()
+                }
+                uiData.nextEnable?.let {
+                    nextBtn.isEnabled = it
                 }
             }
         })
 
-        // 메일 인증 시도 Event
-        resetPasswordViewModel.requestConfirmEmailEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { requestConfirmEmailEvent ->
-            requestConfirmEmailEvent?.let { _ ->
-                requestConfirmEmailEvent.status?.let {
-                    if (it) { // 메일 인증 성공
-                        confirmCodeLayout.visibility = View.VISIBLE
-                        textViewMailRequest.visibility = View.INVISIBLE
-                        textViewMailReRequest.visibility = View.VISIBLE
-
-                        // 타이머 시작
-                        resetPasswordViewModel.startTimer()
-                    } else { // 메일 인증 실패
-                        confirmCodeLayout.visibility = View.GONE
-                        textViewMailRequest.visibility = View.VISIBLE
-                        textViewMailReRequest.visibility = View.INVISIBLE
-
-                        // 타이머 종료
-                        resetPasswordViewModel.stopTimer()
-                    }
+        // 메일 인증 시도 이벤트 observe
+        resetPasswordViewModel.confirmEmailData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isSuccess ->
+                if (isSuccess) { // 메일 인증 성공
+                    // 타이머 시작
+                    resetPasswordViewModel.startTimer()
+                } else { // 메일 인증 실패
+                    // 타이머 종료
+                    resetPasswordViewModel.stopTimer()
                 }
             }
         })
 
         // 인증코드 확인 Event
-        resetPasswordViewModel.requestConfirmCodeEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { requestConfirmCodeEvent ->
-            requestConfirmCodeEvent?.let { _ ->
-                requestConfirmCodeEvent.accessToken?.let {
-                    if (it.isNotEmpty()) { // 인증 성공
-                        // 타이머 종료
-                        resetPasswordViewModel.stopTimer()
-                        (context as ResetPasswordActivity).runNewPasswordFragment(it)
-                    }
-                }
+        resetPasswordViewModel.confirmCodeData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { accessToken ->// 인증 성공
+                // 타이머 종료
+                resetPasswordViewModel.stopTimer()
+                (context as ResetPasswordActivity).runNewPasswordFragment(accessToken = accessToken)
             }
         })
     }
@@ -140,8 +137,8 @@ class EmailConfirmFragment: Fragment(), View.OnClickListener {
     }
 
     private fun getBundleEmail(): String = arguments?.getString("email") ?: ""
-    private fun getEmail(): String = editTextMail?.text.toString()
-    private fun getCode(): String = editTextCode?.text.toString()
+    private fun getEmail(): String = editTextMail?.text.toString().trim()
+    private fun getCode(): String = editTextCode?.text.toString().trim()
 
     companion object {
         fun newFragment(email: String): EmailConfirmFragment {

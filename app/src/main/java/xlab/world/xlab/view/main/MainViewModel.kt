@@ -3,6 +3,7 @@ package xlab.world.xlab.view.main
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.graphics.Color
+import io.reactivex.Observable
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.data.response.ResGoodsSearchData
@@ -10,6 +11,7 @@ import xlab.world.xlab.server.ApiURL
 import xlab.world.xlab.server.provider.ApiPostProvider
 import xlab.world.xlab.server.provider.ApiShopProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
+import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
@@ -25,7 +27,41 @@ class MainViewModel(private val apiPost: ApiPostProvider,
     val loadAllFeedDataEvent = SingleLiveEvent<LoadFeedDataEvent>()
     val loadFollowingFeedDataEvent = SingleLiveEvent<LoadFeedDataEvent>()
     val loadExploreFeedDataEvent = SingleLiveEvent<LoadFeedDataEvent>()
+    val btnActionData = SingleLiveEvent<BtnActionModel?>()
     val uiData = MutableLiveData<UIModel>()
+
+    fun notificationBtnAction(authorization: String) {
+        // login 확인
+        if (SupportData.isGuest(authorization)) { // guest
+            uiData.postValue(UIModel(guestMode = true))
+            return
+        }
+
+        btnActionData.postValue(BtnActionModel(notification = true))
+    }
+
+    fun profileBtnAction(authorization: String) {
+        // login 확인
+        if (SupportData.isGuest(authorization)) { // guest
+            uiData.postValue(UIModel(guestMode = true))
+            return
+        }
+
+        btnActionData.postValue(BtnActionModel(profile = true))
+    }
+
+    fun uploadPostBtnAction(authorization: String, userLevel: Int) {
+        // login 확인
+        if (SupportData.isGuest(authorization)) { // guest
+            uiData.postValue(UIModel(guestMode = true))
+            return
+        }
+
+        // 유저 레벨이 admin 이면 post upload type 선택 다이얼로그 띄우기
+        // 일반이면 바로 post upload 화면으로
+        btnActionData.postValue(BtnActionModel(post = if (userLevel == AppConstants.ADMIN_USER_LEVEL) null else true,
+                postTypeDialog = if (userLevel == AppConstants.ADMIN_USER_LEVEL) true else null))
+    }
 
     fun loadAllFeedData(authorization: String, page: Int, topicColorList: Array<String>, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
@@ -274,6 +310,8 @@ class MainViewModel(private val apiPost: ApiPostProvider,
 
 data class MatchData(val percent: Int, val color: Int)
 data class LoadFeedDataEvent(val isLoading: Boolean? = null)
+data class BtnActionModel(val notification: Boolean? = null, val profile: Boolean? = null,
+                          val post: Boolean? = null, val postTypeDialog: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val allFeedData: AllFeedData? = null,
                    val followingFeedData: PostDetailData? = null, val guestMode: Boolean? = null, val noFollowing: Boolean? = null,

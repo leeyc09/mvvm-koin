@@ -1,10 +1,7 @@
 package xlab.world.xlab.server.provider
 
 import io.reactivex.disposables.Disposable
-import xlab.world.xlab.data.response.ResMessageData
-import xlab.world.xlab.data.response.ResMessageErrorData
-import xlab.world.xlab.data.response.ResNoticeData
-import xlab.world.xlab.data.response.ResShopFeedData
+import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.`interface`.INoticeRequest
 import xlab.world.xlab.server.errorHandle
 import xlab.world.xlab.utils.rx.SchedulerProvider
@@ -19,6 +16,9 @@ interface ApiNoticeProvider {
     fun updateReadNotice(scheduler: SchedulerProvider, authorization: String, noticeId: String,
                          responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
+    // new notice 있는지 요청
+    fun requestNewNotice(scheduler: SchedulerProvider, authorization: String,
+                         responseData: (ResExistNewData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiNotice(private val iNoticeRequest: INoticeRequest): ApiNoticeProvider {
@@ -34,6 +34,17 @@ class ApiNotice(private val iNoticeRequest: INoticeRequest): ApiNoticeProvider {
 
     override fun updateReadNotice(scheduler: SchedulerProvider, authorization: String, noticeId: String, responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iNoticeRequest.readNotice(authorization = authorization, noticeId = noticeId)
+                .with(scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestNewNotice(scheduler: SchedulerProvider, authorization: String,
+                                  responseData: (ResExistNewData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iNoticeRequest.getExistNewNotice(authorization = authorization)
                 .with(scheduler)
                 .subscribe({
                     responseData(it)

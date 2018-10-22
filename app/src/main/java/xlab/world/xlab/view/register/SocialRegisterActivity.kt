@@ -1,14 +1,10 @@
 package xlab.world.xlab.view.register
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.content.res.ResourcesCompat
-import android.text.TextPaint
 import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
 import android.view.MotionEvent
 import android.view.View
 import android.widget.EditText
@@ -28,10 +24,6 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
     private val registerViewModel: RegisterViewModel by viewModel()
     private val letterOrDigitInputFilter: LetterOrDigitInputFilter by inject()
 
-    private var resultCode = Activity.RESULT_CANCELED
-
-    private lateinit var userData: ResUserLoginData
-
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
 
@@ -49,7 +41,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
     }
 
     override fun onPause() {
-        // 엑티비티 멈출때 키보드 숨기
+        // 엑티비티 멈출때 키보드 숨기기
         ViewFunction.hideKeyboard(context = this, view = mainLayout)
         super.onPause()
     }
@@ -59,15 +51,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
     }
 
     private fun onSetup() {
-        userData = intent.getSerializableExtra(IntentPassName.USER_LOGIN_DATA) as ResUserLoginData
-
-        // Toast, Dialog 초기화
-        defaultToast = DefaultToast(context = this)
-        progressDialog = DefaultProgressDialog(context = this)
-
-        // listener 초기화
-        defaultListener = DefaultListener(context = this)
-
+        // 타이틀, 확인 버튼 비활성화
         actionBarTitle.visibility = View.GONE
         actionBtn.visibility = View.GONE
 
@@ -77,6 +61,13 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         // 닉네임 숫자 or 문자만 가능하게
         editTextNick.filters = arrayOf(letterOrDigitInputFilter)
 
+        // Toast, Dialog 초기화
+        defaultToast = DefaultToast(context = this)
+        progressDialog = DefaultProgressDialog(context = this)
+
+        // listener 초기화
+        defaultListener = DefaultListener(context = this)
+
         registerViewModel.contentTextSet(context = this, policy1 = defaultListener.clausePolicyListener, policy2 = defaultListener.personalInfoPolicyListener)
         registerViewModel.nickNameRegexCheck(context = this, nickName = getNickNameText())
     }
@@ -85,6 +76,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         actionBackBtn.setOnClickListener(this) // 뒤로가기
         finishBtn.setOnClickListener(this) // 회원가입 완료 버튼
         editTextNick.setOnTouchListener(this) // 닉네임 지우기
+        scrollView.setOnTouchListener(this) // 키보드 숨기기
 
         // 키보드 보일때만 완료 버튼 보이기
         ViewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
@@ -117,14 +109,20 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.resultCode?.let {
+                    setResult(it, intent)
+                    finish()
+                }
                 uiData.agreementStr?.let {
                     textViewAgreement.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.nickNameRegexVisibility?.let {
+                    confirmNickLayout.visibility = it
                 }
                 uiData.nickNameRegexText?.let {
                     textViewConfirmNick.setText(it, TextView.BufferType.SPANNABLE)
                 }
                 uiData.nickNameRegex?.let {
-                    confirmNickLayout.visibility = View.VISIBLE
                     textViewConfirmNick.isSelected = it
                     finishBtn.isEnabled = it
                 }
@@ -132,13 +130,10 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         })
 
         // 회원가입 이벤트
-        registerViewModel.requestRegisterEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { requestRegisterEvent ->
-            requestRegisterEvent?.let { _ ->
-                requestRegisterEvent.accessToken?.let { // 회원가입 성공
-                    resultCode = Activity.RESULT_OK
-                    intent.putExtra(IntentPassName.ACCESS_TOKEN, it)
-                    actionBackBtn.performClick()
-                }
+        registerViewModel.registerData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { accessToken -> // 회원가입 성공
+                intent.putExtra(IntentPassName.ACCESS_TOKEN, accessToken)
+                actionBackBtn.performClick()
             }
         })
     }
@@ -147,14 +142,16 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode, intent)
-                    finish()
+                    registerViewModel.actionBackAction()
                 }
                 R.id.finishBtn -> { // 회원가입 완료 버튼
                     ViewFunction.hideKeyboard(context = this, view = v)
+                    val userData = intent.getSerializableExtra(IntentPassName.USER_LOGIN_DATA) as ResUserLoginData
                     registerViewModel.requestRegister(context = this,
-                            loginType = userData.loginType, email = userData.email,
-                            password = "", nickName = getNickNameText(), socialId = userData.socialID)
+                            loginType = userData.loginType,
+                            email = userData.email,
+                            nickName = getNickNameText(),
+                            socialId = userData.socialID)
                 }
             }
         }
@@ -171,9 +168,9 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
                         }
                     }
                 }
-//                R.id.scrollView -> { // 키보드 숨기기
-//                    ViewFunction.hideKeyboard(context = this, view = v)
-//                }
+                R.id.scrollView -> { // 키보드 숨기기
+                    ViewFunction.hideKeyboard(context = this, view = v)
+                }
             }
         }
         return false

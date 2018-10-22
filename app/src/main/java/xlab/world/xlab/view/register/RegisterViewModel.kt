@@ -1,10 +1,12 @@
 package xlab.world.xlab.view.register
 
+import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ClickableSpan
+import android.view.View
 import io.reactivex.Observable
 import xlab.world.xlab.R
 import xlab.world.xlab.data.request.ReqRegisterData
@@ -18,12 +20,14 @@ import xlab.world.xlab.view.SingleLiveEvent
 class RegisterViewModel(private val apiUser: ApiUserProvider,
                         private val networkCheck: NetworkCheck,
                         private val scheduler: SchedulerProvider): AbstractViewModel() {
-    private val tag = "Register"
+    private val viewModelTag = "Register"
 
-    val requestRegisterEvent = SingleLiveEvent<RequestRegisterEvent>()
+    private var resultCode = Activity.RESULT_CANCELED
+
+    val registerData = SingleLiveEvent<String?>()
     val uiData = MutableLiveData<UIModel>()
 
-    // 약관 내용 터 업데이트 이벤트
+    // 약관 내용 텍스트 업데이트 이벤트
     fun contentTextSet(context: Context, policy1: ClickableSpan, policy2: ClickableSpan) {
         launch {
             Observable.create<SpannableString> {
@@ -33,11 +37,12 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
 
                 it.onNext(agreementStr)
                 it.onComplete()
-            }.with(scheduler).subscribe { agreementStr ->
-                uiData.value = UIModel(agreementStr = agreementStr)
+            }.with(scheduler).subscribe {
+                uiData.value = UIModel(agreementStr = it)
             }
         }
     }
+
     // 가입 요청 정보 정규식 체크
     fun inputDataRegex(email: String = "", password: String = "", nickName: String = "") {
         launch {
@@ -47,58 +52,77 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                         DataRegex.passwordTextRegex(password)&&
                         DataRegex.nickNameRegex(nickName))
                 it.onComplete()
-            }.with(scheduler).subscribe { isEnable ->
-                PrintLog.d("inputDataRegex", isEnable.toString())
-                uiData.value = UIModel(isRegisterBtnEnable = isEnable)
+            }.with(scheduler).subscribe {
+                PrintLog.d("inputDataRegex", it.toString(), viewModelTag)
+                uiData.value = UIModel(registerBtnEnable = it)
             }
         }
     }
-    // 이메일 체크
+
+    // 이메일 정규식 체크
     fun emailRegexCheck(context: Context, email: String) {
         launch {
-            Observable.create<RegexResultData> {
+            Observable.create<ArrayList<Any?>> {
                 val emailRegex = DataRegex.emailRegex(email)
                 val emailRegexText =
                         if (!emailRegex) context.getString(R.string.toast_email_format_wrong)
                         else null
 
-                it.onNext(RegexResultData(text = emailRegexText, result = emailRegex))
+                // [0] -> 정규식 결과 텍스트
+                // [1] -> 정규식 결과 보이기 & 숨기기 (통과 -> 숨기기 & 실패 -> 보이기)
+                it.onNext(arrayListOf(emailRegexText,
+                        if (emailRegex) View.INVISIBLE else View.VISIBLE))
                 it.onComplete()
-            }.with(scheduler).subscribe { resultData ->
-                PrintLog.d("emailRegexCheck", resultData.result.toString())
-                uiData.value = UIModel(emailRegexText = resultData.text, emailRegex = resultData.result)
+            }.with(scheduler).subscribe {
+                PrintLog.d("emailRegexCheck", it.toString(), viewModelTag)
+                uiData.value = UIModel(emailRegexText = it[0] as String?, emailRegexVisibility = it[1] as Int)
             }
         }
     }
-    // 비밀번호 체크
+
+    // 비밀번호 정규식 체크
     fun passwordRegexCheck(password: String) {
         launch {
             Observable.create<ArrayList<Boolean>> {
-                it.onNext(arrayListOf(DataRegex.passwordLengthRegex(password), DataRegex.passwordTextRegex(password)))
+                // [0] -> 비밀번호 길이 체크 결과
+                // [1] -> 비밀번호 텍스트 정규식 체크 결과
+                // [2] -> 통합 결과
+                it.onNext(arrayListOf(DataRegex.passwordLengthRegex(password),
+                        DataRegex.passwordTextRegex(password)))
                 it.onComplete()
-            }.with(scheduler).subscribe { isEnable ->
-                PrintLog.d("passwordRegexCheck", isEnable.toString())
-                uiData.value = UIModel(passwordLengthRegex = isEnable[0], passwordTextRegex = isEnable[1])
+            }.with(scheduler).subscribe {
+                PrintLog.d("passwordRegexCheck", it.toString(), viewModelTag)
+                uiData.value = UIModel(passwordLengthRegex = it[0],
+                        passwordTextRegex = it[1],
+                        passwordRegex = it[0] && it[1],
+                        passwordRegexVisibility = View.VISIBLE)
             }
         }
     }
-    // 닉네임 체크
+
+    // 닉네임 정규식 체크
     fun nickNameRegexCheck(context: Context, nickName: String) {
         launch {
-            Observable.create<RegexResultData> {
+            Observable.create<ArrayList<Any>> {
                 val nickNameRegex = DataRegex.nickNameRegex(nickName)
                 val nickNameRegexText = context.getString(R.string.confirm_nick_length)
 
-                it.onNext(RegexResultData(text = nickNameRegexText, result = nickNameRegex))
+                // [0] -> 정규식 알림 텍스트
+                // [1] -> 정규식 체크 결과
+                it.onNext(arrayListOf(nickNameRegexText, nickNameRegex))
                 it.onComplete()
-            }.with(scheduler).subscribe { resultData ->
-                PrintLog.d("nickRegexCheck", resultData.result.toString())
-                uiData.value = UIModel(nickNameRegexText = resultData.text, nickNameRegex = resultData.result)
+            }.with(scheduler).subscribe {
+                PrintLog.d("nickRegexCheck", it.toString(), viewModelTag)
+                uiData.value = UIModel(nickNameRegexText = it[0] as String,
+                        nickNameRegex = it[1] as Boolean,
+                        nickNameRegexVisibility = View.VISIBLE)
             }
         }
     }
+
     // 회원 가입 요청
-    fun requestRegister(context: Context, loginType: Int, email: String, password: String, nickName: String, socialId: String) {
+    fun requestRegister(context: Context, loginType: Int, email: String, password: String = "",
+                        nickName: String, socialId: String = "") {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.value = UIModel(toastMessage = networkCheck.networkErrorMsg)
@@ -109,45 +133,80 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
         val reqRegisterData = ReqRegisterData(loginType = loginType, email = email, password = password, nickName = nickName, socialID = socialId)
         apiUser.requestRegister(scheduler = scheduler, reqRegisterData = reqRegisterData,
                 responseData = {
-                    PrintLog.d("requestRegister", "success")
-                    PrintLog.d("access token", it.accessToken)
-                    requestRegisterEvent.postValue(RequestRegisterEvent(accessToken = it.accessToken))
+                    PrintLog.d("requestRegister success", it.toString(), viewModelTag)
+                    resultCode = Activity.RESULT_OK
+                    registerData.postValue(it.accessToken)
                     uiData.value = UIModel(isLoading = false)
                 },
                 errorData = { errorData ->
-                    uiData.value = UIModel(isLoading = false, isRegisterBtnEnable = false)
+                    uiData.value = UIModel(isLoading = false, registerBtnEnable = false)
                     errorData?.let {
-                        val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
-                        PrintLog.d("requestRegister fail", errorData.message)
-                        if (errorMessage.size > 1) {
+                        PrintLog.e("requestRegister fail", errorData.message, viewModelTag)
+                        errorData.getErrorDetail()?.let { errorDetail ->
                             // 존재하는 유저 정보 에러 메세지
-                            if(errorMessage[1].contains(ApiCallBackConstants.EXIST_USER_DATA)) {
-                                val duplicateError = errorMessage[1].replace(ApiCallBackConstants.EXIST_USER_DATA, "").trim().split("__")
+                            if(errorDetail.contains(ApiCallBackConstants.EXIST_USER_DATA)) {
+                                val duplicateError = errorDetail.replace(ApiCallBackConstants.EXIST_USER_DATA, "").trim().split("__")
                                 if (duplicateError.size > 1) { // 이메일, 닉네임 중복
-                                    uiData.value = UIModel(emailRegex = false, nickNameRegex = false,
-                                            emailRegexText = context.getString(R.string.used_email), nickNameRegexText = context.getString(R.string.used_nick))
+                                    uiData.value = UIModel(emailRegexVisibility = View.VISIBLE, emailRegexText = context.getString(R.string.used_email),
+                                            nickNameRegexVisibility = View.VISIBLE, nickNameRegex = false, nickNameRegexText = context.getString(R.string.used_nick))
                                 } else { // 이메일, 닉네임 둘 중 하나 중복
                                     when (duplicateError[0].trim()) {
                                         ApiCallBackConstants.EMAIL_DUPLICATE_CHAR -> { // 이메일 중복
-                                            uiData.value = UIModel(emailRegex = false, emailRegexText = context.getString(R.string.used_email))
+                                            uiData.value = UIModel(emailRegexVisibility = View.VISIBLE, emailRegexText = context.getString(R.string.used_email))
                                         }
                                         ApiCallBackConstants.NICK_NAME_DUPLICATE_CHAR -> { // 닉네임 중복
-                                            uiData.value = UIModel(nickNameRegex = false, nickNameRegexText = context.getString(R.string.used_nick))
+                                            uiData.value = UIModel(nickNameRegexVisibility = View.VISIBLE, nickNameRegex = false, nickNameRegexText = context.getString(R.string.used_nick))
                                         }
                                     }
                                 }
                             }
-                        } else {
                         }
                     }
                 })
     }
+
+    // 비밀번호 정규식 텍스트 보이기 & 숨기기
+    fun passwordRegexVisibility(hasFocus: Boolean, password: String) {
+        launch {
+            Observable.create<Int> {
+                // 비밀번호 입력 필드에 포커스가 사라졌을 경우 & 비밀번호 정규식 (길이, 텍스트) 모두 통과 -> 안보이기
+                val passwordRegexVisibility =
+                        if (!hasFocus && DataRegex.passwordLengthRegex(password) && DataRegex.passwordTextRegex(password)) View.INVISIBLE
+                        else View.VISIBLE
+                it.onNext(passwordRegexVisibility)
+                it.onComplete()
+            }.with(scheduler).subscribe {
+                PrintLog.d("passwordRegexVisibility", it.toString(), viewModelTag)
+                uiData.value = UIModel(passwordRegexVisibility = it)
+            }
+        }
+    }
+
+    // 닉네임 정규식 텍스트 보이기 & 숨기기
+    fun nickNameRegexVisibility(hasFocus: Boolean, nickName: String) {
+        launch {
+            Observable.create<Int> {
+                // 닉네임 입력 필드에 포커스가 사라졌을 경우 & 닉네임 정규식 통과 -> 텍스트 안보이기
+                val nickNameRegexVisibility =
+                        if (!hasFocus && DataRegex.nickNameRegex(nickName)) View.INVISIBLE
+                        else View.VISIBLE
+                it.onNext(nickNameRegexVisibility)
+                it.onComplete()
+            }.with(scheduler).subscribe {
+                PrintLog.d("nickNameRegexVisibility", it.toString(), viewModelTag)
+                uiData.value = UIModel(nickNameRegexVisibility = it)
+            }
+        }
+    }
+
+    fun actionBackAction() {
+        uiData.postValue(UIModel(resultCode = resultCode))
+    }
 }
 
-class RegexResultData(val text: String? = null, val result: Boolean? = null)
-data class RequestRegisterEvent(val accessToken: String? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
-                   val agreementStr: SpannableString? = null, val isRegisterBtnEnable: Boolean? = null,
-                   val emailRegex: Boolean? = null, val passwordLengthRegex: Boolean? = null,
-                   val passwordTextRegex: Boolean? = null, val nickNameRegex: Boolean? = null,
-                   val emailRegexText: String? = null, val nickNameRegexText: String? = null)
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
+                   val agreementStr: SpannableString? = null, val registerBtnEnable: Boolean? = null,
+                   val emailRegexVisibility: Int? = null, val emailRegexText: String? = null,
+                   val passwordRegexVisibility: Int? = null, val passwordRegex: Boolean? = null,
+                   val passwordLengthRegex: Boolean? = null, val passwordTextRegex: Boolean? = null,
+                   val nickNameRegexVisibility: Int? = null, val nickNameRegex: Boolean? = null, val nickNameRegexText: String? = null)

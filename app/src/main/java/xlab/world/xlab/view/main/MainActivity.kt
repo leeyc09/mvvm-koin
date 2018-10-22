@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.action_bar_main.*
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
@@ -25,16 +26,17 @@ import xlab.world.xlab.view.main.fragment.FeedAllFragment
 import xlab.world.xlab.view.main.fragment.FeedExploreFragment
 import xlab.world.xlab.view.main.fragment.FeedFollowingFragment
 import xlab.world.xlab.view.main.fragment.FeedShopFragment
+import xlab.world.xlab.view.notice.NoticeViewModel
+import xlab.world.xlab.view.notification.NotificationViewModel
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
+    private val mainViewModel: MainViewModel by viewModel()
+    private val notificationViewModel: NotificationViewModel by viewModel()
+    private val noticeViewModel: NoticeViewModel by viewModel()
     private val fontColorSpan: FontColorSpan by inject()
     private val spHelper: SPHelper by inject()
     private val permissionHelper: PermissionHelper by inject()
 
-    private var linkData: Uri? = null
-
-    private lateinit var defaultToast: DefaultToast
-    private lateinit var progressDialog: DefaultProgressDialog
     private lateinit var loginDialog: DefaultDialog
     private lateinit var postUploadTypeSelectDialog: TwoSelectBottomDialog
 
@@ -85,8 +87,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onPause() {
-        super.onPause()
         ViewFunction.hideKeyboard(context = this, view = mainLayout)
+        super.onPause()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -109,12 +111,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 //                    RequestCodeData.GOODS_SEARCH -> { // 상품 검색
 //                        reloadAllData { max, current -> }
 //                    }
-//                    RequestCodeData.TOPIC_SETTING -> { // 토픽 설정
-//                        // 전체
-//                        allFragment.initFeedAllData { }
-//                        // 제품
-//                        shopFragment.initFeedShopData {  }
-//                    }
+                    RequestCodeData.TOPIC_SETTING -> { // 토픽 설정
+                        // 전체, 제품 피드 갱신
+                        feedAllFragment.reloadFeedData(loadingBar = null)
+                        feedShopFragment.reloadFeedData(loadingBar = null)
+                    }
 //                    RequestCodeData.POST_UPLOAD -> { // 포스트 업로드
 //                    }
                 }
@@ -133,7 +134,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 //                }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                reloadAllData()
+                feedAllFragment.reloadFeedData(loadingBar = null)
+                feedFollowingFragment.reloadFeedData(loadingBar = null)
+                feedExploreFragment.reloadFeedData(loadingBar = null)
+                feedShopFragment.reloadFeedData(loadingBar = null)
+
+                notificationViewModel.loadExistNewNotification(authorization = spHelper.authorization)
+                noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
                 finish()
@@ -142,11 +149,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
-        linkData = intent.data
-
         // appBarLayout 애니메이션 없애기
         appBarLayout.stateListAnimator = null
 
+        // Dialog 초기화
         loginDialog = DialogCreator.loginDialog(context = this)
         postUploadTypeSelectDialog = DialogCreator.postUploadTypeSelectDialog(context = this)
 
@@ -187,6 +193,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 rootView = matchBtnLayout,
                 isMatchShow = true,
                 listener = matchButtonListener)
+
+        notificationViewModel.loadExistNewNotification(authorization = spHelper.authorization)
+        noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
     }
 
     private fun onBindEvent() {
@@ -209,6 +218,55 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
+        // TODO: Main View Model
+        // UI 이벤트 observe
+        mainViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let {_->
+                uiData.guestMode?.let {
+                    if (spHelper.accessToken.isEmpty()) { // 게스트
+                        loginDialog.show()
+                    }
+                }
+            }
+        })
+
+        // button Action 이벤트 observe
+        mainViewModel.btnActionData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let {_->
+                eventData.notification?.let {
+                    RunActivity.notificationActivity(context = this)
+                }
+                eventData.profile?.let {
+                    RunActivity.profileActivity(context = this, userId = spHelper.userId)
+                }
+                eventData.post?.let {
+                    RunActivity.postUploadPictureActivity(context = this, postId = "", youTubeVideoId = "")
+                }
+                eventData.postTypeDialog?.let {
+                    postUploadTypeSelectDialog.show(supportFragmentManager, "postUploadTypeSelectDialog")
+                }
+            }
+        })
+
+        // TODO: Notification View Model
+        // UI 이벤트 observe
+        notificationViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let {_->
+                uiData.newNotificationDotVisibility?.let {
+                    notiDotView.visibility = it
+                }
+            }
+        })
+
+        // TODO: Notice View Model
+        // UI 이벤트 observe
+        noticeViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let {_->
+                uiData.newNoticeDotVisibility?.let {
+                    profileDotView.visibility = it
+                }
+            }
+        })
     }
 
     override fun onClick(v: View?) {
@@ -218,44 +276,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     RunActivity.combinedSearchActivity(context = this)
                 }
                 R.id.actionNotificationBtn -> { // 노티 버튼
-                    if (spHelper.accessToken.isEmpty()) { // 게스트
-                        loginDialog.show()
-                        return
-                    }
-
-                    RunActivity.notificationActivity(context = this)
+                    mainViewModel.notificationBtnAction(authorization = spHelper.authorization)
                 }
                 R.id.actionUploadBtn -> { // 포스트 업로드 버튼
-                    if (spHelper.accessToken.isEmpty()) { // 게스트
-                        loginDialog.show()
-                        return
-                    }
-
                     // 권한 체크
                     if (!permissionHelper.hasPermission(context = this, permissions = permissionHelper.cameraPermissions)) {
                         permissionHelper.requestCameraPermissions(context = this)
                         return
                     }
 
-                    postUploadTypeSelectDialog.show(supportFragmentManager, "postUploadTypeSelectDialog")
+                    mainViewModel.uploadPostBtnAction(authorization = spHelper.authorization,
+                            userLevel = spHelper.userLevel)
+
                 }
                 R.id.actionProfileBtn -> { // 프로필 버튼
-                    if (spHelper.accessToken.isEmpty()) { // 게스트
-                        loginDialog.show()
-                        return
-                    }
-
-                    RunActivity.profileActivity(context = this, userId = spHelper.userId)
+                    mainViewModel.profileBtnAction(authorization = spHelper.authorization)
                 }
             }
         }
-    }
-
-    private fun reloadAllData() {
-        feedAllFragment.reloadFeedData(loadingBar = null)
-        feedFollowingFragment.reloadFeedData(loadingBar = null)
-        feedExploreFragment.reloadFeedData(loadingBar = null)
-        feedShopFragment.reloadFeedData(loadingBar = null)
     }
 
     companion object {

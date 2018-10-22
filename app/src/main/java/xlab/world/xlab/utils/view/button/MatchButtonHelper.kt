@@ -8,6 +8,7 @@ import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SPHelper
+import xlab.world.xlab.utils.support.SupportData
 import xlab.world.xlab.utils.view.dialog.DialogCreator
 
 class MatchButtonHelper (rootView: View,
@@ -48,7 +49,7 @@ class MatchButtonHelper (rootView: View,
         v?.let {
             when (v.id) {
                 R.id.matchSettingBtn -> { // 매칭률 설정 버튼
-                    if (spHelper.accessToken.isEmpty()) {
+                    if (SupportData.isGuest(authorization = spHelper.authorization)) {
                         loginDialog.show()
                         return
                     }

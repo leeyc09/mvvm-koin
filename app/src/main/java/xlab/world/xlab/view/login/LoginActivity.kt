@@ -29,9 +29,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
     private val loginViewModel: LoginViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
-    private var isComePreLoadActivity: Boolean = true
-    private var linkData: Uri? = null
-
     private val socialAuth: SocialAuth = SocialAuth()
 
     private lateinit var defaultToast: DefaultToast
@@ -39,15 +36,10 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
     private lateinit var progressDialog: DefaultProgressDialog
     private lateinit var shopAccountDialog: ShopAccountDialog
 
-    private val shopLoginListener = object: ShopAccountDialog.Listener {
+    private val shopAccountListener = object: ShopAccountDialog.Listener {
         override fun webViewFinish(result: Boolean) {
             if (result) {
-                if (isComePreLoadActivity)  // 앱 실행으로 로그인 화면 온 경우
-                    RunActivity.mainActivity(context = this@LoginActivity, linkData = null)
-                else  // 다른 화면에서 로그인 화면으로 온 경우
-                    setResult(ResultCodeData.LOGIN_SUCCESS)
-
-                finish()
+                loginViewModel.finishView()
             }
         }
     }
@@ -63,6 +55,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
     }
 
     override fun onPause() {
+        // 엑티비티 멈출때 키보드 숨기기
         ViewFunction.hideKeyboard(context = this, view = mainLayout)
         super.onPause()
     }
@@ -80,12 +73,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
             Activity.RESULT_OK -> {
                 when (requestCode) {
                     RequestCodeData.REGISTER_USER -> { // 회원가입 성공
-                        rootLayout.visibility = View.INVISIBLE
-                        val accessToken = data?.let {
-                            data.getStringExtra(IntentPassName.ACCESS_TOKEN)
-                        } ?: ""
-                        spHelper.accessToken = accessToken
-                        loginViewModel.requestLoginByAccessToken(authorization = spHelper.authorization, fcmToken = spHelper.fcmToken)
+                        data?.let {
+                            rootLayout.visibility = View.INVISIBLE
+                            val accessToken = data.getStringExtra(IntentPassName.ACCESS_TOKEN)
+                            loginViewModel.requestLoginByAccessToken(authorization = "Bearer $accessToken", fcmToken = spHelper.fcmToken)
+                        }
                     }
                 }
             }
@@ -110,20 +102,17 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
     }
 
     private fun onSetup() {
-        isComePreLoadActivity = intent.getBooleanExtra(IntentPassName.IS_COME_PRELOAD_ACTIVITY, true)
-        linkData = intent.data
-
         // 타이틀, 확인 버튼 비활성화
         actionBarTitle.visibility = View.GONE
         actionBtn.visibility = View.GONE
 
+        // 페이스북 email 읽기 권한 추가
+        originFacebookBtn.setReadPermissions("email")
+
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
-        shopAccountDialog = ShopAccountDialog(context = this, listener = shopLoginListener)
-
-        // 페이스북 email 읽기 권한 추가
-        originFacebookBtn.setReadPermissions("email")
+        shopAccountDialog = ShopAccountDialog(context = this, listener = shopAccountListener)
 
         // 페이스북, 카카오 로그아웃
         socialAuth.facebookLogout()
@@ -191,6 +180,10 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
                 uiData.backBtnVisibility?.let {
                     actionBackBtn.visibility = it
                 }
@@ -203,7 +196,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 uiData.popupVisibility?.let {
                     layoutPopUp.visibility = it
                 }
-                uiData.isLoginBtnEnable?.let {
+                uiData.loginBtnEnable?.let {
                     loginBtn.isEnabled = it
                 }
             }
@@ -221,15 +214,13 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                             userEmail = loginData.email,
                             push = loginData.isPushAlarmOn)
                 }
-                checkValidTokenEvent.isExpireToken?.let { // access token 만료
-                }
             }
         })
 
         // 로그인 이벤트 observe
-        loginViewModel.requestLoginEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { requestLoginEvent ->
-            requestLoginEvent?.let { _ ->
-                requestLoginEvent.loginData?.let { loginData ->
+        loginViewModel.loginData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.loginData?.let { loginData ->
                     if (loginData.needRegisterSocial) { // 소셜 회원가입 필요
                         RunActivity.socialRegisterActivity(context = this, userData = loginData)
                     } else {
@@ -242,11 +233,24 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                                 push = loginData.isPushAlarmOn)
                     }
                 }
-                requestLoginEvent.isLoginFail?.let {
+                eventData.isLoginFail?.let {
                     if (it) {
                         socialAuth.facebookLogout()
                         socialAuth.kakaoLogout()
                     }
+                }
+            }
+        })
+
+        // 화면 전환 이벤트 observe
+        loginViewModel.finishViewData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let {_->
+                eventData.runMainActivity?.let {
+                    RunActivity.mainActivity(context = this, linkData = null)
+                    finish()
+                }
+                eventData.runGuestMode?.let {
+                    guestBtn.performClick()
                 }
             }
         })
@@ -256,13 +260,12 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(Activity.RESULT_CANCELED)
-                    finish()
+                    loginViewModel.actionBackAction()
                 }
                 R.id.facebookBtn -> { // 페이스북 로그인 버튼
                     originFacebookBtn.performClick()
                     // 페이스북 토큰 요청
-                    socialAuth.getFacebookToken( { facebookToken ->
+                    socialAuth.getFacebookToken({ facebookToken ->
                         loginViewModel.requestLogin(context = this,
                                 loginType = FACEBOOK_LOGIN,
                                 socialToken = facebookToken,
@@ -274,7 +277,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 R.id.kakaoBtn -> { // 카카오 로그인 버튼
                     originKakaoBtn.performClick()
                     // 카카오 토큰 요청
-                    socialAuth.getKakaoToken( { kakaoToken ->
+                    socialAuth.getKakaoToken({ kakaoToken ->
                         loginViewModel.requestLogin(context = this,
                                 loginType = KAKAO_LOGIN,
                                 socialToken = kakaoToken,
@@ -285,12 +288,12 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 }
                 R.id.registerBtn -> { // 회원가입 버튼
                     // clear mail and password
-                    editTextMail.text?.clear()
-                    editTextPassword.text?.clear()
+                    editTextMail?.setText("")
+                    editTextPassword?.setText("")
                     RunActivity.localRegisterActivity(context = this)
                 }
                 R.id.guestBtn -> { // 둘러보기(게스트 모드)
-                    RunActivity.mainActivity(context = this, linkData = linkData)
+                    RunActivity.mainActivity(context = this, linkData = intent.data)
                     finish()
                 }
                 R.id.loginBtn -> { // 로컬 로그인 버튼
@@ -338,12 +341,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 push = push)
 
 //        shopAccountDialog.requestLogin(userId = userId)
-        if (isComePreLoadActivity)  // 앱 실행으로 로그인 화면 온 경우
-            RunActivity.mainActivity(context = this@LoginActivity, linkData = null)
-        else  // 다른 화면에서 로그인 화면으로 온 경우
-            setResult(ResultCodeData.LOGIN_SUCCESS)
-
-        finish()
+        loginViewModel.finishView()
     }
 
     private fun getEmailText() = editTextMail.text?.trim().toString()
