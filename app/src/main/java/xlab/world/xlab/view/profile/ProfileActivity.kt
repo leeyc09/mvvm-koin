@@ -40,7 +40,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             .error(R.drawable.profile_img_100)
 
     private var resultCode = Activity.RESULT_CANCELED
-    private var userId = ""
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
@@ -55,7 +54,8 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var profilePetFragment: ProfilePetFragment
 
     private val topicSelectListener = View.OnClickListener { view ->
-        RunActivity.petDetailActivity(context = this@ProfileActivity, userId = userId, petNo = view.tag as Int, petTotal = profileTopicAdapter.dataTotal)
+        RunActivity.petDetailActivity(context = this@ProfileActivity,
+                userId = intent.getStringExtra(IntentPassName.USER_ID), petNo = view.tag as Int, petTotal = profileTopicAdapter.dataTotal)
     }
     private val topicAddListener = View.OnClickListener {
         RunActivity.petEditActivity(context = this@ProfileActivity, petNo = null)
@@ -97,7 +97,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.PROFILE_EDIT -> { // 프로필 수정
-                        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = userId, loadingBar = null)
+                        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loadingBar = null)
                     }
                     RequestCodeData.USED_GOODS, // 사용한 제품 더보기
                     RequestCodeData.FOLLOW, // 팔로우, 팔로잉
@@ -109,13 +109,15 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     RequestCodeData.POST_COMMENT, // 댓글
                     RequestCodeData.GOODS_DETAIL, // 상품 상세
                     RequestCodeData.MY_SHOP -> {
-                        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = userId, loadingBar = null)
-                        profileViewModel.loadUserTopicData(userId = userId, page = 1, topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
+                        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loadingBar = null)
+                        profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
+                                topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
                         profileAlbumFragment.reloadPetUsedGoodsData(loadingBar = null)
                         profilePetFragment.reloadPetUsedGoodsData(loadingBar = null)
                     }
                     RequestCodeData.TOPIC_ADD -> { // 펫 추가
-                        profileViewModel.loadUserTopicData(userId = userId, page = 1, topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
+                        profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
+                                topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
                     }
                     RequestCodeData.POST_UPLOAD -> { // 포스트 업로드
                         // set user post data
@@ -126,13 +128,15 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             ResultCodeData.TOPIC_DELETE -> {
 //                if (this.resultCode == Activity.RESULT_CANCELED)
 //                    this.resultCode = Activity.RESULT_OK
-                profileViewModel.loadUserTopicData(userId = userId, page = 1, topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
+                profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
+                        topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
                 this.resultCode = ResultCodeData.LOGIN_SUCCESS
-                profileViewModel.setProfileType(profileUserId = userId, loginUserId = spHelper.userId, loadingBar = null)
-                profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = userId, loadingBar = null)
-                profileViewModel.loadUserTopicData(userId = userId, page = 1, topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
+                profileViewModel.setProfileType(userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
+                profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loadingBar = null)
+                profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1, topicDataCount = 0,
+                        loginUserId = spHelper.userId, loadingBar = null)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
                 setResult(ResultCodeData.LOGOUT_SUCCESS)
@@ -142,21 +146,17 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
-        userId = intent.getStringExtra(IntentPassName.USER_ID)
-
         // appBarLayout 애니메이션 없애기
         appBarLayout.stateListAnimator = null
 
-        // set tool bar
-        setSupportActionBar(topicToolbar)
-
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
         postUploadTypeSelectDialog = DialogCreator.postUploadTypeSelectDialog(context = this)
 
         // 프래그먼트 초기화
-        profileAlbumFragment = ProfileAlbumFragment.newFragment(userId = userId)
-        profilePetFragment = ProfilePetFragment.newFragment(userId = userId)
+        profileAlbumFragment = ProfileAlbumFragment.newFragment(userId = intent.getStringExtra(IntentPassName.USER_ID))
+        profilePetFragment = ProfilePetFragment.newFragment(userId = intent.getStringExtra(IntentPassName.USER_ID))
 
         viewPagerAdapter = ViewStatePagerAdapter(manager = supportFragmentManager)
         viewPagerAdapter.addFragment(fragment = profileAlbumFragment, title = getString(R.string.profile_tab_album))
@@ -182,9 +182,10 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         topicRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         topicRecyclerView.addItemDecoration(CustomItemDecoration(context = this, right = 4f))
 
-        profileViewModel.setProfileType(profileUserId = userId, loginUserId = spHelper.userId)
-        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = userId)
-        profileViewModel.loadUserTopicData(userId = userId, page = 1, topicDataCount = 0, loginUserId = spHelper.userId)
+        profileViewModel.setProfileType(userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId)
+        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID))
+        profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
+                topicDataCount = 0, loginUserId = spHelper.userId)
     }
 
     private fun onBindEvent() {
@@ -201,7 +202,8 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = topicRecyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = profileTopicAdapter.dataLoading, total = profileTopicAdapter.dataTotal) { _ ->
-                profileViewModel.loadUserTopicData(userId = userId, page = profileTopicAdapter.dataNextPage, topicDataCount = profileTopicAdapter.itemCount, loginUserId = spHelper.userId)
+                profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = profileTopicAdapter.dataNextPage,
+                        topicDataCount = profileTopicAdapter.itemCount, loginUserId = spHelper.userId)
             }
         }
     }
@@ -238,11 +240,10 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }
                 uiData.topicData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        profileTopicAdapter.updateData(profileTopicData = it)
-                    }
-                    else
-                        profileTopicAdapter.addData(profileTopicData = it)
+                    profileTopicAdapter.linkData(profileTopicData = it)
+                }
+                uiData.topicDataUpdate?.let {
+                    profileTopicAdapter.notifyDataSetChanged()
                 }
                 uiData.profileImage?.let {
                     Glide.with(this)
@@ -269,21 +270,17 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // load user data 이벤트 observe
-        profileViewModel.loadUserDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadUserDataEvent ->
-            loadUserDataEvent?.let { _ ->
-                loadUserDataEvent.status?.let { isSuccess ->
-                    if (!isSuccess)
-                        actionBackBtn.performClick()
-                }
+        profileViewModel.loadUserData.observe(owner = this, observer = android.arch.lifecycle.Observer { loadUserDataEvent ->
+            loadUserDataEvent?.let { isSuccess ->
+                if (!isSuccess)
+                    actionBackBtn.performClick()
             }
         })
 
         // load user topic 이벤트 observe
-        profileViewModel.loadUserPetEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadUserPetEvent ->
-            loadUserPetEvent?.let { _ ->
-                loadUserPetEvent.status?.let { isLoading ->
-                    profileTopicAdapter.dataLoading = isLoading
-                }
+        profileViewModel.loadUserPetData.observe(owner = this, observer = android.arch.lifecycle.Observer { loadUserPetEvent ->
+            loadUserPetEvent?.let { isLoading ->
+                profileTopicAdapter.dataLoading = isLoading
             }
         })
     }
@@ -317,13 +314,13 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
                 }
                 R.id.followBtn -> { // 팔로우 버튼
-                    profileViewModel.userFollow(authorization = spHelper.authorization, userId = userId)
+                    profileViewModel.userFollow(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID))
                 }
                 R.id.followerLayout -> { // 팔로워
-                    RunActivity.followerActivity(context = this, userId = userId)
+                    RunActivity.followerActivity(context = this, userId = intent.getStringExtra(IntentPassName.USER_ID))
                 }
                 R.id.followingLayout -> { // 팔로잉
-                    RunActivity.followingActivity(context = this, userId = userId)
+                    RunActivity.followingActivity(context = this, userId = intent.getStringExtra(IntentPassName.USER_ID))
                 }
                 R.id.profileEditBtn -> { // 프로필 수정
                     RunActivity.profileEditActivity(context = this)

@@ -123,6 +123,9 @@ class PostUploadUsedGoodsActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.usedGoodsData?.let {
                     selectUsedGoodsAdapter.linkData(selectUsedGoodsData = it)
                 }
+                uiData.usedGoodsUpdate?.let {
+                    selectUsedGoodsAdapter.notifyDataSetChanged()
+                }
                 uiData.usedGoodsUpdateIndex?.let {
                     selectUsedGoodsAdapter.notifyItemChanged(it)
                 }

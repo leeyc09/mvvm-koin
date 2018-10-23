@@ -23,10 +23,10 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                        private val scheduler: SchedulerProvider): AbstractViewModel() {
     private val viewModelTag = "Profile"
 
-    private var userId: String = ""
+    private var topicData: ProfileTopicData = ProfileTopicData()
 
-    val loadUserDataEvent = SingleLiveEvent<ProfileEvent>()
-    val loadUserPetEvent = SingleLiveEvent<ProfileEvent>()
+    val loadUserData = SingleLiveEvent<Boolean?>()
+    val loadUserPetData = SingleLiveEvent<Boolean?>()
     val loadTopicUsedGoodsEvent = SingleLiveEvent<ProfileEvent>()
     val loadUserPostsThumbDataEvent = SingleLiveEvent<ProfileEvent>()
     val loadUserPostsDetailDataEvent = SingleLiveEvent<ProfileEvent>()
@@ -34,13 +34,12 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
 
     // 프로필 타입 설정
     // 나의 프로필 & 상대방 프로필에 따라 action bar 달라짐
-    fun setProfileType(profileUserId: String, loginUserId: String, loadingBar: Boolean? = true) {
+    fun setProfileType(userId: String, loginUserId: String, loadingBar: Boolean? = true) {
         uiData.value = UIModel(isLoading = loadingBar)
         launch {
             Observable.create<Int> {
-                this.userId = profileUserId
                 it.onNext(
-                        if (profileUserId == loginUserId) AppConstants.MY_PROFILE
+                        if (userId == loginUserId) AppConstants.MY_PROFILE
                         else AppConstants.OTHER_PROFILE)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
@@ -50,6 +49,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         }
     }
 
+    // 해당 유저 토픽 정보 불러오기
     fun loadUserTopicData(userId: String, page: Int, topicDataCount: Int, loginUserId: String, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
@@ -58,13 +58,14 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         }
 
         uiData.value = UIModel(isLoading = loadingBar)
-        loadUserPetEvent.value = ProfileEvent(status = true)
+        loadUserPetData.value = true
         launch {
             apiPet.getUserPetList(scheduler = scheduler, userId = userId, page = page,
                     responseData = {
-                        val topicData = ProfileTopicData(total = it.total, nextPage = page + 1)
+                        PrintLog.d("getUserPetList success", it.toString(), viewModelTag)
+                        val newTopicData = ProfileTopicData(total = it.total, nextPage = page + 1)
                         it.petsData?.forEach { petData ->
-                            topicData.items.add(ProfileTopicListData(
+                            newTopicData.items.add(ProfileTopicListData(
                                     dataType = AppConstants.ADAPTER_CONTENT,
                                     topicId = petData.id,
                                     imageURL = petData.image))
@@ -73,24 +74,32 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                         val loadedTopicCount =
                                 if (topicDataCount < 0) 0
                                 else topicDataCount
-                        val loadedTopicSize = loadedTopicCount + topicData.items.size
+                        val loadedTopicSize = loadedTopicCount + newTopicData.items.size
 
                         // 모든 topic 다 불러오고, 자신의 프로필 화면 -> 토픽 추가 버튼
-                        if (loadedTopicSize >= topicData.total && userId == loginUserId)
-                            topicData.items.add(ProfileTopicListData(dataType = AppConstants.ADAPTER_FOOTER))
+                        if (loadedTopicSize >= newTopicData.total && userId == loginUserId)
+                            newTopicData.items.add(ProfileTopicListData(dataType = AppConstants.ADAPTER_FOOTER))
 
-                        PrintLog.d("getUserPetList success", topicData.toString())
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, topicData = topicData)
+                        if (page == 1) {
+                            this.topicData.updateData(profileTopicData = newTopicData)
+                            uiData.value = UIModel(topicData = this.topicData)
+                        } else {
+                            this.topicData.addData(profileTopicData = newTopicData)
+                            uiData.value = UIModel(topicDataUpdate = true)
+                        }
+
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("getUserPetList fail", errorData.message)
+                            PrintLog.e("getUserPetList fail", errorData.message, viewModelTag)
                         }
                     })
         }
     }
 
+    // 해당 유저 정보(프로필 이미지, 닉네임, 소개, 팔로잉 & 팔로워 수, 팔로잉 상태) 불러오기
     fun loadUserData(context: Context, authorization: String, userId: String, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
@@ -102,7 +111,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         launch {
             apiUser.requestProfileMain(scheduler = scheduler, authorization = authorization, userId = userId,
                     responseData = {
-                        PrintLog.d("requestProfileMain success", it.toString())
+                        PrintLog.d("requestProfileMain success", it.toString(), viewModelTag)
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
                                 profileImage = it.profileImg,
                                 nickName = it.nickName,
@@ -113,9 +122,9 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, toastMessage = context.getString(R.string.toast_no_exist_user))
-                        loadUserDataEvent.postValue(ProfileEvent(status = false))
+                        loadUserData.value = false
                         errorData?.let {
-                            PrintLog.d("requestProfileMain fail", errorData.message)
+                            PrintLog.d("requestProfileMain fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -284,8 +293,9 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
 
 data class ProfileEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
-                   val profileType: Int? = null, val topicData: ProfileTopicData? = null,
+                   val profileType: Int? = null,
                    val profileImage: String? = null, val nickName: String? = null, val introduction: String? = null,
                    val followerCnt: Int? = null, val followingCnt: Int? = null, val followState: Boolean? = null,
+                   val topicData: ProfileTopicData? = null, val topicDataUpdate: Boolean? = null,
                    val topicUsedGoodsData: GoodsThumbnailData? = null,
                    val postsThumbData: PostThumbnailData? = null, val postsDetailData: PostDetailData? = null)

@@ -18,12 +18,13 @@ import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.ProfileTopicData
 import xlab.world.xlab.data.adapter.ProfileTopicListData
 import xlab.world.xlab.utils.support.AppConstants
+import xlab.world.xlab.utils.support.PrintLog
 
 class ProfileTopicAdapter(private val context: Context,
                           private val addListener: View.OnClickListener,
                           private val selectListener: View.OnClickListener) : RecyclerView.Adapter<ProfileTopicAdapter.ViewHolder>() {
 
-    private val profileTopicData: ProfileTopicData = ProfileTopicData()
+    private var profileTopicData: ProfileTopicData = ProfileTopicData()
     var dataLoading: Boolean
         get() = this.profileTopicData.isLoading
         set(value) { this.profileTopicData.isLoading = value }
@@ -38,25 +39,9 @@ class ProfileTopicAdapter(private val context: Context,
             .placeholder(imagePlaceHolder)
             .error(imagePlaceHolder)
 
-    fun updateData(profileTopicData: ProfileTopicData) {
-        this.profileTopicData.items.clear()
-        this.profileTopicData.items.addAll(profileTopicData.items)
-
-        this.profileTopicData.isLoading = false
-        this.profileTopicData.total = profileTopicData.total
-        this.profileTopicData.nextPage = 2
-
+    fun linkData(profileTopicData: ProfileTopicData) {
+        this.profileTopicData = profileTopicData
         notifyDataSetChanged()
-    }
-
-    fun addData(profileTopicData: ProfileTopicData) {
-        val size: Int = itemCount
-        this.profileTopicData.items.addAll(profileTopicData.items)
-
-        this.profileTopicData.isLoading = false
-        this.profileTopicData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override fun getItemViewType(position: Int): Int {

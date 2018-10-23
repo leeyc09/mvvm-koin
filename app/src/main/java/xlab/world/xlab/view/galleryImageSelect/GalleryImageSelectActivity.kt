@@ -48,9 +48,10 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
+        // appBarLayout 애니메이션 없애기
         appBarLayout.stateListAnimator = null
+        // swipe refresh 비활성화
         swipeRefreshLayout.isEnabled = false
-        setSupportActionBar(toolbar)
 
         actionBarTitle.visibility = View.GONE
 
@@ -60,7 +61,7 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
 
         imageViewPreview.getDisplayMatrix(Matrix())
 
-        // Toast 초기화
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
@@ -109,6 +110,9 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 uiData.galleryData?.let {
                     galleryAdapter.linkData(galleryData = it)
+                }
+                uiData.galleryDataUpdate?.let {
+                    galleryAdapter.notifyDataSetChanged()
                 }
                 uiData.galleryUpdateIndex?.let {
                     galleryAdapter.notifyItemChanged(it)
