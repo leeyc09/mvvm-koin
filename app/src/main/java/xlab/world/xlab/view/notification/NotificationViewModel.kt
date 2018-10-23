@@ -102,7 +102,7 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
 
                 it.onNext(shopNotificationData)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 uiData.value = UIModel(isLoading = false, shopNotificationData = it)
             }
         }

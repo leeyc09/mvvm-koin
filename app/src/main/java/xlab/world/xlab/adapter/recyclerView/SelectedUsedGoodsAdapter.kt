@@ -21,7 +21,7 @@ import xlab.world.xlab.utils.support.AppConstants
 class SelectedUsedGoodsAdapter(private val context: Context,
                                private val deleteListener: View.OnClickListener) : RecyclerView.Adapter<SelectedUsedGoodsAdapter.ViewHolder>() {
 
-    private val selectUsedGoodsData: SelectUsedGoodsData = SelectUsedGoodsData()
+    private var selectUsedGoodsData: SelectUsedGoodsData = SelectUsedGoodsData()
 
     private val imagePlaceHolder = ColorDrawable(ResourcesCompat.getColor(context.resources, R.color.colorE2E2E2, null))
     private val glideOption = RequestOptions()
@@ -29,16 +29,21 @@ class SelectedUsedGoodsAdapter(private val context: Context,
             .placeholder(imagePlaceHolder)
             .error(imagePlaceHolder)
 
-    fun getItem(position: Int): SelectUsedGoodsListData {
-        return selectUsedGoodsData.items[position]
-    }
+//    fun getItem(position: Int): SelectUsedGoodsListData {
+//        return selectUsedGoodsData.items[position]
+//    }
+//
+//    fun updateData(selectUsedGoodsData: ArrayList<SelectUsedGoodsListData>) {
+//        this.selectUsedGoodsData.items.clear()
+//        selectUsedGoodsData.forEach { data ->
+//            this.selectUsedGoodsData.items.add(data)
+//        }
+//
+//        notifyDataSetChanged()
+//    }
 
-    fun updateData(selectUsedGoodsData: ArrayList<SelectUsedGoodsListData>) {
-        this.selectUsedGoodsData.items.clear()
-        selectUsedGoodsData.forEach { data ->
-            this.selectUsedGoodsData.items.add(data)
-        }
-
+    fun linkData(selectUsedGoodsData: SelectUsedGoodsData) {
+        this.selectUsedGoodsData = selectUsedGoodsData
         notifyDataSetChanged()
     }
 

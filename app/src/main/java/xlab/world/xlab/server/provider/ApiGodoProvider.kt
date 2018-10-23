@@ -74,7 +74,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestShopProfile(scheduler: SchedulerProvider, authorization: String,
                                     responseData: (ResShopProfileData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.getShopProfile(authorization = authorization)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -85,7 +85,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestUpdateShopProfile(scheduler: SchedulerProvider, authorization: String, name: String, email: String,
                                           responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.updateShopProfile(authorization = authorization, name = name, email = email)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -96,7 +96,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestGetCart(scheduler: SchedulerProvider, authorization: String,
                                 responseData: (ResCartData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.getMyCart(authorization = authorization)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -107,7 +107,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestAddCart(scheduler: SchedulerProvider, authorization: String, goodsNo: String, count: Int,
                                 responseData: (ResAddCartData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.addMyCart(authorization = authorization, goodsNo = goodsNo, count = count)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -118,7 +118,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestUpdateCart(scheduler: SchedulerProvider, authorization: String, sno: String, count: Int,
                                    responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.updateMyCart(authorization = authorization, sno = sno, count = count)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -129,7 +129,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestDeleteCart(scheduler: SchedulerProvider, authorization: String, sno: String,
                                    responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.deleteMyCart(authorization = authorization, sno = sno)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -140,7 +140,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestOrderStateCnt(scheduler: SchedulerProvider, authorization: String,
                                        responseData: (ResOrderStateCntData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.getOrderStateCnt(authorization = authorization)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -151,7 +151,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestOrderStateList(scheduler: SchedulerProvider, authorization: String, state: Int,
                                        responseData: (ResOrderHistoryData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.getOrderStateHistory(authorization = authorization, state = state)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -162,7 +162,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestOrderDetail(scheduler: SchedulerProvider, authorization: String, orderNo: String,
                                     responseData: (ResOrderDetailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.getOrderDetail(authorization = authorization, orderNo = orderNo)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -173,7 +173,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestOrderList(scheduler: SchedulerProvider, authorization: String,
                                   responseData: (ResOrderHistoryData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.getOrderHistory(authorization = authorization)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -184,7 +184,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestOrderCRR(scheduler: SchedulerProvider, authorization: String, requestBody: RequestBody,
                                  responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.orderCRR(authorization = authorization, requestBody = requestBody)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -195,7 +195,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestCRRDetail(scheduler: SchedulerProvider, authorization: String, handleSno: String,
                                   responseData: (ResCRRDetailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.getCRRDetail(authorization = authorization, handleSno = handleSno)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -206,7 +206,7 @@ class ApiGodo(private val iGodoRequest: IGodoRequest): ApiGodoProvider {
     override fun requestOrderCancel(scheduler: SchedulerProvider, authorization: String, orderNo: String,
                                     responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iGodoRequest.orderCancel(authorization = authorization, orderNo = orderNo)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {

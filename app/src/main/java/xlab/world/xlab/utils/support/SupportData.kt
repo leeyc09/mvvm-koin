@@ -25,7 +25,9 @@ object SupportData {
         }
 
     // youtube id 로 해당 영상 썸네일 가져오기
-    fun getYoutubeThumbnailUrl(videoId: String, quality: Int): String {
+    fun getYoutubeThumbnailUrl(videoId: String, quality: Int): String? {
+        if (videoId.isEmpty()) return null
+
         return when (quality) {
             YOUTUBE_THUMB_120x90 -> "$YOUTUBE_THUMBNAIL_BASE_URL$videoId/default.jpg" // (120x90)
             YOUTUBE_THUMB_320x180 -> "$YOUTUBE_THUMBNAIL_BASE_URL$videoId/mqdefault.jpg" // (320x180)

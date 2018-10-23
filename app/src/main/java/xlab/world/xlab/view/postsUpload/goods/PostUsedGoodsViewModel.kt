@@ -1,6 +1,7 @@
 package xlab.world.xlab.view.postsUpload.goods
 
 import android.arch.lifecycle.MutableLiveData
+import android.view.View
 import io.reactivex.Observable
 import xlab.world.xlab.data.adapter.SelectUsedGoodsData
 import xlab.world.xlab.data.adapter.SelectUsedGoodsListData
@@ -16,29 +17,41 @@ import xlab.world.xlab.view.SingleLiveEvent
 class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvider,
                              private val networkCheck: NetworkCheck,
                              private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "PostGoods"
+    private val viewModelTag = "PostGoods"
 
     private val selectedUsedGoodsData = ArrayList<SelectUsedGoodsListData>()
+
+    private var usedGoodsData: SelectUsedGoodsData = SelectUsedGoodsData()
+    private var selectUsedGoodsData: SelectUsedGoodsData = SelectUsedGoodsData()
 
     val loadUsedGoodsEventData = SingleLiveEvent<PostUsedGoodsEvent>()
     val uiData = MutableLiveData<UIModel>()
 
     fun getSelectedUsedGoodsData(): ArrayList<SelectUsedGoodsListData> = selectedUsedGoodsData
 
+    // 선택한 제품 데이터 세팅
     fun setSelectedUsedGoodsData(selectedData: ArrayList<SelectUsedGoodsListData>, dataType: Int) {
         launch {
-            Observable.create<ArrayList<SelectUsedGoodsListData>> {
-                selectedUsedGoodsData.clear()
+            Observable.create<SelectUsedGoodsData> {
+                val newSelectUsedGoodsData = SelectUsedGoodsData()
                 selectedData.forEach { data ->
                     data.dataType = dataType
-                    selectedUsedGoodsData.add(data)
+                    newSelectUsedGoodsData.items.add(data.copy())
                 }
+                this.selectUsedGoodsData.updateData(selectUsedGoodsData = newSelectUsedGoodsData)
 
-                it.onNext(selectedUsedGoodsData)
+//                selectedUsedGoodsData.clear()
+//                selectedData.forEach { data ->
+//                    data.dataType = dataType
+//                    selectedUsedGoodsData.add(data)
+//                }
+
+                it.onNext(this.selectUsedGoodsData)
                 it.onComplete()
-            }.with(scheduler).subscribe {
-                PrintLog.d("set selectedUsedGoodsData", it.toString())
-                uiData.value = UIModel(selectedUsedGoodsData = it)
+            }.with(scheduler = scheduler).subscribe {
+                PrintLog.d("set selectedUsedGoodsData", it.toString(), viewModelTag)
+                uiData.value = UIModel(selectedLayoutVisibility = if (it.items.isEmpty()) View.GONE else View.VISIBLE,
+                        selectedUsedGoodsData = it)
             }
         }
     }
@@ -86,12 +99,15 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
         }
     }
 
-    fun selectUsedGoods(position: Int, usedGoodsData: SelectUsedGoodsListData) {
+    // 사용한 제품 선택 & 해제
+    fun selectUsedGoods(selectIndex: Int) {
         launch {
             Observable.create<ArrayList<SelectUsedGoodsListData>> {
-                usedGoodsData.isSelect = !usedGoodsData.isSelect
+                val item = usedGoodsData.items[selectIndex]
+                // 제품 선택 -> 해제 / 해제 -> 선택
+                item.isSelect = !item.isSelect
 
-                if (usedGoodsData.isSelect) { // 사용한 제품 선택 리스트 추가
+                if (item.isSelect) { // 사용한 제품 선택 리스트 추가
                     val copyData = usedGoodsData.copy()
                     copyData.dataType = AppConstants.SELECTED_GOODS_ONLY_THUMB
                     selectedUsedGoodsData.add(copyData)
@@ -108,7 +124,7 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
 
                 it.onNext(selectedUsedGoodsData)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("update selectedUsedGoodsData", selectedUsedGoodsData.toString())
                 uiData.value = UIModel(usedGoodsUpdateIndex = position,
                         updateSelectedUsedGoodsData = selectedUsedGoodsData,
@@ -133,7 +149,7 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
 
                 it.onNext(updateUsedGoodsIndex)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("update selectedUsedGoodsData", selectedUsedGoodsData.toString())
                 PrintLog.d("usedGoodsUpdateIndex", it.toString())
                 uiData.value = UIModel(usedGoodsUpdateIndex = if (it == -1) null else it,
@@ -145,7 +161,8 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
 
 data class PostUsedGoodsEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
-                   val selectedUsedGoodsData: ArrayList<SelectUsedGoodsListData>? = null,
+                   val selectedLayoutVisibility: Int? = null,
+                   val selectedUsedGoodsData: SelectUsedGoodsData? = null,
                    val updateSelectedUsedGoodsData: ArrayList<SelectUsedGoodsListData>? = null,
                    val selectedUsedGoodsScrollIndex: Int? = null,
                    val usedGoodsData: SelectUsedGoodsData? = null,

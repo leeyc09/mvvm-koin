@@ -30,8 +30,7 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var progressDialog: DefaultProgressDialog
 
     private val gallerySelectListener = View.OnClickListener { view ->
-        galleryImageSelectViewModel.singleSelectImageChange(position = view.tag as Int,
-                newSelectedData = galleryAdapter.getItem(position = view.tag as Int))
+        galleryImageSelectViewModel.singleSelectImageChange(selectIndex = view.tag as Int)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +49,7 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun onSetup() {
         appBarLayout.stateListAnimator = null
+        swipeRefreshLayout.isEnabled = false
         setSupportActionBar(toolbar)
 
         actionBarTitle.visibility = View.GONE
@@ -108,18 +108,14 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
                             .into(imageViewPreview)
                 }
                 uiData.galleryData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        galleryAdapter.updateData(galleryData = it)
-                    }
-                    else
-                        galleryAdapter.addData(galleryData = it)
+                    galleryAdapter.linkData(galleryData = it)
                 }
-                uiData.galleryUpdatePosition?.let {
+                uiData.galleryUpdateIndex?.let {
                     galleryAdapter.notifyItemChanged(it)
                 }
-                uiData.finalImagePath?.let {
+                uiData.finalImagePathList?.let {
                     val intent = Intent()
-                    intent.putExtra(IntentPassName.IMAGE_URL,it)
+                    intent.putExtra(IntentPassName.IMAGE_URL, it.last())
                     setResult(Activity.RESULT_OK, intent)
                     finish()
                 }
@@ -127,20 +123,9 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // load gallery image 이벤트 observe
-        galleryImageSelectViewModel.loadGalleryImageEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.status?.let { isLoading ->
-                    galleryAdapter.dataLoading = isLoading
-                }
-            }
-        })
-
-        // image preview 이벤트 observe
-        galleryImageSelectViewModel.imagePreviewEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.updateIndex?.let {
-                    galleryImageSelectViewModel.updateSelectDataList(index = it, selectData = galleryAdapter.getItem(it))
-                }
+        galleryImageSelectViewModel.loadGalleryData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isLoading ->
+                galleryAdapter.dataLoading = isLoading
             }
         })
     }
@@ -153,9 +138,13 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
                     finish()
                 }
                 R.id.actionBtn -> {  // 사진 선택 완료
-                    imageViewPreview.buildDrawingCache()
+                    // 이미지 bitmap 저장
+                    imageViewPreview.isDrawingCacheEnabled = true
                     val bitmap: Bitmap = imageViewPreview.drawingCache
-                    galleryImageSelectViewModel.createImageFileBySelectedImage(bitmap = bitmap)
+                    galleryImageSelectViewModel.updateBitmap(bitmap = bitmap.copy(bitmap.config, true))
+                    imageViewPreview.isDrawingCacheEnabled = false
+
+                    galleryImageSelectViewModel.createImageFileBySelectedImageList()
                 }
             }
         }

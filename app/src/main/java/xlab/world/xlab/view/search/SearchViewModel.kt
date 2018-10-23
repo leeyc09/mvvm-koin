@@ -42,7 +42,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
 
                 it.onNext(0)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 uiData.value = UIModel(searchGoodsUpdatePosition = it)
                 changeSearchSortTypeEventData.value = SearchEvent(status = true)
             }

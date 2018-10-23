@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import android.widget.TextView
 import com.bumptech.glide.Glide
-import com.google.android.youtube.player.YouTubeStandalonePlayer
 import kotlinx.android.synthetic.main.action_bar_default.*
 import kotlinx.android.synthetic.main.activity_post_upload_content.*
 import org.koin.android.architecture.ext.viewModel
@@ -19,7 +18,6 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.*
 import xlab.world.xlab.data.adapter.SelectUsedGoodsListData
 import xlab.world.xlab.utils.font.CustomFont
-import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.hashTag.HashTagHelper
@@ -37,10 +35,10 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var hashTagHelper: HashTagHelper
 
-    private lateinit var postUploadPictureAdapter: PostUploadPictureAdapter
-    private lateinit var recentHashTagAdapter: RecentHashTagAdapter
-    private lateinit var searchHashTagAdapter: SearchHashTagAdapter
-    private lateinit var selectedUsedGoodsAdapter: SelectedUsedGoodsAdapter
+    private lateinit var postUploadPictureAdapter: PostUploadPictureAdapter // 업로드 이미지 adapter
+    private lateinit var recentHashTagAdapter: RecentHashTagAdapter // 최근 검색 기록 adapter
+    private lateinit var searchHashTagAdapter: SearchHashTagAdapter // 해시 태그 adapter
+    private lateinit var selectedUsedGoodsAdapter: SelectedUsedGoodsAdapter // 선택한 사용 제품 adapter
 
     private val hashTagWritingListener = object: HashTagHelper.WritingListener {
         override fun onWritingHashTag(hashTagSign: Char, hashTag: String, start: Int, end: Int) {
@@ -76,6 +74,7 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
     private val selectedDeleteListener = View.OnClickListener { view ->
         postUsedGoodsViewModel.deleteSelectedUsedGoods(selectedGoodsPosition = view.tag as Int, selectedUsedGoods = null)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post_upload_content)
@@ -104,36 +103,35 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
         when (resultCode) {
             Activity.RESULT_OK -> {
                 when (requestCode) {
-                    RequestCodeData.POST_UPLOAD -> {
+                    RequestCodeData.POST_UPLOAD -> { // 제품 대크 변경 완료
                         val selectedData = data!!.getParcelableArrayListExtra<SelectUsedGoodsListData>(IntentPassName.SELECTED_USED_GOODS)
                         postUsedGoodsViewModel.setSelectedUsedGoodsData(selectedData = selectedData, dataType = AppConstants.SELECTED_GOODS_WITH_INFO)
-                    } // used item update
+                    }
                 }
             }
         }
     }
 
     private fun onSetup() {
+        // 제목 숨기기, 다음 버튼 활성화
         actionBarTitle.visibility = View.GONE
         actionBtn.isEnabled = true
-
+        // popup layout 숨기기 (normal popup 활성화, hash tag popup 비활성화)
         popupLayout.visibility = View.GONE
         normalPopupLayout.visibility = View.VISIBLE
         hashTagPopupLayout.visibility = View.GONE
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
-        // hash tag helper setting
-        val hashTagCharsColor = hashMapOf(AppConstants.HASH_TAG_SIGN to ResourcesCompat.getColor(resources, R.color.color000000, null))
-        val hashTagCharsFont = hashMapOf(AppConstants.HASH_TAG_SIGN to CustomFont.getTypeface(CustomFont.notoSansCJKkrBold, this)!!)
-        val additionalHashTagChar = ArrayList<Char>()
+        // hash tag helper 초기화
         hashTagHelper = HashTagHelper(
-                hashTagCharsColor = hashTagCharsColor,
-                hashTagCharsFont = hashTagCharsFont,
+                hashTagCharsColor = hashMapOf(AppConstants.HASH_TAG_SIGN to ResourcesCompat.getColor(resources, R.color.color000000, null)),
+                hashTagCharsFont = hashMapOf(AppConstants.HASH_TAG_SIGN to CustomFont.getTypeface(CustomFont.notoSansCJKkrBold, this)!!),
                 onHashTagWritingListener = hashTagWritingListener,
                 onHashTagClickListener = null,
-                additionalHashTagChar = additionalHashTagChar)
+                additionalHashTagChar = ArrayList())
         hashTagHelper.handle(editTextContent)
 
         // post upload image adapter & recycler 초기화
@@ -154,8 +152,7 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
         goodsRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         goodsRecyclerView.isNestedScrollingEnabled = false
 
-        postContentViewModel.setPostId(postId = intent.getStringExtra(IntentPassName.POST_ID))
-
+        postContentViewModel.initPostType(postId = intent.getStringExtra(IntentPassName.POST_ID))
         postContentViewModel.loadRecentHashTagData(authorization = spHelper.authorization)
 
     }
@@ -201,16 +198,14 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 uiData.youtubeThumbnailVisible?.let {
                     youtubeThumbnailLayout.visibility = it
-                    if (it == View.VISIBLE) {
-                        val youTubeThumbnail = SupportData.getYoutubeThumbnailUrl(videoId = "1JMwgtMxReE",
-                                quality = SupportData.YOUTUBE_THUMB_480x360)
-                        Glide.with(this)
-                                .load(youTubeThumbnail)
-                                .into(youtubeThumbnailView)
-                    }
+                }
+                uiData.youtubeThumbnailUrl?.let {
+                    Glide.with(this)
+                            .load(it)
+                            .into(youtubeThumbnailView)
                 }
                 uiData.postUploadPictureData?.let {
-                    postUploadPictureAdapter.updateData(postUploadPictureData = it)
+                    postUploadPictureAdapter.linkData(postUploadPictureData = it)
                 }
                 uiData.recentHashTagData?.let {
                     recentHashTagAdapter.updateData(recentHashTagData = it)
@@ -233,16 +228,14 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
-        // set post id 이벤트 observe
-        postContentViewModel.setPostIdEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _->
-                eventData.status?.let { isPostUpload ->
-                    if (isPostUpload) { // 포스트 업로드
-                        postContentViewModel.initViewModelData(imagePaths = intent.getStringArrayListExtra(IntentPassName.IMAGE_PATH_LIST),
-                                youTubeVideoId = intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID))
-                    } else { // 포스트 업데이트
-                        postContentViewModel.loadPost(context = this, authorization = spHelper.authorization)
-                    }
+        // post type 체크 이벤트 observe
+        postContentViewModel.postTypeData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isPostUpload ->
+                if (isPostUpload) { // 포스트 업로드
+                    postContentViewModel.initPostUploadData(imagePathList = intent.getStringArrayListExtra(IntentPassName.IMAGE_PATH_LIST),
+                            youTubeVideoId = intent.getStringExtra(IntentPassName.YOUTUBE_VIDEO_ID))
+                } else { // 포스트 업데이트 -> 해당 포스트 정보 불러오기
+                    postContentViewModel.loadPost(context = this, authorization = spHelper.authorization)
                 }
             }
         })
@@ -257,7 +250,7 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // load post 이벤트 observe
-        postContentViewModel.loadPostEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+        postContentViewModel.loadPostData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let { _->
                 eventData.content?.let {
                     editTextContent.setText(it)
@@ -288,11 +281,11 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
         postUsedGoodsViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.selectedUsedGoodsData?.let {
-                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
-                    textViewUsedGoodsCnt.setText(it.size.toString(), TextView.BufferType.SPANNABLE)
+//                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
+                    textViewUsedGoodsCnt.setText(it.items.size.toString(), TextView.BufferType.SPANNABLE)
                 }
                 uiData.updateSelectedUsedGoodsData?.let {
-                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
+//                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
                     textViewUsedGoodsCnt.setText(it.size.toString(), TextView.BufferType.SPANNABLE)
                 }
             }

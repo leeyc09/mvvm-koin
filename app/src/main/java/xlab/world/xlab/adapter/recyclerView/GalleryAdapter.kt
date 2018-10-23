@@ -16,7 +16,7 @@ class GalleryAdapter(private val context: Context,
                      private val selectListener: View.OnClickListener,
                      private val directSelectListener: View.OnClickListener?) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
 
-    private val galleryData: GalleryData = GalleryData()
+    private var galleryData: GalleryData = GalleryData()
     var dataLoading: Boolean
         get() = this.galleryData.isLoading
         set(value) { this.galleryData.isLoading = value }
@@ -25,29 +25,9 @@ class GalleryAdapter(private val context: Context,
     var dataNextPage: Int = 1
         get() = this.galleryData.nextPage
 
-    fun getItem(position: Int): GalleryListData {
-        return galleryData.items[position]
-    }
-
-    fun updateData(galleryData: GalleryData) {
-        this.galleryData.items.clear()
-        this.galleryData.items.addAll(galleryData.items)
-
-        this.galleryData.isLoading = false
-        this.galleryData.total = galleryData.total
-        this.galleryData.nextPage = 2
-
+    fun linkData(galleryData: GalleryData) {
+        this.galleryData = galleryData
         notifyDataSetChanged()
-    }
-
-    fun addData(galleryData: GalleryData) {
-        val size: Int = itemCount
-        this.galleryData.items.addAll(galleryData.items)
-
-        this.galleryData.isLoading = false
-        this.galleryData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override fun getItemViewType(position: Int): Int {

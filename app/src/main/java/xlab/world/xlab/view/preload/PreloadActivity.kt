@@ -142,8 +142,8 @@ class PreloadActivity: AppCompatActivity() {
             eventData?.let { _ ->
                 eventData.newAccessToken?.let { // 새로운 토큰 저장소에 저장 -> preload 다시 실행
                     spHelper.accessToken = it
-                    startActivity(intent)
                     finish()
+                    startActivity(intent)
                 }
                 eventData.isFailGenerateToken?.let { // 토큰 발행 실패
                     shopAccountDialog.requestLogout(userId = spHelper.userId)

@@ -38,8 +38,7 @@ class PostUploadUsedGoodsActivity : AppCompatActivity(), View.OnClickListener {
         postUsedGoodsViewModel.deleteSelectedUsedGoods(selectedGoodsPosition = view.tag as Int, selectedUsedGoods = selectUsedGoodsAdapter.getSelectedGoods())
     }
     private val selectUsedGoodsListener = View.OnClickListener { view ->
-        val position = view.tag as Int
-        postUsedGoodsViewModel.selectUsedGoods(position = position, usedGoodsData = selectUsedGoodsAdapter.getItem(position = position))
+        postUsedGoodsViewModel.selectUsedGoods(selectIndex = view.tag as Int)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,9 +57,11 @@ class PostUploadUsedGoodsActivity : AppCompatActivity(), View.OnClickListener {
     }
     
     private fun onSetup() {
+        // 제목 숨기기, 다음 버튼 비활성화
         actionBarTitle.visibility = View.GONE
         actionBtn.isEnabled = false
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
@@ -105,18 +106,19 @@ class PostUploadUsedGoodsActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.selectedLayoutVisibility?.let {
+                    selectedLayout.visibility = it
+                }
                 uiData.selectedUsedGoodsData?.let {
-                    selectedLayout.visibility =
-                            if (it.isEmpty()) View.GONE
-                            else View.VISIBLE
-                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
+                    selectedUsedGoodsAdapter.linkData(selectUsedGoodsData = it)
+//                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
                     postUsedGoodsViewModel.loadUsedGoodsData(userId = spHelper.userId, goodsType = AppConstants.USED_GOODS_PET, page = 1)
                 }
                 uiData.updateSelectedUsedGoodsData?.let {
-                    selectedLayout.visibility =
-                            if (it.isEmpty()) View.GONE
-                            else View.VISIBLE
-                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
+//                    selectedLayout.visibility =
+//                            if (it.isEmpty()) View.GONE
+//                            else View.VISIBLE
+//                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
                     actionBtn.isEnabled = true
                 }
                 uiData.selectedUsedGoodsScrollIndex?.let {

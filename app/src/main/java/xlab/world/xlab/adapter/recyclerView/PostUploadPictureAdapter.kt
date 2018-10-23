@@ -17,14 +17,11 @@ import xlab.world.xlab.data.adapter.*
 
 class PostUploadPictureAdapter(private val context: Context) : RecyclerView.Adapter<PostUploadPictureAdapter.ViewHolder>() {
 
-    private val postUploadPictureData: PostUploadPictureData = PostUploadPictureData()
+    private var postUploadPictureData: PostUploadPictureData = PostUploadPictureData()
     private val glideOption = RequestOptions().centerCrop()
 
-
-    fun updateData(postUploadPictureData: PostUploadPictureData) {
-        this.postUploadPictureData.items.clear()
-        this.postUploadPictureData.items.addAll(postUploadPictureData.items)
-
+    fun linkData(postUploadPictureData: PostUploadPictureData) {
+        this.postUploadPictureData = postUploadPictureData
         notifyDataSetChanged()
     }
 

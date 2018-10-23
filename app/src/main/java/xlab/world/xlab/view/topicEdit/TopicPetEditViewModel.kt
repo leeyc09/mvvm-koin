@@ -119,7 +119,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
 
                 it.onNext(result)
                 it.onComplete()
-            }.with(scheduler).subscribe { resultData ->
+            }.with(scheduler = scheduler).subscribe { resultData ->
                 PrintLog.d("existChangedData", resultData.toString())
                 uiData.value = UIModel(saveEnable = resultData)
                 petType?.let {
@@ -136,7 +136,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
             Observable.create<Boolean> {
                 it.onNext(DataRegex.birthRegex(birthday = petBirth))
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("birthRegex", it.toString())
                 if (it) {
                     val birthSplit = petBirth.split("-")
@@ -217,7 +217,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
                     it.onNext(breedData)
                     it.onComplete()
                 }
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("setBreedDetailData", it.toString())
                 uiData.value = UIModel(breedName = it.breedName, isBreedSelect = true,
                         breedDetailVisibility = if (it.hairTypeData == null && it.hairColorData == null) View.GONE else View.VISIBLE,
@@ -236,7 +236,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
 
                 it.onNext(hairType)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("hairColorSelect", it)
                 uiData.value = UIModel(hairTypeUpdateValue = it)
             }
@@ -254,7 +254,7 @@ class TopicPetEditViewModel(private val apiPet: ApiPetProvider,
 
                 it.onNext(position)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("petColorSelect", hairColorData.toString())
                 uiData.value = UIModel(hairColorUpdateIndex = it)
             }

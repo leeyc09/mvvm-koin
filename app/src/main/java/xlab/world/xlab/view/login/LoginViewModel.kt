@@ -118,7 +118,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
                     responseData = { refreshTokenData ->
                         PrintLog.d("getRefreshToken success", refreshTokenData.refreshToken, viewModelTag)
                         // refresh token 으로 access token 발행 요청
-                        apiUser.generateToken(scheduler = scheduler, authorization = refreshTokenData.refreshToken,
+                        apiUser.generateToken(scheduler = scheduler, authorization = "Bearer ${refreshTokenData.refreshToken}",
                                 responseData = { newTokenData ->
                                     PrintLog.d("generateToken success", newTokenData.accessToken)
                                     uiData.value = UIModel(isLoading = false)
@@ -188,7 +188,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
             Observable.create<Boolean> {
                 it.onNext(email.isNotEmpty() && password.isNotEmpty())
                 it.onComplete()
-            }.with(scheduler).subscribe{ isEnable -> uiData.value = UIModel(loginBtnEnable = isEnable) }
+            }.with(scheduler = scheduler).subscribe{ isEnable -> uiData.value = UIModel(loginBtnEnable = isEnable) }
         }
     }
 

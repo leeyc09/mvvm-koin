@@ -25,7 +25,7 @@ class ApiFollow(private val iFollowRequest: IFollowRequest): ApiFollowProvider {
     override fun requestFollow(scheduler: SchedulerProvider, authorization: String, userId: String,
                         responseData: (ResFollowData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iFollowRequest.follow(authorization = authorization, userId = userId)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -36,7 +36,7 @@ class ApiFollow(private val iFollowRequest: IFollowRequest): ApiFollowProvider {
     override fun requestGetFollower(scheduler: SchedulerProvider, authorization: String, userId: String, page: Int,
                                     responseData: (ResUserDefaultData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iFollowRequest.getFollowerList(authorization = authorization, userId = userId, page = page)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -47,7 +47,7 @@ class ApiFollow(private val iFollowRequest: IFollowRequest): ApiFollowProvider {
     override fun requestGetFollowing(scheduler: SchedulerProvider, authorization: String, userId: String, page: Int,
                                      responseData: (ResUserDefaultData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iFollowRequest.getFollowingList(authorization = authorization, userId = userId, page = page)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {

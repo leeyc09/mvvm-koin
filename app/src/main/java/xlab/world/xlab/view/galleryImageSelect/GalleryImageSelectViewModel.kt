@@ -19,89 +19,110 @@ import xlab.world.xlab.view.SingleLiveEvent
 import java.io.File
 
 class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "GalleryImageSelect"
+    private val viewModelTag = "GalleryImageSelect"
 
     private val galleryOnePage = 40
     private var maxSelectCount: Int = 3 // limit item select count
+
+    private var galleryData: GalleryData = GalleryData()
 
     private var selectIndexList: ArrayList<Int> = ArrayList()
     private var selectDataList: ArrayList<GalleryListData> = ArrayList()
     private var selectMatrixList: ArrayList<Matrix> = ArrayList()
     private var selectBitmapList: ArrayList<Bitmap?> = ArrayList()
 
-    val loadGalleryImageEvent = SingleLiveEvent<GalleryEvent>()
-    val imagePreviewEvent = SingleLiveEvent<ImagePreviewEvent>()
+    val loadGalleryData = SingleLiveEvent<Boolean?>()
     val uiData = MutableLiveData<UIModel>()
 
+    // 유저 레벨에 따른 이미지 선택 갯수 제한
+    fun initMaxSelectCount(userLevel: Int) {
+        maxSelectCount =
+                if (userLevel == AppConstants.ADMIN_USER_LEVEL) 10
+                else 3
+    }
+    // 선택 된 이미지 matrix 정보 저장
     fun updateMatrix(matrix: Matrix) {
-        selectDataList.forEachIndexed { index, data ->
+        selectDataList.forEachIndexed selectDataList@ { index, data ->
             if (data.isPreview) {
                 selectMatrixList[index] = matrix
+                return@selectDataList
             }
         }
     }
-
+    // 선택 된 이미지 bitmap 정보 저장
     fun updateBitmap(bitmap: Bitmap) {
-        selectDataList.forEachIndexed { index, data ->
+        selectDataList.forEachIndexed selectDataList@ { index, data ->
             if (data.isPreview) {
-                PrintLog.d("Bitmap update Index", index.toString())
                 selectBitmapList[index] = bitmap
+                return@selectDataList
             }
         }
     }
-
-    fun updateSelectDataList(index: Int, selectData: GalleryListData) {
+    // 선택 갤러리 데이터 업데이트
+    private fun updateSelectDataList(index: Int) {
         launch {
             Observable.create<Any> {
+                PrintLog.d("updateSelectDataList Index", index.toString(), viewModelTag)
                 selectIndexList.clear()
                 selectDataList.clear()
                 selectMatrixList.clear()
                 selectBitmapList.clear()
 
                 selectIndexList.add(index)
-                selectDataList.add(selectData)
+                selectDataList.add(galleryData.items[index])
                 selectMatrixList.add(Matrix())
                 selectBitmapList.add(null)
-            }.with(scheduler).subscribe {}
+
+                printSelectDataList()
+            }.with(scheduler = scheduler).subscribe {}
         }
     }
-
-    fun addSelectDataList(index: Int, selectData: GalleryListData) {
+    // 선택 갤러리 데이터 추가
+    private fun addSelectDataList(index: Int) {
         launch {
             Observable.create<Any> {
+                PrintLog.d("addSelectDataList Index", index.toString(), viewModelTag)
                 selectIndexList.add(index)
-                selectDataList.add(selectData)
+                selectDataList.add(galleryData.items[index])
                 selectMatrixList.add(Matrix())
                 selectBitmapList.add(null)
-            }.with(scheduler).subscribe {}
+
+                printSelectDataList()
+            }.with(scheduler = scheduler).subscribe {}
         }
     }
-
-    fun removeSelectDataList(index: Int) {
+    // 선택 갤러리 데이터 삭제
+    private fun removeSelectDataList(index: Int) {
         launch {
             Observable.create<Any> {
-                var removeIndex = -1
-                selectIndexList.takeWhile { _-> removeIndex == -1 }.forEachIndexed { i, value ->
-                    if (index == value) removeIndex = i
+                PrintLog.d("removeSelectDataList Index", index.toString(), viewModelTag)
+                var removeIndex = 0
+                selectIndexList.forEachIndexed selectIndexList@ { i, value ->
+                    if (index == value) {
+                        removeIndex = i
+                        return@selectIndexList
+                    }
                 }
                 selectIndexList.removeAt(removeIndex)
                 selectMatrixList.removeAt(removeIndex)
                 selectDataList.removeAt(removeIndex)
                 selectBitmapList.removeAt(removeIndex)
-            }.with(scheduler).subscribe {}
+
+                printSelectDataList()
+            }.with(scheduler = scheduler).subscribe {}
         }
     }
-
-    fun initMaxSelectCount(userLevel: Int) {
-        maxSelectCount =
-                if (userLevel == AppConstants.ADMIN_USER_LEVEL) 10
-                else 3
+    // 선택 갤러리 출력
+    private fun printSelectDataList() {
+        PrintLog.d("selectIndexList", selectIndexList.toString(), viewModelTag)
+        PrintLog.d("selectDataList", selectDataList.toString(), viewModelTag)
     }
-
+    // 갤러리에 있는 이미지 불러오기
     fun loadGalleryImage(context: Context, page: Int, dataType: Int) {
-        loadGalleryImageEvent.value = GalleryEvent(status = true)
+        loadGalleryData.value = true
         launch {
             Observable.create<GalleryData> {
+                // 페이징 처리한 이미지 불러오기 query
                 val orderBy = MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC LIMIT $galleryOnePage OFFSET ${(page - 1) * galleryOnePage}" // image load order
                 val projection = arrayOf(
                         MediaStore.Images.Media._ID,
@@ -130,236 +151,230 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
                                 displayName = cursor.getString(4),
                                 isSelect = isSelect,
                                 isPreview = isSelect,
-                                selectNum = if(isSelect) 1 else null))
+                                selectNum = if(isSelect) 1 else null)) // 첫번째 페이지 & 첫번째 사진 선택 상태로
                     }
                     cursor.close()
 
                     it.onNext(galleryData)
                     it.onComplete()
                 }
-            }.with(scheduler).subscribe { resultData ->
-                PrintLog.d("loadGalleryImage", resultData.toString())
-                uiData.value = UIModel(galleryData = resultData)
-                if (resultData.items.isEmpty()) // 갤러리에 이미지가 없는경우
-                    uiData.value = UIModel(toastMessage = context.getString(R.string.toast_no_exist_gallery_image))
-                else if (resultData.items.isNotEmpty() && page == 1) {
-                    uiData.value = UIModel(imagePreviewData = PreviewData(data = resultData.items.first().data, matrix = Matrix()))
-                    imagePreviewEvent.value = ImagePreviewEvent(updateIndex = 0)
+            }.with(scheduler = scheduler).subscribe {
+                if (page == 1) // 요청한 page => 첫페이지
+                    this.galleryData.updateData(galleryData = it)
+                else
+                    this.galleryData.addData(galleryData = it)
+
+                PrintLog.d("loadGalleryImage", it.toString(), viewModelTag)
+                if (page == 1) {
+                    uiData.value = UIModel(galleryData = this.galleryData)
+
+                    if (it.items.isEmpty()) // 첫번째 페이지, 갤러리에 이미지가 없는경우
+                        uiData.value = UIModel(toastMessage = context.getString(R.string.toast_no_exist_gallery_image))
+                    else if (it.items.isNotEmpty()) { // 첫번째 페이지 -> 미리보기 이미지 제공
+                        uiData.value = UIModel(imagePreviewData = PreviewData(data = this.galleryData.items.first().data, matrix = Matrix()))
+                        // 선택 갤러리 데이터 update
+                        updateSelectDataList(index = 0)
+                    }
                 }
             }
         }
     }
 
     // 선택 이미지 변경 (이미지 단일 선택)
-    fun singleSelectImageChange(position: Int, newSelectedData: GalleryListData) {
+    fun singleSelectImageChange(selectIndex: Int) {
         launch {
             Observable.create<ArrayList<Int>> {
-                if (selectDataList.isNotEmpty()) {
-                    if (selectDataList.last() != newSelectedData) {
-                        // 기존 선택된 데이터 선택 해제 & 새로운 데이터 선택
-                        selectDataList.last().isSelect = false
-                        selectDataList.last().isPreview = false
+                if (selectIndexList.last() != selectIndex) {
+                    // 기존 선택된 데이터 선택 해제 & 새로운 데이터 선택
+                    selectDataList.last().isSelect = false
+                    selectDataList.last().isPreview = false
 
-                        newSelectedData.isSelect = true
-                        newSelectedData.isPreview = true
+                    val item = galleryData.items[selectIndex]
+                    item.isSelect = true
+                    item.isPreview = true
 
-                        selectIndexList.add(position)
-                        selectDataList.add(newSelectedData)
+                    selectIndexList.add(selectIndex)
+                    selectDataList.add(item)
 
-                        it.onNext(selectIndexList)
-                        it.onComplete()
-                    }
+                    it.onNext(selectIndexList)
+                    it.onComplete()
                 }
-            }.with(scheduler).subscribe {
-                it.forEach { position ->
-                    uiData.value = UIModel(galleryUpdatePosition = position)
+            }.with(scheduler = scheduler).subscribe {
+                // 갤러리 데이터 화면 업데이트
+                it.forEach { index ->
+                    uiData.value = UIModel(galleryUpdateIndex = index)
                 }
+                // preview data
                 uiData.value = UIModel(imagePreviewData = PreviewData(data = selectDataList.last().data, matrix = Matrix()))
-                imagePreviewEvent.value = ImagePreviewEvent(updateIndex = selectIndexList.last())
+
+                // 선택 갤러리 데이터 update
+                updateSelectDataList(index = it.last())
             }
         }
     }
 
     // 선택 이미지 바로 변경 (이미지 다수 선택)
-    fun directMultiSelectImageChange(position: Int, selectData: GalleryListData) {
+    fun directMultiSelectImageChange(selectIndex: Int) {
         launch {
-            var previewData: GalleryListData? = null
+            var previewImage: String? = null
             var previewMatrix = Matrix()
             var addOrRemove = -1 // 0 - remove, 1 - add
             Observable.create<ArrayList<Int>> {
                 val updatePosition = ArrayList<Int>()
                 updatePosition.addAll(selectIndexList)
 
-                if (selectData.isSelect) { // 기존 선택 O 이미지 -> 선택 해제
-                    if (selectDataList.size > 1) { // 선택 된 이미지가 2개 이상
-                        selectData.selectNum = null
-                        selectData.isSelect = false
-                        selectData.isPreview = false
-
-                        var imageNum = 1
-                        selectDataList.forEachIndexed { index, data ->
-                            // preview image data 이면서 삭제 될 이미지가 아닌 경우
-                            if (data.isPreview && selectIndexList[index] != position) {
-                                previewData = data
-                                previewMatrix = selectMatrixList[index]
-                            }
-                            // 삭제 될 이미지 아닌 경우 이미지 번호
-                            if (selectIndexList[index] != position) data.selectNum = imageNum++
-                        }
-
-                        //기존 preview data 선택 해제
-                        if (previewData == null) {
-                            if (selectDataList.last() != selectData) {
-                                previewData = selectDataList.last()
-                                previewMatrix = selectMatrixList.last()
-                            } else {
-                                previewData = selectDataList[selectDataList.size - 2]
-                                previewMatrix = selectMatrixList[selectMatrixList.size - 2]
-                            }
-                        }
-                        previewData!!.isSelect = true
-                        previewData!!.isPreview = true
+                val item = galleryData.items[selectIndex]
+                if (item.isSelect) { // 기존 선택된 이미지 -> 선택 해제
+                    if (selectDataList.size > 1) { // 선택 된 이미지가 2개 이상일 경우만 해제 가능
+                        val preViewData = gallerySelectCancel(selectIndex = selectIndex)
+                        previewImage = preViewData.data
+                        previewMatrix = preViewData.matrix
 
                         addOrRemove = 0
-                        updatePosition.add(position)
+                        updatePosition.add(selectIndex)
                     }
-                } else { // 기존 선택 X 이미지 -> 선택
-                    if (selectDataList.size < maxSelectCount) { // 선택 이미지가 max 갯수보다 작을 경우
-                        selectData.selectNum = selectDataList.size + 1
-                        selectData.isSelect = true
-                        selectData.isPreview = true
-
-                        previewData = selectData
-
-                        selectDataList.forEach { data -> data.isPreview = false }
+                } else { // 기존 선택 안된 이미지 -> 선택
+                    if (selectDataList.size < maxSelectCount) { // 선택 이미지가 max 갯수보다 작을 경우 -> 선택 가능
+                        val preViewData = gallerySelect(selectIndex = selectIndex)
+                        previewImage = preViewData.data
+                        previewMatrix = preViewData.matrix
 
                         addOrRemove = 1
-                        updatePosition.add(position)
+                        updatePosition.add(selectIndex)
                     }
                 }
 
                 it.onNext(updatePosition)
                 it.onComplete()
-            }.with(scheduler).subscribe {
-                it.forEach { position ->
-                    uiData.value = UIModel(galleryUpdatePosition = position)
+            }.with(scheduler = scheduler).subscribe {
+                // 갤러리 데이터 화면 업데이트
+                it.forEach { index ->
+                    uiData.value = UIModel(galleryUpdateIndex = index)
                 }
-                previewData?.let { _->
-                    uiData.value = UIModel(imagePreviewData = PreviewData(data = previewData!!.data, matrix = previewMatrix))
+                // preview data
+                previewImage?.let { data ->
+                    uiData.value = UIModel(imagePreviewData = PreviewData(data = data, matrix = previewMatrix))
                 }
 
+                // 선택 갤러리 데이터 update
                 if (addOrRemove == 0) // remove
-                    imagePreviewEvent.value = ImagePreviewEvent(removeIndex = position)
+                    removeSelectDataList(index = selectIndex)
                 else if (addOrRemove == 1) // add
-                    imagePreviewEvent.value = ImagePreviewEvent(addIndex = position)
+                    addSelectDataList(index = selectIndex)
             }
         }
     }
     // 선택 이미지 체크 후 변경 (이미지 다수 선택)
-    fun multiSelectImageChange(position: Int, selectData: GalleryListData) {
+    fun multiSelectImageChange(selectIndex: Int) {
         launch {
-            var previewData: GalleryListData? = null
+            var previewImage: String? = null
             var previewMatrix = Matrix()
             var addOrRemove = -1 // 0 - remove, 1 - add
             Observable.create<ArrayList<Int>> {
                 val updatePosition = ArrayList<Int>()
                 updatePosition.addAll(selectIndexList)
 
-                if (selectData.isSelect) { // 기존 선택 O 이미지
-                    if (selectData.isPreview) { // 프리뷰에 있는 이미지 -> 선택 해제
-                        if (selectDataList.size > 1) { // 선택 된 이미지가 2개 이상
-                            selectData.selectNum = null
-                            selectData.isSelect = false
-                            selectData.isPreview = false
-
-                            var imageNum = 1
-                            selectDataList.forEachIndexed { index, data ->
-                                // preview image data 이면서 삭제 될 이미지가 아닌 경우
-                                if (data.isPreview && selectIndexList[index] != position) {
-                                    previewData = data
-                                    previewMatrix = selectMatrixList[index]
-                                }
-                                // 삭제 될 이미지 아닌 경우 이미지 번호
-                                if (selectIndexList[index] != position) data.selectNum = imageNum++
-                            }
-
-                            if (previewData == null) {
-                                if (selectDataList.last() != selectData) {
-                                    previewData = selectDataList.last()
-                                    previewMatrix = selectMatrixList.last()
-                                } else {
-                                    previewData = selectDataList[selectDataList.size - 2]
-                                    previewMatrix = selectMatrixList[selectMatrixList.size - 2]
-                                }
-                            }
-                            previewData!!.isSelect = true
-                            previewData!!.isPreview = true
+                val item = galleryData.items[selectIndex]
+                if (item.isSelect) { // 기존 선택된 이미지
+                    if (item.isPreview) { // 프리뷰 이미지 -> 선택 해제
+                        if (selectDataList.size > 1) { // 선택 된 이미지가 2개 이상일 경우만 해제 가능
+                            val preViewData = gallerySelectCancel(selectIndex = selectIndex)
+                            previewImage = preViewData.data
+                            previewMatrix = preViewData.matrix
 
                             addOrRemove = 0
-                            updatePosition.add(position)
+                            updatePosition.add(selectIndex)
                         }
-                    } else { // 프리뷰 변경
+                    } else { // 프리뷰 이미지 아닌 경우 -> 프리뷰 변경
                         selectDataList.forEachIndexed { index, data ->
-                            data.isPreview = data.data == selectData.data
+                            data.isPreview = selectIndexList[index] == selectIndex
                             if (data.isPreview) {
-                                previewData = data
+                                previewImage = data.data
                                 previewMatrix = selectMatrixList[index]
                             }
                         }
                     }
-                } else { // 기존 선택 X 이미지 -> 선택
-                    if (selectDataList.size < maxSelectCount) { // 선택 이미지가 max 갯수보다 작을 경우
-                        selectData.selectNum = selectDataList.size + 1
-                        selectData.isSelect = true
-                        selectData.isPreview = true
-
-                        previewData = selectData
-
-                        selectDataList.forEach { data -> data.isPreview = false }
+                } else {  // 기존 선택 안된 이미지 -> 선택
+                    if (selectDataList.size < maxSelectCount) { // 선택 이미지가 max 갯수보다 작을 경우 -> 선택 가능
+                        val preViewData = gallerySelect(selectIndex = selectIndex)
+                        previewImage = preViewData.data
+                        previewMatrix = preViewData.matrix
 
                         addOrRemove = 1
-                        updatePosition.add(position)
+                        updatePosition.add(selectIndex)
                     }
                 }
 
                 it.onNext(updatePosition)
                 it.onComplete()
-            }.with(scheduler).subscribe {
-                it.forEach { position ->
-                    uiData.value = UIModel(galleryUpdatePosition = position)
+            }.with(scheduler = scheduler).subscribe {
+                it.forEach { index ->
+                    uiData.value = UIModel(galleryUpdateIndex = index)
                 }
-                previewData?.let { _ ->
-                    uiData.value = UIModel(imagePreviewData = PreviewData(data = previewData!!.data, matrix = previewMatrix))
+                previewImage?.let { data ->
+                    uiData.value = UIModel(imagePreviewData = PreviewData(data = data, matrix = previewMatrix))
                 }
 
+                // 선택 갤러리 데이터 update
                 if (addOrRemove == 0) // remove
-                    imagePreviewEvent.value = ImagePreviewEvent(removeIndex = position)
+                    removeSelectDataList(index = selectIndex)
                 else if (addOrRemove == 1) // add
-                    imagePreviewEvent.value = ImagePreviewEvent(addIndex = position)
+                    addSelectDataList(index = selectIndex)
             }
         }
     }
 
-    fun createImageFileBySelectedImage(bitmap: Bitmap) {
-        uiData.value = UIModel(isLoading = true)
-        launch {
-            Observable.create<String> {
-                val outFile: File? = SupportData.createTmpFile(type = AppConstants.MEDIA_IMAGE)
-                outFile?.let { _ ->
-                    SupportData.saveFile(bitmap = bitmap, path = outFile.absolutePath)
-                    it.onNext(outFile.absolutePath)
-                }?:let{_->
-                    it.onNext("")
+    // 갤러리 이미지 선택 해제
+    private fun gallerySelectCancel(selectIndex: Int): PreviewData {
+        var imageNum = 1
+        var previewData: GalleryListData? = null
+        var previewMatrix = Matrix()
+        selectDataList.forEachIndexed { index, data ->
+            if (selectIndexList[index] != selectIndex) { // 선택 해제 될 이미지 아닌 경우
+                data.selectNum = imageNum++
+                // preview image data 이면서 삭제 될 이미지가 아닌 경우 -> 해당 갤러리 데이터를 preview data 로 설정
+                // preview image data 가 삭제 될 이미지인 경우 -> 아래에서 재 설정
+                if (data.isPreview) {
+                    previewData = data
+                    previewMatrix = selectMatrixList[index]
                 }
-                it.onComplete()
-            }.with(scheduler).subscribe{
-                uiData.value = UIModel(isLoading = false)
-                if (it.isNotEmpty())
-                    uiData.value = UIModel(finalImagePath = it)
+            } else { // 선택 해제 될 이미지 경우
+                data.selectNum = null
+                data.isSelect = false
+                data.isPreview = false
             }
         }
+
+        // preview image data 가 삭제 될 이미지인 경우 -> 기존 preview data 선택 해제
+        // select data list 중 가장 마지막 데이터를 preview image 로 설정
+        // 가장 마지막 데이터가 삭제 될 이미지인 경우 -> 마지막 이전 데이터로 설정
+        if (previewData == null) {
+            if (selectIndexList.last() != selectIndex) {
+                previewData = selectDataList.last()
+                previewMatrix = selectMatrixList.last()
+            } else {
+                previewData = selectDataList[selectDataList.size - 2]
+                previewMatrix = selectMatrixList[selectMatrixList.size - 2]
+            }
+        }
+        previewData!!.isPreview = true
+
+        return PreviewData(data = previewData!!.data, matrix = previewMatrix)
     }
 
+    // 갤러리 이미지 선택
+    private fun gallerySelect(selectIndex: Int): PreviewData {
+        val item = galleryData.items[selectIndex]
+        item.selectNum = selectDataList.size + 1
+        item.isSelect = true
+        item.isPreview = true
+
+        // 기존 프리뷰 해제
+        selectDataList.forEach { data -> data.isPreview = false }
+
+        return PreviewData(data = item.data, matrix = Matrix())
+    }
+    // 선택 된 갤러리 데이터 image file 만들기
     fun createImageFileBySelectedImageList() {
         uiData.value = UIModel(isLoading = true)
         launch {
@@ -376,7 +391,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
 
                 it.onNext(imagePathList)
                 it.onComplete()
-            }.with(scheduler).subscribe{
+            }.with(scheduler = scheduler).subscribe{
                 uiData.value = UIModel(isLoading = false)
                 if (it.isNotEmpty())
                     uiData.value = UIModel(finalImagePathList = it)
@@ -386,9 +401,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
 }
 
 data class PreviewData(val data: String, val matrix: Matrix)
-data class ImagePreviewEvent(val updateIndex: Int? = null, val addIndex: Int? = null, val removeIndex: Int? = null)
-data class GalleryEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val imagePreviewData: PreviewData? = null,
-                   val galleryData: GalleryData? = null, val galleryUpdatePosition: Int? = null,
-                   val finalImagePath: String? = null, val finalImagePathList: ArrayList<String>? = null)
+                   val galleryData: GalleryData? = null, val galleryUpdateIndex: Int? = null,
+                   val finalImagePathList: ArrayList<String>? = null)

@@ -27,7 +27,7 @@ class ApiComment(private val iCommentRequest: ICommentRequest): ApiCommentProvid
     override fun getComment(scheduler: SchedulerProvider, postId: String, page: Int,
                             responseData: (ResCommentData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iCommentRequest.getComments(postId = postId, page = page)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -38,7 +38,7 @@ class ApiComment(private val iCommentRequest: ICommentRequest): ApiCommentProvid
     override fun postComment(scheduler: SchedulerProvider, authorization: String, postId: String, requestBody: RequestBody,
                              responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iCommentRequest.postComment(authorization = authorization, postId = postId, requestBody = requestBody)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -49,7 +49,7 @@ class ApiComment(private val iCommentRequest: ICommentRequest): ApiCommentProvid
     override fun deleteComment(scheduler: SchedulerProvider, authorization: String, postId: String, position: Int,
                                responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iCommentRequest.deleteComment(authorization = authorization, postId = postId, index = position)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {

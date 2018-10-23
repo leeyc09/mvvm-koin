@@ -37,7 +37,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
 
                 it.onNext(agreementStr)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 uiData.value = UIModel(agreementStr = it)
             }
         }
@@ -52,7 +52,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                         DataRegex.passwordTextRegex(password)&&
                         DataRegex.nickNameRegex(nickName))
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("inputDataRegex", it.toString(), viewModelTag)
                 uiData.value = UIModel(registerBtnEnable = it)
             }
@@ -73,7 +73,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onNext(arrayListOf(emailRegexText,
                         if (emailRegex) View.INVISIBLE else View.VISIBLE))
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("emailRegexCheck", it.toString(), viewModelTag)
                 uiData.value = UIModel(emailRegexText = it[0] as String?, emailRegexVisibility = it[1] as Int)
             }
@@ -90,7 +90,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 it.onNext(arrayListOf(DataRegex.passwordLengthRegex(password),
                         DataRegex.passwordTextRegex(password)))
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("passwordRegexCheck", it.toString(), viewModelTag)
                 uiData.value = UIModel(passwordLengthRegex = it[0],
                         passwordTextRegex = it[1],
@@ -111,7 +111,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                 // [1] -> 정규식 체크 결과
                 it.onNext(arrayListOf(nickNameRegexText, nickNameRegex))
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("nickRegexCheck", it.toString(), viewModelTag)
                 uiData.value = UIModel(nickNameRegexText = it[0] as String,
                         nickNameRegex = it[1] as Boolean,
@@ -175,7 +175,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                         else View.VISIBLE
                 it.onNext(passwordRegexVisibility)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("passwordRegexVisibility", it.toString(), viewModelTag)
                 uiData.value = UIModel(passwordRegexVisibility = it)
             }
@@ -192,7 +192,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
                         else View.VISIBLE
                 it.onNext(nickNameRegexVisibility)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("nickNameRegexVisibility", it.toString(), viewModelTag)
                 uiData.value = UIModel(nickNameRegexVisibility = it)
             }

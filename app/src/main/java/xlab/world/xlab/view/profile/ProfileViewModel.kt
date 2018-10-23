@@ -38,7 +38,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                         if (profileUserId == loginUserId) AppConstants.MY_PROFILE
                         else AppConstants.OTHER_PROFILE)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("setProfileType", it.toString())
                 uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, profileType = it)
             }

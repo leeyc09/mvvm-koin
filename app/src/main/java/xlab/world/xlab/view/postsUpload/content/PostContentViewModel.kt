@@ -21,10 +21,9 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
                            private val apiHashTag: ApiHashTagProvider,
                            private val networkCheck: NetworkCheck,
                            private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "PostContent"
+    private val viewModelTag = "PostContent"
 
     private var postId: String = ""
-    private var isPostUpload: Boolean = true // false - 포스트 업데이트
     private var imagePathList: ArrayList<String> = ArrayList()
     private var youTubeVideoId: String = ""
     private var recentHashTagEmpty: Boolean = false
@@ -33,39 +32,56 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
 
     private var hashTagNowState: Int = HashTagHelper.stateNoTag
 
-    val loadPostEvent = SingleLiveEvent<LoadPostEventData>()
-    val setPostIdEvent = SingleLiveEvent<PostContentEventData>()
+    private var postUploadPictureData: PostUploadPictureData = PostUploadPictureData()
+
+    val loadPostData = SingleLiveEvent<LoadPostModel>()
+    val postTypeData = SingleLiveEvent<Boolean?>()
     val savePostEvent = SingleLiveEvent<PostContentEventData>()
     val searchHashTagEvent = SingleLiveEvent<PostContentEventData>()
     val uiData = MutableLiveData<UIModel>()
 
-    fun setPostId(postId: String) {
-        this.postId = postId
-        isPostUpload = postId.isEmpty()
-
-        setPostIdEvent.value = PostContentEventData(status = isPostUpload)
-    }
-
-    fun initViewModelData(imagePaths: ArrayList<String>, youTubeVideoId: String) {
-        uiData.value = UIModel(isLoading = true)
+    fun initPostType(postId: String) {
         launch {
             Observable.create<Boolean> {
+                this.postId = postId
+                // 포스트 아이디 존재하지 않음 -> 포스트 업로드 (true)
+                // 포스트 아이디가 존재 -> 포스트 업데이트 (false)
+                it.onNext(postId.isEmpty())
+                it.onComplete()
+            }.with(scheduler = scheduler).subscribe {
+                PrintLog.d("initPostType", it.toString(), viewModelTag)
+                postTypeData.value = it
+            }
+        }
+    }
+
+    // 업로드 이미지, 유튜브 미리보기 설정
+    fun initPostUploadData(imagePathList: ArrayList<String>, youTubeVideoId: String) {
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            Observable.create<PostUploadPictureData> {
                 this.imagePathList.clear()
-                this.imagePathList.addAll(imagePaths)
+                this.imagePathList.addAll(imagePathList)
 
                 this.youTubeVideoId = youTubeVideoId
 
-                PrintLog.d("imagePathList", imagePathList.toString())
+                PrintLog.d("imagePathList", imagePathList.toString(), viewModelTag)
+                PrintLog.d("youTubeVideoId", youTubeVideoId, viewModelTag)
 
-                it.onNext(this.youTubeVideoId.isNotEmpty())
-                it.onComplete()
-            }.with(scheduler).subscribe { isYouTubePost ->
-                val postUploadPictureData = PostUploadPictureData()
+                val newPostUploadPictureData = PostUploadPictureData()
                 this.imagePathList.forEach { imagePath ->
-                    postUploadPictureData.items.add(PostUploadPictureListData(imagePath = imagePath))
+                    newPostUploadPictureData.items.add(PostUploadPictureListData(imagePath = imagePath))
                 }
-                uiData.value = UIModel(isLoading = false, youtubeThumbnailVisible = if (isYouTubePost) View.VISIBLE else View.GONE,
-                        postUploadPictureData = postUploadPictureData)
+                this.postUploadPictureData.updateData(postUploadPictureData = newPostUploadPictureData)
+
+                it.onNext(this.postUploadPictureData)
+                it.onComplete()
+            }.with(scheduler = scheduler).subscribe {
+                // 유튜브 영상 아이디 있는 경우 -> 유튜브 썸네일 보이기
+                uiData.value = UIModel(isLoading = false,
+                        youtubeThumbnailVisible = if (youTubeVideoId.isNotEmpty()) View.VISIBLE else View.GONE,
+                        youtubeThumbnailUrl = SupportData.getYoutubeThumbnailUrl(videoId = youTubeVideoId, quality = SupportData.YOUTUBE_THUMB_480x360),
+                        postUploadPictureData = it)
             }
         }
     }
@@ -98,7 +114,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
 
                     it.onNext(visibilityList)
                     it.onComplete()
-                }.with(scheduler).subscribe { visibilityList ->
+                }.with(scheduler = scheduler).subscribe { visibilityList ->
                     uiData.value = UIModel(normalPopupVisibility = visibilityList[0],
                             hashTagPopupVisibility = visibilityList[1])
                 }
@@ -164,6 +180,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
         }
     }
 
+    // 포스트 정보 불러오기
     fun loadPost(context: Context, authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
@@ -175,9 +192,10 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
         launch {
             apiPost.getPostDetail(scheduler = scheduler, authorization = authorization, postId = postId,
                     responseData = {
-                        PrintLog.d("getPostDetail success", it.toString())
+                        PrintLog.d("getPostDetail success", it.toString(), viewModelTag)
                         uiData.value = UIModel(isLoading = false)
 
+                        // 포스트 링크 선택 상품 데이터
                         val goodsData = ArrayList<SelectUsedGoodsListData>()
                         it.postsData.goods.forEach { goods ->
                             goodsData.add(SelectUsedGoodsListData(
@@ -188,14 +206,14 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
                                     goodsBrand = goods.brand
                             ))
                         }
-                        loadPostEvent.value = LoadPostEventData(content = it.postsData.content, goodsData = goodsData)
+                        loadPostData.value = LoadPostModel(content = it.postsData.content, goodsData = goodsData)
 
-                        initViewModelData(imagePaths = it.postsData.postFile,
+                        initPostUploadData(imagePathList = it.postsData.postFile,
                                 youTubeVideoId = it.postsData.youTubeVideoID)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_no_exist_post))
-                        loadPostEvent.value = LoadPostEventData(isFail = true)
+                        loadPostData.value = LoadPostModel(isFail = true)
                         errorData?.let {
                             PrintLog.d("getPostDetail fail", errorData.message)
                         }
@@ -231,7 +249,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
             // set youtube video id
             reqPostUploadData.addYouTubeVideoId(youTubeVideoId = youTubeVideoId)
 
-            if (isPostUpload) // 포스트 업로드
+            if (postId.isEmpty()) // 포스트 업로드
                 apiPost.requestUploadPost(scheduler = scheduler, authorization = authorization, requestBody = reqPostUploadData.getReqBody(),
                         responseData = {
                             PrintLog.d("requestUploadPost success", "")
@@ -268,11 +286,13 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
     }
 }
 
-data class LoadPostEventData(val content: String? = null, val goodsData: ArrayList<SelectUsedGoodsListData>? = null,
-                             val isFail: Boolean? = null)
+data class LoadPostModel(val content: String? = null,
+                         val goodsData: ArrayList<SelectUsedGoodsListData>? = null,
+                         val isFail: Boolean? = null)
 data class PostContentEventData(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val normalPopupVisibility: Int? = null, val hashTagPopupVisibility: Int? = null,
-                   val youtubeThumbnailVisible: Int? = null, val postUploadPictureData: PostUploadPictureData? = null,
+                   val youtubeThumbnailVisible: Int? = null, val youtubeThumbnailUrl: String? = null,
+                   val postUploadPictureData: PostUploadPictureData? = null,
                    val recentHashTagData: RecentHashTagData? = null,
                    val searchHashTagData: SearchHashTagData? = null)

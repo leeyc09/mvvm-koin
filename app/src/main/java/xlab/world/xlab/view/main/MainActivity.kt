@@ -95,13 +95,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data)
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
+
         when (resultCode) {
             Activity.RESULT_OK -> {
                 when (requestCode) {
 //                    RequestCodeData.POST_COMMENT, // 댓글
-                    RequestCodeData.POST_DETAIL -> {  // 포스트 상세
-                        feedFollowingFragment.reloadFeedData(loadingBar = null)
-                    }
+//                    RequestCodeData.POST_DETAIL -> {  // 포스트 상세
+//                        feedFollowingFragment.reloadFeedData(loadingBar = null)
+//                    }
 //                    RequestCodeData.TOPIC_ADD, // 토픽 추가
 //                    RequestCodeData.COMBINATION_SEARCH , // 통합 검색
 //                    RequestCodeData.TAG_POST, // 포스트 태그 검색

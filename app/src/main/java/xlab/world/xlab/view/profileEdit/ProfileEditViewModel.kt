@@ -75,7 +75,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
 
                 it.onNext(birthRegex)
                 it.onComplete()
-            }.with(scheduler).subscribe { resultData ->
+            }.with(scheduler = scheduler).subscribe { resultData ->
                 PrintLog.d("birthRegexCheck", resultData.toString())
                 uiData.value = UIModel(birthConfirmVisibility =
                 if (resultData) View.INVISIBLE
@@ -103,7 +103,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
                     regex && ((initProfileData != recentProfileData) || newProfileImage.isNotEmpty()) }
                         ?:let { _ ->false})
                 it.onComplete()
-            }.with(scheduler).subscribe { resultData ->
+            }.with(scheduler = scheduler).subscribe { resultData ->
                 PrintLog.d("existChangedData", resultData.toString())
                 uiData.value = UIModel(saveEnable = resultData)
             }

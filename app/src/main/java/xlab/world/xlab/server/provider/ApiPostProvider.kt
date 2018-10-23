@@ -62,7 +62,7 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun requestUploadPost(scheduler: SchedulerProvider, authorization: String, requestBody: RequestBody,
                                    responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.upload(authorization = authorization, requestBody = requestBody)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -73,7 +73,7 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun requestUpdatePost(scheduler: SchedulerProvider, authorization: String, postId: String, requestBody: RequestBody,
                                    responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.update(authorization = authorization, postId = postId, requestBody = requestBody)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -84,7 +84,7 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun requestDeletePost(scheduler: SchedulerProvider, authorization: String, postId: String,
                                    responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.delete(authorization = authorization, postId = postId)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -95,7 +95,7 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun getAllFeed(scheduler: SchedulerProvider, authorization: String, page: Int,
                             responseData: (ResFeedData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.getAllFeed(authorization = authorization, page = page)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -106,7 +106,7 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun getFollowingFeed(scheduler: SchedulerProvider, authorization: String, page: Int,
                                   responseData: (ResDetailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.getFollowingFeed(authorization = authorization, page = page)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -117,7 +117,7 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun getExploreFeed(scheduler: SchedulerProvider, authorization: String, page: Int,
                                 responseData: (ResFeedData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.getExploreFeed(authorization = authorization, page = page)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -128,7 +128,7 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun getPostDetail(scheduler: SchedulerProvider, authorization: String, postId: String,
                                responseData: (ResDetailPostData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.getPostDetail(authorization = authorization, postId = postId)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -139,7 +139,7 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun postDelete(scheduler: SchedulerProvider, authorization: String, postId: String,
                             responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.deletePost(authorization = authorization, postId = postId)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -150,7 +150,7 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun checkMyPost(scheduler: SchedulerProvider, authorization: String, postId: String,
                              responseData: (ResCheckMyPostData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.checkPostsMine(authorization = authorization, postId = postId)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -161,7 +161,7 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun requestUserPostsThumbnail(scheduler: SchedulerProvider, userId: String, page: Int,
                                            responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.getUserPostsThumb(userId = userId, page = page)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -172,7 +172,7 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun requestUserPostsDetail(scheduler: SchedulerProvider, authorization: String, userId: String, page: Int,
                                         responseData: (ResDetailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.getUserPostsDetail(authorization = authorization, userId = userId, page = page)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -183,7 +183,7 @@ class ApiPost(private val iPostRequest: IPostRequest): ApiPostProvider {
     override fun requestSearchPosts(scheduler: SchedulerProvider, searchText: String, page: Int,
                                     responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPostRequest.searchPost(searchText = searchText, page = page)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {

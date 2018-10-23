@@ -13,6 +13,7 @@ import android.os.AsyncTask
 import android.support.v4.content.res.ResourcesCompat
 import android.view.*
 import xlab.world.xlab.R
+import xlab.world.xlab.utils.asyncTask.ImageSaveTask
 import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SupportData
@@ -22,22 +23,22 @@ import java.io.IOException
 class CameraHelper(private val context: Context,
                    private val textureView: TextureView) : TextureView.SurfaceTextureListener, ICameraHelper {
 
-    private val tag = "Camera"
+    private val helperTag = "Camera"
 
     enum class CameraMode(mode: Int) {
         PICTURE(mode = 0),
         VIDEO(mode = 1)
     }
 
-    var cameraMode: CameraMode = CameraMode.PICTURE
+    var cameraMode: CameraMode = CameraMode.PICTURE // 카메라 모드 (사진, 동영상)
     var isCameraReloading = false
 
     private var cameraRotate = 0
     private var saveRotate = 0
     private val recordTimeMax = 10 * 1000
 
-    var cameraID = Camera.CameraInfo.CAMERA_FACING_BACK
-    var cameraFlash = Camera.Parameters.FLASH_MODE_OFF
+    var cameraID = Camera.CameraInfo.CAMERA_FACING_BACK // 전면, 후면 카메라 모드
+    var cameraFlash = Camera.Parameters.FLASH_MODE_OFF // 플레시 on, off, auto 모드
 
     private var camcorderProfile: CamcorderProfile? = null
     private var mediaRecorder: MediaRecorder? = null
@@ -78,9 +79,10 @@ class CameraHelper(private val context: Context,
         cameraReload()
     }
 
+    // 사진 촬영
     override
     fun takePicture(picturePath: (String) -> Unit) {
-        this.saveRotate = cameraRotate
+        this.saveRotate = cameraRotate // 카메라 회전 반영
 
         try {
             camera?.takePicture(null, null, Camera.PictureCallback{ data, camera ->
@@ -88,13 +90,14 @@ class CameraHelper(private val context: Context,
                 if (pictureFile != null) {
                     camera!!.stopPreview()
                     val isFrontCam = isFrontCamera()
-                    ImageSaveTask(data, pictureFile, isFrontCam, saveRotate.toFloat()) { path ->
+                    // 촬영 된 데이터 image file 로 저장
+                    ImageSaveTask(data = data, pictureFile = pictureFile, isFrontCam = isFrontCam, saveRotate = saveRotate.toFloat()) { path ->
                         picturePath(path)
                     }.execute()
                 }
             })
         } catch (e: Exception) {
-            PrintLog.e("takePicture", e.message!!)
+            PrintLog.e("takePicture", e.message!!, helperTag)
             picturePath("")
         }
     }
@@ -109,7 +112,7 @@ class CameraHelper(private val context: Context,
         try {
             mediaRecorder!!.stop() // stop the recording
         } catch (e: RuntimeException) {
-            PrintLog.e("RuntimeException", e.message!!)
+            PrintLog.e("RuntimeException", e.message!!, helperTag)
             outputFile!!.delete()
         }
         releaseMediaRecorder() // release the media recorder object
@@ -121,15 +124,18 @@ class CameraHelper(private val context: Context,
         try {
             val path = SupportData.moveFile(outputFile!!, SupportData.createReleaseFile(AppConstants.MEDIA_VIDEO)!!)
         } catch (e: IOException) {
-            PrintLog.e("IOException", e.message!!)
+            PrintLog.e("IOException", e.message!!, helperTag)
         }
     }
 
+    // 플래시 모드 변경
     override
     fun changeFlashMode(flashModeImage: (Drawable?) -> Unit) {
         val parameters: Camera.Parameters = camera!!.parameters
 
         try {
+            // 플래시 상태
+            // on -> auto -> off -> on 으로 변경
             parameters.flashMode = when(parameters.flashMode) {
                 Camera.Parameters.FLASH_MODE_ON -> Camera.Parameters.FLASH_MODE_AUTO
                 Camera.Parameters.FLASH_MODE_AUTO -> Camera.Parameters.FLASH_MODE_OFF
@@ -140,6 +146,7 @@ class CameraHelper(private val context: Context,
             cameraFlash = parameters.flashMode
             camera!!.parameters = parameters
 
+            // 플래시 상태에 따른 이미지
             val flashDrawable: Drawable = when(cameraFlash) {
                 Camera.Parameters.FLASH_MODE_ON -> ResourcesCompat.getDrawable(context.resources, R.drawable.flash_on, null)!!
                 Camera.Parameters.FLASH_MODE_OFF -> ResourcesCompat.getDrawable(context.resources, R.drawable.flash_off, null)!!
@@ -149,11 +156,12 @@ class CameraHelper(private val context: Context,
 
             flashModeImage(flashDrawable)
         } catch (e: Exception) {
-            PrintLog.e("changeFlashMode", e.message!!)
+            PrintLog.e("changeFlashMode", e.message!!, helperTag)
             flashModeImage(null)
         }
     }
 
+    // 카메라 전환
     override
     fun changeCameraID(flashEnable: (Boolean) -> Unit) {
         this.cameraID = when (this.cameraID) {
@@ -168,17 +176,18 @@ class CameraHelper(private val context: Context,
 
     fun cameraReload() {
         if (!isCameraReloading) {
-            PrintLog.d("cameraReload", "")
+            PrintLog.d("cameraReload", "", helperTag)
             isCameraReloading = true
             CameraPrepareTask().execute()
         }
     }
 
+    // 카메라 세팅
     private fun cameraPrepare() {
         releaseCamera()
 
         camera = Camera.open(cameraID)
-        setCameraDisplayOrientation(cameraID, camera!!)
+        setCameraDisplayOrientation(cameraID = cameraID, camera = camera!!)
         val parameters: Camera.Parameters = camera!!.parameters
         val sizeList: List<Camera.Size> = camera!!.parameters.supportedPreviewSizes
         cameraBestSize = sizeList[0]
@@ -188,13 +197,12 @@ class CameraHelper(private val context: Context,
                 cameraBestSize = size
             }
         }
-        PrintLog.d("cameraBestSize", "w: " + cameraBestSize!!.width + "  h: " + cameraBestSize!!.height)
+        PrintLog.d("cameraBestSize", "w: " + cameraBestSize!!.width + "  h: " + cameraBestSize!!.height, helperTag)
 
         camcorderProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH)
         camcorderProfile!!.videoFrameWidth = 640
         camcorderProfile!!.videoFrameHeight = 480
 
-//        parameters.setPreviewSize(cameraBestSize!!.height, cameraBestSize!!.height)
         parameters.setPreviewSize(cameraBestSize!!.width, cameraBestSize!!.height)
         if (this.cameraID == Camera.CameraInfo.CAMERA_FACING_BACK) {
             parameters.focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
@@ -205,7 +213,7 @@ class CameraHelper(private val context: Context,
 
     private fun releaseCamera() {
         if (camera != null) {
-            PrintLog.d("releaseCamera", "")
+            PrintLog.d("releaseCamera", "", helperTag)
             camera!!.stopPreview()
             camera!!.setPreviewCallback(null)
             camera!!.release()
@@ -229,7 +237,7 @@ class CameraHelper(private val context: Context,
         val info: Camera.CameraInfo = Camera.CameraInfo()
         Camera.getCameraInfo(cameraID, info)
 
-        val rotation: Int = (context!!.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
+        val rotation: Int = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
 
         val degrees = when (rotation) {
             Surface.ROTATION_0 -> 0
@@ -278,7 +286,7 @@ class CameraHelper(private val context: Context,
             // set output file
             outputFile = SupportData.createTmpFile(AppConstants.MEDIA_VIDEO)
             if (outputFile == null) {
-                PrintLog.d("outputFile", "null")
+                PrintLog.d("outputFile", "null", helperTag)
                 return false
             }
             mediaRecorder!!.setOutputFile(outputFile!!.path)
@@ -287,11 +295,11 @@ class CameraHelper(private val context: Context,
             try {
                 mediaRecorder!!.prepare()
             } catch (e: IllegalStateException) {
-                PrintLog.e("IllegalStateException preparing MediaRecorder", e.message!!)
+                PrintLog.e("IllegalStateException preparing MediaRecorder", e.message!!, helperTag)
                 releaseMediaRecorder()
                 return false
             } catch (e: IOException) {
-                PrintLog.e("IOException preparing MediaRecorder", e.message!!)
+                PrintLog.e("IOException preparing MediaRecorder", e.message!!, helperTag)
                 releaseMediaRecorder()
                 return false
             }
@@ -312,12 +320,13 @@ class CameraHelper(private val context: Context,
                 cameraPrepare()
                 true
             } catch (e: Exception) {
-                PrintLog.e("takePicture", e.message!!)
+                PrintLog.e("takePicture", e.message!!, helperTag)
                 false
             }
         }
 
         override fun onPostExecute(result: Boolean?) {
+            PrintLog.d("CameraPrepareTask result", result.toString(), helperTag)
             super.onPostExecute(result)
 
             if (result!!) {
@@ -336,7 +345,7 @@ class CameraHelper(private val context: Context,
 
         override fun doInBackground(vararg params: Void?): Boolean {
             val prepareVideoRecorder = prepareVideoRecorder()
-            PrintLog.d("prepareVideoRecorder", prepareVideoRecorder.toString())
+            PrintLog.d("prepareVideoRecorder", prepareVideoRecorder.toString(), helperTag)
             if (prepareVideoRecorder) {
                 mediaRecorder!!.start()
                 isRecording = true
@@ -348,37 +357,8 @@ class CameraHelper(private val context: Context,
         }
 
         override fun onPostExecute(result: Boolean?) {
-            PrintLog.d("result", result.toString())
+            PrintLog.d("MediaPrepareTask result", result.toString(), helperTag)
             super.onPostExecute(result)
-        }
-    }
-
-    companion object {
-        private class ImageSaveTask(val data: ByteArray,
-                                    val pictureFile: File,
-                                    val isFrontCam: Boolean,
-                                    val saveRotate: Float,
-                                    val picturePath: (String) -> Unit): AsyncTask<Void, Void, String>() {
-
-            override fun doInBackground(vararg params: Void?): String {
-                PrintLog.d("isFrontCam", isFrontCam.toString(), "Camera")
-
-                val options = BitmapFactory.Options()
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888
-                val bitmap: Bitmap = BitmapFactory.decodeByteArray(data, 0, data.size, options)
-                val saveBitmap: Bitmap = SupportData.rotateCropSquareImage(bitmap, saveRotate, isFrontCam)
-                bitmap.recycle()
-
-                SupportData.saveFile(saveBitmap, pictureFile.absolutePath)
-                saveBitmap.recycle()
-
-                return pictureFile.absolutePath
-            }
-
-            override fun onPostExecute(result: String?) {
-                super.onPostExecute(result)
-                picturePath(result!!)
-            }
         }
     }
 }

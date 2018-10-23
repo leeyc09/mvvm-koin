@@ -23,7 +23,7 @@ class ApiHashTag(private val iHashTagRequest: IHashTagRequest): ApiHashTagProvid
     override fun requestRecentHashTag(scheduler: SchedulerProvider, authorization: String,
                                       responseData: (ResRecentHashTagData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iHashTagRequest.recentHashTag(authorization = authorization)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -34,7 +34,7 @@ class ApiHashTag(private val iHashTagRequest: IHashTagRequest): ApiHashTagProvid
     override fun searchHashTagCount(scheduler: SchedulerProvider, authorization: String, searchText: String,
                                     responseData: (ResCountHashTagData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iHashTagRequest.searchHashTagCount(authorization = authorization, query = searchText)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {

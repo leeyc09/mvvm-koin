@@ -46,7 +46,7 @@ class PostUploadPictureActivity : AppCompatActivity() {
         when (resultCode) {
             Activity.RESULT_OK -> {
                 when (requestCode) {
-                    RequestCodeData.POST_UPLOAD -> { // upload finish
+                    RequestCodeData.POST_UPLOAD -> { // 포스트 업로드 완료
                         setResult(Activity.RESULT_OK)
                         finish()
                     }

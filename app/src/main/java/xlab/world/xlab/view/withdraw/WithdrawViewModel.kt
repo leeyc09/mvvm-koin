@@ -28,7 +28,7 @@ class WithDrawViewModel(private val apiUser: ApiUserProvider,
 
                 it.onNext((this.withdrawReason != null) && isAgree)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("enableWithdraw", it.toString())
                 uiData.value = UIModel(enableWithdraw = it)
             }

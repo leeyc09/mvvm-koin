@@ -64,6 +64,6 @@ class GPUImageFilterData {
         return GPUImageVignetteFilter(centerPoint, floatArrayOf(0f, 0f, 0f), 0.3f, 0.75f);
     }
 
-    inner class FilterData(val name: String,
-                           val filter: GPUImageFilter)
+    data class FilterData(val name: String,
+                          val filter: GPUImageFilter)
 }

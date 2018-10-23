@@ -207,7 +207,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                 it.onNext(arrayListOf(visibility, rotation))
                 it.onComplete()
 
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 if (it.isNotEmpty()) {
                     uiData.value = UIModel(
                             ratingViewVisibility = it[0] as Int,
@@ -224,7 +224,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
 
                 it.onNext(position)
                 it.onComplete()
-            }.with(scheduler).subscribe{
+            }.with(scheduler = scheduler).subscribe{
                 uiData.value = UIModel(goodsDescriptionUpdateIndex = it)
             }
         }
@@ -402,7 +402,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                 it.onNext(goodsData!!.goods.price)
                 it.onComplete()
 
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 uiData.value = UIModel(buyOptionDialogShow = it)
             }
         }

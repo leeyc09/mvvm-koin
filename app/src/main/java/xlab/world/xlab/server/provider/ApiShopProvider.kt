@@ -42,7 +42,7 @@ class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
     override fun requestGoodsSimple(scheduler: SchedulerProvider, goodsCode: String,
                                     responseData: (ResGoodsSimpleData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iShopRequest.getGoodsSimple(goodsCode = goodsCode)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -53,7 +53,7 @@ class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
     override fun requestGoodsDetail(scheduler: SchedulerProvider, goodsCode: String,
                                     responseData: (ResGoodsDetailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iShopRequest.getGoodsDetail(goodsCode = goodsCode)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -64,7 +64,7 @@ class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
     override fun getShopFeed(scheduler: SchedulerProvider, authorization: String,
                              responseData: (ResShopFeedData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iShopRequest.getShopMain(authorization = authorization)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -77,7 +77,7 @@ class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
                              responseData: (ResGoodsSearchData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iShopRequest.searchGoods(authorization = authorization, reqGoodsSearchData = reqGoodsSearchData,
                 page = page, sortType = sortType)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -88,7 +88,7 @@ class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
     override fun requestGoodsStats(scheduler: SchedulerProvider, authorization: String, goodsCode: String,
                                    responseData: (ResGoodsStatsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iShopRequest.getGoodsStats(authorization = authorization, goodsCode = goodsCode)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -99,7 +99,7 @@ class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
     override fun requestGoodsTaggedPosts(scheduler: SchedulerProvider, goodsCode: String, page: Int,
                                          responseData: (ResThumbnailPostsData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iShopRequest.getGoodsTaggedPosts(goodsCode = goodsCode, page = page)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {
@@ -110,7 +110,7 @@ class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
     override fun requestRecentViewGoods(scheduler: SchedulerProvider, authorization: String, page: Int,
                                         responseData: (ResGoodsThumbnailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iShopRequest.getRecentViewGoods(authorization = authorization, page = page)
-                .with(scheduler)
+                .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)
                 }, {

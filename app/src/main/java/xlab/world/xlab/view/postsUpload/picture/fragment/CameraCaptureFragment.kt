@@ -33,13 +33,16 @@ class CameraCaptureFragment: Fragment(), View.OnClickListener {
     }
 
     private fun onSetup() {
+        // 라이브러리 전환 버튼 활성화, 카메라 전환 버튼 비활성화
         libraryBtn.isEnabled = true
         cameraBtn.isEnabled = false
 
+        // 다음 버튼 비활성화
         actionNextBtn.visibility = View.GONE
 
         activity = context as PostUploadPictureActivity
 
+        // Dialog 초기화
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
     }
 

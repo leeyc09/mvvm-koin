@@ -54,7 +54,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
                     it.onNext(PetDetailData(breed = breed, topicColor = topicColor, type = type,
                             name = name, gender = gender, age = age, weight = weight))
                     it.onComplete()
-                }.with(scheduler).subscribe {
+                }.with(scheduler = scheduler).subscribe {
                     PrintLog.d("changePetData", it.toString())
                     uiData.value = UIModel(petDetailData = it)
                 }
@@ -78,7 +78,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
             Observable.create<Int> {
                 it.onNext(if (userId == loginUserId) View.VISIBLE else View.GONE)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("setButtonVisible", it.toString())
                 uiData.value = UIModel(btnVisibility = it)
             }
@@ -90,7 +90,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
             Observable.create<Int> {
                 it.onNext(if (total > 1) View.VISIBLE else View.GONE)
                 it.onComplete()
-            }.with(scheduler).subscribe {
+            }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("changePetTotal", it.toString())
                 uiData.value = UIModel(petTotal = total, petCountVisibility = it)
             }

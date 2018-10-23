@@ -13,7 +13,6 @@ import android.text.TextUtils
 import android.text.style.CharacterStyle
 import android.util.TypedValue
 import android.view.View
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -36,9 +35,9 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
     private val imageFilterViewModel: ImageFilterViewModel by viewModel()
     private val fontColorSpan: FontColorSpan by inject()
 
-    private lateinit var viewPagerAdapter: ViewStatePagerAdapter
-
     private lateinit var progressDialog: DefaultProgressDialog
+
+    private lateinit var viewPagerAdapter: ViewStatePagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +52,7 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        imageFilterViewModel.deleteProfileImage()
+        imageFilterViewModel.deleteFilterImage()
     }
 
     override fun onBackPressed() {
@@ -68,7 +67,7 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
         when (resultCode) {
             Activity.RESULT_OK -> {
                 when (requestCode) {
-                    RequestCodeData.POST_UPLOAD -> { // upload finish
+                    RequestCodeData.POST_UPLOAD -> { // 포스트 업로드 완료
                         setResult(Activity.RESULT_OK)
                         finish()
                     }
@@ -78,11 +77,14 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
+        // 제목 숨기기, 다음 버튼 활성화
         actionBarTitle.visibility = View.GONE
         actionBtn.isEnabled = true
 
+        // Dialog 초기화
         progressDialog = DefaultProgressDialog(context = this)
 
+        // filter preview image view pager adapter 초기화
         viewPagerAdapter = ViewStatePagerAdapter(supportFragmentManager)
 
         imageFilterViewModel.initImageFilterData(imagePaths = intent.getStringArrayListExtra(IntentPassName.IMAGE_PATH_LIST))
@@ -115,6 +117,7 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
                     tabLayoutDot.visibility = it
                 }
                 uiData.imageFileList?.let {
+                    // file 수 만큼 pager 생성 & 닷 인디케이터 설정
                     it.forEach { imageFile ->
                         val fragment = ImageFilterPreviewFragment.newFragment(imageFile = imageFile)
                         viewPagerAdapter.addFragment(fragment = fragment, title = "")
@@ -123,22 +126,24 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
                     imageViewPreviewPager.adapter = viewPagerAdapter
 
                     tabLayoutDot.setupWithViewPager(imageViewPreviewPager, true)
-                    (0 until tabLayoutDot.tabCount).forEach { index ->
-                        val tab: View = (tabLayoutDot.getChildAt(0) as ViewGroup).getChildAt(index)
-                        val params = tab.layoutParams as ViewGroup.MarginLayoutParams
-                        val marginDp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, resources.displayMetrics).toInt()
-                        params.setMargins(marginDp, 0, marginDp, 0)
-                        tab.requestLayout()
-                    }
+                    val marginDIP = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, resources.displayMetrics).toInt()
+                    ViewFunction.setDotIndicator(tabLayoutDot = tabLayoutDot, marginDIP = marginDIP)
+
+                    // 프리뷰 이미지 변경 -> 필터 미리보기 데이터 변경
+                    imageFilterViewModel.changeSampleImageFilter(position = 0)
                 }
                 uiData.imageFile?.let {
                     imagePreview.setImage(it)
+
+                    // 프리뷰 이미지 변경 -> 필터 미리보기 데이터 변경
+                    imageFilterViewModel.changeSampleImageFilter(position = 0)
                 }
                 uiData.filterPreviewData?.let {
+                    // 필터 미리보기 리스트 생성 & 교체
                     if (filterList.childCount > 1)
-                        changeSampleImageFilter(it)
+                        changeSampleImageFilter(filterPreviewData = it)
                     else
-                        createFilterPreviewScrollView(it)
+                        createFilterPreviewScrollView(filterPreviewData = it)
                 }
                 uiData.finalImagePathList?.let {
                     RunActivity.postUploadContentActivity(context = this,
@@ -150,7 +155,7 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // image preview 이벤트 observe
-        imageFilterViewModel.imageFilterEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+        imageFilterViewModel.imageFilterData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let { _ ->
                 eventData.singleFilter?.let {
                     imagePreview.setImage(it.imageFile)
@@ -166,6 +171,7 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
                         imageFilterViewModel.updateBitmap(bitmap = fragment.getBitmap(), index = imageViewPreviewPager.currentItem)
                     }
 
+                    // 선택 필터 -> overlay 보이고 필터 이름 폰트&색상 변경
                     (0 until filterList.childCount).forEach { index ->
                         val imageFilter = filterList.getChildAt(index) as LinearLayout
                         val overlayImageView = (imageFilter.getChildAt(0) as FrameLayout).getChildAt(1) as ImageView
@@ -173,10 +179,10 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
 
                         if (index == it) {
                             overlayImageView.visibility = View.VISIBLE
-                            changeFont(textView, fontColorSpan.notoBold000000)
+                            changeFont(textView = textView, font = fontColorSpan.notoBold000000)
                         } else {
                             overlayImageView.visibility = View.GONE
-                            changeFont(textView, fontColorSpan.notoMediumBFBFBF)
+                            changeFont(textView = textView, font = fontColorSpan.notoMediumBFBFBF)
                         }
                     }
                 }
@@ -202,7 +208,7 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
         val metrics = resources.displayMetrics
         // set filter select list view
         filterPreviewData.forEachIndexed { index, previewData ->
-            // 레이아웃 틀 잡
+            // 레이아웃 틀 잡기
             val linearLayout = LinearLayout(this)
             val imageWidthDIP = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 72f, metrics).toInt()
             val linearLayoutOffSetDIP = when(index) {
@@ -253,6 +259,7 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    // 필터 미리보기 데이터 교체 (이미지, 선택 필터)
     private fun changeSampleImageFilter(filterPreviewData: ArrayList<FilterPreviewData>) {
         filterPreviewData.forEachIndexed { index, previewData ->
             val imageFilter = filterList.getChildAt(index) as LinearLayout
@@ -264,16 +271,18 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
             gpuImageView.setImage(previewData.imageFile)
             gpuImageView.filter = previewData.filterData.filter
 
+            // 선택 필터 -> overlay 보이고 필터 이름 폰트&색상 변경
             if (previewData.isSelect) {
                 overlayImageView.visibility = View.VISIBLE
-                changeFont(textView, fontColorSpan.notoBold000000)
+                changeFont(textView = textView, font = fontColorSpan.notoBold000000)
             } else {
                 overlayImageView.visibility = View.GONE
-                changeFont(textView, fontColorSpan.notoMediumBFBFBF)
+                changeFont(textView = textView, font = fontColorSpan.notoMediumBFBFBF)
             }
         }
     }
 
+    // 폰트&색상 변경
     private fun changeFont(textView: TextView, font: FontForegroundColorSpan) {
         val spannable = SpannableString(textView.text)
 
@@ -288,8 +297,8 @@ class PostUploadFilterActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun LinearLayout.filterClickAction(index: Int) {
         this.setOnClickListener {
-            val pagerIndex = imageViewPreviewPager.currentItem
-            imageFilterViewModel.changePreviewFilter(pagerIndex = pagerIndex, filterIndex = index)
+            imageFilterViewModel.changePreviewFilter(pagerIndex = imageViewPreviewPager.currentItem,
+                    filterIndex = index)
         }
     }
 
