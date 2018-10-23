@@ -19,15 +19,12 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
                              private val scheduler: SchedulerProvider): AbstractViewModel() {
     private val viewModelTag = "PostGoods"
 
-    private val selectedUsedGoodsData = ArrayList<SelectUsedGoodsListData>()
-
     private var usedGoodsData: SelectUsedGoodsData = SelectUsedGoodsData()
     private var selectUsedGoodsData: SelectUsedGoodsData = SelectUsedGoodsData()
 
-    val loadUsedGoodsEventData = SingleLiveEvent<PostUsedGoodsEvent>()
+    val loadUsedGoodsData = SingleLiveEvent<Boolean?>()
+    val finishSelectData = SingleLiveEvent<FinishSelectModel>()
     val uiData = MutableLiveData<UIModel>()
-
-    fun getSelectedUsedGoodsData(): ArrayList<SelectUsedGoodsListData> = selectedUsedGoodsData
 
     // 선택한 제품 데이터 세팅
     fun setSelectedUsedGoodsData(selectedData: ArrayList<SelectUsedGoodsListData>, dataType: Int) {
@@ -40,22 +37,18 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
                 }
                 this.selectUsedGoodsData.updateData(selectUsedGoodsData = newSelectUsedGoodsData)
 
-//                selectedUsedGoodsData.clear()
-//                selectedData.forEach { data ->
-//                    data.dataType = dataType
-//                    selectedUsedGoodsData.add(data)
-//                }
-
                 it.onNext(this.selectUsedGoodsData)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("set selectedUsedGoodsData", it.toString(), viewModelTag)
                 uiData.value = UIModel(selectedLayoutVisibility = if (it.items.isEmpty()) View.GONE else View.VISIBLE,
-                        selectedUsedGoodsData = it)
+                        selectedUsedGoodsData = it,
+                        selectedUsedGoodsDataCnt = selectUsedGoodsData.items.size.toString())
             }
         }
     }
 
+    // 사용한 제품 불러오기
     fun loadUsedGoodsData(userId: String, goodsType: Int, page: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
@@ -64,22 +57,23 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
         }
 
         uiData.value = UIModel(isLoading = true)
-        loadUsedGoodsEventData.postValue(PostUsedGoodsEvent(status = true))
+        loadUsedGoodsData.value = true
         launch {
             apiUserActivity.requestTopicUsedGoods(scheduler = scheduler, userId = userId, goodsType = goodsType, page = page,
                     responseData = {
-                        PrintLog.d("requestTopicUsedGoods success", it.toString())
-                        PrintLog.d("selectedUsedGoodsData", selectedUsedGoodsData.toString())
-                        val usedGoodsData = SelectUsedGoodsData(total = it.total, nextPage = page + 1)
+                        PrintLog.d("requestTopicUsedGoods success", it.toString(), viewModelTag)
+                        PrintLog.d("selectUsedGoodsData", selectUsedGoodsData.toString(), viewModelTag)
+                        val newUsedGoodsData = SelectUsedGoodsData(total = it.total, nextPage = page + 1)
                         it.goods?.forEach { goods ->
                             var isSelect = false
-                            selectedUsedGoodsData.forEach selectedUsedGoodsData@ { selectedGoods ->
+                            // 선택한 상품은 체크 상태로
+                            selectUsedGoodsData.items.forEach selectedUsedGoodsData@ { selectedGoods ->
                                 if (goods.code == selectedGoods.goodsCode) {
                                     isSelect = true
                                     return@selectedUsedGoodsData
                                 }
                             }
-                            usedGoodsData.items.add(SelectUsedGoodsListData(
+                            newUsedGoodsData.items.add(SelectUsedGoodsListData(
                                     dataType = AppConstants.SELECTED_GOODS_WITH_INFO,
                                     goodsCode = goods.code,
                                     goodsName = goods.name,
@@ -88,12 +82,20 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
                                     isSelect = isSelect
                             ))
                         }
-                        uiData.value = UIModel(isLoading = false, usedGoodsData = usedGoodsData)
+                        if (page == 1)  // 요청한 page => 첫페이지
+                            this.usedGoodsData.updateData(selectUsedGoodsData = newUsedGoodsData)
+                        else
+                            this.usedGoodsData.addData(selectUsedGoodsData = newUsedGoodsData)
+
+                        uiData.value = UIModel(isLoading = false)
+                        if (page == 1)
+                            uiData.value = UIModel(usedGoodsData = this.usedGoodsData,
+                                    emptyGoodsVisibility = if (this.usedGoodsData.items.isEmpty()) View.VISIBLE else View.GONE)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestTopicUsedGoods fail", errorData.message)
+                            PrintLog.e("requestTopicUsedGoods fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -102,68 +104,84 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
     // 사용한 제품 선택 & 해제
     fun selectUsedGoods(selectIndex: Int) {
         launch {
-            Observable.create<ArrayList<SelectUsedGoodsListData>> {
+            Observable.create<SelectUsedGoodsData> {
                 val item = usedGoodsData.items[selectIndex]
                 // 제품 선택 -> 해제 / 해제 -> 선택
                 item.isSelect = !item.isSelect
 
                 if (item.isSelect) { // 사용한 제품 선택 리스트 추가
-                    val copyData = usedGoodsData.copy()
-                    copyData.dataType = AppConstants.SELECTED_GOODS_ONLY_THUMB
-                    selectedUsedGoodsData.add(copyData)
+                    item.dataType = AppConstants.SELECTED_GOODS_ONLY_THUMB
+                    selectUsedGoodsData.addData(selectUsedGoodsListData = item)
                 } else { // 사용한 제품 선택 리스트 삭제
-                    var removeItem: SelectUsedGoodsListData? = null
-                    selectedUsedGoodsData.forEach selectedUsedGoodsData@ { selectedGoods ->
-                        if (usedGoodsData.goodsCode == selectedGoods.goodsCode) {
-                            removeItem = selectedGoods
+                    var removeIndex: Int = -1
+                    selectUsedGoodsData.items.forEachIndexed selectedUsedGoodsData@ { index, selectedGoods ->
+                        if (item.goodsCode == selectedGoods.goodsCode) {
+                            removeIndex = index
                             return@selectedUsedGoodsData
                         }
                     }
-                    selectedUsedGoodsData.remove(removeItem)
+                    selectUsedGoodsData.removeData(index = removeIndex)
                 }
 
-                it.onNext(selectedUsedGoodsData)
+                it.onNext(selectUsedGoodsData)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
-                PrintLog.d("update selectedUsedGoodsData", selectedUsedGoodsData.toString())
-                uiData.value = UIModel(usedGoodsUpdateIndex = position,
-                        updateSelectedUsedGoodsData = selectedUsedGoodsData,
-                        selectedUsedGoodsScrollIndex = if (usedGoodsData.isSelect) selectedUsedGoodsData.size - 1 else null)
+                PrintLog.d("selectedUsedGoodsData", it.toString(), viewModelTag)
+                uiData.value = UIModel(usedGoodsUpdateIndex = selectIndex,
+                        selectedLayoutVisibility = if (it.items.isEmpty()) View.GONE else View.VISIBLE,
+                        selectedUsedGoodsDataUpdate = true,
+                        selectedUsedGoodsScrollIndex =
+                        if (usedGoodsData.items[selectIndex].isSelect) selectUsedGoodsData.items.size - 1 else null)
             }
         }
     }
 
-    fun deleteSelectedUsedGoods(selectedGoodsPosition: Int, selectedUsedGoods: HashMap<Int, SelectUsedGoodsListData>?) {
+    // 선택 제품 삭제
+    fun deleteSelectedUsedGoods(selectIndex: Int) {
         launch {
             Observable.create<Int> {
-                val removeItem = selectedUsedGoodsData[selectedGoodsPosition]
-                var updateUsedGoodsIndex = -1
+                val removeItem = selectUsedGoodsData.items[selectIndex]
 
-                selectedUsedGoods?.forEach { (key, value) ->
-                    if (value.goodsCode == removeItem.goodsCode) {
-                        value.isSelect = false
-                        updateUsedGoodsIndex = key
+                var updateUsedGoodsIndex = -1
+                usedGoodsData.items.forEachIndexed usedGoodsData@ { index, goods ->
+                    // 사용 제품 리스트에서 선택한 제품과 같은 제품 선택 해제
+                    if (removeItem.goodsCode == goods.goodsCode) {
+                        goods.isSelect = false
+                        updateUsedGoodsIndex = index
                     }
                 }
-                selectedUsedGoodsData.remove(removeItem)
+                selectUsedGoodsData.removeData(index = selectIndex)
 
                 it.onNext(updateUsedGoodsIndex)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
-                PrintLog.d("update selectedUsedGoodsData", selectedUsedGoodsData.toString())
-                PrintLog.d("usedGoodsUpdateIndex", it.toString())
+                PrintLog.d("selectedUsedGoodsData", selectUsedGoodsData.toString(), viewModelTag)
+                PrintLog.d("updateUsedGoodsIndex", it.toString(), viewModelTag)
                 uiData.value = UIModel(usedGoodsUpdateIndex = if (it == -1) null else it,
-                        updateSelectedUsedGoodsData = selectedUsedGoodsData)
+                        selectedLayoutVisibility = if (selectUsedGoodsData.items.isEmpty()) View.GONE else View.VISIBLE,
+                        selectedUsedGoodsDataUpdate = true,
+                        selectedUsedGoodsDataCnt = selectUsedGoodsData.items.size.toString())
             }
         }
     }
+
+    // 사용한 제품 선택 완료
+    fun finishSelectUsedGoods(dataNum: Int) {
+        finishSelectData.postValue(FinishSelectModel(
+                selectData = if (dataNum == 1) selectUsedGoodsData.items else null,
+                selectData2 = if (dataNum == 2) selectUsedGoodsData.items else null))
+    }
 }
 
-data class PostUsedGoodsEvent(val status: Boolean? = null)
+data class FinishSelectModel(val selectData: ArrayList<SelectUsedGoodsListData>? = null,
+                             val selectData2: ArrayList<SelectUsedGoodsListData>? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val selectedLayoutVisibility: Int? = null,
                    val selectedUsedGoodsData: SelectUsedGoodsData? = null,
+                   val selectedUsedGoodsDataUpdate: Boolean? = null,
+                   val selectedUsedGoodsDataCnt: String? = null,
                    val updateSelectedUsedGoodsData: ArrayList<SelectUsedGoodsListData>? = null,
                    val selectedUsedGoodsScrollIndex: Int? = null,
+                   val emptyGoodsVisibility: Int? = null,
                    val usedGoodsData: SelectUsedGoodsData? = null,
                    val usedGoodsUpdateIndex: Int? = null)

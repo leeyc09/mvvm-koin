@@ -26,10 +26,20 @@ data class SelectUsedGoodsData(var total:Int = -1,
         nextPage += 1
     }
 
-    fun removeData(index: Int) {
-        items.removeAt(index)
+    fun addData(selectUsedGoodsListData: SelectUsedGoodsListData) {
+        items.add(selectUsedGoodsListData)
 
-        total -= 1
+        total += 1
+
+        isLoading = false
+    }
+
+    fun removeData(index: Int) {
+        if (index in 0 until items.size) {
+            items.removeAt(index)
+
+            total -= 1
+        }
 
         isLoading = false
     }

@@ -36,7 +36,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
 
     val loadPostData = SingleLiveEvent<LoadPostModel>()
     val postTypeData = SingleLiveEvent<Boolean?>()
-    val savePostEvent = SingleLiveEvent<PostContentEventData>()
+    val savePostData = SingleLiveEvent<Boolean?>()
     val searchHashTagEvent = SingleLiveEvent<PostContentEventData>()
     val uiData = MutableLiveData<UIModel>()
 
@@ -221,6 +221,7 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
         }
     }
 
+    // 포스트 저장
     fun savePost(authorization: String, content: String, hashTags: ArrayList<String>,
                  goodsData: ArrayList<SelectUsedGoodsListData>, imagePaths: ArrayList<String>) {
         // 네트워크 연결 확인
@@ -252,27 +253,27 @@ class PostContentViewModel(private val apiPost: ApiPostProvider,
             if (postId.isEmpty()) // 포스트 업로드
                 apiPost.requestUploadPost(scheduler = scheduler, authorization = authorization, requestBody = reqPostUploadData.getReqBody(),
                         responseData = {
-                            PrintLog.d("requestUploadPost success", "")
+                            PrintLog.d("requestUploadPost success", "", viewModelTag)
                             uiData.value = UIModel(isLoading = false)
-                            savePostEvent.value = PostContentEventData(status = true)
+                            savePostData.value = true
                         },
                         errorData = { errorData ->
                             uiData.value = UIModel(isLoading = false)
                             errorData?.let {
-                                PrintLog.d("requestUploadPost fail", errorData.message)
+                                PrintLog.e("requestUploadPost fail", errorData.message, viewModelTag)
                             }
                         })
             else // 포스트 업데이트
                 apiPost.requestUpdatePost(scheduler = scheduler, authorization = authorization, postId = postId, requestBody = reqPostUploadData.getReqBody(),
                         responseData = {
-                            PrintLog.d("requestUpdatePost success", "")
+                            PrintLog.d("requestUpdatePost success", "", viewModelTag)
                             uiData.value = UIModel(isLoading = false)
-                            savePostEvent.value = PostContentEventData(status = true)
+                            savePostData.value = true
                         },
                         errorData = { errorData ->
                             uiData.value = UIModel(isLoading = false)
                             errorData?.let {
-                                PrintLog.d("requestUpdatePost fail", errorData.message)
+                                PrintLog.e("requestUpdatePost fail", errorData.message, viewModelTag)
                             }
                         })
         }

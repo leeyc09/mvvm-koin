@@ -28,9 +28,11 @@ data class CartData(var total:Int = -1,
     }
 
     fun removeData(index: Int) {
-        items.removeAt(index)
+        if (index in 0 until items.size) {
+            items.removeAt(index)
 
-        total -= 1
+            total -= 1
+        }
 
         isLoading = false
     }

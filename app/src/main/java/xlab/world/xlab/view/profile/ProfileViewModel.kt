@@ -21,7 +21,9 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                        private val apiUserActivity: ApiUserActivityProvider,
                        private val networkCheck: NetworkCheck,
                        private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "Profile"
+    private val viewModelTag = "Profile"
+
+    private var userId: String = ""
 
     val loadUserDataEvent = SingleLiveEvent<ProfileEvent>()
     val loadUserPetEvent = SingleLiveEvent<ProfileEvent>()
@@ -30,16 +32,19 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
     val loadUserPostsDetailDataEvent = SingleLiveEvent<ProfileEvent>()
     val uiData = MutableLiveData<UIModel>()
 
+    // 프로필 타입 설정
+    // 나의 프로필 & 상대방 프로필에 따라 action bar 달라짐
     fun setProfileType(profileUserId: String, loginUserId: String, loadingBar: Boolean? = true) {
         uiData.value = UIModel(isLoading = loadingBar)
         launch {
             Observable.create<Int> {
+                this.userId = profileUserId
                 it.onNext(
                         if (profileUserId == loginUserId) AppConstants.MY_PROFILE
                         else AppConstants.OTHER_PROFILE)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
-                PrintLog.d("setProfileType", it.toString())
+                PrintLog.d("setProfileType", it.toString(), viewModelTag)
                 uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, profileType = it)
             }
         }

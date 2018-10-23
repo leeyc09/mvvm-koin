@@ -42,13 +42,13 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     private var resultCode = Activity.RESULT_CANCELED
     private var userId = ""
 
-    private lateinit var tabLayoutHelper: TabLayoutHelper
-
-    private lateinit var profileTopicAdapter: ProfileTopicAdapter
-
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
     private lateinit var postUploadTypeSelectDialog: TwoSelectBottomDialog
+
+    private lateinit var tabLayoutHelper: TabLayoutHelper
+
+    private lateinit var profileTopicAdapter: ProfileTopicAdapter
 
     private lateinit var viewPagerAdapter: ViewStatePagerAdapter
     private lateinit var profileAlbumFragment: ProfileAlbumFragment

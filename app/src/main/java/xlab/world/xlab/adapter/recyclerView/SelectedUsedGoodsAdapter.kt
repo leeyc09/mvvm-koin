@@ -29,19 +29,6 @@ class SelectedUsedGoodsAdapter(private val context: Context,
             .placeholder(imagePlaceHolder)
             .error(imagePlaceHolder)
 
-//    fun getItem(position: Int): SelectUsedGoodsListData {
-//        return selectUsedGoodsData.items[position]
-//    }
-//
-//    fun updateData(selectUsedGoodsData: ArrayList<SelectUsedGoodsListData>) {
-//        this.selectUsedGoodsData.items.clear()
-//        selectUsedGoodsData.forEach { data ->
-//            this.selectUsedGoodsData.items.add(data)
-//        }
-//
-//        notifyDataSetChanged()
-//    }
-
     fun linkData(selectUsedGoodsData: SelectUsedGoodsData) {
         this.selectUsedGoodsData = selectUsedGoodsData
         notifyDataSetChanged()

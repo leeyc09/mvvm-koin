@@ -88,7 +88,7 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
         actionBarTitle.visibility = View.GONE
         actionBtn.visibility = View.GONE
 
-        postId = intent.getStringExtra(IntentPassName.POST_ID)
+        postId = intent.getStringExtra(IntentPassName.POST_ID) ?: ""
         // 바로 comment 화면으로 넘겨야 하는 경우
         if (intent.getBooleanExtra(IntentPassName.GO_COMMENT, false)) {
             RunActivity.postCommentActivity(context = this, postId = postId)

@@ -117,8 +117,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                         feedAllFragment.reloadFeedData(loadingBar = null)
                         feedShopFragment.reloadFeedData(loadingBar = null)
                     }
-//                    RequestCodeData.POST_UPLOAD -> { // 포스트 업로드
-//                    }
+                    RequestCodeData.POST_UPLOAD -> { // 포스트 업로드
+                    }
                 }
             }
             ResultCodeData.LOAD_OLD_DATA -> { // notification dot reload

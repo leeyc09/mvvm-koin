@@ -16,10 +16,7 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.SelectUsedGoodsAdapter
 import xlab.world.xlab.adapter.recyclerView.SelectedUsedGoodsAdapter
 import xlab.world.xlab.data.adapter.SelectUsedGoodsListData
-import xlab.world.xlab.utils.support.AppConstants
-import xlab.world.xlab.utils.support.IntentPassName
-import xlab.world.xlab.utils.support.SPHelper
-import xlab.world.xlab.utils.support.ViewFunction
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
@@ -35,7 +32,7 @@ class PostUploadUsedGoodsActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var selectUsedGoodsAdapter: SelectUsedGoodsAdapter
 
     private val selectedDeleteListener = View.OnClickListener { view ->
-        postUsedGoodsViewModel.deleteSelectedUsedGoods(selectedGoodsPosition = view.tag as Int, selectedUsedGoods = selectUsedGoodsAdapter.getSelectedGoods())
+        postUsedGoodsViewModel.deleteSelectedUsedGoods(selectIndex = view.tag as Int)
     }
     private val selectUsedGoodsListener = View.OnClickListener { view ->
         postUsedGoodsViewModel.selectUsedGoods(selectIndex = view.tag as Int)
@@ -111,28 +108,20 @@ class PostUploadUsedGoodsActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 uiData.selectedUsedGoodsData?.let {
                     selectedUsedGoodsAdapter.linkData(selectUsedGoodsData = it)
-//                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
                     postUsedGoodsViewModel.loadUsedGoodsData(userId = spHelper.userId, goodsType = AppConstants.USED_GOODS_PET, page = 1)
                 }
-                uiData.updateSelectedUsedGoodsData?.let {
-//                    selectedLayout.visibility =
-//                            if (it.isEmpty()) View.GONE
-//                            else View.VISIBLE
-//                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
+                uiData.selectedUsedGoodsDataUpdate?.let {
+                    selectedUsedGoodsAdapter.notifyDataSetChanged()
                     actionBtn.isEnabled = true
                 }
                 uiData.selectedUsedGoodsScrollIndex?.let {
                     selectedGoodsRecyclerView.scrollToPosition(it)
                 }
+                uiData.emptyGoodsVisibility?.let {
+                    textViewEmptyUsedGoods.visibility = it
+                }
                 uiData.usedGoodsData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        selectUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
-                        textViewEmptyUsedGoods.visibility =
-                                if (it.items.isEmpty()) View.VISIBLE
-                                else View.GONE
-                    }
-                    else
-                        selectUsedGoodsAdapter.addData(selectUsedGoodsData = it)
+                    selectUsedGoodsAdapter.linkData(selectUsedGoodsData = it)
                 }
                 uiData.usedGoodsUpdateIndex?.let {
                     selectUsedGoodsAdapter.notifyItemChanged(it)
@@ -141,10 +130,19 @@ class PostUploadUsedGoodsActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // load used goods 이벤트 observe
-        postUsedGoodsViewModel.loadUsedGoodsEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _->
-                eventData.status?.let { isLoading ->
-                    selectUsedGoodsAdapter.dataLoading = isLoading
+        postUsedGoodsViewModel.loadUsedGoodsData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isLoading ->
+                selectUsedGoodsAdapter.dataLoading = isLoading
+            }
+        })
+
+        // finish select 이벤트 observe
+        postUsedGoodsViewModel.finishSelectData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let {_->
+                eventData.selectData?.let {
+                    intent.putParcelableArrayListExtra(IntentPassName.SELECTED_USED_GOODS, it)
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
                 }
             }
         })
@@ -158,9 +156,7 @@ class PostUploadUsedGoodsActivity : AppCompatActivity(), View.OnClickListener {
                     finish()
                 }
                 R.id.actionBtn -> { // 완료
-                    intent.putParcelableArrayListExtra(IntentPassName.SELECTED_USED_GOODS, postUsedGoodsViewModel.getSelectedUsedGoodsData())
-                    setResult(Activity.RESULT_OK, intent)
-                    finish()
+                    postUsedGoodsViewModel.finishSelectUsedGoods(dataNum = 1)
                 }
             }
         }

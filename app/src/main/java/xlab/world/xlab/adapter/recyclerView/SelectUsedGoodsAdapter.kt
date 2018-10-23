@@ -24,7 +24,7 @@ import xlab.world.xlab.utils.support.SPHelper
 class SelectUsedGoodsAdapter(private val context: Context,
                              private val selectListener: View.OnClickListener) : RecyclerView.Adapter<SelectUsedGoodsAdapter.ViewHolder>() {
 
-    private val selectUsedGoodsData: SelectUsedGoodsData = SelectUsedGoodsData()
+    private var selectUsedGoodsData: SelectUsedGoodsData = SelectUsedGoodsData()
     var dataLoading: Boolean
         get() = this.selectUsedGoodsData.isLoading
         set(value) { this.selectUsedGoodsData.isLoading = value }
@@ -43,15 +43,15 @@ class SelectUsedGoodsAdapter(private val context: Context,
         return selectUsedGoodsData.items[position]
     }
 
-    fun getSelectedGoods(): HashMap<Int, SelectUsedGoodsListData>{
-        val selectedGoods = HashMap<Int, SelectUsedGoodsListData>()
-        selectUsedGoodsData.items.forEachIndexed { index, goods ->
-            if (goods.isSelect)
-                selectedGoods[index] = goods
-        }
-
-        return selectedGoods
-    }
+//    fun getSelectedGoods(): HashMap<Int, SelectUsedGoodsListData>{
+//        val selectedGoods = HashMap<Int, SelectUsedGoodsListData>()
+//        selectUsedGoodsData.items.forEachIndexed { index, goods ->
+//            if (goods.isSelect)
+//                selectedGoods[index] = goods
+//        }
+//
+//        return selectedGoods
+//    }
 
     fun updateData(selectUsedGoodsData: SelectUsedGoodsData) {
         this.selectUsedGoodsData.items.clear()
@@ -72,6 +72,11 @@ class SelectUsedGoodsAdapter(private val context: Context,
         this.selectUsedGoodsData.nextPage += 1
 
         notifyItemRangeChanged(size, itemCount)
+    }
+
+    fun linkData(selectUsedGoodsData: SelectUsedGoodsData) {
+        this.selectUsedGoodsData = selectUsedGoodsData
+        notifyDataSetChanged()
     }
 
     override

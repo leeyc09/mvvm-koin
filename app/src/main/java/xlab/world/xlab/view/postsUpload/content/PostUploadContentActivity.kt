@@ -72,7 +72,7 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
         hashTagPopupLayout.visibility = View.GONE
     }
     private val selectedDeleteListener = View.OnClickListener { view ->
-        postUsedGoodsViewModel.deleteSelectedUsedGoods(selectedGoodsPosition = view.tag as Int, selectedUsedGoods = null)
+        postUsedGoodsViewModel.deleteSelectedUsedGoods(selectIndex = view.tag as Int)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,8 +104,10 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
             Activity.RESULT_OK -> {
                 when (requestCode) {
                     RequestCodeData.POST_UPLOAD -> { // 제품 대크 변경 완료
-                        val selectedData = data!!.getParcelableArrayListExtra<SelectUsedGoodsListData>(IntentPassName.SELECTED_USED_GOODS)
-                        postUsedGoodsViewModel.setSelectedUsedGoodsData(selectedData = selectedData, dataType = AppConstants.SELECTED_GOODS_WITH_INFO)
+                        data?.let {
+                            val selectedData = data.getParcelableArrayListExtra<SelectUsedGoodsListData>(IntentPassName.SELECTED_USED_GOODS)
+                            postUsedGoodsViewModel.setSelectedUsedGoodsData(selectedData = selectedData, dataType = AppConstants.SELECTED_GOODS_WITH_INFO)
+                        }
                     }
                 }
             }
@@ -265,13 +267,11 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // save post 이벤트 observe
-        postContentViewModel.savePostEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _->
-                eventData.status?.let { isSuccess ->
-                    if (isSuccess) {
-                        setResult(Activity.RESULT_OK)
-                        finish()
-                    }
+        postContentViewModel.savePostData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isSuccess ->
+                if (isSuccess) {
+                    setResult(Activity.RESULT_OK)
+                    finish()
                 }
             }
         })
@@ -281,12 +281,30 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
         postUsedGoodsViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.selectedUsedGoodsData?.let {
-//                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
-                    textViewUsedGoodsCnt.setText(it.items.size.toString(), TextView.BufferType.SPANNABLE)
+                    selectedUsedGoodsAdapter.linkData(selectUsedGoodsData = it)
                 }
-                uiData.updateSelectedUsedGoodsData?.let {
-//                    selectedUsedGoodsAdapter.updateData(selectUsedGoodsData = it)
-                    textViewUsedGoodsCnt.setText(it.size.toString(), TextView.BufferType.SPANNABLE)
+                uiData.selectedUsedGoodsDataUpdate?.let {
+                    selectedUsedGoodsAdapter.notifyDataSetChanged()
+                }
+                uiData.selectedUsedGoodsDataCnt?.let {
+                    textViewUsedGoodsCnt.setText(it, TextView.BufferType.SPANNABLE)
+                }
+            }
+        })
+
+        // finish select 이벤트 observe
+        postUsedGoodsViewModel.finishSelectData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let {_->
+                eventData.selectData?.let {
+                    RunActivity.postUploadUsedGoodsActivity(context = this,
+                            selectedItem = it)
+                }
+                eventData.selectData2?.let {
+                    postContentViewModel.savePost(authorization = spHelper.authorization,
+                            content = getPostContent(),
+                            hashTags = hashTagHelper.getAllHashTags(),
+                            goodsData = it,
+                            imagePaths = intent.getStringArrayListExtra(IntentPassName.IMAGE_PATH_LIST))
                 }
             }
         })
@@ -317,19 +335,11 @@ class PostUploadContentActivity : AppCompatActivity(), View.OnClickListener {
                     currentFocus?.clearFocus()
                     v.requestFocus()
                     ViewFunction.hideKeyboard(this, v)
-
-                    postContentViewModel.savePost(authorization = spHelper.authorization,
-                            content = getPostContent(),
-                            hashTags = hashTagHelper.getAllHashTags(),
-                            goodsData = postUsedGoodsViewModel.getSelectedUsedGoodsData(),
-                            imagePaths = intent.getStringArrayListExtra(IntentPassName.IMAGE_PATH_LIST))
+                    postUsedGoodsViewModel.finishSelectUsedGoods(dataNum = 2)
                 }
                 R.id.usedGoodsTitleLayout -> { // 사용한 제품 추가 레이아웃
-                    currentFocus?.clearFocus()
-                    v.requestFocus()
                     ViewFunction.hideKeyboard(this, v)
-
-                    RunActivity.postUploadUsedGoodsActivity(context = this, selectedItem = postUsedGoodsViewModel.getSelectedUsedGoodsData())
+                    postUsedGoodsViewModel.finishSelectUsedGoods(dataNum = 1)
                 }
                 else -> {}
             }
