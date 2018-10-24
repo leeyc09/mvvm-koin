@@ -194,7 +194,7 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    cartViewModel.actionBackAction()
+                    cartViewModel.backBtnAction()
                 }
                 R.id.allSelectBtn -> { // 전체 선택
                     cartViewModel.selectAllCartData(isSelectAll = allSelectBtn.isSelected)

@@ -271,7 +271,7 @@ class OrderCRRViewModel(private val apiGodo: ApiGodoProvider,
         }
     }
 
-    fun actionBackAction() {
+    fun backBtnAction() {
         uiData.postValue(UIModel(resultCode = Activity.RESULT_CANCELED))
     }
 }

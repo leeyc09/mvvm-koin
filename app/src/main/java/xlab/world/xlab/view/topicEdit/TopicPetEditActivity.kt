@@ -37,16 +37,14 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
             .placeholder(R.drawable.pet_profile_image_default)
             .error(R.drawable.pet_profile_image_default)
 
-    private var petNo: Int? = null
-
-    private lateinit var petHairTypeAdapter: PetHairTypeAdapter
-    private lateinit var petHairColorAdapter: PetHairColorAdapter
-
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
     private lateinit var editCancelDialog: DefaultDialog
     private lateinit var topicDeleteDialog: DefaultOneDialog
     private lateinit var topicColorSelectDialog: TopicColorSelectDialog
+
+    private lateinit var petHairTypeAdapter: PetHairTypeAdapter
+    private lateinit var petHairColorAdapter: PetHairColorAdapter
 
     private val topicColorListener = object:TopicColorSelectDialog.Listener {
         override fun onTopicColorSelect(selectColorStr: String) {
@@ -56,11 +54,10 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
         }
     }
     private val petHairTypeListener = View.OnClickListener { view ->
-        topicPetEditViewModel.hairTypeSelect(hairType = view.tag as String)
+        topicPetEditViewModel.hairTypeSelect(selectIndex = view.tag as Int)
     }
     private val petHairColorListener = View.OnClickListener { view ->
-        val position = view.tag as Int
-        topicPetEditViewModel.hairColorSelect(position = position, hairColorData = petHairColorAdapter.getItem(position = position))
+        topicPetEditViewModel.hairColorSelect(selectIndex = view.tag as Int)
     }
     private val topicDeleteListener = object: DefaultOneDialog.Listener {
         override fun onOkayTouch(tag: Any?) {
@@ -79,9 +76,8 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
     }
 
     override fun onDestroy() {
+        topicPetEditViewModel.deleteImageFile()
         super.onDestroy()
-
-        topicPetEditViewModel.deleteProfileImage()
     }
 
     override fun onBackPressed() {
@@ -106,14 +102,17 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
         when (resultCode) {
             Activity.RESULT_OK -> {
                 when (requestCode) {
-                    RequestCodeData.GALLARY_IMAGE_SELECT -> { // pet 이미지 수정
-                        // profile image change success
-                        val imageUri = data!!.getStringExtra(IntentPassName.IMAGE_URL)
-                        topicPetEditViewModel.setNewProfileImage(petImage = imageUri)
+                    RequestCodeData.GALLARY_IMAGE_SELECT -> { // pet profile 이미지 선택 완료
+                        data?.let {
+                            val imageUri = data.getStringExtra(IntentPassName.IMAGE_URL)
+                            topicPetEditViewModel.setNewProfileImage(petImage = imageUri)
+                        }
                     }
-                    RequestCodeData.TOPIC_BREED -> {
-                        val breedIndex = data!!.getStringExtra(IntentPassName.BREED_INDEX)
-                        topicPetEditViewModel.setBreedDetailData(context = this, breedIndex = breedIndex, petData = null)
+                    RequestCodeData.TOPIC_BREED -> { // pet breed 선택 완료
+                        data?.let {
+                            val breedIndex = data.getStringExtra(IntentPassName.BREED_INDEX)
+                            topicPetEditViewModel.setBreedDetailData(breedIndex = breedIndex, petData = null)
+                        }
                     }
                 }
             }
@@ -121,22 +120,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
     }
 
     private fun onSetup() {
-        petNo = intent.getStringExtra(IntentPassName.PET_NO)?.toInt()
-        topicPetEditViewModel.isAddPet = petNo?.let{_->false}?:let{_->true}
-
-        val topicColorStrArray = resources.getStringArray(R.array.topicColorStringList)
-        petNo?.let { // pet 수정
-            actionBarTitle.setText(getString(R.string.topic_pet_edit), TextView.BufferType.SPANNABLE)
-//            breedDetailVisibility = View.VISIBLE
-            breedDetailLayout.visibility = View.VISIBLE
-            topicDeleteBtn.visibility = View.VISIBLE
-        } ?:let { // pet 추가
-            actionBarTitle.setText(getString(R.string.topic_pet_add), TextView.BufferType.SPANNABLE)
-//            breedDetailVisibility = View.GONE
-            breedDetailLayout.visibility = View.GONE
-            topicDeleteBtn.visibility = View.GONE
-        }
-
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
         editCancelDialog = DialogCreator.editCancelDialog(context= this)
@@ -159,14 +143,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
         hairColorRecyclerView.addItemDecoration(CustomItemDecoration(context = this, right = 6f))
         (hairColorRecyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
-        petNo?.let {
-            topicPetEditViewModel.loadPetData(context = this, userId = spHelper.userId, petNo = it, topicColorList = resources.getStringArray(R.array.topicColorStringList))
-            topicPetEditViewModel.enableSaveData(context = this)
-        } ?: let {
-            topicColorBtn.tag = topicColorStrArray[0]
-            topicColorBtn.setBackgroundColor(Color.parseColor("#${topicColorStrArray[0]}"))
-            topicPetEditViewModel.enableSaveData(context = this, topicColor = topicColorStrArray[0])
-        }
+        topicPetEditViewModel.setEditMode(context = this, petNo = intent.getStringExtra(IntentPassName.PET_NO))
     }
 
     private fun onBindEvent() {
@@ -216,6 +193,16 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
+                uiData.titleStr?.let {
+                    actionBarTitle.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.deleteBtnVisibility?.let {
+                    topicDeleteBtn.visibility = it
+                }
                 uiData.topicColorData?.let {
                     topicColorBtn.tag = it.topicColor
                     topicColorBtn.setBackgroundColor(Color.parseColor("#${it.topicColor}"))
@@ -253,18 +240,18 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
                     breedDetailLayout.visibility = it
                 }
                 uiData.hairTypeData?.let {
-                    petHairTypeAdapter.updateData(petHairTypeData = it)
+                    petHairTypeAdapter.linkData(petHairTypeData = it)
                 }
                 uiData.hairTypeVisibility?.let {
                     hairTypeLayout.visibility = it
                     petHairTypeAdapter.notifyDataSetChanged()
                 }
-                uiData.hairTypeUpdateValue?.let {
-                    petHairTypeAdapter.changeSelectType(hairType = it)
+                uiData.hairTypeUpdateIndex?.let {
+                    petHairTypeAdapter.notifyItemChanged(it)
                     topicPetEditViewModel.enableSaveData(context = this)
                 }
                 uiData.hairColorData?.let {
-                    petHairColorAdapter.updateData(petHairColorData = it)
+                    petHairColorAdapter.linkData(petHairColorData = it)
                 }
                 uiData.hairColorVisibility?.let {
                     hairColorLayout.visibility = it
@@ -287,27 +274,35 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
                 uiData.saveEnable?.let {
                     actionBtn.isEnabled = it
                 }
-            }
-        })
-
-        // enable save pet 이벤트 observe
-        topicPetEditViewModel.enableSaveDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { enableSaveDataEvent ->
-            enableSaveDataEvent?.let { _ ->
-                enableSaveDataEvent.status?.let { backPopUpDialog ->
-                    actionBackBtn.tag = backPopUpDialog
+                uiData.editCancelDialogShow?.let {
+                    editCancelDialog.show()
                 }
             }
         })
 
-        // save or delete pet 이벤트 observe
-        topicPetEditViewModel.saveDeletePetEvent.observe(owner = this, observer = android.arch.lifecycle.Observer {
-            it?.let { _ ->
-                it.status?.let { saveOrDelete -> // true - (update, add) false - delete
-                    val resultCode =
-                            if (saveOrDelete) Activity.RESULT_OK
-                            else ResultCodeData.TOPIC_DELETE
-                    setResult(resultCode)
-                    finish()
+        // load pet data 이벤트 observe
+        topicPetEditViewModel.loadPetData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let {
+                topicPetEditViewModel.setBreedDetailData(breedIndex = it.breed, petData = it)
+            }
+        })
+
+        // set breed data 이벤트 observe
+        topicPetEditViewModel.setBreedData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isSuccess ->
+                if (isSuccess)
+                    topicPetEditViewModel.enableSaveData(context = this)
+            }
+        })
+
+        // set edit mode 이벤트 observe
+        topicPetEditViewModel.setEditModeData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isAddMode ->
+                if (isAddMode) { // 추가 모드
+                    topicPetEditViewModel.enableSaveData(context = this, topicColor = topicColorBtn.tag as String)
+                } else { // 수정 모드
+                    topicPetEditViewModel.loadPetData(context = this, userId = spHelper.userId)
+                    topicPetEditViewModel.enableSaveData(context = this)
                 }
             }
         })
@@ -320,12 +315,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
             ViewFunction.hideKeyboard(context = this, view = v)
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    if (actionBackBtn.tag as Boolean) {
-                        editCancelDialog.show()
-                        return
-                    }
-                    setResult(Activity.RESULT_CANCELED)
-                    finish()
+                    topicPetEditViewModel.backBtnAction()
                 }
                 R.id.actionBtn -> { // 토픽 (추가, 수정)
                     topicPetEditViewModel.savePet(authorization = spHelper.authorization)
@@ -379,9 +369,9 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
     }
 
     companion object {
-        fun newIntent(context: Context, petNo: Int?): Intent {
+        fun newIntent(context: Context, petNo: String?): Intent {
             val intent = Intent(context, TopicPetEditActivity::class.java)
-            intent.putExtra(IntentPassName.PET_NO, petNo?.toString())
+            intent.putExtra(IntentPassName.PET_NO, petNo)
 
             return intent
         }

@@ -167,7 +167,7 @@ class BuyGoodsWebViewActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    buyGoodsViewModel.actionBackAction(authorization = spHelper.authorization)
+                    buyGoodsViewModel.backBtnAction(authorization = spHelper.authorization)
                 }
             }
         }

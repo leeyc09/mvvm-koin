@@ -66,7 +66,7 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             Observable.create<Int> {
                 if (url.contains(ApiURL.GODO_CART_PAGE) || url.contains(ApiURL.GODO_MAIN_PAGE)) { // 장바구니, 메인 (웹)페이지 준비 -> 구매화면 종료
-                    actionBackAction(authorization = authorization)
+                    backBtnAction(authorization = authorization)
                 } else if (url.contains(ApiURL.GODO_BUY_GOODS_FINISH_WITH_ORDER_NO_PAGE)) { // 구매 완료 페이지 준비 -> 웹뷰 안보이게
                     uiData.postValue(UIModel(webViewVisibility = View.GONE))
                 } else {}
@@ -282,7 +282,7 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
         return true
     }
 
-    fun actionBackAction(authorization: String) {
+    fun backBtnAction(authorization: String) {
         if (intentFrom == AppConstants.FROM_GOODS_DETAIL) { // 상품 상세에서 넘어온 경우 -> 장바구니에서 해당 상품 삭제 필요
             deleteCartData(authorization = authorization, sno = snoList.first().toString()) {
                 uiData.postValue(UIModel(resultCode = Activity.RESULT_CANCELED))

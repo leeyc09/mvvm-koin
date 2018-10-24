@@ -288,7 +288,7 @@ class OrderDetailActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    orderDetailViewModel.actionBackAction()
+                    orderDetailViewModel.backBtnAction()
                 }
             }
         }

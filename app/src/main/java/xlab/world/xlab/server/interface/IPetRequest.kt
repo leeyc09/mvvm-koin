@@ -10,7 +10,7 @@ interface IPetRequest {
 
     @GET(ApiURL.PETS)
     fun getUserPet(@Query("userId") userId: String,
-                   @Query("page") petNo: Int): Observable<ResUserPetData>
+                   @Query("page") petNo: String): Observable<ResUserPetData>
 
     @POST(ApiURL.PETS)
     fun addPet(@Header("Authorization") authorization: String,

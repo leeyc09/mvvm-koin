@@ -16,19 +16,10 @@ class PetHairTypeAdapter(val context: Context,
                          private val selectListener: View.OnClickListener) : RecyclerView.Adapter<PetHairTypeAdapter.ViewHolder>() {
 
     private val petInfo: PetInfo by (context as Activity).inject()
-    private val petHairTypeData: PetHairFeatureData = PetHairFeatureData()
+    private var petHairTypeData: PetHairFeatureData = PetHairFeatureData()
 
-    fun changeSelectType(hairType: String) {
-        petHairTypeData.items.forEach {
-            it.isSelect = hairType == it.hairFeatureCode
-        }
-        notifyDataSetChanged()
-    }
-
-    fun updateData(petHairTypeData: PetHairFeatureData) {
-        this.petHairTypeData.items.clear()
-        this.petHairTypeData.items.addAll(petHairTypeData.items)
-
+    fun linkData(petHairTypeData: PetHairFeatureData) {
+        this.petHairTypeData = petHairTypeData
         notifyDataSetChanged()
     }
 
@@ -56,7 +47,7 @@ class PetHairTypeAdapter(val context: Context,
             textViewType.isSelected = item.isSelect
             textViewType.setText(petInfo.petHairType[item.hairFeatureCode], TextView.BufferType.SPANNABLE)
 
-            textViewType.tag = item.hairFeatureCode
+            textViewType.tag = position
             textViewType.setOnClickListener(selectListener)
         }
     }

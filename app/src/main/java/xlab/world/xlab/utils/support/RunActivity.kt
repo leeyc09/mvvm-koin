@@ -123,7 +123,7 @@ object RunActivity {
         context.startActivityForResult(intent, RequestCodeData.GALLARY_IMAGE_SELECT)
     }
 
-    fun petEditActivity(context: Activity, petNo: Int?) {
+    fun petEditActivity(context: Activity, petNo: String?) {
         val intent = TopicPetEditActivity.newIntent(context = context, petNo = petNo)
         val requestCode = petNo?.let{RequestCodeData.TOPIC_EDIT}?:let{RequestCodeData.TOPIC_ADD}
         context.startActivityForResult(intent, requestCode)

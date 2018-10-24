@@ -142,7 +142,7 @@ class SocialRegisterActivity : AppCompatActivity(), View.OnClickListener, View.O
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    registerViewModel.actionBackAction()
+                    registerViewModel.backBtnAction()
                 }
                 R.id.finishBtn -> { // 회원가입 완료 버튼
                     ViewFunction.hideKeyboard(context = this, view = v)

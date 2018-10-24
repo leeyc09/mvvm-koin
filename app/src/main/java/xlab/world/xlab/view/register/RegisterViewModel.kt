@@ -199,7 +199,7 @@ class RegisterViewModel(private val apiUser: ApiUserProvider,
         }
     }
 
-    fun actionBackAction() {
+    fun backBtnAction() {
         uiData.postValue(UIModel(resultCode = resultCode))
     }
 }

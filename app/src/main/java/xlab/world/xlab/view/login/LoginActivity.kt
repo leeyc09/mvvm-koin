@@ -260,7 +260,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    loginViewModel.actionBackAction()
+                    loginViewModel.backBtnAction()
                 }
                 R.id.facebookBtn -> { // 페이스북 로그인 버튼
                     originFacebookBtn.performClick()

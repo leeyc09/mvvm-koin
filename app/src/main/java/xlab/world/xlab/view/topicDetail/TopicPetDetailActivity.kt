@@ -268,7 +268,7 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
                     RunActivity.petEditActivity(context = this, petNo = null)
                 }
                 R.id.petEditBtn -> { // 펫 수정하기
-                    RunActivity.petEditActivity(context = this, petNo = textViewPetNo.text.toString().toInt())
+                    RunActivity.petEditActivity(context = this, petNo = textViewPetNo.text.toString())
                 }
             }
         }

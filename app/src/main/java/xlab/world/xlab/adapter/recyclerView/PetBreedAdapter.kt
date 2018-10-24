@@ -36,10 +36,6 @@ class PetBreedAdapter(val context: Context,
         petBreedFinalData.items.addAll(petBreedData.items)
     }
 
-    fun getItem(position: Int): PetBreedListData {
-        return petBreedFinalData.items[position]
-    }
-
     fun searchData(search: String) {
         petBreedFinalData.items.clear()
         if (search.isEmpty()) {

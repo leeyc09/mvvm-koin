@@ -121,7 +121,7 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
 
         uiData.value = UIModel(isLoading = true)
         launch {
-            apiPet.requestUserPet(scheduler = scheduler, userId = userId, petNo = petNo,
+            apiPet.requestUserPet(scheduler = scheduler, userId = userId, petNo = petNo.toString(),
                     responseData = {
                         petData = it
                         PrintLog.d("requestUserPet success", it.toString())

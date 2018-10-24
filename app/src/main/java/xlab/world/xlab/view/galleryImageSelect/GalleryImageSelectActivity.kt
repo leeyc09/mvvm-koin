@@ -24,10 +24,10 @@ import xlab.world.xlab.utils.view.toast.DefaultToast
 class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
     private val galleryImageSelectViewModel: GalleryImageSelectViewModel by viewModel()
 
-    private lateinit var galleryAdapter: GalleryAdapter
-
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
+
+    private lateinit var galleryAdapter: GalleryAdapter
 
     private val gallerySelectListener = View.OnClickListener { view ->
         galleryImageSelectViewModel.singleSelectImageChange(selectIndex = view.tag as Int)
@@ -48,18 +48,17 @@ class GalleryImageSelectActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
-        // appBarLayout 애니메이션 없애기
-        appBarLayout.stateListAnimator = null
-        // swipe refresh 비활성화
-        swipeRefreshLayout.isEnabled = false
-
+        // 타이틀 비활성화
         actionBarTitle.visibility = View.GONE
-
+        // 이미지 프리뷰 overlay 활성 & 비활성
         imageViewOverlay.visibility =
                 if (intent.getBooleanExtra(IntentPassName.WITH_CIRCLE_OVERLAY, true)) View.VISIBLE
                 else View.GONE
 
-        imageViewPreview.getDisplayMatrix(Matrix())
+        // appBarLayout 애니메이션 없애기
+        appBarLayout.stateListAnimator = null
+        // swipe refresh 비활성화
+        swipeRefreshLayout.isEnabled = false
 
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)

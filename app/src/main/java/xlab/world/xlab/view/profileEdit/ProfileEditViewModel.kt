@@ -1,5 +1,6 @@
 package xlab.world.xlab.view.profileEdit
 
+import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
 import android.view.View
 import io.reactivex.Observable
@@ -18,18 +19,28 @@ import java.io.File
 class ProfileEditViewModel(private val apiUser: ApiUserProvider,
                            private val networkCheck: NetworkCheck,
                            private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "ProfileEdit"
+    private val viewModelTag = "ProfileEdit"
+    private var existChangeData: Boolean = false
 
-    private var initProfileData: ResProfileEditData? = null
+    private var initProfileData = ResProfileEditData()
     private var recentProfileData = ResProfileEditData()
     private val newProfileImage: ArrayList<String> = ArrayList()
 
-    val profileUpdateEvent = SingleLiveEvent<ProfileEditEvent>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setNewProfileImage(profileImage: String) {
-        newProfileImage.add(profileImage)
-        uiData.value = UIModel(profileImage = newProfileImage.last())
+        launch {
+            Observable.create<String> {
+                // 새로운 프로필 이미지 추가
+                newProfileImage.add(profileImage)
+
+                it.onNext(newProfileImage.last())
+                it.onComplete()
+            }.with(scheduler = scheduler).subscribe {
+                PrintLog.d("setNewProfileImage", it, viewModelTag)
+                uiData.value = UIModel(profileImage = it)
+            }
+        }
     }
 
     fun loadProfileEditData(authorization: String) {
@@ -43,6 +54,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
         launch {
             apiUser.requestProfileEdit(scheduler = scheduler, authorization = authorization,
                     responseData = {
+                        PrintLog.d("requestProfileEdit success", it.toString(), viewModelTag)
                         initProfileData = it.copy()
                         recentProfileData = it.copy()
 
@@ -54,12 +66,13 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
                                 if (it.gender != UserInfo.NO_GENDER_SELECT || it.locale.isNotEmpty() || it.birthYear.isNotEmpty()) View.GONE
                                 else View.VISIBLE,
                                 gender = UserInfo.genderMap[it.gender],
-                                birth = it.birthYear)
+                                birth = it.birthYear,
+                                saveEnable = false)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestProfileEdit fail", errorData.message)
+                            PrintLog.e("requestProfileEdit fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -76,7 +89,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
                 it.onNext(birthRegex)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe { resultData ->
-                PrintLog.d("birthRegexCheck", resultData.toString())
+                PrintLog.d("birthRegexCheck", resultData.toString(), viewModelTag)
                 uiData.value = UIModel(birthConfirmVisibility =
                 if (resultData) View.INVISIBLE
                 else View.VISIBLE)
@@ -88,23 +101,25 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
     fun existChangedData(nickName: String? = null, introduction: String? = null, gender: Int? = null, birth: String? = null) {
         launch {
             Observable.create<Boolean> {
+                // 변경 된 값이 있는경우 -> recent data update
                 nickName?.let {_-> recentProfileData.nickName = nickName }
                 introduction?.let {_-> recentProfileData.introduction = introduction }
                 gender?.let {_-> recentProfileData.gender = gender }
                 birth?.let {_-> recentProfileData.birthYear = birth }
 
-                PrintLog.d("initProfileData", initProfileData.toString())
-                PrintLog.d("recentData", recentProfileData.toString())
+                PrintLog.d("initProfileData", initProfileData.toString(), viewModelTag)
+                PrintLog.d("recentData", recentProfileData.toString(), viewModelTag)
                 val birthRegex =
                         if (recentProfileData.birthYear.isEmpty()) initProfileData?.let{_->initProfileData!!.birthYear.isEmpty()}?: let{_->false}
                         else DataRegex.birthRegex(recentProfileData.birthYear.toInt())
                 val regex = birthRegex && DataRegex.nickNameRegex(recentProfileData.nickName)
-                it.onNext(initProfileData?.let { _ ->
-                    regex && ((initProfileData != recentProfileData) || newProfileImage.isNotEmpty()) }
-                        ?:let { _ ->false})
+
+                this.existChangeData = (initProfileData != recentProfileData) || newProfileImage.isNotEmpty()
+
+                it.onNext(regex && this.existChangeData)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe { resultData ->
-                PrintLog.d("existChangedData", resultData.toString())
+                PrintLog.d("existChangedData", resultData.toString(), viewModelTag)
                 uiData.value = UIModel(saveEnable = resultData)
             }
         }
@@ -144,8 +159,7 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
 
             apiUser.requestProfileUpdate(scheduler = scheduler, authorization = authorization, userId = userId, requestBody = reqData.getReqBody(),
                     responseData = {
-                        profileUpdateEvent.value = ProfileEditEvent(status = true)
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.value = UIModel(isLoading = false, resultCode = Activity.RESULT_OK)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
@@ -162,14 +176,21 @@ class ProfileEditViewModel(private val apiUser: ApiUserProvider,
             SupportData.deleteFile(path = filePath)
         }
     }
+
+    fun backBtnAction() {
+        // 변경 된 데이터 있으면 취소 다이얼로그 보이기
+        // 없으면 result code => cancel 로 종료
+        uiData.postValue(UIModel(
+                resultCode = if (existChangeData) null else Activity.RESULT_CANCELED,
+                editCancelDialogShow = if (existChangeData) true else null
+        ))
+    }
 }
 
-data class InitProfile(var nickName: String = "", var introduction: String = "",
-                       var gender: String? = "", var birth: String = "")
-data class ProfileEditEvent(val status: Boolean? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
                    val profileImage: String? = null, val nickName: String? = null,
                    val introduction: String? = null, val detailInfoVisibility: Int? = null,
                    val gender: String? = null, val birth: String? = null,
                    val birthConfirmVisibility: Int? = null,
-                   val saveEnable: Boolean? = null)
+                   val saveEnable: Boolean? = null,
+                   val editCancelDialogShow: Boolean? = null)

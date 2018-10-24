@@ -39,8 +39,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             .placeholder(R.drawable.profile_img_100)
             .error(R.drawable.profile_img_100)
 
-    private var resultCode = Activity.RESULT_CANCELED
-
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
     private lateinit var postUploadTypeSelectDialog: TwoSelectBottomDialog
@@ -93,11 +91,14 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
+                profileViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                 when (requestCode) {
                     RequestCodeData.PROFILE_EDIT -> { // 프로필 수정
                         profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loadingBar = null)
+                    }
+                    RequestCodeData.TOPIC_ADD -> { // 펫 추가
+                        profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
+                                topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
                     }
                     RequestCodeData.USED_GOODS, // 사용한 제품 더보기
                     RequestCodeData.FOLLOW, // 팔로우, 팔로잉
@@ -115,10 +116,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                         profileAlbumFragment.reloadPetUsedGoodsData(loadingBar = null)
                         profilePetFragment.reloadPetUsedGoodsData(loadingBar = null)
                     }
-                    RequestCodeData.TOPIC_ADD -> { // 펫 추가
-                        profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
-                                topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
-                    }
                     RequestCodeData.POST_UPLOAD -> { // 포스트 업로드
                         // set user post data
                         profileAlbumFragment.reloadPetUsedGoodsData(loadingBar = null)
@@ -126,21 +123,20 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             ResultCodeData.TOPIC_DELETE -> {
-//                if (this.resultCode == Activity.RESULT_CANCELED)
-//                    this.resultCode = Activity.RESULT_OK
+                profileViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                 profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
                         topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                this.resultCode = ResultCodeData.LOGIN_SUCCESS
+                profileViewModel.setResultCode(resultCode = ResultCodeData.LOGIN_SUCCESS)
                 profileViewModel.setProfileType(userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
                 profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loadingBar = null)
                 profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1, topicDataCount = 0,
                         loginUserId = spHelper.userId, loadingBar = null)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                profileViewModel.setResultCode(resultCode = ResultCodeData.LOGOUT_SUCCESS)
+                actionBackBtn.performClick()
             }
         }
     }
@@ -221,23 +217,21 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
-                uiData.profileType?.let {
-                    when(it) {
-                        AppConstants.MY_PROFILE -> {
-                            myProfileActionLayout.visibility = View.VISIBLE
-                            otherProfileActionLayout.visibility = View.GONE
-
-                            followBtn.visibility = View.GONE
-                            profileEditBtn.visibility = View.VISIBLE
-                        }
-                        AppConstants.OTHER_PROFILE -> {
-                            myProfileActionLayout.visibility = View.GONE
-                            otherProfileActionLayout.visibility = View.VISIBLE
-
-                            followBtn.visibility = View.VISIBLE
-                            profileEditBtn.visibility = View.GONE
-                        }
-                    }
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
+                uiData.myProfileLayoutVisibility?.let {
+                    myProfileActionLayout.visibility = it
+                }
+                uiData.otherProfileLayoutVisibility?.let {
+                    otherProfileActionLayout.visibility = it
+                }
+                uiData.followBtnVisibility?.let {
+                    followBtn.visibility = it
+                }
+                uiData.editBtnVisibility?.let {
+                    profileEditBtn.visibility = it
                 }
                 uiData.topicData?.let {
                     profileTopicAdapter.linkData(profileTopicData = it)
@@ -289,8 +283,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    profileViewModel.backBtnAction()
                 }
                 R.id.actionPostUploadBtn -> { // 포스트 업로드
                     // 권한 체크

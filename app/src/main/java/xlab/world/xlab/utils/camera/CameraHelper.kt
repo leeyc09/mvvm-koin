@@ -25,10 +25,7 @@ class CameraHelper(private val context: Context,
 
     private val helperTag = "Camera"
 
-    enum class CameraMode(mode: Int) {
-        PICTURE(mode = 0),
-        VIDEO(mode = 1)
-    }
+    enum class CameraMode { PICTURE, VIDEO }
 
     var cameraMode: CameraMode = CameraMode.PICTURE // 카메라 모드 (사진, 동영상)
     var isCameraReloading = false

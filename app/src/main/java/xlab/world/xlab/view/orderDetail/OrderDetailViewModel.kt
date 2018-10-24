@@ -122,7 +122,7 @@ class OrderDetailViewModel(private val apiGodo: ApiGodoProvider,
         }
     }
 
-    fun actionBackAction() {
+    fun backBtnAction() {
         uiData.postValue(UIModel(resultCode = resultCode))
     }
 }

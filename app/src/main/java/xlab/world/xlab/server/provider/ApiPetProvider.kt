@@ -11,7 +11,7 @@ import xlab.world.xlab.utils.rx.with
 
 interface ApiPetProvider {
     // pet data 가져오기
-    fun requestUserPet(scheduler: SchedulerProvider, userId: String, petNo: Int,
+    fun requestUserPet(scheduler: SchedulerProvider, userId: String, petNo: String,
                        responseData: (ResUserPetData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
     // pet 추가하기
@@ -44,7 +44,7 @@ interface ApiPetProvider {
 }
 
 class ApiPet(private val iPetRequest: IPetRequest): ApiPetProvider {
-    override fun requestUserPet(scheduler: SchedulerProvider, userId: String, petNo: Int,
+    override fun requestUserPet(scheduler: SchedulerProvider, userId: String, petNo: String,
                                 responseData: (ResUserPetData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iPetRequest.getUserPet(userId = userId, petNo = petNo)
                 .with(scheduler)

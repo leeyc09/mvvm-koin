@@ -23,7 +23,7 @@ class PetHairColorAdapter(val context: Context,
                           private val selectListener: View.OnClickListener) : RecyclerView.Adapter<PetHairColorAdapter.ViewHolder>() {
 
     private val petInfo: PetInfo by (context as Activity).inject()
-    private val petHairColorData: PetHairFeatureData = PetHairFeatureData()
+    private var petHairColorData: PetHairFeatureData = PetHairFeatureData()
 
     private val imagePlaceHolder = ColorDrawable(ResourcesCompat.getColor(context.resources, R.color.colorE2E2E2, null))
     private val glideOption = RequestOptions().centerCrop()
@@ -31,13 +31,8 @@ class PetHairColorAdapter(val context: Context,
             .placeholder(imagePlaceHolder)
             .error(imagePlaceHolder)
 
-    fun getItem(position: Int): PetHairFeatureListData {
-        return petHairColorData.items[position]
-    }
-    fun updateData(petHairColorData: PetHairFeatureData) {
-        this.petHairColorData.items.clear()
-        this.petHairColorData.items.addAll(petHairColorData.items)
-
+    fun linkData(petHairColorData: PetHairFeatureData) {
+        this.petHairColorData = petHairColorData
         notifyDataSetChanged()
     }
 

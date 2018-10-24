@@ -1,7 +1,9 @@
 package xlab.world.xlab.view.profile
 
+import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
+import android.view.View
 import io.reactivex.Observable
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
@@ -11,6 +13,7 @@ import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PrintLog
+import xlab.world.xlab.utils.support.ResultCodeData
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
@@ -23,6 +26,8 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                        private val scheduler: SchedulerProvider): AbstractViewModel() {
     private val viewModelTag = "Profile"
 
+    private var resultCode = Activity.RESULT_CANCELED
+
     private var topicData: ProfileTopicData = ProfileTopicData()
 
     val loadUserData = SingleLiveEvent<Boolean?>()
@@ -32,19 +37,46 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
     val loadUserPostsDetailDataEvent = SingleLiveEvent<ProfileEvent>()
     val uiData = MutableLiveData<UIModel>()
 
+    fun setResultCode(resultCode: Int) {
+        when (resultCode) {
+            ResultCodeData.LOGIN_SUCCESS,
+            ResultCodeData.LOGOUT_SUCCESS -> {
+                this.resultCode = resultCode
+            }
+            Activity.RESULT_OK -> {
+                if (this.resultCode == Activity.RESULT_CANCELED)
+                    this.resultCode = resultCode
+            }
+        }
+    }
+
+    fun backBtnAction() {
+        uiData.postValue(UIModel(resultCode = resultCode))
+    }
+
     // 프로필 타입 설정
     // 나의 프로필 & 상대방 프로필에 따라 action bar 달라짐
     fun setProfileType(userId: String, loginUserId: String, loadingBar: Boolean? = true) {
         uiData.value = UIModel(isLoading = loadingBar)
         launch {
-            Observable.create<Int> {
-                it.onNext(
-                        if (userId == loginUserId) AppConstants.MY_PROFILE
-                        else AppConstants.OTHER_PROFILE)
+            Observable.create<ArrayList<Int>> {
+                // [0] - 나의 프로필 action bar 보이기 & 숨기기
+                // [1] - 상대방 프로필 action bar 보이기 & 숨기기
+                // [2] - follow 버튼 보이기 & 숨기기
+                // [3] - 프로필 수정 버튼 보이기 & 숨기기
+                val visibilityArrayList: ArrayList<Int> =
+                        if (userId == loginUserId) arrayListOf(View.VISIBLE, View.GONE, View.GONE, View.VISIBLE)
+                        else arrayListOf(View.GONE, View.VISIBLE, View.VISIBLE, View.GONE)
+
+                it.onNext(visibilityArrayList)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
                 PrintLog.d("setProfileType", it.toString(), viewModelTag)
-                uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, profileType = it)
+                uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
+                        myProfileLayoutVisibility = it[0],
+                        otherProfileLayoutVisibility = it[1],
+                        followBtnVisibility = it[2],
+                        editBtnVisibility = it[3])
             }
         }
     }
@@ -292,8 +324,9 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
 }
 
 data class ProfileEvent(val status: Boolean? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
-                   val profileType: Int? = null,
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
+                   val myProfileLayoutVisibility: Int? = null, val otherProfileLayoutVisibility: Int? = null,
+                   val followBtnVisibility: Int? = null, val editBtnVisibility: Int? = null,
                    val profileImage: String? = null, val nickName: String? = null, val introduction: String? = null,
                    val followerCnt: Int? = null, val followingCnt: Int? = null, val followState: Boolean? = null,
                    val topicData: ProfileTopicData? = null, val topicDataUpdate: Boolean? = null,

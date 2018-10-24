@@ -41,6 +41,7 @@ class PetBreedActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
+        // 타이틀 설정, 확인 버튼 비활성화
         actionBarTitle.setText(getString(R.string.pet_breed_select), TextView.BufferType.SPANNABLE)
         actionBtn.visibility = View.GONE
 

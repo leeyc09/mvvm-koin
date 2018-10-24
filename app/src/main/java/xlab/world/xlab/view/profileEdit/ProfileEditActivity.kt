@@ -92,10 +92,11 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
             Activity.RESULT_OK -> {
                 when (requestCode) {
                     RequestCodeData.GALLARY_IMAGE_SELECT -> { // 프로필 이미지 수정
-                        // profile image change success
-                        val imageUri = data!!.getStringExtra(IntentPassName.IMAGE_URL)
-                        profileEditViewModel.setNewProfileImage(profileImage = imageUri)
-                        profileEditViewModel.existChangedData()
+                        data?.let {
+                            val imageUri = data.getStringExtra(IntentPassName.IMAGE_URL)
+                            profileEditViewModel.setNewProfileImage(profileImage = imageUri)
+                            profileEditViewModel.existChangedData()
+                        }
                     }
                 }
             }
@@ -103,17 +104,18 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
     }
 
     private fun onSetup() {
+        // 타이틀 설정
         actionBarTitle.setText(getString(R.string.profile_edit), TextView.BufferType.SPANNABLE)
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
         editCancelDialog = DialogCreator.editCancelDialog(context= this)
         genderSelectDialog = DialogCreator.genderSelectDialog(listener = genderDialogListener)
 
-        // 출생연도 숫자만 가능하게
+        // 출생연도 숫자만 가능, 4글자 제한
         editTextBirth.filters = arrayOf(letterOrDigitInputFilter, InputFilter.LengthFilter(4))
 
-        profileEditViewModel.existChangedData()
         profileEditViewModel.loadProfileEditData(authorization = spHelper.authorization)
     }
 
@@ -175,6 +177,10 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
                 uiData.profileImage?.let {
                     Glide.with(this)
                             .load(it)
@@ -205,17 +211,8 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
                 uiData.saveEnable?.let {
                     actionBtn.isEnabled = it
                 }
-            }
-        })
-
-        // profile update 이벤트 observe
-        profileEditViewModel.profileUpdateEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { profileUpdateEvent ->
-            profileUpdateEvent?.let { _ ->
-                profileUpdateEvent.status?.let { isSuccess ->
-                    if (isSuccess) {
-                        setResult(Activity.RESULT_OK)
-                        finish()
-                    }
+                uiData.editCancelDialogShow?.let {
+                    editCancelDialog.show()
                 }
             }
         })
@@ -248,12 +245,7 @@ class ProfileEditActivity : AppCompatActivity(), View.OnClickListener, View.OnTo
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    if (actionBtn.isEnabled) {
-                        editCancelDialog.show()
-                        return
-                    }
-                    setResult(Activity.RESULT_CANCELED)
-                    finish()
+                    profileEditViewModel.backBtnAction()
                 }
                 R.id.actionBtn -> { // 프로필 변경
                     profileEditViewModel.changeProfileData(

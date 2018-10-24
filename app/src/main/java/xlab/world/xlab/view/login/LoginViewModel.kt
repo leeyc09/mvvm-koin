@@ -210,7 +210,7 @@ class LoginViewModel(private val apiUser: ApiUserProvider,
         }
     }
 
-    fun actionBackAction() {
+    fun backBtnAction() {
         uiData.postValue(UIModel(resultCode = Activity.RESULT_CANCELED))
     }
 }

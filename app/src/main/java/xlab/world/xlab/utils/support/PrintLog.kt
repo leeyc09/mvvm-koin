@@ -8,7 +8,7 @@ object PrintLog {
     // Log for debug
     fun d(title:String, log: String) {
         if (BuildConfig.DEBUG)
-            Log.d(defaultTag ?: defaultTag, "$title => $log")
+            Log.d(defaultTag, "$title => $log")
     }
     // Log for debug
     fun d(title:String, log: String, tag: String? = null) {

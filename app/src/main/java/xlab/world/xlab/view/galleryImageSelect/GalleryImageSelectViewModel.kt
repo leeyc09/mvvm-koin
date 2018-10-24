@@ -404,6 +404,7 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
 
 data class PreviewData(val data: String, val matrix: Matrix)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
+                   val overlayVisibility: Int? = null,
                    val imagePreviewData: PreviewData? = null,
                    val galleryData: GalleryData? = null, val galleryDataUpdate: Boolean? = null, val galleryUpdateIndex: Int? = null,
                    val finalImagePathList: ArrayList<String>? = null)
