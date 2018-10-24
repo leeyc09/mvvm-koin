@@ -11,7 +11,7 @@ import xlab.world.xlab.view.SingleLiveEvent
 class SettingViewModel(private val apiUser: ApiUserProvider,
                        private val networkCheck: NetworkCheck,
                        private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "Setting"
+    private val viewModelTag = "Setting"
 
     val logoutEventData = SingleLiveEvent<SettingEvent>()
     val uiData = MutableLiveData<UIModel>()

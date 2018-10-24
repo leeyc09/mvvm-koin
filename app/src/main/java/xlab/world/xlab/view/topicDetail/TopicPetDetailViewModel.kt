@@ -161,8 +161,6 @@ class TopicPetDetailViewModel(private val apiPet: ApiPetProvider,
                         PrintLog.d("requestUserPet success", it.toString(), viewModelTag)
                         loadPetData.value = LoadPetModel(petData = it)
                         uiData.value = UIModel(isLoading = false, petImage = it.profileImage)
-
-                        petUsedGoodsData?: loadPetUsedGoodsData(page = 1)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)

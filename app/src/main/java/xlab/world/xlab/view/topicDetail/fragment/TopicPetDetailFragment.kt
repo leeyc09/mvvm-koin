@@ -98,6 +98,7 @@ class TopicPetDetailFragment: Fragment() {
         topicPetDetailViewModel.loadPetData.observe(owner = this, observer = android.arch.lifecycle.Observer { loadPetDataEvent ->
             loadPetDataEvent?.let { _ ->
                 loadPetDataEvent.petData?.let {
+                    topicPetDetailViewModel.loadPetUsedGoodsData(page = 1)
                     petData = it
                 }
                 loadPetDataEvent.petUsedGoods?.let {

@@ -238,6 +238,7 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
         topicPetDetailViewModel.loadPetData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let { _ ->
                 eventData.petData?.let {
+                    topicPetDetailViewModel.loadPetUsedGoodsData(page = 1)
                     topicPetDetailViewModel.changePetData(petData = it,
                             userId = intent.getStringExtra(IntentPassName.USER_ID),
                             loginUserId = spHelper.userId)
