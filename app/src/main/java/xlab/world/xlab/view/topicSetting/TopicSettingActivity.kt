@@ -27,20 +27,14 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
     private val topicSettingViewModel: TopicSettingViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
-    private var resultCode = Activity.RESULT_CANCELED
-
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
 
     private lateinit var topicSettingAdapter: TopicSettingAdapter
 
     private val topicToggleListener = View.OnClickListener { view ->
-        if (view.tag is Int) {
-            val position = view.tag as Int
-            topicSettingViewModel.changeTopicToggle(authorization = spHelper.authorization,
-                    position = position,
-                    topicData = topicSettingAdapter.getItem(position))
-        }
+        topicSettingViewModel.changeTopicToggle(authorization = spHelper.authorization,
+                selectIndex = view.tag as Int)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,17 +56,16 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
+        topicSettingViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
-
                 topicSettingViewModel.loadUserPetsData(userId = spHelper.userId, page = 1)
             }
         }
     }
 
     private fun onSetup() {
+        // 타이틀 설정, 액션 버튼 비활성화
         actionBarTitle.setText(getString(R.string.topic_setting), TextView.BufferType.SPANNABLE)
         actionBtn.visibility = View.GONE
 
@@ -114,37 +107,30 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
-                uiData.petData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        if (it.items.isEmpty()) { // topic 없음
-                            addTopicBtn.visibility = View.VISIBLE
-                            textLayout.visibility = View.GONE
-                            recyclerView.visibility = View.GONE
-                        } else { // topic 있음
-                            addTopicBtn.visibility = View.GONE
-                            textLayout.visibility = View.VISIBLE
-                            recyclerView.visibility = View.VISIBLE
-                        }
-                        topicSettingAdapter.updateData(topicSettingData = it)
-                    }
-                    else {
-                        topicSettingAdapter.addData(topicSettingData = it)
-                    }
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
                 }
-                uiData.topicPosition?.let {
+                uiData.headerVisibility?.let {
+                    textLayout.visibility = it
+                }
+                uiData.addTopicVisibility?.let {
+                    addTopicBtn.visibility = it
+                }
+                uiData.petData?.let {
+                    topicSettingAdapter.linkData(topicSettingData = it)
+                }
+                uiData.petUpdateIndex?.let {
                     topicSettingAdapter.notifyItemChanged(it)
-                    if (resultCode == Activity.RESULT_CANCELED)
-                        resultCode = Activity.RESULT_OK
+                    topicSettingViewModel.setResultCode(resultCode =  Activity.RESULT_OK)
                 }
             }
         })
 
         // load user pet list 이벤트 observe
-        topicSettingViewModel.loadUserPetsListDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadUserPetListEvent ->
-            loadUserPetListEvent?.let { _ ->
-                loadUserPetListEvent.isLoading?.let {
-                    topicSettingAdapter.dataLoading = it
-                }
+        topicSettingViewModel.loadPetListData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isLoading ->
+                topicSettingAdapter.dataLoading = isLoading
             }
         })
     }
@@ -153,8 +139,7 @@ class TopicSettingActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    topicSettingViewModel.backBtnAction()
                 }
                 R.id.addTopicBtn -> { // 토픽 추가하기
                     RunActivity.petEditActivity(context = this, petNo = null)

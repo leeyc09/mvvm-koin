@@ -17,7 +17,9 @@ class NoticeViewModel(private val apiNotice: ApiNoticeProvider,
                       private val scheduler: SchedulerProvider): AbstractViewModel() {
     private val viewModelTag = "Notice"
 
-    val loadNoticeventData = SingleLiveEvent<NoticeEvent>()
+    private var noticeData: NoticeData = NoticeData()
+
+    val loadNoticeData = SingleLiveEvent<Boolean?>()
     val uiData = MutableLiveData<UIModel>()
 
     fun loadExistNewNotification(authorization: String) {
@@ -50,32 +52,40 @@ class NoticeViewModel(private val apiNotice: ApiNoticeProvider,
         }
 
         uiData.value = UIModel(isLoading = loadingBar)
-        loadNoticeventData.postValue(NoticeEvent(status = true))
+        loadNoticeData.value = true
         launch {
             apiNotice.requestNoticeData(scheduler = scheduler, authorization = authorization, page = page,
                     responseData = {
-                        PrintLog.d("requestNoticeData success", it.toString())
-                        val noticeData = NoticeData(total = it.total, nextPage = page + 1)
+                        PrintLog.d("requestNoticeData success", it.toString(), viewModelTag)
+                        val newNoticeData = NoticeData(total = it.total, nextPage = page + 1)
                         it.notices?.forEach { notice ->
-                            noticeData.items.add(NoticeListData(
+                            newNoticeData.items.add(NoticeListData(
                                     isRead = notice.isRead,
                                     noticeId = notice.id,
                                     title = notice.title,
                                     content = notice.content,
                                     date = SupportData.contentDateForm(year = notice.year, month = notice.month, day = notice.day)))
                         }
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, noticeData = noticeData)
+
+                        if (page == 1) {
+                            this.noticeData.updateData(noticeData = newNoticeData)
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, noticeData = this.noticeData,
+                                    emptyNoticeVisibility = if (this.noticeData.items.isEmpty()) View.VISIBLE else View.GONE)
+                        } else {
+                            this.noticeData.addData(noticeData = newNoticeData)
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, noticeDataUpdate = true)
+                        }
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("requestNoticeData fail", errorData.message)
+                            PrintLog.e("requestNoticeData fail", errorData.message, viewModelTag)
                         }
                     })
         }
     }
 
-    fun readNotice(authorization: String, noticeListData: NoticeListData, position: Int) {
+    fun readNotice(authorization: String, selectIndex: Int) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
@@ -84,16 +94,17 @@ class NoticeViewModel(private val apiNotice: ApiNoticeProvider,
 
         uiData.value = UIModel(isLoading = true)
         launch {
+            val noticeListData = this.noticeData.items[selectIndex]
             apiNotice.updateReadNotice(scheduler = scheduler, authorization = authorization, noticeId = noticeListData.noticeId,
                     responseData = {
                         noticeListData.isRead = true
                         noticeListData.isSelect = !noticeListData.isSelect
-                        uiData.value = UIModel(isLoading = false, noticeUpdatePosition = position)
+                        uiData.value = UIModel(isLoading = false, noticeUpdateIndex = selectIndex)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("updateReadNotice fail", errorData.message)
+                            PrintLog.e("updateReadNotice fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -101,7 +112,7 @@ class NoticeViewModel(private val apiNotice: ApiNoticeProvider,
 
 }
 
-data class NoticeEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
-                   val noticeData: NoticeData? = null, val noticeUpdatePosition: Int? = null,
+                   val emptyNoticeVisibility: Int? = null,
+                   val noticeData: NoticeData? = null, val noticeDataUpdate: Boolean? = null, val noticeUpdateIndex: Int? = null,
                    val newNoticeDotVisibility: Int? = null)

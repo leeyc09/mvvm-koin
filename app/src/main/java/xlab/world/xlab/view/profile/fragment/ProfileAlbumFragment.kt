@@ -1,9 +1,7 @@
 package xlab.world.xlab.view.profile.fragment
 
 import android.app.Activity
-import android.graphics.Color
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
@@ -20,7 +18,6 @@ import xlab.world.xlab.adapter.recyclerView.PostDetailAdapter
 import xlab.world.xlab.adapter.recyclerView.PostThumbnailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.listener.PostDetailListener
-import xlab.world.xlab.utils.listener.UserDefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
@@ -137,7 +134,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         if (needInitData)
-            reloadPetUsedGoodsData(loadingBar = true)
+            reloadAlbumPostsData(loadingBar = true)
         else
             setLayoutVisibility()
     }
@@ -146,7 +143,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
         noPostsLayout.setOnClickListener(this) // 포스트 업로드
 
         swipeRefreshLayout.setOnRefreshListener {
-            reloadPetUsedGoodsData(loadingBar = null)
+            reloadAlbumPostsData(loadingBar = null)
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
@@ -252,7 +249,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
         }
     }
 
-    fun reloadPetUsedGoodsData(loadingBar: Boolean?) {
+    fun reloadAlbumPostsData(loadingBar: Boolean?) {
         context?.let {
             profileViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = 1, loadingBar = loadingBar)
             profileViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = 1, loginUserId = spHelper.userId, loadingBar = loadingBar)

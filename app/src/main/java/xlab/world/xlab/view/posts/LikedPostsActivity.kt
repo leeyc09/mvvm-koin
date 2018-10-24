@@ -24,8 +24,6 @@ class LikedPostsActivity : AppCompatActivity(), View.OnClickListener {
     private val postsViewModel: PostsViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
-    private var resultCode = Activity.RESULT_CANCELED
-
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
 
@@ -53,10 +51,9 @@ class LikedPostsActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
+        postsViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.POST_DETAIL -> { // 포스트 상세
                         postsViewModel.loadLikedPostsData(authorization = spHelper.authorization, page = 1)
@@ -64,21 +61,24 @@ class LikedPostsActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
 
     private fun onSetup() {
+        // 타이틀 설정, 액션 버튼 비활성화
         actionBarTitle.setText(getText(R.string.liked_post), TextView.BufferType.SPANNABLE)
         actionBtn.visibility = View.GONE
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
+        // Listener 초기화
         defaultListener = DefaultListener(context = this)
 
+        // post adapter & recycler 초기화
         postsAdapter = PostThumbnailAdapter(context = this, changeViewTypeListener = null,
                 postListener = defaultListener.postListener)
         recyclerView.adapter = postsAdapter
@@ -111,16 +111,18 @@ class LikedPostsActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
+                uiData.emptyPostVisibility?.let {
+                    textViewEmptyPost.visibility = it
+                }
                 uiData.postsData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        // post 없으면 no post 띄우기
-                        textViewEmptyPost.visibility =
-                                if (it.items.isEmpty()) View.VISIBLE
-                                else View.GONE
-                        postsAdapter.updateData(postThumbnailData = it)
-                    }
-                    else
-                        postsAdapter.addData(postThumbnailData = it)
+                    postsAdapter.linkData(postThumbnailData = it)
+                }
+                uiData.postsDataUpdate?.let {
+                    postsAdapter.notifyDataSetChanged()
                 }
             }
         })
@@ -139,8 +141,7 @@ class LikedPostsActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    postsViewModel.backBtnAction()
                 }
             }
         }

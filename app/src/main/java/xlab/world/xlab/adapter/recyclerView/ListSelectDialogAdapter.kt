@@ -25,6 +25,7 @@ class ListSelectDialogAdapter(private val context: Context,
 
     fun linkData(listData: ArrayList<String>) {
         this.listData = listData
+        notifyDataSetChanged()
     }
 
     override

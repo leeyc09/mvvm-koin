@@ -25,11 +25,13 @@ import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.notice.NoticeViewModel
 import xlab.world.xlab.view.profile.fragment.ProfileAlbumFragment
 import xlab.world.xlab.view.profile.fragment.ProfilePetFragment
 
 class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     private val profileViewModel: ProfileViewModel by viewModel()
+    private val noticeViewModel: NoticeViewModel by viewModel()
     private val fontColorSpan: FontColorSpan by inject()
     private val spHelper: SPHelper by inject()
     private val permissionHelper: PermissionHelper by inject()
@@ -89,9 +91,9 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
+        profileViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                profileViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                 when (requestCode) {
                     RequestCodeData.PROFILE_EDIT -> { // 프로필 수정
                         profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loadingBar = null)
@@ -113,29 +115,29 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                         profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loadingBar = null)
                         profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
                                 topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
-                        profileAlbumFragment.reloadPetUsedGoodsData(loadingBar = null)
+                        profileAlbumFragment.reloadAlbumPostsData(loadingBar = null)
                         profilePetFragment.reloadPetUsedGoodsData(loadingBar = null)
                     }
                     RequestCodeData.POST_UPLOAD -> { // 포스트 업로드
                         // set user post data
-                        profileAlbumFragment.reloadPetUsedGoodsData(loadingBar = null)
+                        profileAlbumFragment.reloadAlbumPostsData(loadingBar = null)
                     }
                 }
             }
             ResultCodeData.TOPIC_DELETE -> {
-                profileViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                 profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
                         topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
             }
+            ResultCodeData.LOAD_OLD_DATA -> {
+                noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
+            }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                profileViewModel.setResultCode(resultCode = ResultCodeData.LOGIN_SUCCESS)
                 profileViewModel.setProfileType(userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
                 profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loadingBar = null)
                 profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1, topicDataCount = 0,
                         loginUserId = spHelper.userId, loadingBar = null)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                profileViewModel.setResultCode(resultCode = ResultCodeData.LOGOUT_SUCCESS)
                 actionBackBtn.performClick()
             }
         }
@@ -182,6 +184,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID))
         profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
                 topicDataCount = 0, loginUserId = spHelper.userId)
+        noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
     }
 
     private fun onBindEvent() {
@@ -205,6 +208,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
+        // TODO: Profile View Model
         // UI 이벤트 observe
         profileViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
@@ -275,6 +279,16 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         profileViewModel.loadUserPetData.observe(owner = this, observer = android.arch.lifecycle.Observer { loadUserPetEvent ->
             loadUserPetEvent?.let { isLoading ->
                 profileTopicAdapter.dataLoading = isLoading
+            }
+        })
+
+        // TODO: Notice View Model
+        // UI 이벤트 observe
+        noticeViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let {_->
+                uiData.newNoticeDotVisibility?.let {
+                    dotView.visibility = it
+                }
             }
         })
     }

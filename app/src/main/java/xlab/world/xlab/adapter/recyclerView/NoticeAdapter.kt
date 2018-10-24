@@ -20,7 +20,7 @@ import xlab.world.xlab.data.adapter.TopicSettingListData
 class NoticeAdapter(private val context: Context,
                     private val selectListener: View.OnClickListener) : RecyclerView.Adapter<NoticeAdapter.ViewHolder>() {
 
-    private val noticeData: NoticeData = NoticeData()
+    private var noticeData: NoticeData = NoticeData()
     var dataLoading: Boolean
         get() = this.noticeData.isLoading
         set(value) { this.noticeData.isLoading = value }
@@ -29,34 +29,9 @@ class NoticeAdapter(private val context: Context,
     var dataNextPage: Int = 1
         get() = this.noticeData.nextPage
 
-    private val glideOption = RequestOptions()
-            .circleCrop()
-            .placeholder(R.drawable.profile_image_default)
-            .error(R.drawable.profile_image_default)
-
-    fun getItem(position: Int): NoticeListData {
-        return noticeData.items[position]
-    }
-
-    fun updateData(noticeData: NoticeData) {
-        this.noticeData.items.clear()
-        this.noticeData.items.addAll(noticeData.items)
-
-        this.noticeData.isLoading = false
-        this.noticeData.total = noticeData.total
-        this.noticeData.nextPage = 2
-
+    fun linkData(noticeData: NoticeData) {
+        this.noticeData = noticeData
         notifyDataSetChanged()
-    }
-
-    fun addData(noticeData: NoticeData) {
-        val size: Int = itemCount
-        this.noticeData.items.addAll(noticeData.items)
-
-        this.noticeData.isLoading = false
-        this.noticeData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override

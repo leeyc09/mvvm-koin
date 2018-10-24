@@ -43,9 +43,11 @@ class ShopProfileEditActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
+        // 타이틀 설정, 액션 버튼 비활성화
         actionBarTitle.setText(getText(R.string.edit_shop_info), TextView.BufferType.SPANNABLE)
         actionBtn.isEnabled = false
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
         editCancelDialog = DialogCreator.editCancelDialog(context = this)
@@ -78,16 +80,15 @@ class ShopProfileEditActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
                 uiData.actionBtnEnable?.let {
                     actionBtn.isEnabled = it
                 }
                 uiData.cancelDialogShow?.let {
-                    if (it)
-                        editCancelDialog.show()
-                    else {
-                        setResult(Activity.RESULT_CANCELED)
-                        finish()
-                    }
+                    editCancelDialog.show()
                 }
                 uiData.shopName?.let {
                     editTextName.setText(it)
@@ -97,25 +98,13 @@ class ShopProfileEditActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         })
-
-        // update profile 이벤트 observe
-        myShoppingViewModel.updateProfileEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.status?.let { isSuccess ->
-                    if (isSuccess) {
-                        setResult(Activity.RESULT_OK)
-                        finish()
-                    }
-                }
-            }
-        })
     }
 
     override fun onClick(v: View?) {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    myShoppingViewModel.actionBackBtnAction()
+                    myShoppingViewModel.profileEditActionBackBtnAction()
                 }
                 R.id.actionBtn -> { // 저장하기
                     myShoppingViewModel.updateShopProfile(context = this, authorization = spHelper.authorization)

@@ -36,7 +36,7 @@ class PostThumbnailAdapter(private val context: Context,
                            private val changeViewTypeListener: View.OnClickListener?,
                            private val postListener: View.OnClickListener) : RecyclerView.Adapter<PostThumbnailAdapter.ViewHolder>() {
 
-    private val postThumbnailData: PostThumbnailData = PostThumbnailData()
+    private var postThumbnailData: PostThumbnailData = PostThumbnailData()
     var dataLoading: Boolean
         get() = this.postThumbnailData.isLoading
         set(value) { this.postThumbnailData.isLoading = value }
@@ -50,6 +50,11 @@ class PostThumbnailAdapter(private val context: Context,
             .centerCrop()
             .placeholder(imagePlaceHolder)
             .error(imagePlaceHolder)
+
+    fun linkData(postThumbnailData: PostThumbnailData) {
+        this.postThumbnailData = postThumbnailData
+        notifyDataSetChanged()
+    }
 
     fun updateData(postThumbnailData: PostThumbnailData) {
         this.postThumbnailData.items.clear()

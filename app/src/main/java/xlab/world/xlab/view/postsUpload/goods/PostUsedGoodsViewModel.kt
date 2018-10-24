@@ -86,14 +86,13 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
                         }
                         if (page == 1) { // 요청한 page => 첫페이지
                             this.usedGoodsData.updateData(selectUsedGoodsData = newUsedGoodsData)
-                            uiData.value = UIModel(usedGoodsData = this.usedGoodsData,
+                            uiData.value = UIModel(isLoading = false,
+                                    usedGoodsData = this.usedGoodsData,
                                     emptyGoodsVisibility = if (this.usedGoodsData.items.isEmpty()) View.VISIBLE else View.GONE)
                         } else {
                             this.usedGoodsData.addData(selectUsedGoodsData = newUsedGoodsData)
-                            uiData.value = UIModel(usedGoodsUpdate = true)
+                            uiData.value = UIModel(isLoading = false, usedGoodsUpdate = true)
                         }
-
-                        uiData.value = UIModel(isLoading = false)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)

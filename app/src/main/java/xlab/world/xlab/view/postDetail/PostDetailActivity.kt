@@ -161,6 +161,7 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 uiData.postUpdatePosition?.let {
                     postDetailAdapter.notifyItemChanged(it)
+                    resultCode = Activity.RESULT_OK
                 }
             }
         })

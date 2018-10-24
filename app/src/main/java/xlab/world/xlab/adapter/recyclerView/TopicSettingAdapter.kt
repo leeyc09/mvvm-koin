@@ -19,7 +19,7 @@ import xlab.world.xlab.data.adapter.TopicSettingListData
 class TopicSettingAdapter(private val context: Context,
                           private val topicToggleListener: View.OnClickListener) : RecyclerView.Adapter<TopicSettingAdapter.ViewHolder>() {
 
-    private val topicSettingData: TopicSettingData = TopicSettingData()
+    private var topicSettingData: TopicSettingData = TopicSettingData()
     var dataLoading: Boolean
         get() = this.topicSettingData.isLoading
         set(value) { this.topicSettingData.isLoading = value }
@@ -33,29 +33,9 @@ class TopicSettingAdapter(private val context: Context,
             .placeholder(R.drawable.profile_image_default)
             .error(R.drawable.profile_image_default)
 
-    fun getItem(position: Int): TopicSettingListData {
-        return topicSettingData.items[position]
-    }
-
-    fun updateData(topicSettingData: TopicSettingData) {
-        this.topicSettingData.items.clear()
-        this.topicSettingData.items.addAll(topicSettingData.items)
-
-        this.topicSettingData.isLoading = false
-        this.topicSettingData.total = topicSettingData.total
-        this.topicSettingData.nextPage = 2
-
+    fun linkData(topicSettingData: TopicSettingData) {
+        this.topicSettingData = topicSettingData
         notifyDataSetChanged()
-    }
-
-    fun addData(topicSettingData: TopicSettingData) {
-        val size: Int = itemCount
-        this.topicSettingData.items.addAll(topicSettingData.items)
-
-        this.topicSettingData.isLoading = false
-        this.topicSettingData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override

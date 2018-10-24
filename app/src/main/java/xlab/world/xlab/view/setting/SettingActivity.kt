@@ -20,12 +20,12 @@ import xlab.world.xlab.utils.view.dialog.DefaultOneDialog
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.dialog.ShopAccountDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.notice.NoticeViewModel
 
 class SettingActivity : AppCompatActivity(), View.OnClickListener {
     private val settingViewModel: SettingViewModel by viewModel()
+    private val noticeViewModel: NoticeViewModel by viewModel()
     private val spHelper: SPHelper by inject()
-
-    private var resultCode = Activity.RESULT_CANCELED
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
@@ -38,14 +38,13 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private val shopLoginListener = object: ShopAccountDialog.Listener {
+    private val shopAccountListener = object: ShopAccountDialog.Listener {
         override fun webViewFinish(result: Boolean) {
             if (result) {
                 spHelper.logout()
                 RunActivity.loginActivity(context = this@SettingActivity, isComePreLoadActivity = true, linkData = null)
 
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                settingViewModel.backBtnAction()
             }
         }
     }
@@ -66,56 +65,48 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
-        PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
+        PrintLog.d("resultCode", resultCode.toString(), this::class.java.name.toString())
+        PrintLog.d("requestCode", requestCode.toString(), this::class.java.name.toString())
 
+        settingViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
-                    RequestCodeData.WITHDRAW -> { // 회원탈퇴
+                    RequestCodeData.WITHDRAW -> { // 회원탈퇴 -> 로그아웃 진행
                         settingViewModel.userLogout(authorization = spHelper.authorization)
                     }
-                    RequestCodeData.LIKED_POST -> { // 좋아한 포스트
-
-                    }
-                    RequestCodeData.MY_SHOP_PROFILE_EDIT -> { // 쇼핑몰 정보 수정
-//                        defaultToast.showToast(resources.getString(R.string.success_change_shop_info))
-                    }
+                }
+            }
+            ResultCodeData.LOAD_OLD_DATA -> {
+                when (requestCode) {
                     RequestCodeData.NOTICE -> { // 공지사항
-//                        loadExistNewNotice { existNewNotice ->
-//                            dotView.visibility =
-//                                    if (existNewNotice) View.VISIBLE
-//                                    else  View.GONE
-//                        }
+                        noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
                     }
                 }
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
 
     private fun onSetup() {
+        // 타이틀 설정, 액션 버튼 비활성
         actionBarTitle.setText(getString(R.string.setting), TextView.BufferType.SPANNABLE)
         actionBtn.visibility = View.GONE
-
-        changePasswordBtn.visibility =
-                if (SPHelper(this).userType == AppConstants.LOCAL_LOGIN) View.VISIBLE
-                else View.GONE
+        // 앱 버전
         textViewVersion.text = String.format("V %s", BuildConfig.VERSION_NAME)
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
         logoutDialog = DefaultOneDialog(context = this,
                 text = getString(R.string.dial_logout),
                 listener = logoutListener)
-        shopLogoutDialog = ShopAccountDialog(context = this, listener = shopLoginListener)
+        shopLogoutDialog = ShopAccountDialog(context = this, listener = shopAccountListener)
 
-        settingViewModel.loadUserSettingData(authorization = spHelper.authorization)
+        settingViewModel.loadUserSettingData(userType = spHelper.userType, authorization = spHelper.authorization)
+        noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
     }
 
     private fun onBindEvent() {
@@ -135,6 +126,7 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
+        // TODO: Setting View Model
         // UI 이벤트 observe
         settingViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
@@ -147,6 +139,10 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
                 uiData.pushAlarm?.let {
                     pushAlarmBtn.isSelected = it
                 }
@@ -154,12 +150,20 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // logout 이벤트 observe
-        settingViewModel.logoutEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { logoutEventData ->
-            logoutEventData?.let { _ ->
-                logoutEventData.status?.let { isSuccess ->
-                    if (isSuccess) {
-                        shopLogoutDialog.requestLogout(userId = spHelper.userId)
-                    }
+        settingViewModel.logoutData.observe(owner = this, observer = android.arch.lifecycle.Observer { logoutEventData ->
+            logoutEventData?.let { isSuccess ->
+                if (isSuccess) {
+                    shopLogoutDialog.requestLogout(userId = spHelper.userId)
+                }
+            }
+        })
+
+        // TODO: Notice View Model
+        // UI 이벤트 observe
+        noticeViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let {_->
+                uiData.newNoticeDotVisibility?.let {
+                    noticeDotView.visibility = it
                 }
             }
         })
@@ -169,8 +173,7 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    settingViewModel.backBtnAction()
                 }
                 R.id.profileEditBtn -> { // 프로필 편집
                     RunActivity.profileEditActivity(context = this)

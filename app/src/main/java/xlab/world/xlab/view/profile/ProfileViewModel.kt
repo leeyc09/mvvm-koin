@@ -10,10 +10,7 @@ import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.server.provider.*
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
-import xlab.world.xlab.utils.support.AppConstants
-import xlab.world.xlab.utils.support.NetworkCheck
-import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.ResultCodeData
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
@@ -38,14 +35,17 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
     val uiData = MutableLiveData<UIModel>()
 
     fun setResultCode(resultCode: Int) {
+        this.resultCode =  SupportData.setResultCode(oldResultCode = this.resultCode, newResultCode = resultCode)
+        
         when (resultCode) {
             ResultCodeData.LOGIN_SUCCESS,
             ResultCodeData.LOGOUT_SUCCESS -> {
                 this.resultCode = resultCode
             }
-            Activity.RESULT_OK -> {
+            Activity.RESULT_OK,
+            ResultCodeData.TOPIC_DELETE -> {
                 if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = resultCode
+                    this.resultCode = Activity.RESULT_OK
             }
         }
     }
@@ -114,13 +114,11 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
 
                         if (page == 1) {
                             this.topicData.updateData(profileTopicData = newTopicData)
-                            uiData.value = UIModel(topicData = this.topicData)
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, topicData = this.topicData)
                         } else {
                             this.topicData.addData(profileTopicData = newTopicData)
-                            uiData.value = UIModel(topicDataUpdate = true)
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, topicDataUpdate = true)
                         }
-
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})

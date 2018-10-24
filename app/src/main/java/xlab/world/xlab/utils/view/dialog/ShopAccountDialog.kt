@@ -58,7 +58,8 @@ class ShopAccountDialog(context: Context,
     fun requestLogin(userId: String) {
         super.show()
 
-        val postData: String = "loginId=" + URLEncoder.encode(userId, "UTF-8")
+//        val postData: String = "loginId=" + URLEncoder.encode(userId, "UTF-8")
+        val postData: String = "loginId=" + URLEncoder.encode("kdu0136", "UTF-8")
         webView.postUrl(ApiURL.SHOP_LOGIN, postData.toByteArray())
         webView.webChromeClient = WebChromeClient()
         webViewClient = DefaultWebViewClient(listener = webViewClientListener, showInWebView = true, finishURL = ApiURL.SHOP_LOGIN)
@@ -68,7 +69,8 @@ class ShopAccountDialog(context: Context,
     fun requestLogout(userId: String) {
         super.show()
 
-        val postData: String = "loginId=" + URLEncoder.encode(userId, "UTF-8")
+//        val postData: String = "loginId=" + URLEncoder.encode(userId, "UTF-8")
+        val postData: String = "loginId=" + URLEncoder.encode("kdu0136", "UTF-8")
         webView.postUrl(ApiURL.SHOP_LOGOUT, postData.toByteArray())
         webView.webChromeClient = WebChromeClient()
         webViewClient = DefaultWebViewClient(listener = webViewClientListener, showInWebView = true, finishURL = ApiURL.SHOP_LOGOUT)

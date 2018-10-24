@@ -122,17 +122,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             ResultCodeData.LOAD_OLD_DATA -> { // notification dot reload
-//                if (SPHelper(this).accessToken != "") {
-//                    loadExistNewData ({ profileNew ->
-//                        profileDotView.visibility =
-//                                if (profileNew) View.VISIBLE
-//                                else View.INVISIBLE
-//                    }, { notiNew ->
-//                        notiDotView.visibility =
-//                                if (notiNew) View.VISIBLE
-//                                else View.INVISIBLE
-//                    })
-//                }
+                notificationViewModel.loadExistNewNotification(authorization = spHelper.authorization)
+                noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
                 feedAllFragment.reloadFeedData(loadingBar = null)

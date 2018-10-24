@@ -1,5 +1,6 @@
 package xlab.world.xlab.view.myShopping
 
+import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import io.reactivex.Observable
@@ -22,13 +23,15 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
                           private val apiUserActivity: ApiUserActivityProvider,
                           private val networkCheck: NetworkCheck,
                           private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "MyShopping"
+    private val viewModelTag = "MyShopping"
+
+    private var resultCode = Activity.RESULT_CANCELED
+
     private var goodsOrderData: GoodsOrderData = GoodsOrderData()
 
     private var initProfileData = ResShopProfileData()
     private var recentProfileData = ResShopProfileData()
 
-    val updateProfileEventData = SingleLiveEvent<MyShopEvent>()
     val orderCancelEventData = SingleLiveEvent<MyShopEvent>()
     val orderReceiveConfirmEventData = SingleLiveEvent<MyShopEvent>()
     val buyDecideEventData = SingleLiveEvent<BuyDecideEvent>()
@@ -46,7 +49,7 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestShopProfile(scheduler = scheduler, authorization = authorization,
                     responseData = {
-                        PrintLog.d("requestShopProfile success", it.toString())
+                        PrintLog.d("requestShopProfile success", it.toString(), viewModelTag)
                         initProfileData.name = it.name
                         initProfileData.email = it.email
                         uiData.value = UIModel(isLoading = false,
@@ -56,7 +59,7 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestShopProfile fail", errorData.message)
+                            PrintLog.e("requestShopProfile fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -73,14 +76,14 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestUpdateShopProfile(scheduler = scheduler, authorization = authorization, name = recentProfileData.name, email = recentProfileData.email,
                     responseData = {
-                        PrintLog.d("requestUpdateShopProfile success", it.toString())
-                        uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_shop_profile_update_success))
-                        updateProfileEventData.value = MyShopEvent(status = true)
+                        PrintLog.d("requestUpdateShopProfile success", it.toString(), viewModelTag)
+                        uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_shop_profile_update_success),
+                                resultCode = Activity.RESULT_OK)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestUpdateShopProfile fail", errorData.message)
+                            PrintLog.e("requestUpdateShopProfile fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -160,31 +163,27 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
         }
     }
 
-    fun actionBackBtnAction() {
+    fun profileEditActionBackBtnAction() {
         launch {
             Observable.create<Boolean> {
-                val result = initProfileData != recentProfileData
-
-                it.onNext(result)
+                it.onNext(initProfileData != recentProfileData)
                 it.onComplete()
             }.with(scheduler).subscribe {
-                uiData.value = UIModel(cancelDialogShow = it)
+                uiData.value = UIModel(resultCode = if (it) null else Activity.RESULT_CANCELED,
+                        cancelDialogShow = if (it) true else null)
             }
         }
     }
 
-    // 변경된 데이터 있는지 확인
+    // shop 프로필 변경 가능한지 확인
     fun enableSaveData(name: String? = null, email: String? = null) {
         launch {
             Observable.create<Boolean> {
-                name?.let {_->
-                    recentProfileData.name = name
-                }
-                email?.let {_->
-                    recentProfileData.email = email
-                }
+                name?.let {_-> recentProfileData.name = name }
+                email?.let {_-> recentProfileData.email = email }
 
-                val result = initProfileData != recentProfileData
+                val result = (initProfileData != recentProfileData) && recentProfileData.name.isNotEmpty()
+                && recentProfileData.email.isNotEmpty()
 
                 it.onNext(result)
                 it.onComplete()
@@ -293,7 +292,7 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
 
 data class BuyDecideEvent(val goods: GoodsOrderListData? = null)
 data class MyShopEvent(val status: Boolean? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
                    val actionBtnEnable: Boolean? = null, val cancelDialogShow: Boolean? = null,
                    val shopName: String? = null, val shopEmail: String? = null,
                    val completePaymentCnt: String? = null, val completePaymentEnable: Boolean? = null,

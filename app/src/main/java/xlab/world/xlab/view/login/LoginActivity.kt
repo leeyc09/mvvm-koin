@@ -340,8 +340,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                 userEmail = userEmail,
                 push = push)
 
-//        shopAccountDialog.requestLogin(userId = userId)
-        loginViewModel.finishView()
+        shopAccountDialog.requestLogin(userId = userId)
     }
 
     private fun getEmailText() = editTextMail.text?.trim().toString()

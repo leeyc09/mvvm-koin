@@ -1,6 +1,5 @@
 package xlab.world.xlab.view.notice
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
@@ -14,6 +13,7 @@ import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.NoticeAdapter
+import xlab.world.xlab.utils.support.ResultCodeData
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
@@ -31,7 +31,7 @@ class NoticeActivity : AppCompatActivity(), View.OnClickListener {
 
     private val noticeSelectListener = View.OnClickListener { view ->
         val position = view.tag as Int
-        noticeViewModel.readNotice(authorization = spHelper.authorization, noticeListData = noticeAdapter.getItem(position = position), position = position)
+        noticeViewModel.readNotice(authorization = spHelper.authorization, selectIndex = position)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,9 +49,11 @@ class NoticeActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
+        // 타이틀 설정, 액션 버튼 비활성화
         actionBarTitle.setText(getText(R.string.notice), TextView.BufferType.SPANNABLE)
         actionBtn.visibility = View.GONE
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
@@ -87,18 +89,16 @@ class NoticeActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
-                uiData.noticeData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        // post 없으면 no post 띄우기
-                        textViewEmptyNotice.visibility =
-                                if (it.items.isEmpty()) View.VISIBLE
-                                else View.GONE
-                        noticeAdapter.updateData(noticeData = it)
-                    }
-                    else
-                        noticeAdapter.addData(noticeData = it)
+                uiData.emptyNoticeVisibility?.let {
+                    textViewEmptyNotice.visibility = it
                 }
-                uiData.noticeUpdatePosition?.let {
+                uiData.noticeData?.let {
+                    noticeAdapter.linkData(noticeData = it)
+                }
+                uiData.noticeDataUpdate?.let {
+                    noticeAdapter.notifyDataSetChanged()
+                }
+                uiData.noticeUpdateIndex?.let {
                     noticeAdapter.notifyItemChanged(it)
                     recyclerView.smoothScrollToPosition(it)
                 }
@@ -106,11 +106,9 @@ class NoticeActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // load notice 이벤트 observe
-        noticeViewModel.loadNoticeventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _->
-                eventData.status?.let { isLoading ->
-                    noticeAdapter.dataLoading = isLoading
-                }
+        noticeViewModel.loadNoticeData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isLoading ->
+                noticeAdapter.dataLoading = isLoading
             }
         })
     }
@@ -119,7 +117,7 @@ class NoticeActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(Activity.RESULT_OK)
+                    setResult(ResultCodeData.LOAD_OLD_DATA)
                     finish()
                 }
             }

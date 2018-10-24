@@ -41,6 +41,7 @@ class PolicyActivity : AppCompatActivity() {
     }
 
     private fun onSetup() {
+        // 타이틀 설정, 액션 버튼 비활성화
         actionBarTitle.setText(resources.getText(R.string.policy), TextView.BufferType.SPANNABLE)
         actionBtn.visibility = View.GONE
 

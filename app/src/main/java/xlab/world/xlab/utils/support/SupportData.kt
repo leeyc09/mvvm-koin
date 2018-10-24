@@ -1,5 +1,6 @@
 package xlab.world.xlab.utils.support
 
+import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Environment
@@ -23,6 +24,39 @@ object SupportData {
         get() {
             return "xlab_" + System.currentTimeMillis()
         }
+
+    // result code level 따져서 설정하기
+    fun setResultCode(oldResultCode: Int, newResultCode: Int): Int {
+        val resultCode =  when (newResultCode) {
+            ResultCodeData.LOGOUT_SUCCESS,
+            ResultCodeData.LOGIN_SUCCESS -> {
+                newResultCode
+            }
+            Activity.RESULT_OK -> {
+                if (oldResultCode == Activity.RESULT_CANCELED ||
+                        oldResultCode == ResultCodeData.TOPIC_DELETE ||
+                        oldResultCode == ResultCodeData.LOAD_OLD_DATA)
+                    newResultCode
+                else oldResultCode
+            }
+            ResultCodeData.TOPIC_DELETE -> {
+                if (oldResultCode == Activity.RESULT_CANCELED ||
+                        oldResultCode == ResultCodeData.LOAD_OLD_DATA)
+                    newResultCode
+                else oldResultCode
+            }
+            ResultCodeData.LOAD_OLD_DATA -> {
+                if (oldResultCode == Activity.RESULT_CANCELED ||
+                        oldResultCode == ResultCodeData.TOPIC_DELETE)
+                    newResultCode
+                else oldResultCode
+            }
+            else -> newResultCode
+        }
+
+        PrintLog.d("setResultCode", resultCode.toString(), "SupportData")
+        return resultCode
+    }
 
     // youtube id 로 해당 영상 썸네일 가져오기
     fun getYoutubeThumbnailUrl(videoId: String, quality: Int): String? {
@@ -110,7 +144,6 @@ object SupportData {
         return if (count < 1000) count.toString()
         else String.format("%.1fk", (count / 1000).toFloat()) // if count more than 1000, show ?k
     }
-
 
     // 원화 표기
     fun applyPriceFormat(price: Int): String {

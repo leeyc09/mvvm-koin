@@ -40,13 +40,13 @@ class UpdatePasswordActivity : AppCompatActivity(), View.OnClickListener {
         actionBarTitle.visibility = View.GONE
         actionBtn.visibility = View.GONE
 
-        // 프래그먼트 초기화
-        val passwordConfirmFragment = PasswordConfirmFragment.newFragment()
-        supportFragmentManager.beginTransaction().replace(R.id.fragmentLayout, passwordConfirmFragment).commit()
-
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
+
+        // 프래그먼트 초기화
+        val passwordConfirmFragment = PasswordConfirmFragment.newFragment()
+        supportFragmentManager.beginTransaction().replace(R.id.fragmentLayout, passwordConfirmFragment).commit()
     }
 
     private fun onBindEvent() {
