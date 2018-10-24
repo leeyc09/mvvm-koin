@@ -20,37 +20,39 @@
         android:padding="10dp"
         android:src="@drawable/arrow_back_black"/>
 
-    <xlab.world.xlab.utils.view.textView.TextViewBoldHan
-        android:id="@+id/textViewPetNo"
+    <LinearLayout
+        android:id="@+id/cntLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0"
-        android:textSize="15sp"
-        android:textColor="@color/color5300ED"
-        app:layout_constraintEnd_toStartOf="@id/imageViewSlash"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <ImageView
-        android:id="@+id/imageViewSlash"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/slash"
+        android:orientation="horizontal"
+        android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <xlab.world.xlab.utils.view.textView.TextViewBoldHan
-        android:id="@+id/textViewPetTotal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0"
-        android:textSize="15sp"
-        android:textColor="@color/color000000"
-        app:layout_constraintStart_toEndOf="@id/imageViewSlash"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+            android:id="@+id/textViewPetNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="15sp"
+            android:textColor="@color/color5300ED"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/slash"/>
+
+        <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+            android:id="@+id/textViewPetTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="15sp"
+            android:textColor="@color/color000000"/>
+
+    </LinearLayout>
 
     <xlab.world.xlab.utils.view.textView.TextViewBoldNoto
         android:id="@+id/actionAddBtn"

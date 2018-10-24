@@ -67,10 +67,12 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
                         it.goods?.forEach { goods ->
                             var isSelect = false
                             // 선택한 상품은 체크 상태로
-                            selectUsedGoodsData.items.forEach selectedUsedGoodsData@ { selectedGoods ->
-                                if (goods.code == selectedGoods.goodsCode) {
-                                    isSelect = true
-                                    return@selectedUsedGoodsData
+                            run selectedUsedGoodsData@{
+                                selectUsedGoodsData.items.forEach { selectedGoods ->
+                                    if (goods.code == selectedGoods.goodsCode) {
+                                        isSelect = true
+                                        return@selectedUsedGoodsData
+                                    }
                                 }
                             }
                             newUsedGoodsData.items.add(SelectUsedGoodsListData(
@@ -115,10 +117,12 @@ class PostUsedGoodsViewModel(private val apiUserActivity: ApiUserActivityProvide
                     selectUsedGoodsData.addData(selectUsedGoodsListData = item)
                 } else { // 사용한 제품 선택 리스트 삭제
                     var removeIndex: Int = -1
-                    selectUsedGoodsData.items.forEachIndexed selectedUsedGoodsData@ { index, selectedGoods ->
-                        if (item.goodsCode == selectedGoods.goodsCode) {
-                            removeIndex = index
-                            return@selectedUsedGoodsData
+                    run selectedUsedGoodsData@ {
+                        selectUsedGoodsData.items.forEachIndexed { index, selectedGoods ->
+                            if (item.goodsCode == selectedGoods.goodsCode) {
+                                removeIndex = index
+                                return@selectedUsedGoodsData
+                            }
                         }
                     }
                     selectUsedGoodsData.removeData(index = removeIndex)

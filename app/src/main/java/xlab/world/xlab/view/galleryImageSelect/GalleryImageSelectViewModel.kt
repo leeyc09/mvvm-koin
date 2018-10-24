@@ -42,19 +42,19 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
     }
     // 선택 된 이미지 matrix 정보 저장
     fun updateMatrix(matrix: Matrix) {
-        selectDataList.forEachIndexed selectDataList@ { index, data ->
+        selectDataList.forEachIndexed { index, data ->
             if (data.isPreview) {
                 selectMatrixList[index] = matrix
-                return@selectDataList
+                return
             }
         }
     }
     // 선택 된 이미지 bitmap 정보 저장
     fun updateBitmap(bitmap: Bitmap) {
-        selectDataList.forEachIndexed selectDataList@ { index, data ->
+        selectDataList.forEachIndexed { index, data ->
             if (data.isPreview) {
                 selectBitmapList[index] = bitmap
-                return@selectDataList
+                return
             }
         }
     }
@@ -97,10 +97,12 @@ class GalleryImageSelectViewModel(private val scheduler: SchedulerProvider): Abs
             Observable.create<Any> {
                 PrintLog.d("removeSelectDataList Index", index.toString(), viewModelTag)
                 var removeIndex = 0
-                selectIndexList.forEachIndexed selectIndexList@ { i, value ->
-                    if (index == value) {
-                        removeIndex = i
-                        return@selectIndexList
+                run selectIndexList@ {
+                    selectIndexList.forEachIndexed { i, value ->
+                        if (index == value) {
+                            removeIndex = i
+                            return@selectIndexList
+                        }
                     }
                 }
                 selectIndexList.removeAt(removeIndex)

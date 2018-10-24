@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
+import xlab.world.xlab.utils.support.PrintLog
 
 class GoodsDetailStatsAdapter(private val context: Context) : RecyclerView.Adapter<GoodsDetailStatsAdapter.ViewHolder>() {
 
@@ -124,13 +125,15 @@ class GoodsDetailStatsAdapter(private val context: Context) : RecyclerView.Adapt
             } else { // exit image
                 topicImageLayout.visibility = View.VISIBLE
 
-                item.topicImages.forEachIndexed topicImages@ { index, image ->
-                    val newView =
-                            if (index < 4) createTopicView(topicImageLayout, index, image, null)
-                            else createTopicView(topicImageLayout, index, image, if (item.topicImages.size - 5 > 0) item.topicImages.size - 5 else null)
-                    topicImageLayout.addView(newView)
+                run topicImages@{
+                    item.topicImages.forEachIndexed { index, image ->
+                        val newView =
+                                if (index < 4) createTopicView(topicImageLayout, index, image, null)
+                                else createTopicView(topicImageLayout, index, image, if (item.topicImages.size - 5 > 0) item.topicImages.size - 5 else null)
+                        topicImageLayout.addView(newView)
 
-                    if (index >= 4) return@topicImages
+                        if (index >= 4) return@topicImages
+                    }
                 }
             }
             // 100% -> ratio 0.8

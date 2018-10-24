@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.widget.NestedScrollView
 import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import android.widget.TextView
@@ -16,7 +15,6 @@ import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.TopicUsedGoodsAdapter
 import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
-import xlab.world.xlab.data.response.ResUserPetData
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
@@ -28,16 +26,12 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
     private val topicPetDetailViewModel: TopicPetDetailViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
-    private var userId: String = ""
-
-    private var resultCode = Activity.RESULT_CANCELED
+    private lateinit var defaultToast: DefaultToast
+    private lateinit var progressDialog: DefaultProgressDialog
 
     private lateinit var viewPagerAdapter: ViewStatePagerAdapter
 
     private lateinit var topicUsedGoodsAdapter: TopicUsedGoodsAdapter
-
-    private lateinit var defaultToast: DefaultToast
-    private lateinit var progressDialog: DefaultProgressDialog
 
     private lateinit var defaultListener: DefaultListener
 
@@ -63,38 +57,34 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
 
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED ||
-                        this.resultCode == ResultCodeData.TOPIC_DELETE)
-                    this.resultCode = Activity.RESULT_OK
+                topicPetDetailViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                 when (requestCode) {
                     RequestCodeData.TOPIC_ADD -> { // 펫 추가
                         (0 until viewPagerAdapter.count).forEach { index ->
                             val frag = viewPagerAdapter.getItem(index) as TopicPetDetailFragment
                             frag.resetPetData(petNo = null)
                         }
-                        viewPagerAdapter.addFragment(fragment = TopicPetDetailFragment.newFragment(userId = userId, petNo = viewPagerAdapter.count + 1), title = "")
+                        viewPagerAdapter.addFragment(fragment = TopicPetDetailFragment.newFragment(
+                                userId = intent.getStringExtra(IntentPassName.USER_ID),
+                                petNo = viewPagerAdapter.count + 1),
+                                title = "")
                         imageViewPager.setCurrentItem(0, false)
 
                         topicPetDetailViewModel.changePetTotal(total = viewPagerAdapter.count)
-                        topicPetDetailViewModel.loadPetDetailData(userId = userId, petNo = 1, reLoad = true)
+                        topicPetDetailViewModel.loadPetDetailData(userId = intent.getStringExtra(IntentPassName.USER_ID), petNo = 1, reLoad = true)
                     }
                     RequestCodeData.TOPIC_EDIT -> { // 펫 수정
                         val frag = viewPagerAdapter.getItem(imageViewPager.currentItem) as TopicPetDetailFragment
                         frag.resetPetData(petNo = null)
-                        topicPetDetailViewModel.loadPetDetailData(userId = userId, petNo = imageViewPager.currentItem + 1, reLoad = true)
+                        topicPetDetailViewModel.loadPetDetailData(userId = intent.getStringExtra(IntentPassName.USER_ID), petNo = imageViewPager.currentItem + 1, reLoad = true)
                     }
                     RequestCodeData.GOODS_DETAIL -> { // update pet used item list
-//                        loadPetUsedItemData(1, currentPetId, { petUsedItems ->
-//                            petItemAdapter.updateData(petUsedItems)
-//                        }, { isEnd ->
-//                            isLoadingPetUsedItem = !isEnd
-//                        })
+                        topicPetDetailViewModel.loadPetUsedGoodsData(page = 1)
                     }
                 }
             }
             ResultCodeData.TOPIC_DELETE -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = ResultCodeData.TOPIC_DELETE
+                topicPetDetailViewModel.setResultCode(resultCode = ResultCodeData.TOPIC_DELETE)
                 when (requestCode) {
                     RequestCodeData.TOPIC_EDIT -> {
                         viewPagerAdapter.removeFragment(viewPagerAdapter.count - 1)
@@ -105,7 +95,7 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
                             }
 
                             topicPetDetailViewModel.changePetTotal(total = viewPagerAdapter.count)
-                            topicPetDetailViewModel.loadPetDetailData(userId = userId, petNo = imageViewPager.currentItem + 1, reLoad = true)
+                            topicPetDetailViewModel.loadPetDetailData(userId = intent.getStringExtra(IntentPassName.USER_ID), petNo = imageViewPager.currentItem + 1, reLoad = true)
                         } else {
                             setResult(ResultCodeData.TOPIC_DELETE)
                             finish()
@@ -113,35 +103,26 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }
             }
-            ResultCodeData.LOGOUT_SUCCESS -> {
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
-            }
             ResultCodeData.LOGIN_SUCCESS -> {
-                this.resultCode = ResultCodeData.LOGIN_SUCCESS
-//                if (userId == SPHelper(this).userId) {
-//                    actionAddBtn.visibility = View.VISIBLE
-//                    petEditBtn.visibility = View.VISIBLE
-//                } else {
-//                    actionAddBtn.visibility = View.GONE
-//                    petEditBtn.visibility = View.GONE
-//                }
-//
-//                loadPetData(topicNum) { petData ->
-//                    setPetInfoData(petData)
-//                }
+                topicPetDetailViewModel.setResultCode(resultCode = ResultCodeData.LOGIN_SUCCESS)
+                topicPetDetailViewModel.setButtonVisible(userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId)
+                topicPetDetailViewModel.loadPetDetailData(userId = intent.getStringExtra(IntentPassName.USER_ID), petNo = intent.getIntExtra(IntentPassName.PET_NO, 1))
+            }
+            ResultCodeData.LOGOUT_SUCCESS -> {
+                topicPetDetailViewModel.setResultCode(resultCode = ResultCodeData.LOGOUT_SUCCESS)
+                actionBackBtn.performClick()
             }
         }
     }
 
     private fun onSetup() {
-        userId = intent.getStringExtra(IntentPassName.USER_ID)
-
         textViewPetNo.setText(intent.getIntExtra(IntentPassName.PET_NO, 1).toString(), TextView.BufferType.SPANNABLE)
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
+        // Listener 초기화
         defaultListener = DefaultListener(context = this)
 
         // topicUsedGoods adapter & recycler view 초기화
@@ -155,14 +136,14 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
         // 프래그먼트 & 뷰 페이저 초기화
         viewPagerAdapter = ViewStatePagerAdapter(manager = supportFragmentManager)
         (1..intent.getIntExtra(IntentPassName.PET_TOTAL, 1)).forEach { petNo ->
-            viewPagerAdapter.addFragment(fragment = TopicPetDetailFragment.newFragment(userId = userId, petNo = petNo), title = "")
+            viewPagerAdapter.addFragment(fragment = TopicPetDetailFragment.newFragment(userId = intent.getStringExtra(IntentPassName.USER_ID), petNo = petNo), title = "")
         }
         imageViewPager.adapter = viewPagerAdapter
         imageViewPager.setCurrentItem(intent.getIntExtra(IntentPassName.PET_NO, 1) - 1, false)
 
-        topicPetDetailViewModel.setButtonVisible(userId = userId, loginUserId = spHelper.userId)
+        topicPetDetailViewModel.setButtonVisible(userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId)
         topicPetDetailViewModel.changePetTotal(total = intent.getIntExtra(IntentPassName.PET_TOTAL, 1))
-        topicPetDetailViewModel.loadPetDetailData(userId = userId, petNo = intent.getIntExtra(IntentPassName.PET_NO, 1))
+        topicPetDetailViewModel.loadPetDetailData(userId = intent.getStringExtra(IntentPassName.USER_ID), petNo = intent.getIntExtra(IntentPassName.PET_NO, 1))
     }
 
     private fun onBindEvent() {
@@ -175,7 +156,9 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
 
             val frag = viewPagerAdapter.getItem(position) as TopicPetDetailFragment
             frag.petData?.let {
-                topicPetDetailViewModel.changePetData(petData = it, isMine = userId == spHelper.userId)
+                topicPetDetailViewModel.changePetData(petData = it,
+                        userId = intent.getStringExtra(IntentPassName.USER_ID),
+                        loginUserId = spHelper.userId)
             }
             frag.petUsedGoods?.let {
                 topicPetDetailViewModel.changePetUsedGoodsData(petUsedGoods = it)
@@ -202,27 +185,43 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
-                uiData.btnVisibility?.let {
-                    actionAddBtn.visibility = it
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
+                uiData.editBtnVisibility?.let {
                     petEditBtn.visibility = it
+                }
+                uiData.addBtnVisibility?.let {
+                    actionAddBtn.visibility = it
                 }
                 uiData.petTotal?.let {
                     textViewPetTotal.tag = it
                     textViewPetTotal.setText(it.toString(), TextView.BufferType.SPANNABLE)
                 }
                 uiData.petCountVisibility?.let {
-                    textViewPetNo.visibility = it
-                    imageViewSlash.visibility = it
-                    textViewPetTotal.visibility = it
+                    cntLayout.visibility = it
                 }
-                uiData.petDetailData?.let {
-                    textViewPetBreed.setText(it.breed, TextView.BufferType.SPANNABLE)
-                    textViewPetBreed.setTextColor(it.topicColor)
-                    textViewPetName.setText(it.name, TextView.BufferType.SPANNABLE)
-                    textViewPetType.setText(it.type, TextView.BufferType.SPANNABLE)
-                    imageViewPetGender.isSelected = it.gender
-                    textViewPetAge.setText(it.age, TextView.BufferType.SPANNABLE)
-                    textViewPetWeight.setText(it.weight, TextView.BufferType.SPANNABLE)
+                uiData.petBreed?.let {
+                    textViewPetBreed.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.topicColor?.let {
+                    textViewPetBreed.setTextColor(it)
+                }
+                uiData.petType?.let {
+                    textViewPetType.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.petName?.let {
+                    textViewPetName.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.petGender?.let {
+                    imageViewPetGender.isSelected = it
+                }
+                uiData.petAge?.let {
+                    textViewPetAge.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.petWeight?.let {
+                    textViewPetWeight.setText(it, TextView.BufferType.SPANNABLE)
                 }
                 uiData.petUsedGoods?.let {
                     if (it.nextPage <= 2 ) // 요청한 page => 첫페이지
@@ -236,12 +235,14 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // load pet data 이벤트 observe
-        topicPetDetailViewModel.loadPetDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadPetDataEvent ->
-            loadPetDataEvent?.let { _ ->
-                loadPetDataEvent.petData?.let {
-                    topicPetDetailViewModel.changePetData(petData = it, isMine = userId == spHelper.userId)
+        topicPetDetailViewModel.loadPetData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.petData?.let {
+                    topicPetDetailViewModel.changePetData(petData = it,
+                            userId = intent.getStringExtra(IntentPassName.USER_ID),
+                            loginUserId = spHelper.userId)
                 }
-                loadPetDataEvent.petUsedGoods?.let {
+                eventData.petUsedGoods?.let {
                     topicPetDetailViewModel.changePetUsedGoodsData(petUsedGoods = it)
                 }
             }
@@ -261,8 +262,7 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    topicPetDetailViewModel.backBtnAction()
                 }
                 R.id.actionAddBtn -> { // 펫 추가하기
                     RunActivity.petEditActivity(context = this, petNo = null)

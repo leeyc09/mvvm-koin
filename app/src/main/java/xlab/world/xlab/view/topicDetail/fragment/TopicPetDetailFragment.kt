@@ -12,7 +12,6 @@ import org.koin.android.architecture.ext.viewModel
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.TopicUsedGoodsData
 import xlab.world.xlab.data.response.ResUserPetData
-import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.topicDetail.TopicPetDetailViewModel
@@ -96,7 +95,7 @@ class TopicPetDetailFragment: Fragment() {
         })
 
         // load pet data 이벤트 observe
-        topicPetDetailViewModel.loadPetDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadPetDataEvent ->
+        topicPetDetailViewModel.loadPetData.observe(owner = this, observer = android.arch.lifecycle.Observer { loadPetDataEvent ->
             loadPetDataEvent?.let { _ ->
                 loadPetDataEvent.petData?.let {
                     petData = it

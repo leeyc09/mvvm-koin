@@ -106,16 +106,18 @@ class PostsViewModel(private val apiShop: ApiShopProvider,
                         PrintLog.d("requestGoodsTaggedPosts success", it.toString())
                         val taggedPostsData = PostThumbnailData(total = it.total, nextPage = page + 1)
 
-                        it.postsData?.forEachIndexed postsData@ { index, post ->
-                            limitCnt?.let { limitCnt ->
-                                if (index > limitCnt) return@postsData
+                        run postsData@ {
+                            it.postsData?.forEachIndexed { index, post ->
+                                limitCnt?.let { limitCnt ->
+                                    if (index > limitCnt) return@postsData
+                                }
+                                taggedPostsData.items.add(PostThumbnailListData(
+                                        dataType = AppConstants.ADAPTER_CONTENT,
+                                        postId = post.id,
+                                        postType = post.postType,
+                                        imageURL = post.postFile.firstOrNull(),
+                                        youTubeVideoID = post.youTubeVideoID))
                             }
-                            taggedPostsData.items.add(PostThumbnailListData(
-                                    dataType = AppConstants.ADAPTER_CONTENT,
-                                    postId = post.id,
-                                    postType = post.postType,
-                                    imageURL = post.postFile.firstOrNull(),
-                                    youTubeVideoID = post.youTubeVideoID))
                         }
                         uiData.value = UIModel(isLoading = false, postsData = taggedPostsData)
                     },
