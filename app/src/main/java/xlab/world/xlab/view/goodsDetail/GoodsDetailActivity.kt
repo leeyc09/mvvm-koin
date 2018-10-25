@@ -246,11 +246,11 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                     addCartToast.showToast()
                 }
                 uiData.isGuest?.let {
-                    if (it) loginDialog.show()
+                    if (it) loginDialog.showDialog(tag = null)
                 }
                 uiData.buyOptionDialogShow?.let {
-                    buyGoodsOptionDialog.setUnitPirce(price = it)
-                    buyGoodsOptionDialog.show(supportFragmentManager, "buyGoodsOptionDialog")
+                    buyGoodsOptionDialog.showDialog(manager = supportFragmentManager, dialogTag = "buyGoodsOptionDialog",
+                            price = it)
                 }
                 uiData.topicMatchData?.let {
                     matchingRecyclerView.visibility =
@@ -327,8 +327,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         goodsDetailViewModel.goodsRatingEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let { _->
                 eventData.ratingCancelPosition?.let {
-                    ratingCancelDialog.setTag(tag = it)
-                    ratingCancelDialog.show()
+                    ratingCancelDialog.showDialog(tag = it)
                 }
             }
         })
@@ -359,7 +358,8 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                     finish()
                 }
                 R.id.actionShareBtn -> { // 공유하기
-                    shareDialog.show(supportFragmentManager, "shareDialog")
+                    shareDialog.showDialog(manager = supportFragmentManager, dialogTag = "shareDialog",
+                            tagData = null)
                 }
                 R.id.actionCartBtn -> { // 장바구니
                     RunActivity.cartActivity(context = this)

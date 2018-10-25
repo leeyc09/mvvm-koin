@@ -2,6 +2,7 @@ package xlab.world.xlab.utils.view.dialog
 
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialogFragment
+import android.support.v4.app.FragmentManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,8 +60,10 @@ class ShareBottomDialog: BottomSheetDialogFragment(), View.OnClickListener {
         this.listener = listener
     }
 
-    fun setTag(tag: Any) {
-        this.tag = tag
+    fun showDialog(manager: FragmentManager, dialogTag: String, tagData: Any?) {
+        this.tag = tagData
+
+        super.show(manager, dialogTag)
     }
 
     companion object {

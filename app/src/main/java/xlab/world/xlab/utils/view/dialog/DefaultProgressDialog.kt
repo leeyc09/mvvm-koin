@@ -47,8 +47,4 @@ class DefaultProgressDialog(context: Context): Dialog(context) {
         }
         toastCountDown.start()
     }
-
-    override fun dismiss() {
-        super.dismiss()
-    }
 }

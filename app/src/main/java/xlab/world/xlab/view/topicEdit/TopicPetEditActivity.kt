@@ -275,7 +275,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
                     actionBtn.isEnabled = it
                 }
                 uiData.editCancelDialogShow?.let {
-                    editCancelDialog.show()
+                    editCancelDialog.showDialog(tag = null)
                 }
             }
         })
@@ -346,7 +346,7 @@ class TopicPetEditActivity : AppCompatActivity(), View.OnClickListener, View.OnT
                     else if (textViewCat.isSelected) RunActivity.petBreedActivity(context = this, petType = petInfo.catCode)
                 }
                 R.id.topicDeleteBtn -> { // pet 삭제
-                    topicDeleteDialog.show()
+                    topicDeleteDialog.showDialog(tag = null)
                 }
             }
         }

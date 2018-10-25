@@ -36,7 +36,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
 
     fun setResultCode(resultCode: Int) {
         this.resultCode =  SupportData.setResultCode(oldResultCode = this.resultCode, newResultCode = resultCode)
-        
+
         when (resultCode) {
             ResultCodeData.LOGIN_SUCCESS,
             ResultCodeData.LOGOUT_SUCCESS -> {
@@ -130,7 +130,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
     }
 
     // 해당 유저 정보(프로필 이미지, 닉네임, 소개, 팔로잉 & 팔로워 수, 팔로잉 상태) 불러오기
-    fun loadUserData(context: Context, authorization: String, userId: String, loadingBar: Boolean? = true) {
+    fun loadUserData(context: Context, authorization: String, userId: String, loginUserId: String, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
@@ -142,12 +142,16 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
             apiUser.requestProfileMain(scheduler = scheduler, authorization = authorization, userId = userId,
                     responseData = {
                         PrintLog.d("requestProfileMain success", it.toString(), viewModelTag)
+                        // 자신의 프로필일 경우 팔로워 버튼 활성화
+                        // 다른 사람 프로필일 경우, 팔로워(팔로잉) 수가 0 이상일 경우 팔로워(팔로잉) 버튼 활성화
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
                                 profileImage = it.profileImg,
                                 nickName = it.nickName,
                                 introduction = it.introduction,
-                                followerCnt = it.followerCnt,
-                                followingCnt = it.followingCnt,
+                                followerCnt = SupportData.countFormat(count = it.followerCnt),
+                                followerEnable = if (userId == loginUserId) true else it.followerCnt > 0,
+                                followingCnt = SupportData.countFormat(count = it.followingCnt),
+                                followingEnable = if (userId == loginUserId) true else it.followingCnt > 0,
                                 followState = it.isFollowing)
                     },
                     errorData = { errorData ->
@@ -326,7 +330,9 @@ data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = n
                    val myProfileLayoutVisibility: Int? = null, val otherProfileLayoutVisibility: Int? = null,
                    val followBtnVisibility: Int? = null, val editBtnVisibility: Int? = null,
                    val profileImage: String? = null, val nickName: String? = null, val introduction: String? = null,
-                   val followerCnt: Int? = null, val followingCnt: Int? = null, val followState: Boolean? = null,
+                   val followerCnt: String? = null, val followerEnable: Boolean? = null,
+                   val followingCnt: String? = null, val followingEnable: Boolean? = null,
+                   val followState: Boolean? = null,
                    val topicData: ProfileTopicData? = null, val topicDataUpdate: Boolean? = null,
                    val topicUsedGoodsData: GoodsThumbnailData? = null,
                    val postsThumbData: PostThumbnailData? = null, val postsDetailData: PostDetailData? = null)

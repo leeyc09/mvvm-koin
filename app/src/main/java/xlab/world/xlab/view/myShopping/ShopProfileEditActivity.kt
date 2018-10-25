@@ -88,7 +88,7 @@ class ShopProfileEditActivity : AppCompatActivity(), View.OnClickListener {
                     actionBtn.isEnabled = it
                 }
                 uiData.cancelDialogShow?.let {
-                    editCancelDialog.show()
+                    editCancelDialog.showDialog(tag = null)
                 }
                 uiData.shopName?.let {
                     editTextName.setText(it)

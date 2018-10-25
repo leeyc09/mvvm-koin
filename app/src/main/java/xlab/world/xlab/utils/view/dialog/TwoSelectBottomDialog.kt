@@ -3,6 +3,7 @@ package xlab.world.xlab.utils.view.dialog
 import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialogFragment
+import android.support.v4.app.FragmentManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,11 +14,11 @@ import xlab.world.xlab.R
 class TwoSelectBottomDialog: BottomSheetDialogFragment(), View.OnClickListener {
 
     interface Listener {
-        fun onFirstBtnClick(tag: Any)
-        fun onSecondBtnClick(tag: Any)
+        fun onFirstBtnClick(tag: Any?)
+        fun onSecondBtnClick(tag: Any?)
     }
 
-    private var tag: Any = -1
+    private var tag: Any? = null
 
     private lateinit var listener: Listener
 
@@ -32,6 +33,11 @@ class TwoSelectBottomDialog: BottomSheetDialogFragment(), View.OnClickListener {
         onSetup()
 
         onBindEvent()
+    }
+
+    override fun dismiss() {
+        this.tag = null
+        super.dismiss()
     }
 
     private fun onSetup() {
@@ -71,7 +77,6 @@ class TwoSelectBottomDialog: BottomSheetDialogFragment(), View.OnClickListener {
                 }
                 R.id.cancelBtn -> { // 취소
                     dismiss()
-                    tag = -1
                 }
             }
         }
@@ -81,8 +86,10 @@ class TwoSelectBottomDialog: BottomSheetDialogFragment(), View.OnClickListener {
         this.listener = listener
     }
 
-    fun setTag(tag: Any) {
-        this.tag = tag
+    fun showDialog(manager: FragmentManager, dialogTag: String, tagData: Any?) {
+        this.tag = tagData
+
+        super.show(manager, dialogTag)
     }
 
     private fun getBundleFirstText(): String? = arguments?.getString("firstText")

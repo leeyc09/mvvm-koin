@@ -17,11 +17,9 @@ import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.button.MatchButtonHelper
 import xlab.world.xlab.utils.view.dialog.DefaultDialog
-import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.dialog.DialogCreator
 import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
 import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
-import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.main.fragment.FeedAllFragment
 import xlab.world.xlab.view.main.fragment.FeedExploreFragment
 import xlab.world.xlab.view.main.fragment.FeedFollowingFragment
@@ -120,8 +118,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     RequestCodeData.POST_UPLOAD -> { // 포스트 업로드
                     }
                 }
+
+                // 공지, 푸시알림 새로운거 있는지 불러오기
+                notificationViewModel.loadExistNewNotification(authorization = spHelper.authorization)
+                noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
             }
-            ResultCodeData.LOAD_OLD_DATA -> { // notification dot reload
+            ResultCodeData.LOAD_OLD_DATA -> {
+                // 공지, 푸시알림 새로운거 있는지 불러오기
                 notificationViewModel.loadExistNewNotification(authorization = spHelper.authorization)
                 noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
             }
@@ -216,7 +219,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             uiData?.let {_->
                 uiData.guestMode?.let {
                     if (spHelper.accessToken.isEmpty()) { // 게스트
-                        loginDialog.show()
+                        loginDialog.showDialog(tag = null)
                     }
                 }
             }
@@ -235,7 +238,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     RunActivity.postUploadPictureActivity(context = this, postId = "", youTubeVideoId = "")
                 }
                 eventData.postTypeDialog?.let {
-                    postUploadTypeSelectDialog.show(supportFragmentManager, "postUploadTypeSelectDialog")
+                    postUploadTypeSelectDialog.showDialog(manager = supportFragmentManager, dialogTag = "postUploadTypeSelectDialog",
+                            tagData = null)
                 }
             }
         })

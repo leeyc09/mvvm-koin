@@ -20,7 +20,7 @@ import xlab.world.xlab.utils.support.SupportData
 class CommentAdapter(private val context: Context,
                      private val profileListener: View.OnClickListener) : RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
 
-    private val commentData: CommentData = CommentData()
+    private var commentData: CommentData = CommentData()
     var dataLoading: Boolean
         get() = this.commentData.isLoading
         set(value) { this.commentData.isLoading = value }
@@ -34,29 +34,9 @@ class CommentAdapter(private val context: Context,
             .placeholder(R.drawable.profile_img_44)
             .error(R.drawable.profile_img_44)
 
-    fun getCommentUserId(position: Int): String {
-        return commentData.items[position].userId
-    }
-
-    fun updateData(commentData: CommentData) {
-        this.commentData.items.clear()
-        this.commentData.items.addAll(commentData.items)
-
-        this.commentData.isLoading = false
-        this.commentData.total = commentData.total
-        this.commentData.nextPage = 2
-
+    fun linkData(commentData: CommentData) {
+        this.commentData = commentData
         notifyDataSetChanged()
-    }
-
-    fun addData(commentData: CommentData) {
-        val size: Int = itemCount
-        this.commentData.items.addAll(commentData.items)
-
-        this.commentData.isLoading = false
-        this.commentData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override

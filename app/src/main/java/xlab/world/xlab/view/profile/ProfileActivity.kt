@@ -96,7 +96,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             Activity.RESULT_OK -> {
                 when (requestCode) {
                     RequestCodeData.PROFILE_EDIT -> { // 프로필 수정
-                        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loadingBar = null)
+                        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
                     }
                     RequestCodeData.TOPIC_ADD -> { // 펫 추가
                         profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
@@ -112,7 +112,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     RequestCodeData.POST_COMMENT, // 댓글
                     RequestCodeData.GOODS_DETAIL, // 상품 상세
                     RequestCodeData.MY_SHOP -> {
-                        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loadingBar = null)
+                        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
                         profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
                                 topicDataCount = 0, loginUserId = spHelper.userId, loadingBar = null)
                         profileAlbumFragment.reloadAlbumPostsData(loadingBar = null)
@@ -133,7 +133,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
                 profileViewModel.setProfileType(userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
-                profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loadingBar = null)
+                profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
                 profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1, topicDataCount = 0,
                         loginUserId = spHelper.userId, loadingBar = null)
             }
@@ -181,7 +181,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         topicRecyclerView.addItemDecoration(CustomItemDecoration(context = this, right = 4f))
 
         profileViewModel.setProfileType(userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId)
-        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID))
+        profileViewModel.loadUserData(context = this, authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId)
         profileViewModel.loadUserTopicData(userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1,
                 topicDataCount = 0, loginUserId = spHelper.userId)
         noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
@@ -256,13 +256,22 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     textViewIntroduction.setText(it, TextView.BufferType.SPANNABLE)
                 }
                 uiData.followState?.let {
+                    profileViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                     followBtn.isSelected = it
                 }
                 uiData.followerCnt?.let {
-                    textViewFollowerNum.setText(SupportData.countFormat(it), TextView.BufferType.SPANNABLE)
+                    textViewFollowerNum.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.followerEnable?.let {
+                    textViewFollowerNum.isEnabled = it
+                    followerLayout.isEnabled = it
                 }
                 uiData.followingCnt?.let {
-                    textViewFollowingNum.setText(SupportData.countFormat(it), TextView.BufferType.SPANNABLE)
+                    textViewFollowingNum.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.followingEnable?.let {
+                    textViewFollowingNum.isEnabled = it
+                    followingLayout.isEnabled = it
                 }
             }
         })
@@ -306,7 +315,8 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                         return
                     }
 
-                    postUploadTypeSelectDialog.show(supportFragmentManager, "postUploadTypeSelectDialog")
+                    postUploadTypeSelectDialog.showDialog(manager = supportFragmentManager, dialogTag = "postUploadTypeSelectDialog",
+                            tagData = null)
                 }
                 R.id.actionMyShopBtn -> { // 마이쇼핑
                     RunActivity.myShoppingActivity(context = this)

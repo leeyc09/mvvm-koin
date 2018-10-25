@@ -29,6 +29,11 @@ class DefaultOneDialog(context: Context,
         onBindEvent()
     }
 
+    override fun dismiss() {
+        this.tag = null
+        super.dismiss()
+    }
+
     private fun onSetup() {
         textViewMedium.setText(text, TextView.BufferType.SPANNABLE)
 
@@ -55,7 +60,7 @@ class DefaultOneDialog(context: Context,
         }
     }
 
-    fun setTag(tag: Any?) {
+    fun showDialog(tag: Any?) {
         this.tag = tag
     }
 }

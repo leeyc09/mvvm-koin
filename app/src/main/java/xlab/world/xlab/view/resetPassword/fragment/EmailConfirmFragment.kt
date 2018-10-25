@@ -90,7 +90,7 @@ class EmailConfirmFragment: Fragment(), View.OnClickListener {
                 }
                 uiData.timerEndDialog?.let {
                     editTextCode.setText("")
-                    timeOverDialog.show()
+                    timeOverDialog.showDialog(tag = null)
                 }
                 uiData.nextEnable?.let {
                     nextBtn.isEnabled = it

@@ -71,8 +71,8 @@ class CombinedSearchUserFragment: Fragment() {
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
         userDefaultListener = UserDefaultListener(context = context as Activity,
                 followUserEvent = { position ->
-                    followViewModel.userFollow(authorization = spHelper.authorization, position = position,
-                            userData = searchUserAdapter?.getItem(position = position), recommendUserData = null)
+//                    followViewModel.userFollow(authorization = spHelper.authorization, selectIndex = position,
+//                            userData = searchUserAdapter?.getItem(position = position), recommendUserData = null)
                 })
 
         // scroll up button 초기화
@@ -153,11 +153,11 @@ class CombinedSearchUserFragment: Fragment() {
                 uiData.toastMessage?.let {
                     defaultToast?.showToast(message = it)
                 }
-                uiData.userUpdatePosition?.let {
-//                    if (this.resultCode == Activity.RESULT_CANCELED)
-//                        this.resultCode = Activity.RESULT_OK
-                    searchUserAdapter?.notifyItemChanged(it)
-                }
+//                uiData.userUpdatePosition?.let {
+////                    if (this.resultCode == Activity.RESULT_CANCELED)
+////                        this.resultCode = Activity.RESULT_OK
+//                    searchUserAdapter?.notifyItemChanged(it)
+//                }
             }
         })
     }

@@ -132,7 +132,7 @@ class GoodsRatingActivity : AppCompatActivity(), View.OnClickListener {
                     finishBtn.isEnabled = it
                 }
                 uiData.isChangeData?.let {
-                    editCancelDialog.show()
+                    editCancelDialog.showDialog(tag = null)
                 }
             }
         })

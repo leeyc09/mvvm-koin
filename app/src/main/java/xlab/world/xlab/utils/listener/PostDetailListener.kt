@@ -35,16 +35,15 @@ class PostDetailListener(context: Activity,
     private val postMoreDialog = DialogCreator.postMoreDialog(
             context = context,
             listener = object: TwoSelectBottomDialog.Listener {
-                override fun onFirstBtnClick(tag: Any) {
+                override fun onFirstBtnClick(tag: Any?) {
                     if (tag is Int) {
                         postMoreEvent(tag, null)
                     }
                 }
 
-                override fun onSecondBtnClick(tag: Any) {
+                override fun onSecondBtnClick(tag: Any?) {
                     if (tag is Int) {
-                        postDeleteDialog.setTag(tag)
-                        postDeleteDialog.show()
+                        postDeleteDialog.showDialog(tag = tag)
                     }
                 }
             })
@@ -55,15 +54,15 @@ class PostDetailListener(context: Activity,
     // 포스트 ...
     val postMoreListener = View.OnClickListener { view ->
         if (view.tag is Int) {
-            postMoreDialog.setTag(view.tag as Int)
-            postMoreDialog.show(fragmentManager, "postMoreDialog")
+            postMoreDialog.showDialog(manager = fragmentManager, dialogTag = "postMoreDialog",
+                    tagData = view.tag as Int)
         }
     }
 
     // 포스트 like
     val likePostListener = View.OnClickListener { view ->
         if (spHelper.accessToken.isEmpty()) {
-            loginDialog.show()
+            loginDialog.showDialog(tag = null)
         } else {
             if (view.tag is Int)
                 likePostEvent(view.tag as Int)
@@ -73,7 +72,7 @@ class PostDetailListener(context: Activity,
     // 포스트 save
     val savePostListener = View.OnClickListener { view ->
         if (spHelper.accessToken.isEmpty()) {
-            loginDialog.show()
+            loginDialog.showDialog(tag = null)
         } else {
             if (view.tag is Int)
                 savePostEvent(view.tag as Int)

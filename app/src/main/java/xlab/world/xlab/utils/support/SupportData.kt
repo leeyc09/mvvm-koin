@@ -46,8 +46,7 @@ object SupportData {
                 else oldResultCode
             }
             ResultCodeData.LOAD_OLD_DATA -> {
-                if (oldResultCode == Activity.RESULT_CANCELED ||
-                        oldResultCode == ResultCodeData.TOPIC_DELETE)
+                if (oldResultCode == Activity.RESULT_CANCELED)
                     newResultCode
                 else oldResultCode
             }

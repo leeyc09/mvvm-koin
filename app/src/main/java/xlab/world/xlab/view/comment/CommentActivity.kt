@@ -29,20 +29,16 @@ class CommentActivity : AppCompatActivity(), View.OnClickListener {
     private val commentViewModel: CommentViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
-    private var resultCode = Activity.RESULT_CANCELED
-    private var postId = ""
-    private var isMyPost = false
-
     private var glideOption = RequestOptions()
             .circleCrop()
             .placeholder(R.drawable.profile_img_44)
             .error(R.drawable.profile_img_44)
 
-    private lateinit var commentAdapter: CommentAdapter
-
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
     private lateinit var commentDeleteDialog: TwoSelectBottomDialog
+
+    private lateinit var commentAdapter: CommentAdapter
 
     private lateinit var defaultListener: DefaultListener
 
@@ -51,18 +47,15 @@ class CommentActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         override fun onLongClick(view: View, position: Int) {
-            if (commentAdapter.getCommentUserId(position) == spHelper.userId || isMyPost) {
-                commentDeleteDialog.setTag(position)
-                commentDeleteDialog.show(supportFragmentManager, "commentDeleteDialog")
-            }
+            commentViewModel.commentLongClick(userId = spHelper.userId, selectIndex = position)
         }
     }
     private val commentDeleteListener = object: TwoSelectBottomDialog.Listener {
-        override fun onFirstBtnClick(tag: Any) {
-            commentViewModel.deleteComment(authorization = spHelper.authorization, postId = postId, position = tag as Int)
+        override fun onFirstBtnClick(tag: Any?) {
+            commentViewModel.deleteComment(authorization = spHelper.authorization, postId = intent.getStringExtra(IntentPassName.POST_ID), position = tag as Int)
         }
 
-        override fun onSecondBtnClick(tag: Any) {
+        override fun onSecondBtnClick(tag: Any?) {
         }
     }
 
@@ -85,31 +78,29 @@ class CommentActivity : AppCompatActivity(), View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data)
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
+
+        commentViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.PROFILE -> { // 프로필
-//                        reloadAllData { max, current ->  }
+                        commentViewModel.loadCommentData(postId = intent.getStringExtra(IntentPassName.POST_ID), page = 1)
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                this.resultCode = ResultCodeData.LOGIN_SUCCESS
-//                reloadAllData { max, current -> }
+                commentViewModel.loadCommentData(postId = intent.getStringExtra(IntentPassName.POST_ID), page = 1)
+                commentViewModel.checkMyPost(authorization = spHelper.authorization, postId = intent.getStringExtra(IntentPassName.POST_ID))
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
 
     private fun onSetup() {
+        // 타이틀 설정
         actionBarTitle.setText(getText(R.string.comment), TextView.BufferType.SPANNABLE)
-
-        postId = intent.getStringExtra(IntentPassName.POST_ID)
 
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
@@ -125,8 +116,8 @@ class CommentActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(CustomItemDecoration(context = this, bottom = 28f))
 
-        commentViewModel.loadCommentData(postId = postId, page = 1)
-        commentViewModel.checkMyPost(authorization = spHelper.authorization, postId = postId)
+        commentViewModel.loadCommentData(postId = intent. getStringExtra(IntentPassName.POST_ID), page = 1)
+        commentViewModel.checkMyPost(authorization = spHelper.authorization, postId = intent.getStringExtra(IntentPassName.POST_ID))
     }
 
     private fun onBindEvent() {
@@ -139,7 +130,7 @@ class CommentActivity : AppCompatActivity(), View.OnClickListener {
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = commentAdapter.dataLoading, total = commentAdapter.dataTotal) { _ ->
-                commentViewModel.loadCommentData(postId = postId, page = commentAdapter.dataNextPage)
+                commentViewModel.loadCommentData(postId = intent.getStringExtra(IntentPassName.POST_ID), page = commentAdapter.dataNextPage)
             }
         }
 
@@ -159,19 +150,25 @@ class CommentActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
-                uiData.isGuest?.let {
-                    commentPopupLayout.visibility =
-                            if (it) View.GONE
-                            else View.VISIBLE
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
+                uiData.commentPopupVisibility?.let {
+                    commentPopupLayout.visibility = it
                 }
                 uiData.commentData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        commentAdapter.updateData(commentData = it)
-                        recyclerView.scrollToPosition(0)
-                        actionBarNumber.setText(SupportData.countFormat(it.total), TextView.BufferType.SPANNABLE)
-                    }
-                    else
-                        commentAdapter.addData(commentData = it)
+                    commentAdapter.linkData(commentData = it)
+                }
+                uiData.commentDataUpdate?.let {
+                    commentAdapter.notifyDataSetChanged()
+                }
+                uiData.commentCnt?.let {
+                    actionBarNumber.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.deleteCommentIndex?.let {
+                    commentDeleteDialog.showDialog(manager = supportFragmentManager, dialogTag = "commentDeleteDialog",
+                            tagData = it)
                 }
                 uiData.profileImg?.let {
                     Glide.with(this)
@@ -183,45 +180,29 @@ class CommentActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // load comment 이벤트 observe
-        commentViewModel.loadCommentDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadCommentDataEvent ->
-            loadCommentDataEvent?.let { _ ->
-                loadCommentDataEvent.status?.let { isLoading ->
-                    commentAdapter.dataLoading = isLoading
-                }
+        commentViewModel.loadCommentData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isLoading ->
+                commentAdapter.dataLoading = isLoading
             }
         })
 
         // post comment 이벤트 observe
-        commentViewModel.postCommentDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { postCommentDataEvent ->
-            postCommentDataEvent?.let { _ ->
-                postCommentDataEvent.status?.let { isSuccess ->
-                    if (isSuccess) {
-                        resultCode = Activity.RESULT_OK
-                        commentViewModel.loadCommentData(postId = postId, page = 1)
-                    }
-
+        commentViewModel.postCommentData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isSuccess ->
+                if (isSuccess) {
+                    commentViewModel.setResultCode(resultCode = Activity.RESULT_OK)
+                    commentViewModel.loadCommentData(postId = intent.getStringExtra(IntentPassName.POST_ID), page = 1)
                     editTextComment?.setText("")
                 }
             }
         })
 
         // delete comment 이벤트 observe
-        commentViewModel.deleteCommentDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { deleteCommentDataEvent ->
-            deleteCommentDataEvent?.let { _ ->
-                deleteCommentDataEvent.status?.let { isSuccess ->
-                    if (isSuccess) {
-                        resultCode = Activity.RESULT_OK
-                        commentViewModel.loadCommentData(postId = postId, page = 1)
-                    }
-                }
-            }
-        })
-
-        // check my post 이벤트 observe
-        commentViewModel.checkMyPostEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { checkMyPostEvent ->
-            checkMyPostEvent?.let { _ ->
-                checkMyPostEvent.status?.let { isMyPost ->
-                    this.isMyPost = isMyPost
+        commentViewModel.deleteCommentData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isSuccess ->
+                if (isSuccess) {
+                    commentViewModel.setResultCode(resultCode = Activity.RESULT_OK)
+                    commentViewModel.loadCommentData(postId = intent.getStringExtra(IntentPassName.POST_ID), page = 1)
                 }
             }
         })
@@ -231,11 +212,10 @@ class CommentActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    commentViewModel.backBtnAction()
                 }
                 R.id.textViewCommentFinish -> { // 댓글 작성
-                    commentViewModel.postCommentData(authorization = spHelper.authorization, postId = postId, comment = getComment())
+                    commentViewModel.postCommentData(authorization = spHelper.authorization, postId = intent.getStringExtra(IntentPassName.POST_ID), comment = getComment())
                 }
             }
         }

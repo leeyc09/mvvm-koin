@@ -65,7 +65,9 @@ class DefaultDialog(context: Context,
         }
     }
 
-    fun setTag(tag: Any) {
+    fun showDialog(tag: Any?) {
         this.tag = tag
+
+        super.show()
     }
 }

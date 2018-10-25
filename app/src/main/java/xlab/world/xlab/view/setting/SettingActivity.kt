@@ -76,13 +76,12 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
                         settingViewModel.userLogout(authorization = spHelper.authorization)
                     }
                 }
+                // 공지 새로운거 있는지 불러오기
+                noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
             }
             ResultCodeData.LOAD_OLD_DATA -> {
-                when (requestCode) {
-                    RequestCodeData.NOTICE -> { // 공지사항
-                        noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
-                    }
-                }
+                // 공지 새로운거 있는지 불러오기
+                noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
                 actionBackBtn.performClick()
@@ -220,7 +219,7 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
                     startActivity(intent)
                 }
                 R.id.logoutBtn -> { // 로그아웃
-                    logoutDialog.show()
+                    logoutDialog.showDialog(tag = null)
                 }
                 R.id.withdrawBtn -> { // 회원 탈퇴
                     RunActivity.withdrawActivity(context = this)

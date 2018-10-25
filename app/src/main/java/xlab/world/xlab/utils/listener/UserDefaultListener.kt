@@ -22,7 +22,7 @@ class UserDefaultListener(context: Activity,
     // 포스트 user follow
     val followListener = View.OnClickListener { view ->
         if (spHelper.accessToken.isEmpty()) {
-            loginDialog.show()
+            loginDialog.showDialog(tag = null)
         } else {
             if (view.tag is Int)
                 followUserEvent(view.tag as Int)

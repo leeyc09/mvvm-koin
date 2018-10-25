@@ -212,8 +212,7 @@ class OrderStateDialog(private val context: Activity,
                 R.id.checkReceiptBtn2,
                 R.id.checkReceiptBtn3,
                 R.id.checkReceiptBtn4 -> { // 수취확인
-                    receiveConfirmDialog?.setTag(goods!!)
-                    receiveConfirmDialog?.show()
+                    receiveConfirmDialog?.showDialog(tag = goods)
                     dismiss()
                 }
                 R.id.requestChangeBtn -> { // 교환신청
@@ -226,8 +225,7 @@ class OrderStateDialog(private val context: Activity,
                 R.id.decideBuyBtn2,
                 R.id.decideBuyBtn3,
                 R.id.decideBuyBtn4 -> { // 구매확정
-                    buyDecideDialog?.setTag(goods!!)
-                    buyDecideDialog?.show()
+                    buyDecideDialog?.showDialog(tag = goods)
                     dismiss()
                 }
                 R.id.goodsAssessmentBtn,

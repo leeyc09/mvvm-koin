@@ -23,7 +23,7 @@ class UserRecommendAdapter(private val context: Context,
                            private val followListener: View.OnClickListener,
                            private val profileListener: View.OnClickListener) : RecyclerView.Adapter<UserRecommendAdapter.ViewHolder>() {
 
-    private val userRecommendData: UserRecommendData = UserRecommendData()
+    private var userRecommendData: UserRecommendData = UserRecommendData()
     var dataLoading: Boolean
         get() = this.userRecommendData.isLoading
         set(value) { this.userRecommendData.isLoading = value }
@@ -37,29 +37,9 @@ class UserRecommendAdapter(private val context: Context,
             .placeholder(R.drawable.profile_img_44)
             .error(R.drawable.profile_img_44)
 
-    fun getItem(position: Int): UserRecommendListData {
-        return userRecommendData.items[position]
-    }
-
-    fun updateData(userRecommendData: UserRecommendData) {
-        this.userRecommendData.items.clear()
-        this.userRecommendData.items.addAll(userRecommendData.items)
-
-        this.userRecommendData.isLoading = false
-        this.userRecommendData.total = userRecommendData.total
-        this.userRecommendData.nextPage = 2
-
+    fun linkData(userRecommendData: UserRecommendData) {
+        this.userRecommendData = userRecommendData
         notifyDataSetChanged()
-    }
-
-    fun addData(userRecommendData: UserRecommendData) {
-        val size: Int = itemCount
-        this.userRecommendData.items.addAll(userRecommendData.items)
-
-        this.userRecommendData.isLoading = false
-        this.userRecommendData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override

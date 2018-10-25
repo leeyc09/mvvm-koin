@@ -108,11 +108,11 @@ object DialogCreator {
                 secondColor = ResourcesCompat.getColor(context.resources, R.color.color000000, null))
 
         dialog.handle(listener = object: TwoSelectBottomDialog.Listener {
-            override fun onFirstBtnClick(tag: Any) { // image post upload
+            override fun onFirstBtnClick(tag: Any?) { // image post upload
                 RunActivity.postUploadPictureActivity(context = context, postId = "", youTubeVideoId = "")
             }
 
-            override fun onSecondBtnClick(tag: Any) { // youtube link post upload
+            override fun onSecondBtnClick(tag: Any?) { // youtube link post upload
                 EditTextDialog(context = context,
                         listener = object: EditTextDialog.EditTextDialogListener {
                             override fun onOkayTouch(text: String) {

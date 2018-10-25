@@ -2,6 +2,7 @@ package xlab.world.xlab.utils.view.dialog
 
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialogFragment
+import android.support.v4.app.FragmentManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -96,8 +97,10 @@ class BuyGoodsOptionDialog: BottomSheetDialogFragment(), View.OnClickListener {
         this.listener = listener
     }
 
-    fun setUnitPirce(price: Int) {
+    fun showDialog(manager: FragmentManager, dialogTag: String, price: Int) {
         this.unitPrice = price
+
+        super.show(manager, dialogTag)
     }
 
     companion object {

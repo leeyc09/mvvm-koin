@@ -27,7 +27,7 @@ class UserDefaultAdapter(private val context: Context,
 
     private val spHelper: SPHelper by (context as Activity).inject()
 
-    private val userDefaultData: UserDefaultData = UserDefaultData()
+    private var userDefaultData: UserDefaultData = UserDefaultData()
     var dataLoading: Boolean
         get() = this.userDefaultData.isLoading
         set(value) { this.userDefaultData.isLoading = value }
@@ -40,6 +40,11 @@ class UserDefaultAdapter(private val context: Context,
             .circleCrop()
             .placeholder(R.drawable.profile_img_44)
             .error(R.drawable.profile_img_44)
+
+    fun linkData(userDefaultData: UserDefaultData) {
+        this.userDefaultData = userDefaultData
+        notifyDataSetChanged()
+    }
 
     fun getItem(position: Int): UserDefaultListData {
         return userDefaultData.items[position]

@@ -49,8 +49,7 @@ class OrderDetailActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
     private val orderCancelListener = View.OnClickListener { view ->
-        orderCancelDialog.setTag(tag = view.tag as String)
-        orderCancelDialog.show()
+        orderCancelDialog.showDialog(tag = view.tag as String)
     }
     private val moreListener = View.OnClickListener { view ->
         orderStateDialog.showDialog(goods = view.tag as GoodsOrderListData)

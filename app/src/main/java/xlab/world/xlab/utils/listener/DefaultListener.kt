@@ -54,7 +54,7 @@ class DefaultListener(private val context: Activity) {
         if (spHelper.accessToken == "") { // guest mode
             defaultToast.showToast(context.getString(R.string.toast_question_match))
         } else {
-            suggestAddTopicDialog.show()
+            suggestAddTopicDialog.showDialog(tag = null)
         }
     }
 

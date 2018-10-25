@@ -50,7 +50,7 @@ class MatchButtonHelper (rootView: View,
             when (v.id) {
                 R.id.matchSettingBtn -> { // 매칭률 설정 버튼
                     if (SupportData.isGuest(authorization = spHelper.authorization)) {
-                        loginDialog.show()
+                        loginDialog.showDialog(tag = null)
                         return
                     }
                     RunActivity.topicSettingActivity(context = context)

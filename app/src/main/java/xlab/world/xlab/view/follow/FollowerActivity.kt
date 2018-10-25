@@ -26,13 +26,10 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
     private val followViewModel: FollowViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
-    private var resultCode = Activity.RESULT_CANCELED
-    private var userId = ""
-
-    private lateinit var followerAdapter: UserDefaultAdapter
-
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
+
+    private lateinit var followerAdapter: UserDefaultAdapter
 
     private lateinit var defaultListener: DefaultListener
     private lateinit var userDefaultListener: UserDefaultListener
@@ -57,41 +54,37 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
+        followViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.PROFILE -> { // 프로필
-                        followViewModel.loadFollower(authorization = spHelper.authorization, userId = userId, page = 1, loadingBar = null)
+                        followViewModel.loadFollower(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1, loadingBar = null)
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                this.resultCode = ResultCodeData.LOGIN_SUCCESS
-                followViewModel.loadFollower(authorization = spHelper.authorization, userId = userId, page = 1, loadingBar = null)
+                followViewModel.loadFollower(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1, loadingBar = null)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
 
     private fun onSetup() {
-        userId = intent.getStringExtra(IntentPassName.USER_ID)
-
+        // 타이틀 설정
         actionBarTitle.setText(getString(R.string.follower), TextView.BufferType.SPANNABLE)
 
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
+        // listener 초기화
         defaultListener = DefaultListener(context = this)
         userDefaultListener = UserDefaultListener(context = this,
                 followUserEvent = { position ->
-                    followViewModel.userFollow(authorization = spHelper.authorization, position = position,
-                            userData = followerAdapter.getItem(position = position), recommendUserData = null)
+                    followViewModel.userFollow(authorization = spHelper.authorization, selectIndex = position, userType = FollowViewModel.UserType.DEFAULT)
                 })
 
         // follower recycler view & adapter 초기화
@@ -103,7 +96,7 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView.addItemDecoration(CustomItemDecoration(context = this, bottom = 10f))
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
-        followViewModel.loadFollower(authorization = spHelper.authorization, userId = userId, page = 1)
+        followViewModel.loadFollower(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1)
     }
 
     private fun onBindEvent() {
@@ -111,7 +104,7 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = followerAdapter.dataLoading, total = followerAdapter.dataTotal) { _ ->
-                followViewModel.loadFollower(authorization = spHelper.authorization, userId = userId, page = followerAdapter.dataNextPage)
+                followViewModel.loadFollower(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = followerAdapter.dataNextPage)
             }
         }
     }
@@ -129,35 +122,33 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
-                uiData.userData?.let {
-                    if (it.nextPage <= 2) { // 요청한 page => 첫페이지
-                        followerAdapter.updateData(userDefaultData = it)
-                        actionBarNumber.setText(SupportData.countFormat(it.total), TextView.BufferType.SPANNABLE)
-
-                        textViewNoFollower.visibility =
-                                if (it.items.isEmpty()) View.VISIBLE
-                                else View.INVISIBLE
-                    } else
-                        followerAdapter.addData(userDefaultData = it)
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
                 }
-                uiData.followCnt?.let {
-                    actionBarNumber.tag = it
-                    actionBarNumber.setText(SupportData.countFormat(it), TextView.BufferType.SPANNABLE)
+                uiData.emptyDefaultUserVisibility?.let {
+                    textViewNoFollower.visibility = it
                 }
-                uiData.userUpdatePosition?.let {
-                    if (this.resultCode == Activity.RESULT_CANCELED)
-                        this.resultCode = Activity.RESULT_OK
+                uiData.defaultUserData?.let {
+                    followerAdapter.linkData(userDefaultData = it)
+                }
+                uiData.defaultUserUpdate?.let {
+                    followerAdapter.notifyDataSetChanged()
+                }
+                uiData.defaultUserUpdateIndex?.let {
+                    followViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                     followerAdapter.notifyItemChanged(it)
+                }
+                uiData.followerCnt?.let {
+                    actionBarNumber.setText(it, TextView.BufferType.SPANNABLE)
                 }
             }
         })
 
         // load follower 이벤트 observe
-        followViewModel.loadFollowEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadFollowerEvent ->
-            loadFollowerEvent?.let { _ ->
-                loadFollowerEvent.status?.let { isLoading ->
-                    followerAdapter.dataLoading = isLoading
-                }
+        followViewModel.loadDefaultUserData.observe(owner = this, observer = android.arch.lifecycle.Observer { evneteData ->
+            evneteData?.let { isLoading ->
+                followerAdapter.dataLoading = isLoading
             }
         })
     }
@@ -166,8 +157,7 @@ class FollowerActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { //뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    followViewModel.backBtnAction()
                 }
             }
         }
