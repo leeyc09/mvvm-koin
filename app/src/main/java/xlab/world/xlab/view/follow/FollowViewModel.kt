@@ -176,10 +176,16 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
         }
     }
 
-    fun loadRecommendUser(authorization: String, page: Int, loadingBar: Boolean? = true) {
+    fun loadRecommendUser(authorization: String, page: Int, userId: String, loginUserId: String, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        // 자신의 팔로잉 화면 아닌 경우 불러올 필요 없음
+        if (userId != loginUserId) {
+            uiData.value = UIModel(recommendLayoutVisibility = View.GONE)
             return
         }
 
@@ -202,10 +208,53 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
                             this.userRecommendData.updateData(userRecommendData = newRecommendUserData)
                             uiData.value = UIModel(isLoading = false,
                                     recommendUserData = this.userRecommendData,
-                                    recommendLayoutVisibility = if (this.userRecommendData.items.isNotEmpty()) View.VISIBLE else View.GONE)
+                                    recommendLayoutVisibility =
+                                    if (this.userRecommendData.items.isNotEmpty()) View.VISIBLE else View.GONE)
                         } else {
                             this.userRecommendData.addData(userRecommendData = newRecommendUserData)
                             uiData.value = UIModel(isLoading = false, recommendUserUpdate = true)
+                        }
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.e("requestRecommendUser fail", errorData.message, viewModelTag)
+                        }
+                    })
+        }
+    }
+
+    fun loadRecommendDefaultUser(authorization: String, page: Int, loadingBar: Boolean? = true) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = loadingBar)
+        loadDefaultUserData.value = true
+        launch {
+            apiUser.requestRecommendUser(scheduler = scheduler, authorization = authorization, page = page,
+                    responseData = {
+                        PrintLog.d("requestRecommendUser success", it.toString(), viewModelTag)
+
+                        val newRecommendUserData = UserDefaultData(total = it.total, nextPage = page + 1)
+                        it.userData?.forEach { following ->
+                            val topicBreed = petInfo.getTopicBreed(following.petData)
+                            newRecommendUserData.items.add(UserDefaultListData(userId = following.id,
+                                    profileImage = following.profileImg,
+                                    nickName = following.nickName,
+                                    topic = topicBreed,
+                                    isFollowing = following.isFollowing))
+                        }
+
+                        if (page == 1) {
+                            this.userDefaultData.updateData(userDefaultData = newRecommendUserData)
+                            uiData.value = UIModel(isLoading = false,
+                                    defaultUserData = this.userDefaultData)
+                        } else {
+                            this.userDefaultData.addData(userDefaultData = newRecommendUserData)
+                            uiData.value = UIModel(isLoading = false, defaultUserUpdate = true)
                         }
                     },
                     errorData = { errorData ->

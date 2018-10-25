@@ -13,6 +13,7 @@ import xlab.world.xlab.view.completePurchase.CompletePurchaseActivity
 import xlab.world.xlab.view.crrDetail.CRRDetailActivity
 import xlab.world.xlab.view.follow.FollowerActivity
 import xlab.world.xlab.view.follow.FollowingActivity
+import xlab.world.xlab.view.follow.RecommendUserActivity
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectActivity
 import xlab.world.xlab.view.goodsDetail.GoodsDetailActivity
 import xlab.world.xlab.view.goodsInfo.GoodsDeliveryActivity
@@ -315,5 +316,10 @@ object RunActivity {
     fun goodsRatingActivity(context: Activity, goodsCode: String) {
         val intent = GoodsRatingActivity.newIntent(context = context, goodsCode = goodsCode)
         context.startActivityForResult(intent, RequestCodeData.GOODS_RATING)
+    }
+
+    fun recommendUserActivity(context: Activity) {
+        val intent = RecommendUserActivity.newIntent(context = context)
+        context.startActivityForResult(intent, RequestCodeData.PROFILE)
     }
 }

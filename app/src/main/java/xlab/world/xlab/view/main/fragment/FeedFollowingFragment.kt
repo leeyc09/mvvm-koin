@@ -180,8 +180,7 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.noFollowLayout -> { // 팔로우 하기
-//                    val intent = RecommendUserActivity.newIntent(activity)
-//                    activity.startActivityForResult(intent, RequestCodeData.PROFILE)
+                    RunActivity.recommendUserActivity(context = context as Activity)
                 }
                 R.id.noLoginLayout -> { // 로그인 하기
                     RunActivity.loginActivity(context = context as Activity, isComePreLoadActivity = false, linkData = null)

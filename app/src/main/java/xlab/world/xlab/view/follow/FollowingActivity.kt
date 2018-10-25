@@ -61,13 +61,13 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
             Activity.RESULT_OK -> {
                 when (requestCode) {
                     RequestCodeData.PROFILE -> { // 프로필
-                        followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, loadingBar = null)
+                        followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
                         followViewModel.loadFollowing(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1, loadingBar = null)
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> {
-                followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, loadingBar = null)
+                followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
                 followViewModel.loadFollowing(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1, loadingBar = null)
             }
             ResultCodeData.LOGOUT_SUCCESS -> {
@@ -111,8 +111,8 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         recyclerView.isNestedScrollingEnabled = false
 
-        followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1)
         followViewModel.loadFollowing(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1)
+        followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId)
     }
 
     private fun onBindEvent() {
@@ -120,7 +120,7 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recommendRecyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = userRecommendAdapter.dataLoading, total = userRecommendAdapter.dataTotal) { _ ->
-                followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = userRecommendAdapter.dataNextPage)
+                followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = userRecommendAdapter.dataNextPage, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId)
             }
         }
 
