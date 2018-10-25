@@ -346,6 +346,10 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    fun setResultCodeFromFragment(resultCode: Int) {
+        profileViewModel.setResultCode(resultCode = resultCode)
+    }
+
     companion object {
         fun newIntent(context: Context, userId: String): Intent {
             val intent = Intent(context, ProfileActivity::class.java)

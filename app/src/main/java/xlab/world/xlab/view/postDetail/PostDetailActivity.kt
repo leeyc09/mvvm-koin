@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SimpleItemAnimator
 import android.view.View
@@ -20,22 +19,17 @@ import xlab.world.xlab.utils.listener.PostDetailListener
 import xlab.world.xlab.utils.listener.UserDefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
-import xlab.world.xlab.utils.view.dialog.DialogCreator
-import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
 
 class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
     private val postDetailViewModel: PostDetailViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
-    private var resultCode = Activity.RESULT_CANCELED
-    private var postId = ""
-
-    private lateinit var postDetailAdapter: PostDetailAdapter
-
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
     private lateinit var userDefaultListener: UserDefaultListener
+
+    private lateinit var postDetailAdapter: PostDetailAdapter
 
     private lateinit var defaultListener: DefaultListener
     private lateinit var postDetailListener: PostDetailListener
@@ -59,27 +53,27 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data)
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
+
+        postDetailViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.PROFILE, // 프로필
                     RequestCodeData.POST_COMMENT, // 댓글
                     RequestCodeData.POST_UPLOAD, // 포스트 수정
                     RequestCodeData.TAG_POST, // 포스트 태그
                     RequestCodeData.GOODS_DETAIL -> { // 상품 상세
-                        postDetailViewModel.loadPostDetail(context = this, authorization = spHelper.authorization, postId = postId, userId = spHelper.userId)
+                        postDetailViewModel.loadPostDetail(context = this, authorization = spHelper.authorization,
+                                postId = intent.getStringExtra(IntentPassName.POST_ID), userId = spHelper.userId)
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                this.resultCode = ResultCodeData.LOGIN_SUCCESS
-                postDetailViewModel.loadPostDetail(context = this, authorization = spHelper.authorization, postId = postId, userId = spHelper.userId)
+                postDetailViewModel.loadPostDetail(context = this, authorization = spHelper.authorization,
+                        postId = intent.getStringExtra(IntentPassName.POST_ID), userId = spHelper.userId)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
@@ -88,37 +82,38 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
         actionBarTitle.visibility = View.GONE
         actionBtn.visibility = View.GONE
 
-        postId = intent.getStringExtra(IntentPassName.POST_ID) ?: ""
         // 바로 comment 화면으로 넘겨야 하는 경우
         if (intent.getBooleanExtra(IntentPassName.GO_COMMENT, false)) {
-            RunActivity.postCommentActivity(context = this, postId = postId)
+            RunActivity.postCommentActivity(context = this, postId = intent.getStringExtra(IntentPassName.POST_ID))
         }
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
+        // listener 초기화
         defaultListener = DefaultListener(context = this)
         postDetailListener = PostDetailListener(context = this, fragmentManager = supportFragmentManager,
                 postMoreEvent = { editPosition, deletePosition ->
                     editPosition?.let { _ ->
                         RunActivity.postUploadContentActivity(context = this,
-                                postId = postId,
+                                postId = intent.getStringExtra(IntentPassName.POST_ID),
                                 youTubeVideoId = postDetailAdapter.getItem(0).youTubeVideoID,
                                 imagePathList = ArrayList())
                     }
                     deletePosition?.let { _ ->
-                        postDetailViewModel.deletePost(authorization = spHelper.authorization, postId = postId)
+                        postDetailViewModel.deletePost(authorization = spHelper.authorization, postId = intent.getStringExtra(IntentPassName.POST_ID))
                     }
                 },
                 likePostEvent = { position ->
-                    postDetailViewModel.likePost(authorization = spHelper.authorization, position = position, postData = postDetailAdapter.getItem(position))
+                    postDetailViewModel.likePost(authorization = spHelper.authorization, selectIndex = position)
                 },
                 savePostEvent = { position ->
-                    postDetailViewModel.savePost(context = this, authorization = spHelper.authorization, position = position, postData = postDetailAdapter.getItem(position))
+                    postDetailViewModel.savePost(context = this, authorization = spHelper.authorization, selectIndex = position)
                 })
         userDefaultListener = UserDefaultListener(context = this,
                 followUserEvent = { position ->
-                    postDetailViewModel.userFollow(authorization = spHelper.authorization, position = position, postData = postDetailAdapter.getItem(position))
+                    postDetailViewModel.userFollow(authorization = spHelper.authorization, selectIndex = position)
                 })
 
         postDetailAdapter = PostDetailAdapter(context = this,
@@ -136,7 +131,8 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
-        postDetailViewModel.loadPostDetail(context = this, authorization = spHelper.authorization, postId = postId, userId = spHelper.userId)
+        postDetailViewModel.loadPostDetail(context = this, authorization = spHelper.authorization,
+                postId = intent.getStringExtra(IntentPassName.POST_ID), userId = spHelper.userId)
     }
 
     private fun onBindEvent() {
@@ -156,35 +152,33 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
-                uiData.postDetailData?.let {
-                    postDetailAdapter.updateData(postDetailData = it)
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
                 }
-                uiData.postUpdatePosition?.let {
+                uiData.postDetailData?.let {
+                    postDetailAdapter.linkData(postDetailData = it)
+                }
+                uiData.postDetailUpdateIndex?.let {
+                    postDetailViewModel.setResultCode(resultCode =  Activity.RESULT_OK)
                     postDetailAdapter.notifyItemChanged(it)
-                    resultCode = Activity.RESULT_OK
                 }
             }
         })
 
         // load post detail 이벤트 observe
-        postDetailViewModel.loadPostDetailEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadPostDetailEvent ->
-            loadPostDetailEvent?.let { _ ->
-                loadPostDetailEvent.isFail?.let {
-                    if (it)
-                        actionBackBtn.performClick()
-                }
+        postDetailViewModel.failLoadPostDetailData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isFail ->
+                if (isFail) actionBackBtn.performClick()
             }
         })
 
         // post delete 이벤트 observe
-        postDetailViewModel.postDeleteEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { postDeleteEvent ->
-            postDeleteEvent?.let { _ ->
-                postDeleteEvent.isSuccess?.let {
-                    if (it) {
-                        if (resultCode == Activity.RESULT_CANCELED)
-                            resultCode = Activity.RESULT_OK
-                        actionBackBtn.performClick()
-                    }
+        postDetailViewModel.postDeleteData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isSuccess ->
+                if (isSuccess) {
+                    postDetailViewModel.setResultCode(resultCode =  Activity.RESULT_OK)
+                    actionBackBtn.performClick()
                 }
             }
         })
@@ -194,20 +188,7 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-//                    when (resultCode) {
-//                        ResultCodeData.LOGIN_SUCCESS,
-//                        Activity.RESULT_OK-> {
-//                            setResult(resultCode)
-//                        }
-//                        else -> {
-//                            if (postDetailListener.isChange)
-//                                setResult(Activity.RESULT_OK)
-//                            else
-//                                setResult(Activity.RESULT_CANCELED)
-//                        }
-//                    }
-                    setResult(resultCode)
-                    finish()
+                    postDetailViewModel.backBtnAction()
                 }
             }
         }

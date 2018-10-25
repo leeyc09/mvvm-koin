@@ -16,8 +16,6 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.PostDetailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.listener.PostDetailListener
-import xlab.world.xlab.utils.listener.UserDefaultListener
-import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
@@ -66,10 +64,10 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
         postDetailListener = postDetailListener ?: PostDetailListener(context = context as Activity, fragmentManager = (context as AppCompatActivity).supportFragmentManager,
                 postMoreEvent = { _, _ ->},
                 likePostEvent = { position ->
-                    postDetailViewModel.likePost(authorization = spHelper.authorization, position = position, postData = followingFeedAdapter!!.getItem(position))
+                    postDetailViewModel.likePost(authorization = spHelper.authorization, selectIndex = position)
                 },
                 savePostEvent = { position ->
-                    postDetailViewModel.savePost(context = context!!, authorization = spHelper.authorization, position = position, postData = followingFeedAdapter!!.getItem(position))
+                    postDetailViewModel.savePost(context = context!!, authorization = spHelper.authorization, selectIndex = position)
                 })
 
         // following feed recycler view & adapter 초기화
@@ -104,7 +102,7 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = followingFeedAdapter!!.dataLoading, total = followingFeedAdapter!!.dataTotal) { _ ->
-                mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = followingFeedAdapter!!.dataNextPage)
+                postDetailViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = followingFeedAdapter!!.dataNextPage)
             }
         }
     }
@@ -123,40 +121,6 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast?.showToast(message = it)
                 }
-                uiData.followingFeedData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        // post 없으면 no post 띄우기
-                        setBundleVisibilityData(noFollowVisibility = View.GONE,
-                                noLoginVisibility = View.GONE,
-                                noPostVisibility =
-                                if (it.items.isEmpty()) View.VISIBLE
-                                else View.GONE)
-                        followingFeedAdapter?.updateData(postDetailData = it)
-                        swipeRefreshLayout.isRefreshing = false
-                    }
-                    else
-                        followingFeedAdapter?.addData(postDetailData = it)
-                }
-                uiData.guestMode?.let {
-                    setBundleVisibilityData(noFollowVisibility = View.GONE,
-                            noLoginVisibility = View.VISIBLE,
-                            noPostVisibility = View.GONE)
-                }
-                uiData.noFollowing?.let {
-                    setBundleVisibilityData(noFollowVisibility = View.VISIBLE,
-                            noLoginVisibility = View.GONE,
-                            noPostVisibility = View.GONE)
-                }
-            }
-        })
-
-        // load following feed 이벤트 observe
-        mainViewModel.loadFollowingFeedDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadFollowingFeedDataEvent ->
-            loadFollowingFeedDataEvent?.let { _ ->
-                loadFollowingFeedDataEvent.isLoading?.let {
-                    followingFeedAdapter?.dataLoading = it
-                    needInitData = false
-                }
             }
         })
 
@@ -173,9 +137,41 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast!!.showToast(message = it)
                 }
-                uiData.postUpdatePosition?.let {
+                uiData.postDetailData?.let {
+                    followingFeedAdapter?.linkData(postDetailData = it)
+                    swipeRefreshLayout.isRefreshing = false
+                }
+                uiData.postDetailDataUpdate?.let {
+                    followingFeedAdapter?.notifyDataSetChanged()
+                }
+                uiData.postDetailUpdateIndex?.let {
                     followingFeedAdapter?.notifyItemChanged(it)
                 }
+                uiData.noPostVisibility?.let {
+                    // post 없으면 no post 띄우기
+                    setBundleVisibilityData(noFollowVisibility = View.GONE,
+                            noLoginVisibility = View.GONE,
+                            noPostVisibility = it)
+                }
+                uiData.noFollowingVisibility?.let {
+                    swipeRefreshLayout.isRefreshing = false
+                    setBundleVisibilityData(noFollowVisibility = it,
+                            noLoginVisibility = View.GONE,
+                            noPostVisibility = View.GONE)
+                }
+                uiData.noLoginVisibility?.let {
+                    setBundleVisibilityData(noFollowVisibility = View.GONE,
+                            noLoginVisibility = it,
+                            noPostVisibility = View.GONE)
+                }
+            }
+        })
+
+        // load following feed 이벤트 observe
+        postDetailViewModel.loadPostDetailData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isLoading ->
+                followingFeedAdapter?.dataLoading = isLoading
+                needInitData = false
             }
         })
     }
@@ -200,7 +196,7 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
 
     fun reloadFeedData(loadingBar: Boolean?) {
         context?.let {
-            mainViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1, loadingBar = loadingBar)
+            postDetailViewModel.loadFollowingFeedData(authorization = spHelper.authorization, page = 1, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 

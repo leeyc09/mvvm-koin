@@ -29,10 +29,10 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
             arguments?.putBoolean("needInitData", value)
         }
 
-    private var goodsThumbnailAdapter: GoodsThumbnailAdapter? = null
-
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
+
+    private var goodsThumbnailAdapter: GoodsThumbnailAdapter? = null
 
     private var defaultListener: DefaultListener? = null
 

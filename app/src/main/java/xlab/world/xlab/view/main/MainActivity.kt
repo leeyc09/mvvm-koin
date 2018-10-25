@@ -97,19 +97,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         when (resultCode) {
             Activity.RESULT_OK -> {
                 when (requestCode) {
-//                    RequestCodeData.POST_COMMENT, // 댓글
-//                    RequestCodeData.POST_DETAIL -> {  // 포스트 상세
-//                        feedFollowingFragment.reloadFeedData(loadingBar = null)
-//                    }
-//                    RequestCodeData.TOPIC_ADD, // 토픽 추가
-//                    RequestCodeData.COMBINATION_SEARCH , // 통합 검색
-//                    RequestCodeData.TAG_POST, // 포스트 태그 검색
-//                    RequestCodeData.GOODS_DETAIL, // 상품 상세
-//                    RequestCodeData.PROFILE, // 프로필
-//                    RequestCodeData.NOTIFICATION, // 푸시
-//                    RequestCodeData.GOODS_SEARCH -> { // 상품 검색
-//                        reloadAllData { max, current -> }
-//                    }
+                    RequestCodeData.POST_COMMENT, // 댓글
+                    RequestCodeData.POST_DETAIL -> {  // 포스트 상세
+                        feedFollowingFragment.reloadFeedData(loadingBar = null)
+                    }
+                    RequestCodeData.TOPIC_ADD, // 토픽 추가
+                    RequestCodeData.COMBINED_SEARCH , // 통합 검색
+                    RequestCodeData.TAG_POST, // 포스트 태그 검색
+                    RequestCodeData.GOODS_DETAIL, // 상품 상세
+                    RequestCodeData.PROFILE, // 프로필
+                    RequestCodeData.NOTIFICATION, // 푸시
+                    RequestCodeData.GOODS_SEARCH -> { // 상품 검색
+                        feedAllFragment.reloadFeedData(loadingBar = null)
+                        feedFollowingFragment.reloadFeedData(loadingBar = null)
+                        feedExploreFragment.reloadFeedData(loadingBar = null)
+                        feedShopFragment.reloadFeedData(loadingBar = null)
+                    }
                     RequestCodeData.TOPIC_SETTING -> { // 토픽 설정
                         // 전체, 제품 피드 갱신
                         feedAllFragment.reloadFeedData(loadingBar = null)

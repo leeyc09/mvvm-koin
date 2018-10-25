@@ -23,6 +23,7 @@ import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
+import xlab.world.xlab.view.profile.ProfileActivity
 import xlab.world.xlab.view.profile.ProfileViewModel
 
 class ProfileAlbumFragment: Fragment(), View.OnClickListener {
@@ -36,14 +37,14 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
             arguments?.putBoolean("needInitData", value)
         }
 
+    private var defaultToast: DefaultToast? = null
+    private var progressDialog: DefaultProgressDialog? = null
+
     private var postThumbnailAdapter: PostThumbnailAdapter? = null
     private var postDetailAdapter: PostDetailAdapter? = null
 
     private var gridLayoutManager: GridLayoutManager? = null // thumbnail view
     private var linearLayoutManager: LinearLayoutManager? = null // detail view
-
-    private var defaultToast: DefaultToast? = null
-    private var progressDialog: DefaultProgressDialog? = null
 
     private var defaultListener: DefaultListener? = null
     private var postDetailListener: PostDetailListener? =  null
@@ -67,6 +68,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
         defaultToast = defaultToast ?: DefaultToast(context = context!!)
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
 
+        // listener 초기화
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
         postDetailListener = postDetailListener ?: PostDetailListener(context = context as Activity, fragmentManager = (context as AppCompatActivity).supportFragmentManager,
                 postMoreEvent = { editPosition, deletePosition ->
@@ -81,10 +83,10 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                     }
                 },
                 likePostEvent = { position ->
-                    postDetailViewModel.likePost(authorization = spHelper.authorization, position = position, postData = postDetailAdapter!!.getItem(position))
+                    postDetailViewModel.likePost(authorization = spHelper.authorization, selectIndex = position)
                 },
                 savePostEvent = { position ->
-                    postDetailViewModel.savePost(context = context!!, authorization = spHelper.authorization, position = position, postData = postDetailAdapter!!.getItem(position))
+                    postDetailViewModel.savePost(context = context!!, authorization = spHelper.authorization, selectIndex = position)
                 })
         changeViewTypeListener = changeViewTypeListener ?: View.OnClickListener { view ->
             if (recyclerView.layoutManager is GridLayoutManager) { // post thumbnail adapter
@@ -153,7 +155,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                 }
             } else if (it is LinearLayoutManager) { // post detail adapter
                 ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = postDetailAdapter!!.dataLoading, total = postDetailAdapter!!.dataTotal) { _ ->
-                    profileViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = postDetailAdapter!!.dataNextPage, loginUserId = spHelper.userId)
+                    postDetailViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = postDetailAdapter!!.dataNextPage, loginUserId = spHelper.userId)
                 }
             }
         }
@@ -184,18 +186,6 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                     }
                     else
                         postThumbnailAdapter?.addData(postThumbnailData = it)
-                }
-                uiData.postsDetailData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        // post 없으면 no post 띄우기
-                        setBundleVisibilityData(noPostsLayout =
-                                if (it.items.isEmpty()) View.VISIBLE
-                                else View.GONE)
-                        postDetailAdapter?.updateData(postDetailData = it)
-                        swipeRefreshLayout.isRefreshing = false
-                    }
-                    else
-                        postDetailAdapter?.addData(postDetailData = it)
                 }
             }
         })
@@ -233,8 +223,30 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast!!.showToast(message = it)
                 }
-                uiData.postUpdatePosition?.let {
+                uiData.postDetailData?.let {
+                    postDetailAdapter?.linkData(postDetailData = it)
+                    swipeRefreshLayout.isRefreshing = false
+                }
+                uiData.postDetailDataUpdate?.let {
+                    postDetailAdapter?.notifyDataSetChanged()
+                }
+                uiData.postDetailUpdateIndex?.let {
+                    (context as ProfileActivity).setResultCodeFromFragment(resultCode = Activity.RESULT_OK)
                     postDetailAdapter?.notifyItemChanged(it)
+                }
+                uiData.noPostVisibility?.let {
+                    // post 없으면 no post 띄우기
+                    setBundleVisibilityData(noPostsLayout = it)
+                }
+            }
+        })
+
+        // post delete 이벤트 observe
+        postDetailViewModel.postDeleteData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isSuccess ->
+                if (isSuccess) {
+                    (context as ProfileActivity).setResultCodeFromFragment(resultCode = Activity.RESULT_OK)
+                    reloadAlbumPostsData(loadingBar = null)
                 }
             }
         })
@@ -252,7 +264,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
     fun reloadAlbumPostsData(loadingBar: Boolean?) {
         context?.let {
             profileViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = 1, loadingBar = loadingBar)
-            profileViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = 1, loginUserId = spHelper.userId, loadingBar = loadingBar)
+            postDetailViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = 1, loginUserId = spHelper.userId, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 

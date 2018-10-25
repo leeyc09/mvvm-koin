@@ -46,7 +46,7 @@ class PostDetailAdapter(private val context: Context,
                         private val hashTagListener: HashTagHelper.ClickListener,
                         private val goodsListener: View.OnClickListener) : RecyclerView.Adapter<PostDetailAdapter.ViewHolder>() {
 
-    private val postDetailData: PostDetailData = PostDetailData()
+    private var postDetailData: PostDetailData = PostDetailData()
     var dataLoading: Boolean
         get() = this.postDetailData.isLoading
         set(value) { this.postDetailData.isLoading = value }
@@ -67,29 +67,13 @@ class PostDetailAdapter(private val context: Context,
     private val hashTagCharsFont = hashMapOf(AppConstants.HASH_TAG_SIGN to CustomFont.getTypeface(CustomFont.notoSansCJKkrBold, context)!!)
     private val additionalHashTagChar = ArrayList<Char>()
 
-    fun getItem(position: Int): PostDetailListData {
-        return postDetailData.items[position]
-    }
-
-    fun updateData(postDetailData: PostDetailData) {
-        this.postDetailData.items.clear()
-        this.postDetailData.items.addAll(postDetailData.items)
-
-        this.postDetailData.isLoading = false
-        this.postDetailData.total = postDetailData.total
-        this.postDetailData.nextPage = 2
-
+    fun linkData(postDetailData: PostDetailData) {
+        this.postDetailData = postDetailData
         notifyDataSetChanged()
     }
 
-    fun addData(postDetailData: PostDetailData) {
-        val size: Int = itemCount
-        this.postDetailData.items.addAll(postDetailData.items)
-
-        this.postDetailData.isLoading = false
-        this.postDetailData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
+    fun getItem(position: Int): PostDetailListData {
+        return postDetailData.items[position]
     }
 
     override fun getItemViewType(position: Int): Int {

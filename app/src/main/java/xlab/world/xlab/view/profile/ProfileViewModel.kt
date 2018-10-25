@@ -244,63 +244,6 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         }
     }
 
-    fun loadUserPostsDetailData(authorization: String, userId: String, page: Int, loginUserId: String, loadingBar: Boolean? = true) {
-        // 네트워크 연결 확인
-        if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
-            return
-        }
-
-        uiData.value = UIModel(isLoading = loadingBar)
-        loadUserPostsDetailDataEvent.postValue(ProfileEvent(status = true))
-        launch {
-            apiPost.requestUserPostsDetail(scheduler = scheduler, authorization = authorization, userId = userId, page = page,
-                    responseData = {
-                        val postsDetailData = PostDetailData(total = it.total, nextPage = page + 1)
-                        it.postsData?.forEach { postsData ->
-                            postsDetailData.items.add(PostDetailListData(
-                                    dataType = AppConstants.ADAPTER_CONTENT,
-                                    postType = postsData.postType,
-                                    postId = postsData.id,
-                                    userId = postsData.userId,
-                                    userProfileURL = postsData.profileImg,
-                                    userNickName = postsData.nickName,
-                                    isFollowing = postsData.isFollowed,
-                                    imageURL = postsData.postFile,
-                                    youTubeVideoID = postsData.youTubeVideoID,
-                                    likeNum = postsData.likedCount,
-                                    commentsNum = postsData.commentCount,
-                                    content = postsData.content,
-                                    contentOrigin = postsData.content,
-                                    isLike = postsData.isLiked,
-                                    isSave = postsData.isSaved,
-                                    uploadYear = postsData.uploadYear,
-                                    uploadMonth = postsData.uploadMonth,
-                                    uploadDay = postsData.uploadDay,
-                                    uploadHour = postsData.uploadHour,
-                                    uploadMinute = postsData.uploadMinute,
-                                    goodsList = postsData.goods,
-                                    isMyPost = userId == loginUserId
-                            ))
-                        }
-
-                        // posts 있고 첫 페이지 경우 -> header 추가
-                        if (postsDetailData.items.isNotEmpty() && page == 1) {
-                            postsDetailData.items.add(0, PostDetailListData(dataType = AppConstants.ADAPTER_HEADER))
-                        }
-
-                        PrintLog.d("requestUserPostsDetail success", postsDetailData.toString())
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, postsDetailData = postsDetailData)
-                    },
-                    errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
-                        errorData?.let {
-                            PrintLog.d("requestUserPostsDetail fail", errorData.message)
-                        }
-                    })
-        }
-    }
-
     fun userFollow(authorization: String, userId: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
@@ -335,4 +278,4 @@ data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = n
                    val followState: Boolean? = null,
                    val topicData: ProfileTopicData? = null, val topicDataUpdate: Boolean? = null,
                    val topicUsedGoodsData: GoodsThumbnailData? = null,
-                   val postsThumbData: PostThumbnailData? = null, val postsDetailData: PostDetailData? = null)
+                   val postsThumbData: PostThumbnailData? = null)

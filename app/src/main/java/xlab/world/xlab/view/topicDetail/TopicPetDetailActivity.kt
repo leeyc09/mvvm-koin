@@ -116,7 +116,7 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
-        // 타이틀 설정
+        // 타이틀 설
         textViewPetNo.setText(intent.getIntExtra(IntentPassName.PET_NO, 1).toString(), TextView.BufferType.SPANNABLE)
 
         // Toast, Dialog 초기화

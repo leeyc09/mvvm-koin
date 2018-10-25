@@ -25,7 +25,6 @@ class MainViewModel(private val apiPost: ApiPostProvider,
     val tag = "Main"
 
     val loadAllFeedDataEvent = SingleLiveEvent<LoadFeedDataEvent>()
-    val loadFollowingFeedDataEvent = SingleLiveEvent<LoadFeedDataEvent>()
     val loadExploreFeedDataEvent = SingleLiveEvent<LoadFeedDataEvent>()
     val btnActionData = SingleLiveEvent<BtnActionModel?>()
     val uiData = MutableLiveData<UIModel>()
@@ -107,72 +106,6 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
                             PrintLog.d("getAllFeed fail", errorData.message)
-                        }
-                    })
-        }
-    }
-
-    fun loadFollowingFeedData(authorization: String, page: Int, loadingBar: Boolean? = true) {
-        // 네트워크 연결 확인
-        if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
-            return
-        }
-
-        // login 확인
-        if (SupportData.isGuest(authorization)) { // guest
-            uiData.value = UIModel(guestMode = true)
-            return
-        }
-
-        uiData.value = UIModel(isLoading = loadingBar)
-        loadFollowingFeedDataEvent.value = LoadFeedDataEvent(isLoading = true)
-        launch {
-            apiPost.getFollowingFeed(scheduler = scheduler, authorization = authorization, page = page,
-                    responseData = {
-                        val followingFeedData = PostDetailData(total = it.total, nextPage = page + 1)
-                        it.postsData?.forEach { postsData ->
-                            followingFeedData.items.add(PostDetailListData(
-                                    dataType = AppConstants.ADAPTER_CONTENT,
-                                    postType = postsData.postType,
-                                    postId = postsData.id,
-                                    userId = postsData.userId,
-                                    userProfileURL = postsData.profileImg,
-                                    userNickName = postsData.nickName,
-                                    isFollowing = postsData.isFollowed,
-                                    imageURL = postsData.postFile,
-                                    youTubeVideoID = postsData.youTubeVideoID,
-                                    likeNum = postsData.likedCount,
-                                    commentsNum = postsData.commentCount,
-                                    content = postsData.content,
-                                    contentOrigin = postsData.content,
-                                    isLike = postsData.isLiked,
-                                    isSave = postsData.isSaved,
-                                    uploadYear = postsData.uploadYear,
-                                    uploadMonth = postsData.uploadMonth,
-                                    uploadDay = postsData.uploadDay,
-                                    uploadHour = postsData.uploadHour,
-                                    uploadMinute = postsData.uploadMinute,
-                                    goodsList = postsData.goods,
-                                    isMyPost = false
-                            ))
-                        }
-
-                        PrintLog.d("getFollowingFeed success", followingFeedData.toString())
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, followingFeedData = followingFeedData)
-                    },
-                    errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
-                        errorData?.let {
-                            PrintLog.d("getFollowingFeed fail", errorData.message)
-                            if (errorData.errorCode == HttpURLConnection.HTTP_BAD_REQUEST) {
-                                val errorMessage = errorData.message.split(ApiCallBackConstants.DELIMITER_CHARACTER)
-                                if (errorMessage.size > 1)
-                                    if (errorMessage[1] == ApiCallBackConstants.N0_FOLLOWING_USER) {
-                                        PrintLog.d("getFollowingFeed fail", "no following user")
-                                        uiData.value = UIModel(noFollowing = true)
-                                    }
-                            }
                         }
                     })
         }
@@ -314,6 +247,6 @@ data class BtnActionModel(val notification: Boolean? = null, val profile: Boolea
                           val post: Boolean? = null, val postTypeDialog: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
                    val allFeedData: AllFeedData? = null,
-                   val followingFeedData: PostDetailData? = null, val guestMode: Boolean? = null, val noFollowing: Boolean? = null,
+                   val guestMode: Boolean? = null,
                    val exploreFeedData: ExploreFeedData? = null,
                    val shopFeedData: ShopFeedData? = null)
