@@ -19,7 +19,7 @@ import xlab.world.xlab.utils.support.AppConstants
 class GoodsDetailRatingAdapter(private val context: Context,
                                private val ratingListener: View.OnClickListener) : RecyclerView.Adapter<GoodsDetailRatingAdapter.ViewHolder>() {
 
-    private val goodsDetailRatingData: GoodsDetailRatingData = GoodsDetailRatingData()
+    private var goodsDetailRatingData: GoodsDetailRatingData = GoodsDetailRatingData()
     var dataLoading: Boolean
         get() = this.goodsDetailRatingData.isLoading
         set(value) { this.goodsDetailRatingData.isLoading = value }
@@ -28,29 +28,9 @@ class GoodsDetailRatingAdapter(private val context: Context,
     var dataNextPage: Int = 1
         get() = this.goodsDetailRatingData.nextPage
 
-    fun getItem(position: Int): GoodsDetailRatingListData {
-        return goodsDetailRatingData.items[position]
-    }
-
-    fun updateData(goodsDetailRatingData: GoodsDetailRatingData) {
-        this.goodsDetailRatingData.items.clear()
-        this.goodsDetailRatingData.items.addAll(goodsDetailRatingData.items)
-
-        this.goodsDetailRatingData.isLoading = false
-        this.goodsDetailRatingData.total = goodsDetailRatingData.total
-        this.goodsDetailRatingData.nextPage = 2
-
+    fun linkData(goodsDetailRatingData: GoodsDetailRatingData) {
+        this.goodsDetailRatingData = goodsDetailRatingData
         notifyDataSetChanged()
-    }
-
-    fun addData(goodsDetailRatingData: GoodsDetailRatingData) {
-        val size: Int = itemCount
-        this.goodsDetailRatingData.items.addAll(goodsDetailRatingData.items)
-
-        this.goodsDetailRatingData.isLoading = false
-        this.goodsDetailRatingData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override

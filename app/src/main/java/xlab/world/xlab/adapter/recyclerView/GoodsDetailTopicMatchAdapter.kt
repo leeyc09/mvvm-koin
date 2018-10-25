@@ -18,9 +18,9 @@ import com.bumptech.glide.request.RequestOptions
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
 
-class GoodsDetailTopicMatchAdapter(private val context: Context) : RecyclerView.Adapter<GoodsDetailTopicMatchAdapter.ViewHolder>() {
+class GoodsDetailTopicMatchAdapter(private val context: Context): RecyclerView.Adapter<GoodsDetailTopicMatchAdapter.ViewHolder>() {
 
-    private val goodsDetailTopicMatchData: GoodsDetailTopicMatchData = GoodsDetailTopicMatchData()
+    private var goodsDetailTopicMatchData: GoodsDetailTopicMatchData = GoodsDetailTopicMatchData()
     var dataLoading: Boolean
         get() = this.goodsDetailTopicMatchData.isLoading
         set(value) { this.goodsDetailTopicMatchData.isLoading = value }
@@ -35,29 +35,9 @@ class GoodsDetailTopicMatchAdapter(private val context: Context) : RecyclerView.
             .placeholder(imagePlaceHolder)
             .error(imagePlaceHolder)
 
-    fun getItem(position: Int): GoodsDetailTopicMatchListData {
-        return goodsDetailTopicMatchData.items[position]
-    }
-
-    fun updateData(goodsDetailTopicMatchData: GoodsDetailTopicMatchData) {
-        this.goodsDetailTopicMatchData.items.clear()
-        this.goodsDetailTopicMatchData.items.addAll(goodsDetailTopicMatchData.items)
-
-        this.goodsDetailTopicMatchData.isLoading = false
-        this.goodsDetailTopicMatchData.total = goodsDetailTopicMatchData.total
-        this.goodsDetailTopicMatchData.nextPage = 2
-
+    fun linkData(goodsDetailTopicMatchData: GoodsDetailTopicMatchData) {
+        this.goodsDetailTopicMatchData = goodsDetailTopicMatchData
         notifyDataSetChanged()
-    }
-
-    fun addData(goodsDetailTopicMatchData: GoodsDetailTopicMatchData) {
-        val size: Int = itemCount
-        this.goodsDetailTopicMatchData.items.addAll(goodsDetailTopicMatchData.items)
-
-        this.goodsDetailTopicMatchData.isLoading = false
-        this.goodsDetailTopicMatchData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override

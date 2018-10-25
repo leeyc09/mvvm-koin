@@ -62,5 +62,7 @@ class DefaultOneDialog(context: Context,
 
     fun showDialog(tag: Any?) {
         this.tag = tag
+
+        super.show()
     }
 }

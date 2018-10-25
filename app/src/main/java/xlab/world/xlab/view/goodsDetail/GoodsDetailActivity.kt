@@ -66,20 +66,19 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         override fun onShareKakao(tag: Any?) {
-            PrintLog.d("share", "kakao", goodsDetailViewModel.tag)
+            PrintLog.d("share", "kakao")
         }
     }
     private val ratingListener = View.OnClickListener { view ->
         val ratingTagData = view.tag as GoodsDetailRatingAdapter.RatingTag
         goodsDetailViewModel.goodsRating(selectRatingData = ratingTagData,
-                goodsRatingData = goodsDetailRatingAdapter.getItem(position = ratingTagData.position),
                 authorization = spHelper.authorization)
     }
     private val ratingCancelListener = object: DefaultDialog.Listener {
         override fun onOkayTouch(tag: Any?) {
-            goodsDetailViewModel.ratingCancel(position = tag as Int,
-                    goodsRatingData = goodsDetailRatingAdapter.getItem(position = tag),
-                    authorization = spHelper.authorization)
+//            goodsDetailViewModel.ratingCancel(position = tag as Int,
+//                    goodsRatingData = goodsDetailRatingAdapter.getItem(position = tag),
+//                    authorization = spHelper.authorization)
         }
     }
     private val buyGoodsListener = object: BuyGoodsOptionDialog.Listener {
@@ -165,11 +164,12 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
+        // appBarLayout 애니메이션 없애기
         appBarLayout.stateListAnimator = null
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         addCartToast = AddCartToast(context = this)
-
         progressDialog = DefaultProgressDialog(context = this)
         loginDialog = DialogCreator.loginDialog(context = this)
         suggestAddTopicDialog = DialogCreator.suggestAddTopicDialog(context = this)
@@ -177,6 +177,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         ratingCancelDialog = DialogCreator.ratingCancelDialog(context = this, listener = ratingCancelListener)
         buyGoodsOptionDialog = DialogCreator.buyGoodsOptionDialog(listener = buyGoodsListener)
 
+        // listener 초기화
         defaultListener = DefaultListener(context = this)
 
         // 프래그먼트 초기화
@@ -253,22 +254,13 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                             price = it)
                 }
                 uiData.topicMatchData?.let {
-                    matchingRecyclerView.visibility =
-                            if (it.items.isEmpty()) View.GONE
-                            else View.VISIBLE
-                    goodsDetailTopicMatchAdapter.updateData(goodsDetailTopicMatchData = it)
+                    goodsDetailTopicMatchAdapter.linkData(goodsDetailTopicMatchData = it)
+                }
+                uiData.topicMatchVisibility?.let {
+                    matchingRecyclerView.visibility = it
                 }
                 uiData.goodsRatingData?.let {
-                    if (it.items.isEmpty()) {
-                        ratingRecyclerView.visibility = View.GONE
-                        ratingRecyclerViewLine.visibility = View.GONE
-                        imageViewRatingArrow.rotation = 0f
-                    } else {
-                        ratingRecyclerView.visibility = View.VISIBLE
-                        ratingRecyclerViewLine.visibility = View.VISIBLE
-                        imageViewRatingArrow.rotation = 180f
-                    }
-                    goodsDetailRatingAdapter.updateData(goodsDetailRatingData = it)
+                    goodsDetailRatingAdapter.linkData(goodsDetailRatingData = it)
                 }
                 uiData.goodsRatingUpdateIndex?.let {
                     goodsDetailRatingAdapter.notifyItemChanged(it)
@@ -309,26 +301,10 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
-        // load pet data 이벤트 observe
-        goodsDetailViewModel.loadGoodsPetEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _->
-                eventData.status?.let { isGuest ->
-                    if (isGuest) {
-                        matchingRecyclerView.visibility = View.GONE
-                        ratingRecyclerView.visibility = View.GONE
-                        ratingRecyclerViewLine.visibility = View.GONE
-                        imageViewRatingArrow.rotation = 0f
-                    }
-                }
-            }
-        })
-
         // goods rating 이벤트 observe
-        goodsDetailViewModel.goodsRatingEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _->
-                eventData.ratingCancelPosition?.let {
-                    ratingCancelDialog.showDialog(tag = it)
-                }
+        goodsDetailViewModel.goodsRatingData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { cancelIndex ->
+                ratingCancelDialog.showDialog(tag = cancelIndex)
             }
         })
 
@@ -392,6 +368,10 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         tabLayoutDot.visibility =
                 if (tabLayoutDot.tabCount > 1) View.VISIBLE
                 else View.GONE
+    }
+
+    fun setResultCodeFromFragment(resultCode: Int) {
+        goodsDetailViewModel.setResultCode(resultCode = resultCode)
     }
 
     companion object {

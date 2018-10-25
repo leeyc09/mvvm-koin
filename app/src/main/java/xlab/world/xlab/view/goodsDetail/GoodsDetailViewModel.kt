@@ -1,5 +1,6 @@
 package xlab.world.xlab.view.goodsDetail
 
+import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.graphics.Color
@@ -30,18 +31,26 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                            private val petInfo: PetInfo,
                            private val networkCheck: NetworkCheck,
                            private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "GoodsDetail"
+    private val viewModelTag = "GoodsDetail"
+
+    private var resultCode = Activity.RESULT_CANCELED
+
     private val defaultDeliveryPrice = 2500
     private var goodsCode: String = ""
     private var goodsData: ResGoodsDetailData? = null
-    private var hasTopicData: Boolean = false
     private val imageRegexPattern = Pattern.compile("\\(?\\b(http://|www[.])[-A-Za-z0-9+&amp;@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&amp;@#/%=~_()|]")
 
+    private var goodsDetailTopicMatchData: GoodsDetailTopicMatchData = GoodsDetailTopicMatchData()
+    private var goodsDetailRatingData: GoodsDetailRatingData = GoodsDetailRatingData()
+
     val ratingOpenCloseEventData = SingleLiveEvent<RatingOpenCloseEvent>()
-    val loadGoodsPetEventData = SingleLiveEvent<GoodsDetailEvent>()
-    val goodsRatingEventData = SingleLiveEvent<GoodsRatingEvent>()
+    val goodsRatingData = SingleLiveEvent<Int?>()
     val buyNowEventData = SingleLiveEvent<BuyNowModel>()
     val uiData = MutableLiveData<UIModel>()
+
+    fun setResultCode(resultCode: Int) {
+        this.resultCode = SupportData.setResultCode(oldResultCode = this.resultCode, newResultCode = resultCode)
+    }
 
     fun loadGoodsDetailData(context: Context, goodsCode: String, needDescription: Boolean) {
         this.goodsCode = goodsCode
@@ -133,7 +142,9 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
 
     fun loadGoodsPetData(authorization: String) {
         if (SupportData.isGuest(authorization = authorization)) { // 게스트
-            loadGoodsPetEventData.postValue(GoodsDetailEvent(status = true))
+            uiData.postValue(UIModel(topicMatchVisibility = View.GONE,
+                    ratingViewVisibility = View.GONE,
+                    ratingArrowRotation = 0f))
             return
         }
 
@@ -147,19 +158,19 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiPet.requestGoodsDetailPets(scheduler = scheduler, authorization = authorization, goodsCode = goodsCode,
                     responseData = {
-                        PrintLog.d("requestGoodsDetailPets success", it.toString())
-                        val topicMatchData = GoodsDetailTopicMatchData()
-                        val goodsRatingData = GoodsDetailRatingData()
+                        PrintLog.d("requestGoodsDetailPets success", it.toString(), viewModelTag)
+                        val newTopicMatchData = GoodsDetailTopicMatchData()
+                        val newGoodsRatingData = GoodsDetailRatingData()
 
                         it.petsData?.forEach { pet ->
-                            topicMatchData.items.add(GoodsDetailTopicMatchListData(
+                            newTopicMatchData.items.add(GoodsDetailTopicMatchListData(
                                     petId = pet.id,
                                     petName = pet.name,
                                     imageURL = pet.image,
                                     matchingPercent = pet.match,
                                     matchColor = Color.parseColor("#${pet.topicColor}")
                             ))
-                            goodsRatingData.items.add(GoodsDetailRatingListData(
+                            newGoodsRatingData.items.add(GoodsDetailRatingListData(
                                     petId = pet.id,
                                     petType = pet.type,
                                     petBreed = pet.breed,
@@ -168,13 +179,21 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                                     rating = pet.rating
                             ))
                         }
-                        hasTopicData = topicMatchData.items.isNotEmpty()
-                        uiData.value = UIModel(isLoading = false, topicMatchData = topicMatchData, goodsRatingData = goodsRatingData)
+
+                        this.goodsDetailTopicMatchData.updateData(goodsDetailTopicMatchData = newTopicMatchData)
+                        this.goodsDetailRatingData.updateData(goodsDetailRatingData = newGoodsRatingData)
+
+                        uiData.value = UIModel(isLoading = false,
+                                topicMatchData = this.goodsDetailTopicMatchData,
+                                topicMatchVisibility = if (this.goodsDetailTopicMatchData.items.isEmpty()) View.GONE else View.VISIBLE,
+                                goodsRatingData = this.goodsDetailRatingData,
+                                ratingViewVisibility = if (this.goodsDetailRatingData.items.isEmpty()) View.GONE else View.VISIBLE,
+                                ratingArrowRotation = if (this.goodsDetailRatingData.items.isEmpty()) 0f else 180f)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestGoodsDetailPets fail", errorData.message)
+                            PrintLog.e("requestGoodsDetailPets fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -189,7 +208,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                     return@create
                 }
 
-                if (!hasTopicData) { // 토픽 없음
+                if (this.goodsDetailTopicMatchData.items.isEmpty()) { // 토픽 없음
                     PrintLog.d("ratingOpenClose", "no topic")
                     ratingOpenCloseEventData.postValue(RatingOpenCloseEvent(noTopic = true))
                     it.onComplete()
@@ -322,10 +341,11 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
         }
     }
 
-    fun goodsRating(selectRatingData: GoodsDetailRatingAdapter.RatingTag,
-                    goodsRatingData: GoodsDetailRatingListData, authorization: String) {
-        if (selectRatingData.rating == goodsRatingData.rating) { // rating 취소
-            goodsRatingEventData.postValue(GoodsRatingEvent(ratingCancelPosition = selectRatingData.position))
+    fun goodsRating(selectRatingData: GoodsDetailRatingAdapter.RatingTag, authorization: String) {
+        val ratingData = this.goodsDetailRatingData.items[selectRatingData.position]
+
+        if (selectRatingData.rating == ratingData.rating) { // rating 취소
+            goodsRatingData.postValue(selectRatingData.position)
             return
         }
 
@@ -345,15 +365,15 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                     goodsImage = goodsData!!.goods.mainImage,
                     goodsType = AppConstants.GOODS_PET,
                     topic = ReqUsedGoodsData.Topic(
-                            id = goodsRatingData.petId,
-                            type = goodsRatingData.petType,
-                            breed = goodsRatingData.petBreed,
+                            id = ratingData.petId,
+                            type = ratingData.petType,
+                            breed = ratingData.petBreed,
                             rating = selectRatingData.rating
                     ))
             apiUserActivity.requestPostUsedGoods(scheduler = scheduler, authorization = authorization, reqUsedGoodsData = reqUsedGoodsData,
                     responseData = {
                         PrintLog.d("requestPostUsedGoods success", it.toString())
-                        goodsRatingData.rating = selectRatingData.rating
+                        ratingData.rating = selectRatingData.rating
 
                         uiData.value = UIModel(isLoading = false, goodsRatingUpdateIndex = selectRatingData.position)
                     },
@@ -456,12 +476,10 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
 }
 
 data class BuyNowModel(val sno: Int? = null)
-data class GoodsRatingEvent(val ratingCancelPosition: Int? = null)
 data class RatingOpenCloseEvent(val noTopic: Boolean? = null)
-data class GoodsDetailEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val cartToastShow: Boolean? = null,
                    val isGuest: Boolean? = null, val buyOptionDialogShow: Int? = null,
-                   val topicMatchData: GoodsDetailTopicMatchData? = null,
+                   val topicMatchData: GoodsDetailTopicMatchData? = null, val topicMatchVisibility: Int? = null,
                    val goodsRatingData: GoodsDetailRatingData? = null, val goodsRatingUpdateIndex: Int? = null,
                    val ratingViewVisibility: Int? = null, val ratingArrowRotation: Float? = null,
                    val buyBtnStr: String? = null, val buyBtnEnable: Boolean? = null,
