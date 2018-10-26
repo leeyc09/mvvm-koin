@@ -1,12 +1,13 @@
 package xlab.world.xlab.view.search
 
+import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
 import android.graphics.Color
+import android.view.View
 import io.reactivex.Observable
 import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.data.request.ReqGoodsSearchData
 import xlab.world.xlab.data.response.ResGoodsSearchData
-import xlab.world.xlab.server.ApiURL
 import xlab.world.xlab.server.provider.ApiPostProvider
 import xlab.world.xlab.server.provider.ApiShopProvider
 import xlab.world.xlab.server.provider.ApiUserProvider
@@ -24,27 +25,42 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                       private val petInfo: PetInfo,
                       private val networkCheck: NetworkCheck,
                       private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "Search"
+    private val viewModelTag = "Search"
+
+    private var resultCode = Activity.RESULT_CANCELED
 
     private var searchSortType = AppConstants.SORT_MATCH
+    private var isShowGoodsKeyword = true
 
-    val changeSearchSortTypeEventData = SingleLiveEvent<SearchEvent>()
+    private var searchGoodsData: SearchGoodsData = SearchGoodsData()
+    private var goodsKeywordData: GoodsKeywordData = GoodsKeywordData()
+
+    val changeSearchSortTypeData = SingleLiveEvent<Boolean?>()
     val searchPostsEventData = SingleLiveEvent<SearchEvent>()
     val searchUserEventData = SingleLiveEvent<SearchEvent>()
-    val searchGoodsEventData = SingleLiveEvent<SearchEvent>()
+    val searchGoodsEventData = SingleLiveEvent<Boolean?>()
     val uiData = MutableLiveData<UIModel>()
 
-    fun changeSearchSortType(goodsData: SearchGoodsListData, sortType: Int) {
+    fun setResultCode(resultCode: Int) {
+        this.resultCode = SupportData.setResultCode(oldResultCode = this.resultCode, newResultCode = resultCode)
+    }
+
+    fun backBtnAction() {
+        uiData.postValue(UIModel(resultCode = resultCode))
+    }
+
+    fun changeSearchSortType(sortType: Int) {
+        // 검색 정렬 변경
         launch {
             Observable.create<Int> {
                 searchSortType = sortType
-                goodsData.sortType = sortType
+                this.searchGoodsData.items[0].sortType = sortType
 
                 it.onNext(0)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
-                uiData.value = UIModel(searchGoodsUpdatePosition = it)
-                changeSearchSortTypeEventData.value = SearchEvent(status = true)
+                uiData.value = UIModel(searchGoodsUpdateIndex = it)
+                changeSearchSortTypeData.value = true
             }
         }
     }
@@ -171,8 +187,9 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
         }
 
         uiData.value = UIModel(isLoading = loadingBar)
-        searchGoodsEventData.value = SearchEvent(status = true)
+        searchGoodsEventData.value = true
         launch {
+            // 상품 검색 데이터 추가
             val reqSearchData = ArrayList<ReqGoodsSearchData>()
             searchData.forEach {
                 reqSearchData.add(ReqGoodsSearchData(text = it.text, code = it.code))
@@ -180,7 +197,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
             apiShop.requestSearchGoods(scheduler = scheduler, authorization = authorization, reqGoodsSearchData = reqSearchData,
                     page = page, sortType = searchSortType,
                     responseData = {
-                        PrintLog.d("searchGoods success", it.toString())
+                        PrintLog.d("searchGoods success", it.toString(), viewModelTag)
                         // keyword data
                         val keywordData = GoodsKeywordData(total = it.keywordTotal)
                         it.keywordList?.let { keywordList ->
@@ -212,14 +229,26 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                             }
                         }
 
-                        if (page == 1 && withHeader)
-                            goodsData.items.add(0, SearchGoodsListData(
-                                    dataType = AppConstants.ADAPTER_HEADER,
-                                    sortType = searchSortType)
-                            )
+                        if (page == 1) {
+                            if (withHeader) {
+                                goodsData.items.add(0, SearchGoodsListData(
+                                        dataType = AppConstants.ADAPTER_HEADER,
+                                        sortType = searchSortType))
+                            }
+                            this.searchGoodsData.updateData(searchGoodsData = goodsData)
+                            this.goodsKeywordData.updateData(goodsKeywordData = keywordData)
 
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
-                                keywordData = keywordData, searchGoodsData = goodsData)
+                            isShowGoodsKeyword = this.goodsKeywordData.items.isNotEmpty()
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
+                                    keywordData = keywordData,
+                                    keywordVisibility = if (isShowGoodsKeyword) View.VISIBLE else View.GONE,
+                                    keywordArrowRotation = if (isShowGoodsKeyword) 180f else 0f,
+                                    searchGoodsData = this.searchGoodsData)
+                        } else {
+                            this.searchGoodsData.addData(searchGoodsData = goodsData)
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
+                                    searchGoodsDataUpdate = true)
+                        }
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
@@ -230,10 +259,12 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
         }
     }
 
+    // 해당 상품 % 와 인기율 설정
     private fun getPercentValueAndColor(topicColorList: Array<String>, matchData: ResGoodsSearchData.TopicMatch?): MatchData {
         val randIndex = Random()
         var percentValue = 0
         var percentColor = Color.parseColor("#${topicColorList[randIndex.nextInt(topicColorList.size)]}")
+        // match 데이터 없을 경우 -> 기본값
         matchData?.let {
             percentValue = it.match
             percentColor = Color.parseColor("#${it.topicColor}")
@@ -241,13 +272,33 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
 
         return MatchData(percent = percentValue, color = percentColor)
     }
+
+    fun keywordVisibilityChnage() {
+        launch {
+            Observable.create<ArrayList<Any>> {
+                // 추천 키워드 숨긴상태 -> 보이기
+                // 보이는 상태 -> 숨기기
+                // [0] -> 키워드 레이아웃 보이기 & 숨기기
+                // [1] -> 키워드 화살표
+                isShowGoodsKeyword = !isShowGoodsKeyword
+                it.onNext(arrayListOf(
+                        if(isShowGoodsKeyword) View.VISIBLE else View.GONE,
+                        if(isShowGoodsKeyword) 180f else 0f
+                ))
+                it.onComplete()
+            }.with(scheduler = scheduler).subscribe {
+                uiData.value = UIModel(keywordVisibility = it[0] as Int,
+                        keywordArrowRotation = it[1] as Float)
+            }
+        }
+    }
 }
 
 data class MatchData(val percent: Int, val color: Int)
 data class SearchEvent(val status: Boolean? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
-                   val keywordData: GoodsKeywordData? = null, val searchGoodsData: SearchGoodsData? = null,
-                   val searchGoodsUpdatePosition: Int? = null,
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
+                   val keywordData: GoodsKeywordData? = null, val keywordVisibility: Int? = null, val keywordArrowRotation: Float? = null,
+                   val searchGoodsData: SearchGoodsData? = null, val searchGoodsDataUpdate: Boolean? = null, val searchGoodsUpdateIndex: Int? = null,
                    val searchPostsData: PostThumbnailData? = null,
                    val searchUserData: UserDefaultData? = null,
                    val searchPostsTotal: Int? = null, val searchUserTotal: Int? = null, val searchGoodsTotal: Int? = null)

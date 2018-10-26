@@ -2,6 +2,7 @@ package xlab.world.xlab.server.provider
 
 import io.reactivex.disposables.Disposable
 import xlab.world.xlab.data.request.ReqGoodsSearchData
+import xlab.world.xlab.data.request.ReqRecentViewGoodsData
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.`interface`.IShopRequest
 import xlab.world.xlab.server.errorHandle
@@ -36,6 +37,10 @@ interface ApiShopProvider {
     // 최근 본 상품 가져오기
     fun requestRecentViewGoods(scheduler: SchedulerProvider, authorization: String, page: Int,
                                responseData: (ResGoodsThumbnailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
+
+    // 최근 본 상품 추가
+    fun requestPostRecentViewGoods(scheduler: SchedulerProvider, authorization: String, recentViewGoodsData: ReqRecentViewGoodsData,
+                                   responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
@@ -110,6 +115,17 @@ class ApiShop(private val iShopRequest: IShopRequest): ApiShopProvider {
     override fun requestRecentViewGoods(scheduler: SchedulerProvider, authorization: String, page: Int,
                                         responseData: (ResGoodsThumbnailData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iShopRequest.getRecentViewGoods(authorization = authorization, page = page)
+                .with(scheduler = scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestPostRecentViewGoods(scheduler: SchedulerProvider, authorization: String, recentViewGoodsData: ReqRecentViewGoodsData,
+                                            responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iShopRequest.postRecentViewGoods(authorization = authorization, reqViewGoodsData = recentViewGoodsData)
                 .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)

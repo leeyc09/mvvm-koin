@@ -256,7 +256,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     textViewIntroduction.setText(it, TextView.BufferType.SPANNABLE)
                 }
                 uiData.followState?.let {
-                    profileViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                     followBtn.isSelected = it
                 }
                 uiData.followerCnt?.let {
@@ -331,6 +330,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
                 }
                 R.id.followBtn -> { // 팔로우 버튼
+                    profileViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                     profileViewModel.userFollow(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID))
                 }
                 R.id.followerLayout -> { // 팔로워

@@ -132,25 +132,24 @@ class CombinedSearchGoodsFragment: Fragment() {
                     defaultToast?.showToast(message = it)
                 }
                 uiData.searchGoodsData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        setBundleVisibilityData(noSearchDataVisibility =
-                        if (it.items.isEmpty()) View.VISIBLE
-                        else View.GONE)
-                        searchGoodsAdapter?.updateData(searchGoodsData = it)
-                    }
-                    else
-                        searchGoodsAdapter?.addData(searchGoodsData = it)
+                    searchGoodsAdapter?.linkData(searchGoodsData = it)
+//                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
+//                        setBundleVisibilityData(noSearchDataVisibility =
+//                        if (it.items.isEmpty()) View.VISIBLE
+//                        else View.GONE)
+//                        searchGoodsAdapter?.updateData(searchGoodsData = it)
+//                    }
+//                    else
+//                        searchGoodsAdapter?.addData(searchGoodsData = it)
                 }
             }
         })
 
         // search user 이벤트 observe
         searchViewModel.searchGoodsEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.status?.let { isLoading ->
-                    searchGoodsAdapter?.dataLoading = isLoading
-                    needInitData = false
-                }
+            eventData?.let { isLoading ->
+                searchGoodsAdapter?.dataLoading = isLoading
+                needInitData = false
             }
         })
     }

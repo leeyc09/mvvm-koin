@@ -12,6 +12,7 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.GoodsDetailInfoAdapter
 import xlab.world.xlab.adapter.recyclerView.GoodsDetailRatingAdapter
 import xlab.world.xlab.data.adapter.*
+import xlab.world.xlab.data.request.ReqRecentViewGoodsData
 import xlab.world.xlab.data.request.ReqUsedGoodsData
 import xlab.world.xlab.data.response.ResGoodsDetailData
 import xlab.world.xlab.server.provider.*
@@ -35,6 +36,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
 
     private var resultCode = Activity.RESULT_CANCELED
 
+    private var isPostViewGoods: Boolean = false
     private val defaultDeliveryPrice = 2500
     private var goodsCode: String = ""
     private var goodsData: ResGoodsDetailData? = null
@@ -43,13 +45,37 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
     private var goodsDetailTopicMatchData: GoodsDetailTopicMatchData = GoodsDetailTopicMatchData()
     private var goodsDetailRatingData: GoodsDetailRatingData = GoodsDetailRatingData()
 
-    val ratingOpenCloseEventData = SingleLiveEvent<RatingOpenCloseEvent>()
+    val recentViewGoodsData = SingleLiveEvent<ReqRecentViewGoodsData?>()
+    val ratingOpenCloseData = SingleLiveEvent<Boolean?>()
     val goodsRatingData = SingleLiveEvent<Int?>()
     val buyNowEventData = SingleLiveEvent<BuyNowModel>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setResultCode(resultCode: Int) {
         this.resultCode = SupportData.setResultCode(oldResultCode = this.resultCode, newResultCode = resultCode)
+    }
+
+    fun postRecentViewGoods(authorization: String, recentViewGoods: ReqRecentViewGoodsData) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            apiShop.requestPostRecentViewGoods(scheduler = scheduler, authorization = authorization, recentViewGoodsData = recentViewGoods,
+                    responseData = {
+                        isPostViewGoods = true
+                        uiData.value = UIModel(isLoading = false)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.d("requestGoodsDetail fail", errorData.message)
+                        }
+                    })
+        }
     }
 
     fun loadGoodsDetailData(context: Context, goodsCode: String, needDescription: Boolean) {
@@ -130,6 +156,11 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                                 brandName = it.goods.brandName, brandCode = it.goods.brandCode, goodsMainImages = goodsMainImages,
                                 goodsName = it.goods.name, goodsPrice = goodsPrice, goodsPriceUnitVisibility = goodsPriceUnitVisibility,
                                 goodsDescriptionData = goodsDetailInfoData)
+
+                        // 최근 본 상품에 추가한 적 없는 경우 -> 추가
+                        if (!isPostViewGoods) {
+                            recentViewGoodsData.value = ReqRecentViewGoodsData(code = it.goods.code, image = it.goods.mainImage)
+                        }
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
@@ -210,7 +241,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
 
                 if (this.goodsDetailTopicMatchData.items.isEmpty()) { // 토픽 없음
                     PrintLog.d("ratingOpenClose", "no topic")
-                    ratingOpenCloseEventData.postValue(RatingOpenCloseEvent(noTopic = true))
+                    ratingOpenCloseData.postValue(true)
                     it.onComplete()
                     return@create
                 }
@@ -476,7 +507,6 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
 }
 
 data class BuyNowModel(val sno: Int? = null)
-data class RatingOpenCloseEvent(val noTopic: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val cartToastShow: Boolean? = null,
                    val isGuest: Boolean? = null, val buyOptionDialogShow: Int? = null,
                    val topicMatchData: GoodsDetailTopicMatchData? = null, val topicMatchVisibility: Int? = null,

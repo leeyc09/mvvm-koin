@@ -25,12 +25,12 @@ import xlab.world.xlab.utils.view.hashTag.EditTextTagHelper
 import xlab.world.xlab.utils.view.popupWindow.GoodsSortPopupWindow
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.cart.CartViewModel
 
 class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
     private val searchViewModel: SearchViewModel by viewModel()
+    private val cartViewModel: CartViewModel by viewModel()
     private val spHelper: SPHelper by inject()
-
-    private var resultCode = Activity.RESULT_CANCELED
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
@@ -44,7 +44,7 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var defaultListener: DefaultListener
     private val sortPopupListener = object: GoodsSortPopupWindow.Listener {
         override fun onChangeSort(sortType: Int) {
-            searchViewModel.changeSearchSortType(goodsData = searchGoodsAdapter.getItem(position = 0), sortType = sortType)
+            searchViewModel.changeSearchSortType(sortType = sortType)
         }
     }
     private val matchButtonListener = object: MatchButtonHelper.Listener {
@@ -76,23 +76,15 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
+        searchViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.TOPIC_ADD, // 토픽 추가
                     RequestCodeData.MY_CART, // 장바구니
                     RequestCodeData.TOPIC_SETTING, // 토픽 설정
                     RequestCodeData.GOODS_DETAIL -> { // 상품 상세
-                        // 카트 숫자
-//                        loadCartCountData({ count ->
-//                            textViewCartCnt.setText(count.toString(), TextView.BufferType.SPANNABLE)
-//                            textViewCartCnt.visibility =
-//                                    if (count > 0) View.VISIBLE
-//                                    else View.GONE
-//                        }, {
-//                        })
+                        cartViewModel.loadCartCnt(authorization = spHelper.authorization)
                         searchViewModel.searchGoods(authorization = spHelper.authorization,
                                 searchData = arrayListOf(EditTextTagHelper.SearchData(
                                         text = intent.getStringExtra(IntentPassName.SEARCH_TEXT),
@@ -102,7 +94,6 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                this.resultCode = ResultCodeData.LOGIN_SUCCESS
                 searchViewModel.searchGoods(authorization = spHelper.authorization,
                         searchData = arrayListOf(EditTextTagHelper.SearchData(
                                 text = intent.getStringExtra(IntentPassName.SEARCH_TEXT),
@@ -110,19 +101,21 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
                         page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
 
     private fun onSetup() {
+        // 타이틀 설정, 공유 버튼 비활성화
         actionBarTitle.setText(intent.getStringExtra(IntentPassName.SEARCH_TEXT), TextView.BufferType.SPANNABLE)
         actionShareBtn.visibility = View.GONE
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
+        // listener 초기화
         defaultListener = DefaultListener(context = this)
 
         // sort popup 초기화
@@ -165,6 +158,7 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView.addItemDecoration(CustomItemDecoration(context = this, left = 0.5f, right = 0.5f))
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
+        cartViewModel.loadCartCnt(authorization = spHelper.authorization)
         searchViewModel.searchGoods(authorization = spHelper.authorization,
                 searchData = arrayListOf(EditTextTagHelper.SearchData(
                         text = intent.getStringExtra(IntentPassName.SEARCH_TEXT),
@@ -174,6 +168,7 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun onBindEvent() {
         actionBackBtn.setOnClickListener(this) // 뒤로가기
+        cartLayout.setOnClickListener(this) // 장바구니
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = searchGoodsAdapter.dataLoading, total = searchGoodsAdapter.dataTotal) { _->
@@ -192,6 +187,7 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
+        // TODO: Search View Model
         // UI 이벤트 observe
         searchViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
@@ -204,13 +200,17 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
-                uiData.searchGoodsData?.let {
-                    if (it.nextPage <= 2 )  // 요청한 page => 첫페이지
-                        searchGoodsAdapter.updateData(searchGoodsData = it)
-                    else
-                        searchGoodsAdapter.addData(searchGoodsData = it)
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
                 }
-                uiData.searchGoodsUpdatePosition?.let {
+                uiData.searchGoodsData?.let {
+                    searchGoodsAdapter.linkData(searchGoodsData = it)
+                }
+                uiData.searchGoodsDataUpdate?.let {
+                    searchGoodsAdapter.notifyDataSetChanged()
+                }
+                uiData.searchGoodsUpdateIndex?.let {
                     searchGoodsAdapter.notifyItemChanged(it)
                 }
             }
@@ -218,23 +218,38 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
 
         // search user 이벤트 observe
         searchViewModel.searchGoodsEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.status?.let { isLoading ->
-                    searchGoodsAdapter.dataLoading = isLoading
-                }
+            eventData?.let { isLoading ->
+                searchGoodsAdapter.dataLoading = isLoading
             }
         })
 
         // change search sort type 이벤트 observe
-        searchViewModel.changeSearchSortTypeEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _->
-                eventData.status?.let { isSuccess ->
-                    if (isSuccess)
+        searchViewModel.changeSearchSortTypeData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isSuccess ->
+                if (isSuccess)
                     searchViewModel.searchGoods(authorization = spHelper.authorization,
                             searchData = arrayListOf(EditTextTagHelper.SearchData(
                                     text = intent.getStringExtra(IntentPassName.SEARCH_TEXT),
                                     code = intent.getStringExtra(IntentPassName.SEARCH_CODE))),
                             page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+            }
+        })
+
+        // TODO: Cart View Model
+        // UI 이벤트 observe
+        cartViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.isLoading?.let {
+                    if (it && !progressDialog.isShowing)
+                        progressDialog.show()
+                    else if (!it && progressDialog.isShowing)
+                        progressDialog.dismiss()
+                }
+                uiData.cartCnt?.let {
+                    textViewCartCnt.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.cartCntVisibility?.let {
+                    textViewCartCnt.visibility = it
                 }
             }
         })
@@ -244,8 +259,10 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    searchViewModel.backBtnAction()
+                }
+                R.id.cartLayout -> { // 장바구니
+                    RunActivity.cartActivity(context = this)
                 }
             }
         }

@@ -30,28 +30,28 @@ import xlab.world.xlab.utils.view.hashTag.EditTextTagHelper
 import xlab.world.xlab.utils.view.popupWindow.GoodsSortPopupWindow
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.cart.CartViewModel
 
 class GoodsSearchActivity : AppCompatActivity(), View.OnClickListener {
     private val searchViewModel: SearchViewModel by viewModel()
+    private val cartViewModel: CartViewModel by viewModel()
     private val spHelper: SPHelper by inject()
-
-    private var resultCode = Activity.RESULT_CANCELED
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
-
-    private lateinit var goodsKeywordAdapter: GoodsKeywordAdapter
-    private lateinit var searchGoodsAdapter: SearchGoodsAdapter
 
     private lateinit var editTextTagHelper: EditTextTagHelper
     private lateinit var matchButtonHelper: MatchButtonHelper
     private lateinit var scrollUpButtonHelper: ScrollUpButtonHelper
     private lateinit var goodsSortPopup: GoodsSortPopupWindow
 
+    private lateinit var goodsKeywordAdapter: GoodsKeywordAdapter
+    private lateinit var searchGoodsAdapter: SearchGoodsAdapter
+
     private lateinit var defaultListener: DefaultListener
     private val sortPopupListener = object: GoodsSortPopupWindow.Listener {
         override fun onChangeSort(sortType: Int) {
-            searchViewModel.changeSearchSortType(goodsData = searchGoodsAdapter.getItem(position = 0), sortType = sortType)
+            searchViewModel.changeSearchSortType(sortType = sortType)
         }
     }
 
@@ -131,43 +131,43 @@ class GoodsSearchActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
+        searchViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.TOPIC_ADD, // 토픽 추가
-                    RequestCodeData.GOODS_DETAIL, // 제품 상세
-                    RequestCodeData.TOPIC_SETTING -> { // 토픽 설정
+                    RequestCodeData.MY_CART, // 장바구니
+                    RequestCodeData.TOPIC_SETTING, // 토픽 설정
+                    RequestCodeData.GOODS_DETAIL -> { // 상품 상세
+                        cartViewModel.loadCartCnt(authorization = spHelper.authorization)
                         searchViewModel.searchGoods(authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(),
                                 page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
-                    }
-                    RequestCodeData.MY_CART -> { // 장바구니
-//                        reloadAllData { max, current ->}
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                this.resultCode = ResultCodeData.LOGIN_SUCCESS
                 searchViewModel.searchGoods(authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(),
                         page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
 
     private fun onSetup() {
+        // 타이틀 설정, 공유 버튼 비활성화
         actionBarTitle.setText(getText(R.string.goods), TextView.BufferType.SPANNABLE)
         actionShareBtn.visibility = View.GONE
 
+        // appBarLayout 애니메이션 없애기
         appBarLayout.stateListAnimator = null
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
+        // listener 초기화
         defaultListener = DefaultListener(context = this)
 
         // sort popup 초기화
@@ -228,12 +228,14 @@ class GoodsSearchActivity : AppCompatActivity(), View.OnClickListener {
         goodsRecyclerView.addItemDecoration(CustomItemDecoration(context = this, left = 0.5f, right = 0.5f))
         (goodsRecyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
+        cartViewModel.loadCartCnt(authorization = spHelper.authorization)
         editTextTagHelper.addTag(text = intent.getStringExtra(IntentPassName.SEARCH_TEXT),
                 code = intent.getStringExtra(IntentPassName.SEARCH_CODE))
     }
 
     private fun onBindEvent() {
         actionBackBtn.setOnClickListener(this) // 뒤로가기
+        cartLayout.setOnClickListener(this) // 장바구니
         keywordBtn.setOnClickListener(this) // 추천 키워드 보기&숨기기
         editTagSearchView.setOnClickListener(this) // 검색 레이아웃
 
@@ -264,6 +266,7 @@ class GoodsSearchActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
+        // TODO: Search View Model
         // UI 이벤트 observe
         searchViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
@@ -276,48 +279,63 @@ class GoodsSearchActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
                 uiData.searchGoodsData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        searchGoodsAdapter.updateData(searchGoodsData = it)
-                        goodsSwipeRefreshLayout.isRefreshing = false
-                    }
-                    else
-                        searchGoodsAdapter.addData(searchGoodsData = it)
+                    searchGoodsAdapter.linkData(searchGoodsData = it)
+                    goodsSwipeRefreshLayout.isRefreshing = false
+                }
+                uiData.searchGoodsDataUpdate?.let {
+                    searchGoodsAdapter.notifyDataSetChanged()
+                }
+                uiData.searchGoodsUpdateIndex?.let {
+                    searchGoodsAdapter.notifyItemChanged(it)
                 }
                 uiData.keywordData?.let {
-                    goodsKeywordAdapter.updateData(goodsKeywordData = it)
-
-                    if (it.total > 0) {
-                        keywordBtn.visibility = View.VISIBLE
-                        imageViewKeywordArrow.rotation = 180f
-                        keywordListLayout.visibility = View.VISIBLE
-                    } else {
-                        keywordBtn.visibility = View.GONE
-                        keywordListLayout.visibility = View.GONE
-                    }
+                    goodsKeywordAdapter.linkData(goodsKeywordData = it)
                 }
-                uiData.searchGoodsUpdatePosition?.let {
-                    searchGoodsAdapter.notifyItemChanged(it)
+                uiData.keywordVisibility?.let {
+                    keywordBtn.visibility = it
+                    keywordListLayout.visibility = it
+                }
+                uiData.keywordArrowRotation?.let {
+                    imageViewKeywordArrow.rotation = it
                 }
             }
         })
 
         // search goods 이벤트 observe
         searchViewModel.searchGoodsEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _->
-                eventData.status?.let { isLoading ->
-                    searchGoodsAdapter.dataLoading = isLoading
-                }
+            eventData?.let { isLoading ->
+                searchGoodsAdapter.dataLoading = isLoading
             }
         })
 
         // change search sort type 이벤트 observe
-        searchViewModel.changeSearchSortTypeEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _->
-                eventData.status?.let { isSuccess ->
-                    if (isSuccess)
-                        searchViewModel.searchGoods(authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(),
-                                page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+        searchViewModel.changeSearchSortTypeData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isSuccess ->
+                if (isSuccess)
+                    searchViewModel.searchGoods(authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(),
+                            page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+            }
+        })
+        // TODO: Cart View Model
+        // UI 이벤트 observe
+        cartViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.isLoading?.let {
+                    if (it && !progressDialog.isShowing)
+                        progressDialog.show()
+                    else if (!it && progressDialog.isShowing)
+                        progressDialog.dismiss()
+                }
+                uiData.cartCnt?.let {
+                    textViewCartCnt.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.cartCntVisibility?.let {
+                    textViewCartCnt.visibility = it
                 }
             }
         })
@@ -327,21 +345,17 @@ class GoodsSearchActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    searchViewModel.backBtnAction()
+                }
+                R.id.cartLayout -> { // 장바구니
+                    RunActivity.cartActivity(context = this)
                 }
                 R.id.keywordBtn -> { // 추천 키워드 보기&숨기기
-                    if (imageViewKeywordArrow.rotation == 0f) { // 숨긴 상태 -> 보이기
-                        imageViewKeywordArrow.rotation = 180f
-                        keywordListLayout.visibility = View.VISIBLE
-                    } else { // 보이기 상태 -> 숨김
-                        imageViewKeywordArrow.rotation = 0f
-                        keywordListLayout.visibility = View.GONE
-                    }
+                    searchViewModel.keywordVisibilityChnage()
                 }
                 R.id.editTagSearchView -> {
                     editTextTagHelper.requestInputFieldFocus()
-                    ViewFunction.showKeyboard(this)
+                    ViewFunction.showKeyboard(context = this)
                 }
             }
         }

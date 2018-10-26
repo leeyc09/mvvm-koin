@@ -28,12 +28,14 @@ import xlab.world.xlab.utils.view.dialog.*
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.cart.CartViewModel
 import xlab.world.xlab.view.goodsDetail.fragment.GoodsDetailInfoFragment
 import xlab.world.xlab.view.goodsDetail.fragment.GoodsDetailPostFragment
 import xlab.world.xlab.view.goodsDetail.fragment.GoodsDetailStatsFragment
 
 class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
     private val goodsDetailViewModel: GoodsDetailViewModel by viewModel()
+    private val cartViewModel: CartViewModel by viewModel()
     private val spHelper: SPHelper by inject()
     private val fontColorSpan: FontColorSpan by inject()
 
@@ -125,19 +127,14 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                     RequestCodeData.POST_DETAIL, // 포스트 상세
                     RequestCodeData.GOODS_BRAND_SEARCH, // 브랜드 검색
                     RequestCodeData.MY_CART -> { // 장바구니
-//                        // 카트 숫자
-//                        loadCartCountData({ count ->
-//                            textViewCartCnt.setText(count.toString(), TextView.BufferType.SPANNABLE)
-//                            textViewCartCnt.visibility =
-//                                    if (count > 0) View.VISIBLE
-//                                    else View.GONE
-//                        }, {
-//                        })
+                        // 카트 숫자
+                        cartViewModel.loadCartCnt(authorization = spHelper.authorization)
                         // 펫 정보
                         goodsDetailViewModel.loadGoodsPetData(authorization = spHelper.authorization)
                         // 통계 정보
                         goodsDetailStatsFragment.loadGoodsStatsData()
                         // 포스트 정보
+                        goodsDetailPostFragment.loadUsedUser(page = 1)
                         goodsDetailPostFragment.loadTaggedPosts()
                     }
                     RequestCodeData.GOODS_BUYING -> { // 구매하기
@@ -217,6 +214,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         (ratingRecyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         ratingRecyclerView.isNestedScrollingEnabled = false
 
+        cartViewModel.loadCartCnt(authorization = spHelper.authorization)
         goodsDetailViewModel.loadGoodsDetailData(context = this, goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), needDescription = false)
         goodsDetailViewModel.loadGoodsPetData(authorization = spHelper.authorization)
     }
@@ -231,6 +229,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
+        // TODO: Goods Detail View Model
         // UI 이벤트 observe
         goodsDetailViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
@@ -244,6 +243,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                     defaultToast.showToast(message = it)
                 }
                 uiData.cartToastShow?.let {
+                    cartViewModel.loadCartCnt(authorization = spHelper.authorization)
                     addCartToast.showToast()
                 }
                 uiData.isGuest?.let {
@@ -309,10 +309,9 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // rating open & close 이벤트 observe
-        goodsDetailViewModel.ratingOpenCloseEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _->
-                eventData.noTopic?.let {
-                }
+        goodsDetailViewModel.ratingOpenCloseData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isNoTopic ->
+                suggestAddTopicDialog.showDialog(tag = null)
             }
         })
 
@@ -321,6 +320,33 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
             eventData?.let { _->
                 eventData.sno?.let {
                     RunActivity.buyGoodsWebViewActivity(context = this, snoList = arrayListOf(it), from = AppConstants.FROM_GOODS_DETAIL)
+                }
+            }
+        })
+
+        // recent view goods 이벤트 observe
+        goodsDetailViewModel.recentViewGoodsData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { recentViewGoods ->
+                goodsDetailViewModel.postRecentViewGoods(authorization = spHelper.authorization,
+                        recentViewGoods = recentViewGoods)
+            }
+        })
+
+        // TODO: Cart View Model
+        // UI 이벤트 observe
+        cartViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.isLoading?.let {
+                    if (it && !progressDialog.isShowing)
+                        progressDialog.show()
+                    else if (!it && progressDialog.isShowing)
+                        progressDialog.dismiss()
+                }
+                uiData.cartCnt?.let {
+                    textViewCartCnt.setText(it, TextView.BufferType.SPANNABLE)
+                }
+                uiData.cartCntVisibility?.let {
+                    textViewCartCnt.visibility = it
                 }
             }
         })

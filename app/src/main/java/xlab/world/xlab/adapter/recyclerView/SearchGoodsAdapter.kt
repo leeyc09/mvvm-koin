@@ -29,7 +29,7 @@ class SearchGoodsAdapter(private val context: Context,
                          private val contentBottomMargin: Float,
                          private var matchVisible: Int) : RecyclerView.Adapter<SearchGoodsAdapter.ViewHolder>() {
 
-    private val searchGoodsData: SearchGoodsData = SearchGoodsData()
+    private var searchGoodsData: SearchGoodsData = SearchGoodsData()
     var dataLoading: Boolean
         get() = this.searchGoodsData.isLoading
         set(value) { this.searchGoodsData.isLoading = value }
@@ -50,27 +50,9 @@ class SearchGoodsAdapter(private val context: Context,
         notifyDataSetChanged()
     }
 
-    fun getItem(position: Int): SearchGoodsListData = searchGoodsData.items[position]
-
-    fun updateData(searchGoodsData: SearchGoodsData) {
-        this.searchGoodsData.items.clear()
-        this.searchGoodsData.items.addAll(searchGoodsData.items)
-
-        this.searchGoodsData.isLoading = false
-        this.searchGoodsData.total = searchGoodsData.total
-        this.searchGoodsData.nextPage = 2
-
+    fun linkData(searchGoodsData: SearchGoodsData) {
+        this.searchGoodsData = searchGoodsData
         notifyDataSetChanged()
-    }
-
-    fun addData(searchGoodsData: SearchGoodsData) {
-        val size: Int = itemCount
-        this.searchGoodsData.items.addAll(searchGoodsData.items)
-
-        this.searchGoodsData.isLoading = false
-        this.searchGoodsData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override fun getItemViewType(position: Int): Int {

@@ -3,6 +3,7 @@ package xlab.world.xlab.server.`interface`
 import io.reactivex.Observable
 import retrofit2.http.*
 import xlab.world.xlab.data.request.ReqGoodsSearchData
+import xlab.world.xlab.data.request.ReqRecentViewGoodsData
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.ApiURL
 
@@ -34,4 +35,8 @@ interface IShopRequest {
     @GET(ApiURL.SHOP_VIEW_GOODS)
     fun getRecentViewGoods(@Header("Authorization") authorization: String,
                            @Query("page") page: Int): Observable<ResGoodsThumbnailData>
+
+    @POST(ApiURL.SHOP_VIEW_GOODS)
+    fun postRecentViewGoods(@Header("Authorization") authorization: String,
+                            @Body reqViewGoodsData: ReqRecentViewGoodsData): Observable<ResMessageData>
 }

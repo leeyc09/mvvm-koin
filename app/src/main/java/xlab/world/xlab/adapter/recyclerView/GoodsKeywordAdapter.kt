@@ -30,7 +30,7 @@ class GoodsKeywordAdapter(private val context: Context,
                           private val selectListener: View.OnClickListener,
                           private val moreListener: View.OnClickListener) : RecyclerView.Adapter<GoodsKeywordAdapter.ViewHolder>() {
 
-    private val goodsKeywordData: GoodsKeywordData = GoodsKeywordData()
+    private var goodsKeywordData: GoodsKeywordData = GoodsKeywordData()
     private val showKeywordData: GoodsKeywordData = GoodsKeywordData()
 
     var dataLoading: Boolean
@@ -43,13 +43,8 @@ class GoodsKeywordAdapter(private val context: Context,
 
     fun getItem(position: Int): GoodsKeywordListData = showKeywordData.items[position]
 
-    fun updateData(goodsKeywordData: GoodsKeywordData) {
-        this.goodsKeywordData.items.clear()
-        this.goodsKeywordData.items.addAll(goodsKeywordData.items)
-
-        this.goodsKeywordData.isLoading = false
-        this.goodsKeywordData.total = goodsKeywordData.total
-        this.goodsKeywordData.nextPage = 2
+    fun linkData(goodsKeywordData: GoodsKeywordData) {
+        this.goodsKeywordData = goodsKeywordData
 
         this.showKeywordData.items.clear()
 
@@ -58,22 +53,12 @@ class GoodsKeywordAdapter(private val context: Context,
                 this.showKeywordData.items.add(this.goodsKeywordData.items[index])
             }
         }
-        // 보여진 키워드 이외 남은 키워드 있으면 > 화살표 표시
+        // 보여진 키워드 이외 남은 키워드 있으면 ">" 화살표 표시
         if (this.goodsKeywordData.items.size > this.showKeywordData.items.size)
             this.showKeywordData.items.add(GoodsKeywordListData(dataType = AppConstants.ADAPTER_FOOTER))
 
 
         notifyDataSetChanged()
-    }
-
-    fun addData(goodsKeywordData: GoodsKeywordData) {
-        val size: Int = itemCount
-        this.goodsKeywordData.items.addAll(goodsKeywordData.items)
-
-        this.goodsKeywordData.isLoading = false
-        this.goodsKeywordData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     fun showMoreData() {

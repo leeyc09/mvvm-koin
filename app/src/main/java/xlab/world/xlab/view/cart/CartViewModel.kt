@@ -18,18 +18,41 @@ import xlab.world.xlab.view.SingleLiveEvent
 class CartViewModel(private val apiGodo: ApiGodoProvider,
                     private val networkCheck: NetworkCheck,
                     private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "Cart"
+    private val viewModelTag = "Cart"
     private var cartData: CartData = CartData()
 
     private var resultCode = Activity.RESULT_CANCELED
 
-    val loadCartEvent = SingleLiveEvent<CartEvent>()
-    val buySelectedGoodsEvent = SingleLiveEvent<BuySelectedModel>()
+    val loadCartEvent = SingleLiveEvent<Boolean?>()
+    val buySelectedGoodsEvent = SingleLiveEvent<ArrayList<Int>?>()
     val uiData = MutableLiveData<UIModel>()
 
-    fun setResultCodeOK() {
-        if (this.resultCode == Activity.RESULT_CANCELED)
-            this.resultCode = Activity.RESULT_OK
+    fun setResultCode(resultCode: Int) {
+        this.resultCode = SupportData.setResultCode(oldResultCode = this.resultCode, newResultCode = resultCode)
+    }
+
+    fun loadCartCnt(authorization: String) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            apiGodo.requestGetCartCnt(scheduler = scheduler, authorization = authorization,
+                    responseData = {
+                        PrintLog.d("requestGetCartCnt success", it.toString(), viewModelTag)
+                        uiData.value = UIModel(isLoading = false, cartCnt = it.total.toString(),
+                                cartCntVisibility = if (it.total > 0) View.VISIBLE else View.GONE)
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.e("requestGetCartCnt fail", errorData.message, viewModelTag)
+                        }
+                    })
+        }
     }
 
     fun selectAllCartData(isSelectAll: Boolean) {
@@ -43,7 +66,8 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
                 it.onNext(!isSelectAll)
                 it.onComplete()
             }.with(scheduler).subscribe {
-                uiData.value = UIModel(selectCnt = (if (it) cartData.total else 0).toString(), cartDataUpdate = true,
+                uiData.value = UIModel(selectCnt = (if (it) cartData.total else 0).toString(),
+                        cartDataUpdate = true,
                         selectAll = it)
             }
         }
@@ -89,14 +113,14 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
             apiGodo.requestUpdateCart(scheduler = scheduler, authorization = authorization, sno = cartListData.sno, count = cnt,
                     responseData = {
                         cartListData.goodsCnt = cnt
-                        setResultCodeOK()
+                        setResultCode(Activity.RESULT_OK)
 
                         uiData.value = UIModel(isLoading = false, cartDataUpdate = true)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestUpdateCart fail", errorData.message)
+                            PrintLog.e("requestUpdateCart fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -114,13 +138,13 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
             apiGodo.requestDeleteCart(scheduler = scheduler, authorization = authorization, sno = this.cartData.items[cartIndex].sno,
                     responseData = {
                         cartData.removeData(index = cartIndex)
-                        PrintLog.d("viewModel cartData", cartData.toString())
+                        PrintLog.d("requestDeleteCart success", cartData.toString(), viewModelTag)
                         // 선택 된 상품 갯수 계산
                         var selectCnt = 0
                         cartData.items.forEach { data ->
                             if (data.isSelect) selectCnt++
                         }
-                        setResultCodeOK()
+                        setResultCode(Activity.RESULT_OK)
 
                         uiData.value = UIModel(isLoading = false, cartDataUpdate = true,
                                 cartLayoutVisibility = if (this.cartData.items.isEmpty()) View.GONE else View.VISIBLE,
@@ -130,13 +154,13 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestDeleteCart fail", errorData.message)
+                            PrintLog.e("requestDeleteCart fail", errorData.message, viewModelTag)
                         }
                     })
         }
     }
 
-    fun loadCartData(authorization: String, page: Int) {
+    fun loadCartData(authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
@@ -144,12 +168,12 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
         }
 
         uiData.value = UIModel(isLoading = true)
-        loadCartEvent.value = CartEvent(status = true)
+        loadCartEvent.value = true
         launch {
             apiGodo.requestGetCart(scheduler = scheduler, authorization = authorization,
                     responseData = {
-                        PrintLog.d("requestGetCart success", it.toString())
-                        val newCartData = CartData(total = it.total, nextPage = page + 1)
+                        PrintLog.d("requestGetCart success", it.toString(), viewModelTag)
+                        val newCartData = CartData(total = it.total)
                         var selectAll = true
                         it.cartData?.forEachIndexed { index, data ->
                             val isSelect =
@@ -172,21 +196,20 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
                             )
                             newCartData.items.add(newData)
                         }
-                        if (page == 1) // 요청한 page => 첫페이지
-                            this.cartData.updateData(cartData = newCartData)
-                        else
-                            this.cartData.addData(cartData = newCartData)
 
+                        this.cartData.updateData(cartData = newCartData)
                         uiData.value = UIModel(isLoading = false, cartData = this.cartData,
                                 cartLayoutVisibility = if (this.cartData.items.isEmpty()) View.GONE else View.VISIBLE,
                                 noCartLayoutVisibility = if (this.cartData.items.isEmpty()) View.VISIBLE else View.GONE,
-                                selectCnt = it.total.toString(), totalCnt = it.total.toString(), selectAll = selectAll,
-                                cartDataUpdate = true)
+                                selectCnt = it.total.toString(),
+                                totalCnt = it.total.toString(),
+                                selectAll = selectAll)
+
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestGetCart fail", errorData.message)
+                            PrintLog.e("requestGetCart fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -236,7 +259,7 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
 
             }.with(scheduler).subscribe {
                 PrintLog.d("buySelectedGoods list", it.toString())
-                buySelectedGoodsEvent.value = BuySelectedModel(goodsSnoList = it)
+                buySelectedGoodsEvent.value = it
             }
         }
     }
@@ -246,13 +269,11 @@ class CartViewModel(private val apiGodo: ApiGodoProvider,
     }
 }
 
-data class CartEvent(val status: Boolean? = null)
-data class BuySelectedModel(val goodsSnoList: ArrayList<Int>? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
-                   val cartData: CartData? = null, val cartLayoutVisibility: Int? = null, val noCartLayoutVisibility: Int? = null,
-                   val cartDataUpdate: Boolean? = null, val cartDataUpdateIndex: Int? = null,
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
+                   val cartCnt: String? = null, val cartCntVisibility: Int? = null,
+                   val cartLayoutVisibility: Int? = null, val noCartLayoutVisibility: Int? = null,
+                   val cartData: CartData? = null, val cartDataUpdate: Boolean? = null,
                    val selectCnt: String? = null, val totalCnt: String? = null,
                    val selectAll: Boolean? = null,
                    val totalGoodsPrice: String? = null, val totalDeliveryPrice: String? = null,
-                   val paymentPrice: String? = null,
-                   val resultCode: Int? = null)
+                   val paymentPrice: String? = null)

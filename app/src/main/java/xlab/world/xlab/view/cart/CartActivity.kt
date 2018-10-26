@@ -65,33 +65,35 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
+        cartViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                cartViewModel.setResultCodeOK()
                 when (requestCode) {
                     RequestCodeData.GOODS_DETAIL, // 제품 상세
                     RequestCodeData.GOODS_BUYING -> { // 구매하기
-                        cartViewModel.loadCartData(authorization = spHelper.authorization, page = 1)
+                        cartViewModel.loadCartData(authorization = spHelper.authorization)
                     }
                 }
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
 
     private fun onSetup() {
+        // 타이틀 설정, 액션 버튼 비활성화
         actionBarTitle.setText(getText(R.string.my_cart_title), TextView.BufferType.SPANNABLE)
         actionBtn.visibility = View.GONE
 
+        // appBarLayout 애니메이션 없애기
         appBarLayout.stateListAnimator = null
 
         // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
 
+        // listener 초기화
         defaultListener = DefaultListener(context = this)
 
         // cart adapter & recycler 초기화
@@ -107,7 +109,7 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
         (goodsRecyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         goodsRecyclerView.isNestedScrollingEnabled = false
 
-        cartViewModel.loadCartData(authorization = spHelper.authorization, page = 1)
+        cartViewModel.loadCartData(authorization = spHelper.authorization)
     }
 
     private fun onBindEvent() {
@@ -131,6 +133,7 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 uiData.cartData?.let {
                     cartAdapter.linkData(cartData = it)
+                    cartViewModel.setTotalPrice()
                 }
                 uiData.cartLayoutVisibility?.let {
                     cartLayout.visibility = it
@@ -141,9 +144,6 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.cartDataUpdate?.let {
                     cartAdapter.notifyDataSetChanged()
                     cartViewModel.setTotalPrice()
-                }
-                uiData.cartDataUpdateIndex?.let {
-                    cartAdapter.notifyItemChanged(it)
                 }
                 uiData.selectAll?.let {
                     allSelectBtn.isSelected = it
@@ -173,19 +173,15 @@ class CartActivity : AppCompatActivity(), View.OnClickListener {
 
         // load cart 이벤트 observe
         cartViewModel.loadCartEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.status?.let { isLoading ->
-                    cartAdapter.dataLoading = isLoading
-                }
+            eventData?.let { isLoading ->
+                cartAdapter.dataLoading = isLoading
             }
         })
 
         // buy goods 이벤트 observe
         cartViewModel.buySelectedGoodsEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.goodsSnoList?.let {
-                    RunActivity.buyGoodsWebViewActivity(context = this, snoList = it, from = AppConstants.FROM_CART)
-                }
+            eventData?.let { snoList ->
+                RunActivity.buyGoodsWebViewActivity(context = this, snoList = snoList, from = AppConstants.FROM_CART)
             }
         })
     }

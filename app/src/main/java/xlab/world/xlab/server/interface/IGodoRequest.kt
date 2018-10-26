@@ -19,6 +19,9 @@ interface IGodoRequest {
     @GET(ApiURL.SHOP_MY_CART)
     fun getMyCart(@Header("Authorization") authorization: String): Observable<ResCartData>
 
+    @GET(ApiURL.SHOP_MY_CART_COUNT)
+    fun getMyCartCnt(@Header("Authorization") authorization: String): Observable<ResCartCntData>
+
     @POST(ApiURL.SHOP_MY_CART_ADD)
     fun addMyCart(@Header("Authorization") authorization: String,
                   @Query("goodsNo") goodsNo: String,
