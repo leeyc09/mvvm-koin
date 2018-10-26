@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.TextView
 import kotlinx.android.synthetic.main.action_bar_default.*
 import kotlinx.android.synthetic.main.activity_notification.*
+import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
@@ -21,9 +22,8 @@ import xlab.world.xlab.view.notification.fragment.ShopNotificationFragment
 import xlab.world.xlab.view.notification.fragment.SocialNotificationFragment
 
 class NotificationActivity : AppCompatActivity(), View.OnClickListener {
+    private val notificationViewModel: NotificationViewModel by viewModel()
     private val fontColorSpan: FontColorSpan by inject()
-
-    var resultCode = Activity.RESULT_CANCELED
 
     private lateinit var tabLayoutHelper: TabLayoutHelper
 
@@ -51,11 +51,9 @@ class NotificationActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
+        notificationViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED ||
-                        this.resultCode == ResultCodeData.LOAD_OLD_DATA)
-                    this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.PROFILE, // 프로필
                     RequestCodeData.POST_DETAIL -> { // 포스트 상세
@@ -63,13 +61,13 @@ class NotificationActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
 
     private fun onSetup() {
+        // 타이틀 설정, 액션 버튼 비활성화
         actionBarTitle.setText(getText(R.string.notification), TextView.BufferType.SPANNABLE)
         actionBtn.visibility = View.GONE
 
@@ -99,15 +97,22 @@ class NotificationActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
-
+        // UI 이벤트 observe
+        notificationViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+            uiData?.let { _ ->
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
+            }
+        })
     }
 
     override fun onClick(v: View?) {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    notificationViewModel.backBtnAction()
                 }
             }
         }

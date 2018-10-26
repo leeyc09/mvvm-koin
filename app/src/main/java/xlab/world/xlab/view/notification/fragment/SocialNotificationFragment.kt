@@ -110,11 +110,9 @@ class SocialNotificationFragment: Fragment() {
 
         // load notification 이벤트 observe
         notificationViewModel.loadNotificationEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.status?.let { isLoading ->
-                    socialNotificationAdapter?.dataLoading = isLoading
-                    needInitData = false
-                }
+            eventData?.let { isLoading ->
+                socialNotificationAdapter?.dataLoading = isLoading
+                needInitData = false
             }
         })
     }

@@ -11,6 +11,8 @@ import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PrintLog
+import xlab.world.xlab.utils.support.ResultCodeData
+import xlab.world.xlab.utils.support.SupportData
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
@@ -19,8 +21,18 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
                             private val scheduler: SchedulerProvider): AbstractViewModel() {
     private val viewModelTag = "Notification"
 
-    val loadNotificationEventData = SingleLiveEvent<NotificationEvent>()
+    private var resultCode = ResultCodeData.LOAD_OLD_DATA
+
+    val loadNotificationEventData = SingleLiveEvent<Boolean?>()
     val uiData = MutableLiveData<UIModel>()
+
+    fun setResultCode(resultCode: Int) {
+        this.resultCode = SupportData.setResultCode(oldResultCode = this.resultCode, newResultCode = resultCode)
+    }
+
+    fun backBtnAction() {
+        uiData.postValue(UIModel(resultCode = resultCode))
+    }
 
     fun loadExistNewNotification(authorization: String) {
         // 네트워크 연결 확인
@@ -52,7 +64,7 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
         }
 
         uiData.value = UIModel(isLoading = true)
-        loadNotificationEventData.postValue(NotificationEvent(status = true))
+        loadNotificationEventData.value = true
         launch {
             apiNotification.requestSocialNotification(scheduler = scheduler, authorization = authorization, page = page,
                     responseData = {
@@ -76,7 +88,8 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
                             ))
                         }
 
-                        uiData.value = UIModel(isLoading = false, socialNotificationData = socialNotificationData)
+                        uiData.value = UIModel(isLoading = false,
+                                socialNotificationData = socialNotificationData)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
@@ -95,7 +108,7 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
         }
 
         uiData.value = UIModel(isLoading = true)
-        loadNotificationEventData.postValue(NotificationEvent(status = true))
+        loadNotificationEventData.value = true
         launch {
             Observable.create<ShopNotificationData> {
                 val shopNotificationData = ShopNotificationData(total = 0, nextPage = page + 1)
@@ -109,8 +122,7 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
     }
 }
 
-data class NotificationEvent(val status: Boolean? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
                    val socialNotificationData: SocialNotificationData? = null,
                    val shopNotificationData: ShopNotificationData? = null,
                    val newNotificationDotVisibility: Int? = null)
