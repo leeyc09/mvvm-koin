@@ -27,8 +27,6 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
     private val spHelper: SPHelper by inject()
     private val fontColorSpan: FontColorSpan by inject()
 
-    private var resultCode = Activity.RESULT_CANCELED
-
     private lateinit var tabLayoutHelper: TabLayoutHelper
 
     private lateinit var viewPagerAdapter: ViewStatePagerAdapter
@@ -71,12 +69,12 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
+        searchViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.TOPIC_ADD, // 토픽 추가
+                    RequestCodeData.TOPIC_SETTING, // 토픽 설정
                     RequestCodeData.PROFILE, // 프로필
                     RequestCodeData.POST_DETAIL, // 포스트 상세
                     RequestCodeData.GOODS_DETAIL-> { // 상품 상세
@@ -85,12 +83,10 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                this.resultCode = ResultCodeData.LOGIN_SUCCESS
                 requestSearch(searchText = getSearchText())
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
@@ -148,6 +144,10 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
         // UI 이벤트 observe
         searchViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
                 uiData.searchPostsTotal?.let {
                     tabLayoutHelper.getTabData(0).extraData = it
                     tabLayoutHelper.updateTabView(0)
@@ -168,8 +168,7 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    searchViewModel.backBtnAction()
                 }
                 R.id.searchDeleteBtn -> { // 검색창 지우기
                     editTextSearch.setText("")
@@ -196,6 +195,10 @@ class CombinedSearchActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun getSearchText(): String = editTextSearch.text.toString()
+
+    fun setResultCodeFromFragment(resultCode: Int) {
+        searchViewModel.setResultCode(resultCode = resultCode)
+    }
 
     companion object {
         fun newIntent(context: Context): Intent {

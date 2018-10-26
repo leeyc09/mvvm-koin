@@ -31,7 +31,6 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
     val loadUserPetData = SingleLiveEvent<Boolean?>()
     val loadTopicUsedGoodsEvent = SingleLiveEvent<ProfileEvent>()
     val loadUserPostsThumbDataEvent = SingleLiveEvent<ProfileEvent>()
-    val loadUserPostsDetailDataEvent = SingleLiveEvent<ProfileEvent>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setResultCode(resultCode: Int) {
@@ -199,46 +198,6 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
                             PrintLog.d("requestTopicUsedGoods fail", errorData.message)
-                        }
-                    })
-        }
-    }
-
-    fun loadUserPostsThumbData(userId: String, page:Int, loadingBar: Boolean? = true) {
-        // 네트워크 연결 확인
-        if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
-            return
-        }
-
-        uiData.value = UIModel(isLoading = loadingBar)
-        loadUserPostsThumbDataEvent.postValue(ProfileEvent(status = true))
-        launch {
-            apiPost.requestUserPostsThumbnail(scheduler = scheduler, userId = userId, page = page,
-                    responseData = {
-                        val postsThumbData = PostThumbnailData(total = it.total, nextPage = page + 1)
-                        it.postsData?.forEach { postData ->
-                            postsThumbData.items.add(PostThumbnailListData(
-                                    dataType = AppConstants.ADAPTER_CONTENT,
-                                    postType = postData.postType,
-                                    postId = postData.id,
-                                    imageURL = postData.postFile.firstOrNull(),
-                                    youTubeVideoID = postData.youTubeVideoID
-                            ))
-                        }
-
-                        // posts 있고 첫 페이지 경우 -> header 추가
-                        if (postsThumbData.items.isNotEmpty() && page == 1) {
-                            postsThumbData.items.add(0, PostThumbnailListData(dataType = AppConstants.ADAPTER_HEADER))
-                        }
-
-                        PrintLog.d("requestUserPostsThumbnail success", postsThumbData.toString())
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, postsThumbData = postsThumbData)
-                    },
-                    errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
-                        errorData?.let {
-                            PrintLog.d("requestUserPostsThumbnail fail", errorData.message)
                         }
                     })
         }

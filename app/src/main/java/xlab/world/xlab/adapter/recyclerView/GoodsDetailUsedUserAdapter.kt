@@ -15,11 +15,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
+import xlab.world.xlab.utils.support.PrintLog
 
 class GoodsDetailUsedUserAdapter(private val context: Context,
                                  private val profileListener: View.OnClickListener) : RecyclerView.Adapter<GoodsDetailUsedUserAdapter.ViewHolder>() {
 
-    private val goodsDetailUsedUserData: GoodsDetailUsedUserData = GoodsDetailUsedUserData()
+    private var goodsDetailUsedUserData: GoodsDetailUsedUserData = GoodsDetailUsedUserData()
     var dataLoading: Boolean
         get() = this.goodsDetailUsedUserData.isLoading
         set(value) { this.goodsDetailUsedUserData.isLoading = value }
@@ -33,29 +34,10 @@ class GoodsDetailUsedUserAdapter(private val context: Context,
             .placeholder(R.drawable.profile_img_44)
             .error(R.drawable.profile_img_44)
 
-    fun getItem(position: Int): GoodsDetailUsedUserListData {
-        return goodsDetailUsedUserData.items[position]
-    }
-
-    fun updateData(goodsDetailUsedUserData: GoodsDetailUsedUserData) {
-        this.goodsDetailUsedUserData.items.clear()
-        this.goodsDetailUsedUserData.items.addAll(goodsDetailUsedUserData.items)
-
-        this.goodsDetailUsedUserData.isLoading = false
-        this.goodsDetailUsedUserData.total = goodsDetailUsedUserData.total
-        this.goodsDetailUsedUserData.nextPage = 2
-
+    fun linkData(goodsDetailUsedUserData: GoodsDetailUsedUserData) {
+        this.goodsDetailUsedUserData = goodsDetailUsedUserData
+        PrintLog.d("goodsDetailUsedUserData", this.goodsDetailUsedUserData.toString(), "")
         notifyDataSetChanged()
-    }
-
-    fun addData(goodsDetailUsedUserData: GoodsDetailUsedUserData) {
-        val size: Int = itemCount
-        this.goodsDetailUsedUserData.items.addAll(goodsDetailUsedUserData.items)
-
-        this.goodsDetailUsedUserData.isLoading = false
-        this.goodsDetailUsedUserData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override

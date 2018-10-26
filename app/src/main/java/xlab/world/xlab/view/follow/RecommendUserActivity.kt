@@ -23,7 +23,7 @@ import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 
 class RecommendUserActivity : AppCompatActivity(), View.OnClickListener {
-    private val followViewModel: FollowViewModel by viewModel()
+    private val userViewModel: UserViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
     private lateinit var defaultToast: DefaultToast
@@ -54,17 +54,17 @@ class RecommendUserActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
-        followViewModel.setResultCode(resultCode = resultCode)
+        userViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
                 when (requestCode) {
                     RequestCodeData.PROFILE -> { // 프로필
-                        followViewModel.loadRecommendDefaultUser(authorization = spHelper.authorization, page = 1, loadingBar = null)
+                        userViewModel.loadRecommendDefaultUser(authorization = spHelper.authorization, page = 1, loadingBar = null)
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                followViewModel.loadRecommendDefaultUser(authorization = spHelper.authorization, page = 1, loadingBar = null)
+                userViewModel.loadRecommendDefaultUser(authorization = spHelper.authorization, page = 1, loadingBar = null)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
                 actionBackBtn.performClick()
@@ -85,7 +85,7 @@ class RecommendUserActivity : AppCompatActivity(), View.OnClickListener {
         defaultListener = DefaultListener(context = this)
         userDefaultListener = UserDefaultListener(context = this,
                 followUserEvent = { position ->
-                    followViewModel.userFollow(authorization = spHelper.authorization, selectIndex = position, userType = FollowViewModel.UserType.DEFAULT)
+                    userViewModel.userFollow(authorization = spHelper.authorization, selectIndex = position, userType = UserViewModel.UserType.DEFAULT)
                 })
 
         // recommend user adapter & recycler  초기화
@@ -97,7 +97,7 @@ class RecommendUserActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView.addItemDecoration(CustomItemDecoration(context = this, bottom = 10f))
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
-        followViewModel.loadRecommendDefaultUser(authorization = spHelper.authorization, page = 1)
+        userViewModel.loadRecommendDefaultUser(authorization = spHelper.authorization, page = 1)
     }
 
     private fun onBindEvent() {
@@ -105,14 +105,14 @@ class RecommendUserActivity : AppCompatActivity(), View.OnClickListener {
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = recommendUserAdapter.dataLoading, total = recommendUserAdapter.dataTotal) { _ ->
-                followViewModel.loadRecommendDefaultUser(authorization = spHelper.authorization, page = recommendUserAdapter.dataNextPage)
+                userViewModel.loadRecommendDefaultUser(authorization = spHelper.authorization, page = recommendUserAdapter.dataNextPage)
             }
         }
     }
 
     private fun observeViewModel() {
         // UI 이벤트 observe
-        followViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+        userViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
                     if (it && !progressDialog.isShowing)
@@ -134,14 +134,14 @@ class RecommendUserActivity : AppCompatActivity(), View.OnClickListener {
                     recommendUserAdapter.notifyDataSetChanged()
                 }
                 uiData.defaultUserUpdateIndex?.let {
-                    followViewModel.setResultCode(resultCode = Activity.RESULT_OK)
+                    userViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                     recommendUserAdapter.notifyItemChanged(it)
                 }
             }
         })
 
         // load follower 이벤트 observe
-        followViewModel.loadDefaultUserData.observe(owner = this, observer = android.arch.lifecycle.Observer { evneteData ->
+        userViewModel.loadDefaultUserData.observe(owner = this, observer = android.arch.lifecycle.Observer { evneteData ->
             evneteData?.let { isLoading ->
                 recommendUserAdapter.dataLoading = isLoading
             }
@@ -152,7 +152,7 @@ class RecommendUserActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { //뒤로가기
-                    followViewModel.backBtnAction()
+                    userViewModel.backBtnAction()
                 }
             }
         }

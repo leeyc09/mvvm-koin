@@ -128,11 +128,9 @@ class SavedPostsActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // load like posts 이벤트 observe
-        postsViewModel.loadPostsEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { loadPostsEventData ->
-            loadPostsEventData?.let { _->
-                loadPostsEventData.status?.let { isLoading ->
-                    postsAdapter.dataLoading = isLoading
-                }
+        postsViewModel.loadPostsData.observe(owner = this, observer = android.arch.lifecycle.Observer { loadPostsEventData ->
+            loadPostsEventData?.let { isLoading ->
+                postsAdapter.dataLoading = isLoading
             }
         })
     }

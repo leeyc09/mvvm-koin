@@ -23,8 +23,6 @@ import xlab.world.xlab.utils.view.toast.DefaultToast
 class SearchHashTagPostsActivity : AppCompatActivity(), View.OnClickListener {
     private val searchViewModel: SearchViewModel by viewModel()
 
-    private var resultCode = Activity.RESULT_CANCELED
-
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
 
@@ -52,10 +50,9 @@ class SearchHashTagPostsActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
+        searchViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.POST_DETAIL -> { // 포스트 상세
                         searchViewModel.searchPosts(searchText = intent.getStringExtra(IntentPassName.SEARCH_TEXT), page = 1)
@@ -63,13 +60,11 @@ class SearchHashTagPostsActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                this.resultCode = ResultCodeData.LOGIN_SUCCESS
                 searchViewModel.searchPosts(searchText = intent.getStringExtra(IntentPassName.SEARCH_TEXT), page = 1)
 
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
@@ -116,13 +111,18 @@ class SearchHashTagPostsActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
                 uiData.searchPostsData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        postsAdapter.updateData(postThumbnailData = it)
-                        actionBarNumber.setText(it.total.toString(), TextView.BufferType.SPANNABLE)
-                    }
-                    else
-                        postsAdapter.addData(postThumbnailData = it)
+                    postsAdapter.linkData(postThumbnailData = it)
+                }
+                uiData.searchPostsDataUpdate?.let {
+                    postsAdapter.notifyDataSetChanged()
+                }
+                uiData.searchPostsTotal?.let {
+                    actionBarNumber.setText(it.toString(), TextView.BufferType.SPANNABLE)
                 }
             }
         })
@@ -141,8 +141,7 @@ class SearchHashTagPostsActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    searchViewModel.backBtnAction()
                 }
             }
         }

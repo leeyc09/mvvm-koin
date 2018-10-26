@@ -28,18 +28,12 @@ class GoodsDetailInfoAdapter(private val context: Context,
                              private val deliveryListener: View.OnClickListener,
                              private val inquiryListener: View.OnClickListener) : RecyclerView.Adapter<GoodsDetailInfoAdapter.ViewHolder>() {
 
-    private val goodsDetailInfoData: GoodsDetailInfoData = GoodsDetailInfoData()
+    private var goodsDetailInfoData: GoodsDetailInfoData = GoodsDetailInfoData()
 
     private val defaultHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 400f, context.resources.displayMetrics).toInt()
 
-    fun getItem(position: Int): GoodsDetailInfoListData {
-        return goodsDetailInfoData.items[position]
-    }
-
-    fun updateData(goodsDetailInfoData: GoodsDetailInfoData) {
-        this.goodsDetailInfoData.items.clear()
-        this.goodsDetailInfoData.items.addAll(goodsDetailInfoData.items)
-
+    fun linkData(goodsDetailInfoData: GoodsDetailInfoData) {
+        this.goodsDetailInfoData = goodsDetailInfoData
         notifyDataSetChanged()
     }
 

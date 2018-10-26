@@ -34,6 +34,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
 
     private var searchGoodsData: SearchGoodsData = SearchGoodsData()
     private var goodsKeywordData: GoodsKeywordData = GoodsKeywordData()
+    private var searchPostsData: PostThumbnailData = PostThumbnailData()
 
     val changeSearchSortTypeData = SingleLiveEvent<Boolean?>()
     val searchPostsEventData = SingleLiveEvent<SearchEvent>()
@@ -122,10 +123,10 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
         launch {
             apiPost.requestSearchPosts(scheduler = scheduler, searchText = searchText, page = page,
                     responseData = {
-                        PrintLog.d("searchPosts success", it.toString())
-                        val postsData = PostThumbnailData(total = it.total, nextPage = page + 1)
+                        PrintLog.d("searchPosts success", it.toString(), viewModelTag)
+                        val newSearchPostsData = PostThumbnailData(total = it.total, nextPage = page + 1)
                         it.postsData?.forEach { post ->
-                            postsData.items.add(PostThumbnailListData(
+                            newSearchPostsData.items.add(PostThumbnailListData(
                                     dataType = AppConstants.ADAPTER_CONTENT,
                                     postId = post.id,
                                     postType = post.postType,
@@ -133,46 +134,23 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                                     youTubeVideoID = post.youTubeVideoID
                             ))
                         }
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, searchPostsData = postsData)
+
+                        if (page == 1) {
+                            this.searchPostsData.updateData(postThumbnailData = newSearchPostsData)
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
+                                    searchPostsData = this.searchPostsData,
+                                    searchPostsTotal = this.searchPostsData.total,
+                                    noSearchDataVisibility = if (this.searchPostsData.items.isEmpty()) View.VISIBLE else View.GONE)
+                        } else {
+                            this.searchPostsData.addData(postThumbnailData = newSearchPostsData)
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
+                                    searchPostsDataUpdate = true)
+                        }
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("searchPosts fail", errorData.message)
-                        }
-                    })
-        }
-    }
-
-    fun searchUsers(authorization: String, searchText: String, page: Int, loadingBar: Boolean? = true) {
-        // 네트워크 연결 확인
-        if (!networkCheck.isNetworkConnected()) {
-            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
-            return
-        }
-
-        uiData.value = UIModel(isLoading = loadingBar)
-        searchUserEventData.value = SearchEvent(status = true)
-        launch {
-            PrintLog.d("authorization", authorization)
-            apiUser.requestSearchUser(authorization = authorization, scheduler = scheduler, searchText = searchText, page = page,
-                    responseData = {
-                        PrintLog.d("searchUser success", it.toString())
-                        val userData = UserDefaultData(total = it.total, nextPage = page + 1)
-                        it.userData?.forEach { user ->
-                            val topicBreed = petInfo.getTopicBreed(user.petData)
-                            userData.items.add(UserDefaultListData(userId = user.id,
-                                    profileImage = user.profileImg,
-                                    nickName = user.nickName,
-                                    topic = topicBreed,
-                                    isFollowing = user.isFollowing))
-                        }
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, searchUserData = userData)
-                    },
-                    errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
-                        errorData?.let {
-                            PrintLog.d("searchUser fail", errorData.message)
+                            PrintLog.e("searchPosts fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -243,7 +221,8 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                                     keywordData = keywordData,
                                     keywordVisibility = if (isShowGoodsKeyword) View.VISIBLE else View.GONE,
                                     keywordArrowRotation = if (isShowGoodsKeyword) 180f else 0f,
-                                    searchGoodsData = this.searchGoodsData)
+                                    searchGoodsData = this.searchGoodsData,
+                                    noSearchDataVisibility = if (this.searchGoodsData.items.isEmpty()) View.VISIBLE else View.GONE)
                         } else {
                             this.searchGoodsData.addData(searchGoodsData = goodsData)
                             uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
@@ -253,7 +232,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("searchGoods fail", errorData.message)
+                            PrintLog.e("searchGoods fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -273,7 +252,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
         return MatchData(percent = percentValue, color = percentColor)
     }
 
-    fun keywordVisibilityChnage() {
+    fun keywordVisibilityChange() {
         launch {
             Observable.create<ArrayList<Any>> {
                 // 추천 키워드 숨긴상태 -> 보이기
@@ -299,6 +278,7 @@ data class SearchEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
                    val keywordData: GoodsKeywordData? = null, val keywordVisibility: Int? = null, val keywordArrowRotation: Float? = null,
                    val searchGoodsData: SearchGoodsData? = null, val searchGoodsDataUpdate: Boolean? = null, val searchGoodsUpdateIndex: Int? = null,
-                   val searchPostsData: PostThumbnailData? = null,
+                   val searchPostsData: PostThumbnailData? = null, val searchPostsDataUpdate: Boolean? = null,
                    val searchUserData: UserDefaultData? = null,
-                   val searchPostsTotal: Int? = null, val searchUserTotal: Int? = null, val searchGoodsTotal: Int? = null)
+                   val searchPostsTotal: Int? = null, val searchUserTotal: Int? = null, val searchGoodsTotal: Int? = null,
+                   val noSearchDataVisibility: Int? = null)

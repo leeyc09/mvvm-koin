@@ -133,14 +133,12 @@ class CombinedSearchGoodsFragment: Fragment() {
                 }
                 uiData.searchGoodsData?.let {
                     searchGoodsAdapter?.linkData(searchGoodsData = it)
-//                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-//                        setBundleVisibilityData(noSearchDataVisibility =
-//                        if (it.items.isEmpty()) View.VISIBLE
-//                        else View.GONE)
-//                        searchGoodsAdapter?.updateData(searchGoodsData = it)
-//                    }
-//                    else
-//                        searchGoodsAdapter?.addData(searchGoodsData = it)
+                }
+                uiData.searchGoodsDataUpdate?.let {
+                    searchGoodsAdapter?.notifyDataSetChanged()
+                }
+                uiData.noSearchDataVisibility?.let {
+                    setBundleVisibilityData(noSearchDataVisibility = it)
                 }
             }
         })

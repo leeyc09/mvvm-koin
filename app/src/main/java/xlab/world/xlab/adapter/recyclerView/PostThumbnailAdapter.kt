@@ -56,27 +56,6 @@ class PostThumbnailAdapter(private val context: Context,
         notifyDataSetChanged()
     }
 
-    fun updateData(postThumbnailData: PostThumbnailData) {
-        this.postThumbnailData.items.clear()
-        this.postThumbnailData.items.addAll(postThumbnailData.items)
-
-        this.postThumbnailData.isLoading = false
-        this.postThumbnailData.total = postThumbnailData.total
-        this.postThumbnailData.nextPage = 2
-
-        notifyDataSetChanged()
-    }
-
-    fun addData(postThumbnailData: PostThumbnailData) {
-        val size: Int = itemCount
-        this.postThumbnailData.items.addAll(postThumbnailData.items)
-
-        this.postThumbnailData.isLoading = false
-        this.postThumbnailData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
-    }
-
     override fun getItemViewType(position: Int): Int {
         return this.postThumbnailData.items[position].dataType
     }

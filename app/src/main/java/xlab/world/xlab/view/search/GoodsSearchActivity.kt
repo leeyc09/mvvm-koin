@@ -351,7 +351,7 @@ class GoodsSearchActivity : AppCompatActivity(), View.OnClickListener {
                     RunActivity.cartActivity(context = this)
                 }
                 R.id.keywordBtn -> { // 추천 키워드 보기&숨기기
-                    searchViewModel.keywordVisibilityChnage()
+                    searchViewModel.keywordVisibilityChange()
                 }
                 R.id.editTagSearchView -> {
                     editTextTagHelper.requestInputFieldFocus()

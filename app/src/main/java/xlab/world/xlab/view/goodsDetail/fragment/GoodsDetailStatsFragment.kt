@@ -38,9 +38,9 @@ class GoodsDetailStatsFragment: Fragment() {
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
 
-    private var defaultListener: DefaultListener? = null
-
     private var goodsDetailStatsAdapter: GoodsDetailStatsAdapter? = null
+
+    private var defaultListener: DefaultListener? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_goods_detail_stats, container, false)
@@ -59,8 +59,10 @@ class GoodsDetailStatsFragment: Fragment() {
         defaultToast = defaultToast ?: DefaultToast(context = context!!)
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
 
+        // listener 초기화
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
 
+        // stats adapter & recycler 초기화
         goodsDetailStatsAdapter = goodsDetailStatsAdapter?: GoodsDetailStatsAdapter(context = context!!)
         recyclerView.adapter = goodsDetailStatsAdapter
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -90,11 +92,11 @@ class GoodsDetailStatsFragment: Fragment() {
                     defaultToast?.showToast(message = it)
                 }
                 uiData.goodsStatsData?.let {
-                    setBundleVisibilityData(noStatsLayout =
-                    if (it.items.isEmpty()) View.VISIBLE
-                    else View.GONE)
-                    goodsDetailStatsAdapter?.updateData(goodsDetailStatsData = it)
+                    goodsDetailStatsAdapter?.linkData(goodsDetailStatsData = it)
                     needInitData = true
+                }
+                uiData.noStatsVisibility?.let {
+                    setBundleVisibilityData(noStatsLayout = it)
                 }
             }
         })

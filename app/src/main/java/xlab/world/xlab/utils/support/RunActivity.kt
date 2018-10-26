@@ -1,7 +1,6 @@
 package xlab.world.xlab.utils.support
 
 import android.app.Activity
-import android.content.Context
 import android.net.Uri
 import com.google.android.youtube.player.YouTubeStandalonePlayer
 import xlab.world.xlab.R
@@ -32,7 +31,6 @@ import xlab.world.xlab.view.orderDetail.OrderDetailActivity
 import xlab.world.xlab.view.orderStateDetail.OrderStateDetailActivity
 import xlab.world.xlab.view.petBreed.PetBreedActivity
 import xlab.world.xlab.view.postDetail.PostDetailActivity
-import xlab.world.xlab.view.posts.GoodsTaggedPostsActivity
 import xlab.world.xlab.view.posts.LikedPostsActivity
 import xlab.world.xlab.view.posts.SavedPostsActivity
 import xlab.world.xlab.view.postsUpload.content.PostUploadContentActivity
@@ -238,11 +236,6 @@ object RunActivity {
     fun searchBrandGoodsActivity(context: Activity, brandName: String, brandCode: String) {
         val intent = SearchBrandGoodsActivity.newIntent(context = context, brandName = brandName, brandCode = brandCode)
         context.startActivityForResult(intent, RequestCodeData.GOODS_BRAND_SEARCH)
-    }
-
-    fun goodsTaggedPostsActivity(context: Activity, goodsCode: String) {
-        val intent = GoodsTaggedPostsActivity.newIntent(context = context, goodsCode = goodsCode)
-        context.startActivityForResult(intent, RequestCodeData.GOODS_TAGGED_POST)
     }
 
     fun myShoppingActivity(context: Activity) {

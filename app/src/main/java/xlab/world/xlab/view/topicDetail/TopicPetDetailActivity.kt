@@ -251,11 +251,9 @@ class TopicPetDetailActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // load pet used goods 이벤트 observe
-        topicPetDetailViewModel.loadPetUsedGoodsEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadPetUsedGoodsEvent ->
-            loadPetUsedGoodsEvent?.let { _ ->
-                loadPetUsedGoodsEvent.status?.let {  isLoading ->
-                    topicUsedGoodsAdapter.dataLoading = isLoading
-                }
+        topicPetDetailViewModel.loadPetUsedGoodsData.observe(owner = this, observer = android.arch.lifecycle.Observer { loadPetUsedGoodsEvent ->
+            loadPetUsedGoodsEvent?.let {  isLoading ->
+                topicUsedGoodsAdapter.dataLoading = isLoading
             }
         })
     }

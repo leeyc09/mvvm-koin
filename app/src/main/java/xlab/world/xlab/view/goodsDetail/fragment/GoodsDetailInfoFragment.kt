@@ -32,8 +32,7 @@ class GoodsDetailInfoFragment: Fragment() {
     private var goodsDetailInfoAdapter: GoodsDetailInfoAdapter? = null
 
     private val moreInfoListener = View.OnClickListener { view ->
-        goodsDetailViewModel.descriptionOpenClose(position = view.tag as Int,
-                goodsDescriptionData = goodsDetailInfoAdapter!!.getItem(position = view.tag as Int))
+        goodsDetailViewModel.descriptionOpenClose(selectIndex = view.tag as Int)
     }
     private val necessaryInfoListener = View.OnClickListener { view ->
         val necessaryInfo = view.tag as GoodsDetailInfoAdapter.NecessaryInfo
@@ -65,6 +64,7 @@ class GoodsDetailInfoFragment: Fragment() {
     }
 
     private fun onSetup() {
+        // swipe refresh 비활성화
         swipeRefreshLayout.isEnabled = false
 
         // Toast, Dialog 초기화
@@ -101,7 +101,7 @@ class GoodsDetailInfoFragment: Fragment() {
                     defaultToast?.showToast(message = it)
                 }
                 uiData.goodsDescriptionData?.let {
-                    goodsDetailInfoAdapter?.updateData(goodsDetailInfoData = it)
+                    goodsDetailInfoAdapter?.linkData(goodsDetailInfoData = it)
                     needInitData = false
                 }
                 uiData.goodsDescriptionUpdateIndex?.let {

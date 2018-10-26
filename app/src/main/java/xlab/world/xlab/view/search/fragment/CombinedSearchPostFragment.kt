@@ -106,14 +106,13 @@ class CombinedSearchPostFragment: Fragment() {
                     defaultToast?.showToast(message = it)
                 }
                 uiData.searchPostsData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        setBundleVisibilityData(noSearchDataVisibility =
-                        if (it.items.isEmpty()) View.VISIBLE
-                        else View.GONE)
-                        searchPostAdapter?.updateData(postThumbnailData = it)
-                    }
-                    else
-                        searchPostAdapter?.addData(postThumbnailData = it)
+                    searchPostAdapter?.linkData(postThumbnailData = it)
+                }
+                uiData.searchPostsDataUpdate?.let {
+                    searchPostAdapter?.notifyDataSetChanged()
+                }
+                uiData.noSearchDataVisibility?.let {
+                    setBundleVisibilityData(noSearchDataVisibility = it)
                 }
             }
         })

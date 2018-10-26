@@ -16,6 +16,7 @@ import xlab.world.xlab.adapter.recyclerView.GoodsDetailUsedUserAdapter
 import xlab.world.xlab.adapter.recyclerView.PostThumbnailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.IntentPassName
+import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
@@ -24,7 +25,7 @@ import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.goodsDetail.GoodsDetailViewModel
 import xlab.world.xlab.view.posts.PostsViewModel
 
-class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
+class GoodsDetailPostFragment: Fragment() {
     private val goodsDetailViewModel: GoodsDetailViewModel by viewModel()
     private val postsViewModel: PostsViewModel by viewModel()
 
@@ -42,10 +43,10 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
 
-    private var defaultListener: DefaultListener? = null
-
     private var goodsDetailUsedUserAdapter: GoodsDetailUsedUserAdapter? = null
     private var taggedPostAdapter: PostThumbnailAdapter? = null
+
+    private var defaultListener: DefaultListener? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_goods_detail_post, container, false)
@@ -60,11 +61,11 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
     }
 
     private fun onSetup() {
-
         // Toast, Dialog 초기화
         defaultToast = defaultToast ?: DefaultToast(context = context!!)
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
 
+        // listener 초기화
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
 
         // goodsDetailUsedUserAdapter & recycler 초기화
@@ -86,16 +87,26 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
         if (needInitUserData) loadUsedUser(page = 1)
         else setUserLayout()
 
-        if (needInitPostsData) loadTaggedPosts()
+        if (needInitPostsData) loadTaggedPosts(page = 1)
         else setPostLayout()
     }
 
     private fun onBindEvent() {
-        moreBtn.setOnClickListener(this) // 포스트 더보기
-
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = userRecyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = goodsDetailUsedUserAdapter!!.dataLoading, total = goodsDetailUsedUserAdapter!!.dataTotal) {_->
-                loadUsedUser(goodsDetailUsedUserAdapter!!.dataNextPage)
+                loadUsedUser(page = goodsDetailUsedUserAdapter!!.dataNextPage)
+            }
+        }
+
+//        ViewFunction.onRecyclerViewScrolledDown(recyclerView = postRecyclerView) {
+//            ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = taggedPostAdapter!!.dataLoading, total = taggedPostAdapter!!.dataTotal) {_->
+//                loadTaggedPosts(page = taggedPostAdapter!!.dataNextPage)
+//            }
+//        }
+
+        ViewFunction.isNestedScrollViewScrolledDown(nestedScrollView = scrollView) { isScrolled ->
+            if (isScrolled && !taggedPostAdapter!!.dataLoading) {
+                loadTaggedPosts(page = taggedPostAdapter!!.dataNextPage)
             }
         }
     }
@@ -115,16 +126,22 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
                     defaultToast?.showToast(message = it)
                 }
                 uiData.goodsUsedUserData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        goodsDetailUsedUserAdapter?.updateData(goodsDetailUsedUserData = it)
-                        needInitUserData = false
-                    }
-                    else
-                        goodsDetailUsedUserAdapter?.addData(goodsDetailUsedUserData = it)
+                    goodsDetailUsedUserAdapter?.linkData(goodsDetailUsedUserData = it)
+                    needInitUserData = false
+                }
+                uiData.goodsUsedUserDataUpdate?.let {
+                    goodsDetailUsedUserAdapter?.notifyDataSetChanged()
                 }
                 uiData.goodsUsedUserTotal?.let {
                     setBundleGoodsUsedUserTotal(total = it)
                 }
+            }
+        })
+
+        // load used user 이벤트 observe
+        goodsDetailViewModel.loadUsedUserData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isLoading ->
+                goodsDetailUsedUserAdapter?.dataLoading = isLoading
             }
         })
 
@@ -142,28 +159,28 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
                     defaultToast?.showToast(message = it)
                 }
                 uiData.postsData?.let {
-                    taggedPostAdapter?.updateData(postThumbnailData = it)
-                    setBundleTagPostsTotal(total = it.total)
-                    setBundleMoreBtnVisibility(visibility = if (it.total > 6) View.VISIBLE else View.GONE)
+                    taggedPostAdapter?.linkData(postThumbnailData = it)
                     needInitPostsData = false
                 }
+                uiData.postsDataUpdate?.let {
+                    taggedPostAdapter?.notifyDataSetChanged()
+                }
+                uiData.postsTotal?.let {
+                    setBundleTagPostsTotal(total = it)
+                }
+            }
+        })
+
+        // load tagged posts 이벤트 observe
+        postsViewModel.loadPostsData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isLoading ->
+                taggedPostAdapter?.dataLoading = isLoading
             }
         })
     }
 
-    override fun onClick(v: View?) {
-        v?.let {
-            when (v.id) {
-                R.id.moreBtn -> { // 포스트 더보기
-                    RunActivity.goodsTaggedPostsActivity(context = context as Activity, goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE))
-                }
-            }
-        }
-    }
-
     private fun getBundleGoodsUsedUserTotal(): Int = arguments?.getInt("goodsUsedUserTotal") ?: 0
     private fun getBundleTagPostsTotal(): Int = arguments?.getInt("tagPostsTotal") ?: 0
-    private fun getBundleMoreBtnVisibility(): Int = arguments?.getInt("moreBtnVisibility") ?: View.GONE
 
     private fun setBundleGoodsUsedUserTotal(total: Int) {
         arguments?.putInt("goodsUsedUserTotal", total)
@@ -173,17 +190,12 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
         arguments?.putInt("tagPostsTotal", total)
         textViewPostCnt?.setText(total.toString(), TextView.BufferType.SPANNABLE)
     }
-    private fun setBundleMoreBtnVisibility(visibility: Int) {
-        arguments?.putInt("moreBtnVisibility", visibility)
-        moreBtn?.visibility = visibility
-    }
 
     private fun setUserLayout() {
         textViewUserCnt?.setText(getBundleGoodsUsedUserTotal().toString(), TextView.BufferType.SPANNABLE)
     }
     private fun setPostLayout() {
         textViewPostCnt?.setText(getBundleTagPostsTotal().toString(), TextView.BufferType.SPANNABLE)
-        moreBtn?.visibility = getBundleMoreBtnVisibility()
     }
 
     fun loadUsedUser(page: Int) {
@@ -192,9 +204,9 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
         } ?:let { needInitUserData = true }
     }
 
-    fun loadTaggedPosts() {
+    fun loadTaggedPosts(page: Int) {
         context?.let {
-            postsViewModel.loadGoodsTaggedPosts(goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE), page = 1, limitCnt = 5)
+            postsViewModel.loadGoodsTaggedPosts(goodsCode = (context as Activity).intent.getStringExtra(IntentPassName.GOODS_CODE), page = page)
         } ?:let { needInitPostsData = true }
     }
 
@@ -207,7 +219,6 @@ class GoodsDetailPostFragment: Fragment(), View.OnClickListener {
             args.putBoolean("needInitPostsData", true)
             args.putInt("goodsUsedUserTotal", 0)
             args.putInt("tagPostsTotal", 0)
-            args.putInt("moreBtnVisibility", View.GONE)
             fragment.arguments = args
 
             return fragment

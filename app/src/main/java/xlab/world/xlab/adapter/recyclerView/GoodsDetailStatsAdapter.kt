@@ -22,7 +22,7 @@ import xlab.world.xlab.utils.support.PrintLog
 
 class GoodsDetailStatsAdapter(private val context: Context) : RecyclerView.Adapter<GoodsDetailStatsAdapter.ViewHolder>() {
 
-    private val goodsDetailStatsData: GoodsDetailStatsData = GoodsDetailStatsData()
+    private var goodsDetailStatsData: GoodsDetailStatsData = GoodsDetailStatsData()
     var dataLoading: Boolean
         get() = this.goodsDetailStatsData.isLoading
         set(value) { this.goodsDetailStatsData.isLoading = value }
@@ -35,29 +35,9 @@ class GoodsDetailStatsAdapter(private val context: Context) : RecyclerView.Adapt
     private val moreOverlayDrawable = ColorDrawable(ResourcesCompat.getColor(context.resources, R.color.colorBlack40, null))
     private val glideOption = RequestOptions().circleCrop()
 
-    fun getItem(position: Int): GoodsDetailStatsListData {
-        return goodsDetailStatsData.items[position]
-    }
-
-    fun updateData(goodsDetailStatsData: GoodsDetailStatsData) {
-        this.goodsDetailStatsData.items.clear()
-        this.goodsDetailStatsData.items.addAll(goodsDetailStatsData.items)
-
-        this.goodsDetailStatsData.isLoading = false
-        this.goodsDetailStatsData.total = goodsDetailStatsData.total
-        this.goodsDetailStatsData.nextPage = 2
-
+    fun linkData(goodsDetailStatsData: GoodsDetailStatsData) {
+        this.goodsDetailStatsData = goodsDetailStatsData
         notifyDataSetChanged()
-    }
-
-    fun addData(goodsDetailStatsData: GoodsDetailStatsData) {
-        val size: Int = itemCount
-        this.goodsDetailStatsData.items.addAll(goodsDetailStatsData.items)
-
-        this.goodsDetailStatsData.isLoading = false
-        this.goodsDetailStatsData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override

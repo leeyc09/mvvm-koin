@@ -200,10 +200,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme" />
         <activity
-            android:name=".view.posts.GoodsTaggedPostsActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/customNoActionBarTheme" />
-        <activity
             android:name=".view.resetPassword.UpdatePasswordActivity"
             android:screenOrientation="portrait"
             android:theme="@style/customNoActionBarTheme"

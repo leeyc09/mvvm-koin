@@ -135,9 +135,11 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                         goodsDetailStatsFragment.loadGoodsStatsData()
                         // 포스트 정보
                         goodsDetailPostFragment.loadUsedUser(page = 1)
-                        goodsDetailPostFragment.loadTaggedPosts()
+                        goodsDetailPostFragment.loadTaggedPosts(page = 1)
                     }
                     RequestCodeData.GOODS_BUYING -> { // 구매하기
+                        // 카트 숫자
+                        cartViewModel.loadCartCnt(authorization = spHelper.authorization)
                         goodsDetailViewModel.loadGoodsDetailData(context = this, goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), needDescription = false)
                         goodsDetailViewModel.loadGoodsPetData(authorization = spHelper.authorization)
                         goodsDetailInfoFragment.loadGoodsDescription()
@@ -151,7 +153,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                 goodsDetailInfoFragment.loadGoodsDescription()
                 goodsDetailStatsFragment.loadGoodsStatsData()
                 goodsDetailPostFragment.loadUsedUser(page = 1)
-                goodsDetailPostFragment.loadTaggedPosts()
+                goodsDetailPostFragment.loadTaggedPosts(page = 1)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
                 setResult(ResultCodeData.LOGOUT_SUCCESS)
@@ -394,10 +396,6 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         tabLayoutDot.visibility =
                 if (tabLayoutDot.tabCount > 1) View.VISIBLE
                 else View.GONE
-    }
-
-    fun setResultCodeFromFragment(resultCode: Int) {
-        goodsDetailViewModel.setResultCode(resultCode = resultCode)
     }
 
     companion object {

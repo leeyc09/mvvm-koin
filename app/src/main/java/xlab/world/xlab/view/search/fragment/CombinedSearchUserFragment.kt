@@ -21,12 +21,12 @@ import xlab.world.xlab.utils.view.button.ScrollUpButtonHelper
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
-import xlab.world.xlab.view.follow.FollowViewModel
+import xlab.world.xlab.view.follow.UserViewModel
+import xlab.world.xlab.view.search.CombinedSearchActivity
 import xlab.world.xlab.view.search.SearchViewModel
 
 class CombinedSearchUserFragment: Fragment() {
-    private val searchViewModel: SearchViewModel by viewModel()
-    private val followViewModel: FollowViewModel by viewModel()
+    private val userViewModel: UserViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
     private var needInitData
@@ -71,8 +71,7 @@ class CombinedSearchUserFragment: Fragment() {
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
         userDefaultListener = UserDefaultListener(context = context as Activity,
                 followUserEvent = { position ->
-//                    followViewModel.userFollow(authorization = spHelper.authorization, selectIndex = position,
-//                            userData = searchUserAdapter?.getItem(position = position), recommendUserData = null)
+                    userViewModel.userFollow(authorization = spHelper.authorization, selectIndex = position, userType = UserViewModel.UserType.DEFAULT)
                 })
 
         // scroll up button 초기화
@@ -98,15 +97,15 @@ class CombinedSearchUserFragment: Fragment() {
     private fun onBindEvent() {
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = searchUserAdapter!!.dataLoading, total = searchUserAdapter!!.dataTotal) { _ ->
-                searchViewModel.searchUsers(authorization = spHelper.authorization, searchText = searchText, page = searchUserAdapter!!.dataNextPage)
+                userViewModel.searchUsers(authorization = spHelper.authorization, searchText = searchText, page = searchUserAdapter!!.dataNextPage)
             }
         }
     }
 
     private fun observeViewModel() {
-        // TODO: Search View Model 이벤트
+        // TODO: User View Model 이벤트
         // UI 이벤트 observe
-        searchViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+        userViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
                     if (it && !progressDialog!!.isShowing)
@@ -117,47 +116,27 @@ class CombinedSearchUserFragment: Fragment() {
                 uiData.toastMessage?.let {
                     defaultToast?.showToast(message = it)
                 }
-                uiData.searchUserData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        setBundleVisibilityData(noSearchDataVisibility =
-                        if (it.items.isEmpty()) View.VISIBLE
-                        else View.GONE)
-                        searchUserAdapter?.updateData(userDefaultData = it)
-                    }
-                    else
-                        searchUserAdapter?.addData(userDefaultData = it)
+                uiData.defaultUserData?.let {
+                    searchUserAdapter?.linkData(userDefaultData = it)
+                }
+                uiData.defaultUserUpdate?.let {
+                    searchUserAdapter?.notifyDataSetChanged()
+                }
+                uiData.defaultUserUpdateIndex?.let {
+                    (context as CombinedSearchActivity).setResultCodeFromFragment(resultCode = Activity.RESULT_OK)
+                    searchUserAdapter?.notifyItemChanged(it)
+                }
+                uiData.emptyDefaultUserVisibility?.let {
+                    setBundleVisibilityData(noSearchDataVisibility = it)
                 }
             }
         })
 
         // search user 이벤트 observe
-        searchViewModel.searchUserEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.status?.let { isLoading ->
-                    searchUserAdapter?.dataLoading = isLoading
-                    needInitData = false
-                }
-            }
-        })
-
-        // TODO: Follow View Model 이벤트
-        // UI 이벤트 observe
-        followViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
-            uiData?.let { _ ->
-                uiData.isLoading?.let {
-                    if (it && !progressDialog!!.isShowing)
-                        progressDialog!!.show()
-                    else if (!it && progressDialog!!.isShowing)
-                        progressDialog!!.dismiss()
-                }
-                uiData.toastMessage?.let {
-                    defaultToast?.showToast(message = it)
-                }
-//                uiData.userUpdatePosition?.let {
-////                    if (this.resultCode == Activity.RESULT_CANCELED)
-////                        this.resultCode = Activity.RESULT_OK
-//                    searchUserAdapter?.notifyItemChanged(it)
-//                }
+        userViewModel.loadDefaultUserData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isLoading ->
+                searchUserAdapter?.dataLoading = isLoading
+                needInitData = false
             }
         })
     }
@@ -165,7 +144,7 @@ class CombinedSearchUserFragment: Fragment() {
     fun searchUserData(searchText: String, loadingBar: Boolean?) {
         this.searchText = searchText
         context?.let {
-            searchViewModel.searchUsers(authorization = spHelper.authorization, searchText = this.searchText, page = 1, loadingBar = loadingBar)
+            userViewModel.searchUsers(authorization = spHelper.authorization, searchText = this.searchText, page = 1, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 

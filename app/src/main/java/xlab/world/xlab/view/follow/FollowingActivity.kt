@@ -24,7 +24,7 @@ import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 
 class FollowingActivity : AppCompatActivity(), View.OnClickListener {
-    private val followViewModel: FollowViewModel by viewModel()
+    private val userViewModel: UserViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
     private lateinit var defaultToast: DefaultToast
@@ -56,19 +56,19 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
-        followViewModel.setResultCode(resultCode = resultCode)
+        userViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
                 when (requestCode) {
                     RequestCodeData.PROFILE -> { // 프로필
-                        followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
-                        followViewModel.loadFollowing(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1, loadingBar = null)
+                        userViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
+                        userViewModel.loadFollowing(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1, loadingBar = null)
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> {
-                followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
-                followViewModel.loadFollowing(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1, loadingBar = null)
+                userViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId, loadingBar = null)
+                userViewModel.loadFollowing(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1, loadingBar = null)
             }
             ResultCodeData.LOGOUT_SUCCESS -> {
                 actionBackBtn.performClick()
@@ -88,13 +88,13 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
         defaultListener = DefaultListener(context = this)
         userDefaultListener = UserDefaultListener(context = this,
                 followUserEvent = { position ->
-                    followViewModel.userFollow(authorization = spHelper.authorization, selectIndex = position, userType = FollowViewModel.UserType.DEFAULT)
+                    userViewModel.userFollow(authorization = spHelper.authorization, selectIndex = position, userType = UserViewModel.UserType.DEFAULT)
                 })
 
         // recommend recycler view & adapter 초기화
         userRecommendAdapter = UserRecommendAdapter(context = this,
                 followListener = View.OnClickListener { view ->
-                    followViewModel.userFollow(authorization = spHelper.authorization, selectIndex = view.tag as Int, userType = FollowViewModel.UserType.RECOMMEND)
+                    userViewModel.userFollow(authorization = spHelper.authorization, selectIndex = view.tag as Int, userType = UserViewModel.UserType.RECOMMEND)
                 },
                 profileListener = defaultListener.profileListener)
         recommendRecyclerView.adapter = userRecommendAdapter
@@ -111,8 +111,8 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         recyclerView.isNestedScrollingEnabled = false
 
-        followViewModel.loadFollowing(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1)
-        followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId)
+        userViewModel.loadFollowing(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = 1)
+        userViewModel.loadRecommendUser(authorization = spHelper.authorization, page = 1, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId)
     }
 
     private fun onBindEvent() {
@@ -120,20 +120,20 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recommendRecyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = userRecommendAdapter.dataLoading, total = userRecommendAdapter.dataTotal) { _ ->
-                followViewModel.loadRecommendUser(authorization = spHelper.authorization, page = userRecommendAdapter.dataNextPage, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId)
+                userViewModel.loadRecommendUser(authorization = spHelper.authorization, page = userRecommendAdapter.dataNextPage, userId = intent.getStringExtra(IntentPassName.USER_ID), loginUserId = spHelper.userId)
             }
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as LinearLayoutManager, isLoading = followingAdapter.dataLoading, total = followingAdapter.dataTotal) { _ ->
-                followViewModel.loadFollowing(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = followingAdapter.dataNextPage)
+                userViewModel.loadFollowing(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID), page = followingAdapter.dataNextPage)
             }
         }
     }
 
     private fun observeViewModel() {
         // UI 이벤트 observe
-        followViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+        userViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
                     if (it && !progressDialog.isShowing)
@@ -158,7 +158,7 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
                     userRecommendAdapter.notifyDataSetChanged()
                 }
                 uiData.recommendUserUpdateIndex?.let {
-                    followViewModel.setResultCode(resultCode = Activity.RESULT_OK)
+                    userViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                     userRecommendAdapter.notifyItemChanged(it)
                 }
                 uiData.emptyDefaultUserVisibility?.let {
@@ -171,7 +171,7 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
                     followingAdapter.notifyDataSetChanged()
                 }
                 uiData.defaultUserUpdateIndex?.let {
-                    followViewModel.setResultCode(resultCode = Activity.RESULT_OK)
+                    userViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                     followingAdapter.notifyItemChanged(it)
                 }
                 uiData.followingCnt?.let {
@@ -181,14 +181,14 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         // load loadRecommendUser 이벤트 observe
-        followViewModel.loadRecommendUserData.observe(owner = this, observer = android.arch.lifecycle.Observer { evneteData ->
+        userViewModel.loadRecommendUserData.observe(owner = this, observer = android.arch.lifecycle.Observer { evneteData ->
             evneteData?.let { isLoading ->
                 userRecommendAdapter.dataLoading = isLoading
             }
         })
 
         // load loadFollowingEvent 이벤트 observe
-        followViewModel.loadDefaultUserData.observe(owner = this, observer = android.arch.lifecycle.Observer { evneteData ->
+        userViewModel.loadDefaultUserData.observe(owner = this, observer = android.arch.lifecycle.Observer { evneteData ->
             evneteData?.let { isLoading ->
                 followingAdapter.dataLoading = isLoading
             }
@@ -199,7 +199,7 @@ class FollowingActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { //뒤로가기
-                    followViewModel.backBtnAction()
+                    userViewModel.backBtnAction()
                 }
             }
         }

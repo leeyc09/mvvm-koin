@@ -44,11 +44,15 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
 
     private var goodsDetailTopicMatchData: GoodsDetailTopicMatchData = GoodsDetailTopicMatchData()
     private var goodsDetailRatingData: GoodsDetailRatingData = GoodsDetailRatingData()
+    private var goodsDetailInfoData: GoodsDetailInfoData = GoodsDetailInfoData()
+    private var goodsDetailStatsData: GoodsDetailStatsData = GoodsDetailStatsData()
+    private var goodsDetailUsedUserData: GoodsDetailUsedUserData = GoodsDetailUsedUserData()
 
     val recentViewGoodsData = SingleLiveEvent<ReqRecentViewGoodsData?>()
     val ratingOpenCloseData = SingleLiveEvent<Boolean?>()
     val goodsRatingData = SingleLiveEvent<Int?>()
     val buyNowEventData = SingleLiveEvent<BuyNowModel>()
+    val loadUsedUserData = SingleLiveEvent<Boolean?>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setResultCode(resultCode: Int) {
@@ -72,7 +76,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestGoodsDetail fail", errorData.message)
+                            PrintLog.e("requestGoodsDetail fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -91,7 +95,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiShop.requestGoodsDetail(scheduler = scheduler, goodsCode = goodsCode,
                     responseData = {
-                        PrintLog.d("requestGoodsDetail success", it.toString())
+                        PrintLog.d("requestGoodsDetail success", it.toString(), viewModelTag)
                         goodsData = it.copy()
                         val buyBtnStr =
                                 if (it.goods.isSoldOut) context.getString(R.string.sold_out)
@@ -113,8 +117,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                                     it.goods.originName,
                                     it.goods.makerName,
                                     SupportData.applyPriceFormat(price = defaultDeliveryPrice) + "원")
-                            PrintLog.d("header Title List", headerTitleList.toString())
-                            PrintLog.d("header SubTitle List", headerSubTitleList.toString())
+                            PrintLog.d("header SubTitle List", headerSubTitleList.toString(), viewModelTag)
                             headerTitleList.forEachIndexed { index, title ->
                                 goodsDetailInfoData.items.add(GoodsDetailInfoListData(
                                         dataType = AppConstants.ADAPTER_HEADER,
@@ -123,7 +126,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                             }
 
                             // 상품 상세
-                            PrintLog.d("goods description", it.goods.description)
+                            PrintLog.d("goods description", it.goods.description, viewModelTag)
                             // 이미지 url parse
                             val detailMatcher = imageRegexPattern.matcher(it.goods.description)
                             val detailUrl = ArrayList<String>()
@@ -150,12 +153,13 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                                         )
                                 ))
                             }
+                            this.goodsDetailInfoData.updateData(goodsDetailInfoData = goodsDetailInfoData)
                         }
 
                         uiData.value = UIModel(isLoading = false, buyBtnStr = buyBtnStr, buyBtnEnable = !it.goods.isSoldOut,
                                 brandName = it.goods.brandName, brandCode = it.goods.brandCode, goodsMainImages = goodsMainImages,
                                 goodsName = it.goods.name, goodsPrice = goodsPrice, goodsPriceUnitVisibility = goodsPriceUnitVisibility,
-                                goodsDescriptionData = goodsDetailInfoData)
+                                goodsDescriptionData = goodsDetailInfoData?.let{_->this.goodsDetailInfoData})
 
                         // 최근 본 상품에 추가한 적 없는 경우 -> 추가
                         if (!isPostViewGoods) {
@@ -165,7 +169,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestGoodsDetail fail", errorData.message)
+                            PrintLog.e("requestGoodsDetail fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -240,7 +244,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                 }
 
                 if (this.goodsDetailTopicMatchData.items.isEmpty()) { // 토픽 없음
-                    PrintLog.d("ratingOpenClose", "no topic")
+                    PrintLog.d("ratingOpenClose", "no topic", viewModelTag)
                     ratingOpenCloseData.postValue(true)
                     it.onComplete()
                     return@create
@@ -267,12 +271,13 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
         }
     }
 
-    fun descriptionOpenClose(position: Int, goodsDescriptionData: GoodsDetailInfoListData) {
+    fun descriptionOpenClose(selectIndex: Int) {
         launch {
             Observable.create<Int> {
+                val goodsDescriptionData = this.goodsDetailInfoData.items[selectIndex]
                 goodsDescriptionData.isShowAllDescription = !goodsDescriptionData.isShowAllDescription
 
-                it.onNext(position)
+                it.onNext(selectIndex)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe{
                 uiData.value = UIModel(goodsDescriptionUpdateIndex = it)
@@ -292,9 +297,10 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiShop.requestGoodsStats(scheduler = scheduler, authorization = authorization, goodsCode = goodsCode,
                     responseData = {
-                        PrintLog.d("requestGoodsStats success", it.toString())
+                        PrintLog.d("requestGoodsStats success", it.toString(), viewModelTag)
                         val goodsStatsData = GoodsDetailStatsData()
                         it.statsList?.forEach { stats ->
+                            // 텍스트에서 하이라이트(진한 검정색) 될 텍스트
                             val highlightStr =
                                     if (stats.title.isEmpty()) {
                                         when (stats.topic.type) {
@@ -306,6 +312,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
 
                             val textStr = SpannableString(if (stats.title.isEmpty()) "다른 ${highlightStr}의 만족도" else "$highlightStr 만족도")
 
+                            // 텍스트에서 하이라이트(진한 검정색) 적용
                             if (stats.title.isEmpty()) {
                                 textStr.setSpan(regularFont, 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                                 textStr.setSpan(boldFont, 3, 3 + highlightStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -314,14 +321,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                                 textStr.setSpan(boldFont, 0, highlightStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                                 textStr.setSpan(regularFont, highlightStr.length, textStr.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                             }
-//                            val title =
-//                                    if (stats.title == "") {
-//                                        when (stats.topic.type) {
-//                                            petInfo.dogCode -> petInfo.dogBreedInfo[stats.topic.breed.toInt()].nameKor
-//                                            petInfo.catCode -> petInfo.catBreedInfo[stats.topic.breed.toInt()].nameKor
-//                                            else -> ""
-//                                        }
-//                                    } else stats.title + " 만족도"
+
                             goodsStatsData.items.add(GoodsDetailStatsListData(
                                     title = textStr,
                                     topicImages = stats.topic.images,
@@ -329,8 +329,11 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                                     sosoPercent = stats.soso,
                                     badPercent = stats.bad ))
                         }
+                        this.goodsDetailStatsData.updateData(goodsDetailStatsData = goodsStatsData)
 
-                        uiData.value = UIModel(isLoading = false, goodsStatsData = goodsStatsData)
+                        uiData.value = UIModel(isLoading = false,
+                                goodsStatsData = this.goodsDetailStatsData,
+                                noStatsVisibility = if (this.goodsDetailStatsData.items.isEmpty()) View.VISIBLE else View.GONE)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
@@ -349,10 +352,11 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
         }
 
         uiData.value = UIModel(isLoading = true)
+        loadUsedUserData.value = true
         launch {
             apiUser.requestGoodsUsedUser(scheduler = scheduler, goodsCode = goodsCode, page = page,
                     responseData = {
-                        PrintLog.d("requestGoodsUsedUser success", it.toString())
+                        PrintLog.d("requestGoodsUsedUser success", it.toString(), viewModelTag)
                         val goodsUsedUserData = GoodsDetailUsedUserData(total = it.total, nextPage = page + 1)
                         it.userData?.forEach { user ->
                             goodsUsedUserData.items.add(GoodsDetailUsedUserListData(
@@ -360,13 +364,22 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                                     userNickname = user.nickName,
                                     userProfile = user.profileImg))
                         }
-                        uiData.value = UIModel(isLoading = false, goodsUsedUserData = goodsUsedUserData,
-                                goodsUsedUserTotal = if (page == 1) it.total else null)
+
+                        if (page == 1) {
+                            this.goodsDetailUsedUserData.updateData(goodsDetailUsedUserData = goodsUsedUserData)
+                            uiData.value = UIModel(isLoading = false,
+                                    goodsUsedUserData = this.goodsDetailUsedUserData,
+                                    goodsUsedUserTotal = if (page == 1) it.total else null)
+                        } else {
+                            this.goodsDetailUsedUserData.addData(goodsDetailUsedUserData = goodsUsedUserData)
+                            uiData.value = UIModel(isLoading = false,
+                                    goodsUsedUserDataUpdate = true)
+                        }
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestGoodsUsedUser fail", errorData.message)
+                            PrintLog.e("requestGoodsUsedUser fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -517,7 +530,7 @@ data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = n
                    val goodsName: String? = null, val goodsPrice: String? = null, val goodsPriceUnitVisibility: Int? = null,
                    val goodsDescriptionData: GoodsDetailInfoData? = null,
                    val goodsDescriptionUpdateIndex: Int? = null,
-                   val goodsStatsData: GoodsDetailStatsData? = null,
-                   val goodsUsedUserData: GoodsDetailUsedUserData? = null, val goodsUsedUserTotal: Int? = null,
+                   val goodsStatsData: GoodsDetailStatsData? = null, val noStatsVisibility: Int? = null,
+                   val goodsUsedUserData: GoodsDetailUsedUserData? = null, val goodsUsedUserDataUpdate: Boolean? = null, val goodsUsedUserTotal: Int? = null,
                    val taggedPostsData: PostThumbnailData? = null, val taggedPostsTotal: Int? = null,
                    val postsMoreVisibility: Int? = null)

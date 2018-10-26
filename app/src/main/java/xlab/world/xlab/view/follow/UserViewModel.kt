@@ -17,11 +17,11 @@ import xlab.world.xlab.utils.support.SupportData
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
-class FollowViewModel(private val apiFollow: ApiFollowProvider,
-                      private val apiUser: ApiUserProvider,
-                      private val petInfo: PetInfo,
-                      private val networkCheck: NetworkCheck,
-                      private val scheduler: SchedulerProvider): AbstractViewModel() {
+class UserViewModel(private val apiFollow: ApiFollowProvider,
+                    private val apiUser: ApiUserProvider,
+                    private val petInfo: PetInfo,
+                    private val networkCheck: NetworkCheck,
+                    private val scheduler: SchedulerProvider): AbstractViewModel() {
     enum class UserType { DEFAULT, RECOMMEND }
 
     private val viewModelTag = "Follow"
@@ -261,6 +261,48 @@ class FollowViewModel(private val apiFollow: ApiFollowProvider,
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
                             PrintLog.e("requestRecommendUser fail", errorData.message, viewModelTag)
+                        }
+                    })
+        }
+    }
+
+    fun searchUsers(authorization: String, searchText: String, page: Int, loadingBar: Boolean? = true) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = loadingBar)
+        loadDefaultUserData.value = true
+        launch {
+            apiUser.requestSearchUser(authorization = authorization, scheduler = scheduler, searchText = searchText, page = page,
+                    responseData = {
+                        PrintLog.d("searchUser success", it.toString(), viewModelTag)
+                        val userData = UserDefaultData(total = it.total, nextPage = page + 1)
+                        it.userData?.forEach { user ->
+                            val topicBreed = petInfo.getTopicBreed(user.petData)
+                            userData.items.add(UserDefaultListData(userId = user.id,
+                                    profileImage = user.profileImg,
+                                    nickName = user.nickName,
+                                    topic = topicBreed,
+                                    isFollowing = user.isFollowing))
+                        }
+
+                        if (page == 1) {
+                            this.userDefaultData.updateData(userDefaultData = userData)
+                            uiData.value = UIModel(isLoading = false,
+                                    defaultUserData = this.userDefaultData,
+                                    emptyDefaultUserVisibility = if (this.userDefaultData.items.isEmpty()) View.VISIBLE else View.GONE)
+                        } else {
+                            this.userDefaultData.addData(userDefaultData = userData)
+                            uiData.value = UIModel(isLoading = false, defaultUserUpdate = true)
+                        }
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
+                        errorData?.let {
+                            PrintLog.d("searchUser fail", errorData.message, viewModelTag)
                         }
                     })
         }

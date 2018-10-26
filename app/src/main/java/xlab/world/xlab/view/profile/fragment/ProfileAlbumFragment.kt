@@ -23,11 +23,12 @@ import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
+import xlab.world.xlab.view.posts.PostsViewModel
 import xlab.world.xlab.view.profile.ProfileActivity
 import xlab.world.xlab.view.profile.ProfileViewModel
 
 class ProfileAlbumFragment: Fragment(), View.OnClickListener {
-    private val profileViewModel: ProfileViewModel by viewModel()
+    private val postsViewModel: PostsViewModel by viewModel()
     private val postDetailViewModel: PostDetailViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
@@ -151,7 +152,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             if (it is GridLayoutManager) { // post thumbnail adapter
                 ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = postThumbnailAdapter!!.dataLoading, total = postThumbnailAdapter!!.dataTotal) { _ ->
-                    profileViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = postThumbnailAdapter!!.dataNextPage)
+                    postsViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = postThumbnailAdapter!!.dataNextPage)
                 }
             } else if (it is LinearLayoutManager) { // post detail adapter
                 ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = postDetailAdapter!!.dataLoading, total = postDetailAdapter!!.dataTotal) { _ ->
@@ -162,9 +163,9 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
-        // TODO: profile view model
+        // TODO: Posts View Model
         // UI 이벤트 observe
-        profileViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
+        postsViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
             uiData?.let { _ ->
                 uiData.isLoading?.let {
                     if (it && !progressDialog!!.isShowing)
@@ -173,42 +174,29 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                         progressDialog!!.dismiss()
                 }
                 uiData.toastMessage?.let {
-                    defaultToast?.showToast(message = it)
+                    defaultToast!!.showToast(message = it)
                 }
-                uiData.postsThumbData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        // post 없으면 no post 띄우기
-                        setBundleVisibilityData(noPostsLayout =
-                        if (it.items.isEmpty()) View.VISIBLE
-                        else View.GONE)
-                        postThumbnailAdapter?.updateData(postThumbnailData = it)
-                        swipeRefreshLayout.isRefreshing = false
-                    }
-                    else
-                        postThumbnailAdapter?.addData(postThumbnailData = it)
+                uiData.postsData?.let {
+                    postThumbnailAdapter?.linkData(postThumbnailData = it)
+                    swipeRefreshLayout.isRefreshing = false
+                }
+                uiData.postsDataUpdate?.let {
+                    postThumbnailAdapter?.notifyDataSetChanged()
+                }
+                uiData.emptyPostVisibility?.let {
+                    setBundleVisibilityData(noPostsLayout = it)
                 }
             }
         })
 
-        // load user posts thumb 이벤트 observe
-        profileViewModel.loadUserPostsThumbDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadUserPostsThumbDataEvent ->
-            loadUserPostsThumbDataEvent?.let { _ ->
-                loadUserPostsThumbDataEvent.status?.let {
-                    postThumbnailAdapter?.dataLoading = it
-                    needInitData = false
-                }
+        // post load 이벤트 observe
+        postsViewModel.loadPostsData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isLoading ->
+                postThumbnailAdapter?.dataLoading = isLoading
+                needInitData = false
             }
         })
 
-        // load user posts detail 이벤트 observe
-        profileViewModel.loadUserPostsDetailDataEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadUserPostsDetailDataEvent ->
-            loadUserPostsDetailDataEvent?.let { _ ->
-                loadUserPostsDetailDataEvent.status?.let {
-                    postDetailAdapter?.dataLoading = it
-                    needInitData = false
-                }
-            }
-        })
 
         // TODO: post detail view model
         // UI 이벤트 observe
@@ -241,6 +229,14 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
             }
         })
 
+        // post detail load 이벤트 observe
+        postDetailViewModel.loadPostDetailData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { isLoading ->
+                postDetailAdapter?.dataLoading = isLoading
+                needInitData = false
+            }
+        })
+
         // post delete 이벤트 observe
         postDetailViewModel.postDeleteData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let { isSuccess ->
@@ -263,7 +259,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
 
     fun reloadAlbumPostsData(loadingBar: Boolean?) {
         context?.let {
-            profileViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = 1, loadingBar = loadingBar)
+            postsViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = 1, loadingBar = loadingBar)
             postDetailViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = 1, loginUserId = spHelper.userId, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }

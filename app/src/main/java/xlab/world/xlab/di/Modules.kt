@@ -15,7 +15,7 @@ import xlab.world.xlab.view.cart.CartViewModel
 import xlab.world.xlab.view.comment.CommentViewModel
 import xlab.world.xlab.view.completePurchase.CompletePurchaseViewModel
 import xlab.world.xlab.view.crrDetail.CRRDetailViewModel
-import xlab.world.xlab.view.follow.FollowViewModel
+import xlab.world.xlab.view.follow.UserViewModel
 import xlab.world.xlab.view.galleryImageSelect.GalleryImageSelectViewModel
 import xlab.world.xlab.view.goodsDetail.GoodsDetailViewModel
 import xlab.world.xlab.view.goodsInfo.GoodsInfoVewModel
@@ -74,7 +74,7 @@ val viewModelModule: Module = applicationContext {
     // ViewModel for Profile Edit View
     viewModel { ProfileEditViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for follow View
-    viewModel { FollowViewModel(apiFollow = get(), apiUser = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { UserViewModel(apiFollow = get(), apiUser = get(), petInfo = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Gallery Image Select View
     viewModel { GalleryImageSelectViewModel(scheduler = get()) }
     // ViewModel for Topic Pet Edit View
@@ -84,7 +84,7 @@ val viewModelModule: Module = applicationContext {
     // ViewModel for Setting View
     viewModel { SettingViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Posts View
-    viewModel { PostsViewModel(apiShop = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
+    viewModel { PostsViewModel(apiPost = get(), apiShop = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Withdraw View
     viewModel { WithDrawViewModel(apiUser = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Notice View
