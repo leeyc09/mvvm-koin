@@ -22,6 +22,7 @@ import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.ShareViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
 import xlab.world.xlab.view.posts.PostsViewModel
 import xlab.world.xlab.view.profile.ProfileActivity
@@ -30,6 +31,7 @@ import xlab.world.xlab.view.profile.ProfileViewModel
 class ProfileAlbumFragment: Fragment(), View.OnClickListener {
     private val postsViewModel: PostsViewModel by viewModel()
     private val postDetailViewModel: PostDetailViewModel by viewModel()
+    private val shareViewModel: ShareViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
     private var needInitData
@@ -71,7 +73,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
 
         // listener 초기화
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
-        postDetailListener = postDetailListener ?: PostDetailListener(context = context as Activity, fragmentManager = (context as AppCompatActivity).supportFragmentManager,
+        postDetailListener = postDetailListener ?: PostDetailListener(context = context as AppCompatActivity, fragmentManager = (context as AppCompatActivity).supportFragmentManager,
                 postMoreEvent = { editPosition, deletePosition ->
                     editPosition?.let {  position ->
                         RunActivity.postUploadContentActivity(context = context as Activity,
@@ -88,6 +90,16 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                 },
                 savePostEvent = { position ->
                     postDetailViewModel.savePost(context = context!!, authorization = spHelper.authorization, selectIndex = position)
+                },
+                postShareEvent = { shareType, position ->
+                    when (shareType) {
+                        AppConstants.ShareType.COPY_LINK -> {
+
+                        }
+                        AppConstants.ShareType.KAKAO -> {
+                            postDetailViewModel.shareKakao(selectIndex = position)
+                        }
+                    }
                 })
         changeViewTypeListener = changeViewTypeListener ?: View.OnClickListener { view ->
             if (recyclerView.layoutManager is GridLayoutManager) { // post thumbnail adapter
@@ -114,7 +126,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                 likePostListener = postDetailListener!!.likePostListener,
                 commentsListener = defaultListener!!.commentsListener,
                 savePostListener = postDetailListener!!.savePostListener,
-                sharePostListener = View.OnClickListener {  },
+                sharePostListener = postDetailListener!!.sharePostListener,
                 hashTagListener = defaultListener!!.hashTagListener,
                 goodsListener = defaultListener!!.goodsListener)
         recyclerView.adapter = postThumbnailAdapter
@@ -194,6 +206,13 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
             eventData?.let { isLoading ->
                 postThumbnailAdapter?.dataLoading = isLoading
                 needInitData = false
+            }
+        })
+
+        // post share kakao 이벤트 observe
+        postDetailViewModel.shareKakaoData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { params ->
+                shareViewModel.shareKakao(context = context!!, shareParams = params)
             }
         })
 

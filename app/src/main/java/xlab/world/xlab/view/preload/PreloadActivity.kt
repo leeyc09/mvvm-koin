@@ -162,7 +162,7 @@ class PreloadActivity: AppCompatActivity() {
                 val md = MessageDigest.getInstance("SHA")
                 md.update(signature.toByteArray())
                 val keyHash = Base64.encodeToString(md.digest(), Base64.DEFAULT)
-                PrintLog.d("Key hash", keyHash)
+                PrintLog.d("Key hash", keyHash, tag)
             }
         } catch (e: PackageManager.NameNotFoundException) {
 

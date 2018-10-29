@@ -21,10 +21,12 @@ import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.dialog.DialogCreator
+import xlab.world.xlab.utils.view.dialog.ShareBottomDialog
 import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.ShareViewModel
 import xlab.world.xlab.view.notice.NoticeViewModel
 import xlab.world.xlab.view.profile.fragment.ProfileAlbumFragment
 import xlab.world.xlab.view.profile.fragment.ProfilePetFragment
@@ -32,6 +34,7 @@ import xlab.world.xlab.view.profile.fragment.ProfilePetFragment
 class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     private val profileViewModel: ProfileViewModel by viewModel()
     private val noticeViewModel: NoticeViewModel by viewModel()
+    private val shareViewModel: ShareViewModel by viewModel()
     private val fontColorSpan: FontColorSpan by inject()
     private val spHelper: SPHelper by inject()
     private val permissionHelper: PermissionHelper by inject()
@@ -44,6 +47,8 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var defaultToast: DefaultToast
     private lateinit var progressDialog: DefaultProgressDialog
     private lateinit var postUploadTypeSelectDialog: TwoSelectBottomDialog
+    private lateinit var profileMoreDialog: TwoSelectBottomDialog
+    private lateinit var shareDialog: ShareBottomDialog
 
     private lateinit var tabLayoutHelper: TabLayoutHelper
 
@@ -59,6 +64,27 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     }
     private val topicAddListener = View.OnClickListener {
         RunActivity.petEditActivity(context = this@ProfileActivity, petNo = null)
+    }
+
+    private val profileMoreDialogListener = object: TwoSelectBottomDialog.Listener {
+        override fun onFirstBtnClick(tag: Any?) {
+            // 공유하기
+            shareDialog.showDialog(manager = this@ProfileActivity.supportFragmentManager, dialogTag = "shareDialog",
+                    tagData = null)
+        }
+
+        override fun onSecondBtnClick(tag: Any?) {
+            // 신고하기
+        }
+    }
+    private val shareDialogListener = object: ShareBottomDialog.Listener {
+        override fun onCopyLink(tag: Any?) {
+            defaultToast.showToast(resources.getString(R.string.toast_copy_link_success))
+        }
+
+        override fun onShareKakao(tag: Any?) {
+            profileViewModel.shareKakao()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -151,6 +177,8 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
         postUploadTypeSelectDialog = DialogCreator.postUploadTypeSelectDialog(context = this)
+        profileMoreDialog = DialogCreator.profileMoreSelectDialog(context = this, listener = profileMoreDialogListener)
+        shareDialog = DialogCreator.shareDialog(context = this, listener = shareDialogListener)
 
         // 프래그먼트 초기화
         profileAlbumFragment = ProfileAlbumFragment.newFragment(userId = intent.getStringExtra(IntentPassName.USER_ID))
@@ -290,6 +318,13 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
+        // profile share kakao 이벤트 observe
+        profileViewModel.shareKakaoData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { params ->
+                shareViewModel.shareKakao(context = this, shareParams = params)
+            }
+        })
+
         // TODO: Notice View Model
         // UI 이벤트 observe
         noticeViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
@@ -327,7 +362,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     RunActivity.settingActivity(context = this)
                 }
                 R.id.actionMoreBtn -> { // 더보기 (신고, 공유
-
+                    profileMoreDialog.showDialog(manager = supportFragmentManager, dialogTag = "profileMoreDialog", tagData = null)
                 }
                 R.id.followBtn -> { // 팔로우 버튼
                     profileViewModel.setResultCode(resultCode = Activity.RESULT_OK)

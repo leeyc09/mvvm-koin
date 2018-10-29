@@ -7,6 +7,9 @@ object AppConstants {
     // kakao plus chat
     const val KAKO_PLUS_CHAT = "http://plus.kakao.com/talk/bot/"
 
+    // share type
+    enum class ShareType { COPY_LINK, KAKAO }
+
     // order state code
     const val ORDER_STATE_STAND_BY_PAYMENT = 1
     const val ORDER_STATE_STAND_DELIVERY = 2

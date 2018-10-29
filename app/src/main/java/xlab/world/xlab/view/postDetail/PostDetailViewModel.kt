@@ -4,6 +4,8 @@ import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.view.View
+import com.kakao.message.template.FeedTemplate
+import io.reactivex.Observable
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.PostDetailData
 import xlab.world.xlab.data.adapter.PostDetailListData
@@ -11,6 +13,7 @@ import xlab.world.xlab.server.provider.ApiFollowProvider
 import xlab.world.xlab.server.provider.ApiPostProvider
 import xlab.world.xlab.server.provider.ApiUserActivityProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
+import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
@@ -30,10 +33,15 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
     val postDeleteData = SingleLiveEvent<Boolean?>()
     val failLoadPostDetailData = SingleLiveEvent<Boolean?>()
     val loadPostDetailData = SingleLiveEvent<Boolean?>()
+    val shareKakaoData = SingleLiveEvent<FeedTemplate?>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setResultCode(resultCode: Int) {
         this.resultCode = SupportData.setResultCode(oldResultCode = this.resultCode, newResultCode = resultCode)
+    }
+
+    fun backBtnAction() {
+        uiData.postValue(UIModel(resultCode = resultCode))
     }
 
     fun loadPostDetail(context: Context, authorization: String, postId: String, userId: String) {
@@ -339,9 +347,30 @@ class PostDetailViewModel(private val apiPost: ApiPostProvider,
                     })
         }
     }
+    fun shareKakao(selectIndex: Int) {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
 
-    fun backBtnAction() {
-        uiData.postValue(UIModel(resultCode = resultCode))
+        launch {
+            Observable.create<FeedTemplate> {
+                val postData = this.postDetailData.items[selectIndex]
+                val params = ShareContent.kakaoPostShareBuild(
+                        title = "",
+                        description = postData.content,
+                        likeCount = postData.likeNum,
+                        commentCount = postData.commentsNum,
+                        postImage = postData.imageURL.first(),
+                        postId = postData.postId)
+
+                it.onNext(params)
+                it.onComplete()
+            }.with(scheduler = scheduler).subscribe {
+                shareKakaoData.value = it
+            }
+        }
     }
 }
 

@@ -11,6 +11,10 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.kakao.kakaolink.v2.KakaoLinkResponse
+import com.kakao.kakaolink.v2.KakaoLinkService
+import com.kakao.network.ErrorResult
+import com.kakao.network.callback.ResponseCallback
 import kotlinx.android.synthetic.main.action_bar_my_shop.*
 import kotlinx.android.synthetic.main.activity_goods_detail.*
 import org.koin.android.architecture.ext.viewModel
@@ -28,6 +32,7 @@ import xlab.world.xlab.utils.view.dialog.*
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.ShareViewModel
 import xlab.world.xlab.view.cart.CartViewModel
 import xlab.world.xlab.view.goodsDetail.fragment.GoodsDetailInfoFragment
 import xlab.world.xlab.view.goodsDetail.fragment.GoodsDetailPostFragment
@@ -36,10 +41,9 @@ import xlab.world.xlab.view.goodsDetail.fragment.GoodsDetailStatsFragment
 class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
     private val goodsDetailViewModel: GoodsDetailViewModel by viewModel()
     private val cartViewModel: CartViewModel by viewModel()
+    private val shareViewModel: ShareViewModel by viewModel()
     private val spHelper: SPHelper by inject()
     private val fontColorSpan: FontColorSpan by inject()
-
-    private var resultCode = Activity.RESULT_CANCELED
 
     private lateinit var defaultToast: DefaultToast
     private lateinit var addCartToast: AddCartToast
@@ -68,7 +72,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         override fun onShareKakao(tag: Any?) {
-            PrintLog.d("share", "kakao")
+            goodsDetailViewModel.shareKakao()
         }
     }
     private val ratingListener = View.OnClickListener { view ->
@@ -110,10 +114,9 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
+        goodsDetailViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                if (this.resultCode == Activity.RESULT_CANCELED)
-                    this.resultCode = Activity.RESULT_OK
                 when (requestCode) {
                     RequestCodeData.TOPIC_ADD -> { // 토픽 추가
                         // 펫 정보
@@ -145,7 +148,6 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                this.resultCode = ResultCodeData.LOGIN_SUCCESS
                 goodsDetailViewModel.loadGoodsDetailData(context = this, goodsCode = intent.getStringExtra(IntentPassName.GOODS_CODE), needDescription = false)
                 goodsDetailViewModel.loadGoodsPetData(authorization = spHelper.authorization)
                 goodsDetailInfoFragment.loadGoodsDescription()
@@ -154,8 +156,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                 goodsDetailPostFragment.loadTaggedPosts(page = 1)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
@@ -242,6 +243,10 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.toastMessage?.let {
                     defaultToast.showToast(message = it)
                 }
+                uiData.resultCode?.let {
+                    setResult(it)
+                    finish()
+                }
                 uiData.cartToastShow?.let {
                     cartViewModel.loadCartCnt(authorization = spHelper.authorization)
                     addCartToast.showToast()
@@ -317,10 +322,8 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
 
         // goods buy now 이벤트 observe
         goodsDetailViewModel.buyNowEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _->
-                eventData.sno?.let {
-                    RunActivity.buyGoodsWebViewActivity(context = this, snoList = arrayListOf(it), from = AppConstants.FROM_GOODS_DETAIL)
-                }
+            eventData?.let { sno ->
+                RunActivity.buyGoodsWebViewActivity(context = this, snoList = arrayListOf(sno), from = AppConstants.FROM_GOODS_DETAIL)
             }
         })
 
@@ -329,6 +332,13 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
             eventData?.let { recentViewGoods ->
                 goodsDetailViewModel.postRecentViewGoods(authorization = spHelper.authorization,
                         recentViewGoods = recentViewGoods)
+            }
+        })
+
+        // goods share kakao 이벤트 observe
+        goodsDetailViewModel.shareKakaoData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { params ->
+                shareViewModel.shareKakao(context = this, shareParams = params)
             }
         })
 
@@ -356,8 +366,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.actionBackBtn -> { // 뒤로가기
-                    setResult(resultCode)
-                    finish()
+                    goodsDetailViewModel.backBtnAction()
                 }
                 R.id.actionShareBtn -> { // 공유하기
                     shareDialog.showDialog(manager = supportFragmentManager, dialogTag = "shareDialog",

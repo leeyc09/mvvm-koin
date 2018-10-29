@@ -4,6 +4,7 @@ import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.view.View
+import com.kakao.message.template.FeedTemplate
 import io.reactivex.Observable
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
@@ -25,12 +26,13 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
 
     private var resultCode = Activity.RESULT_CANCELED
 
+    private var userData: UserData = UserData()
     private var topicData: ProfileTopicData = ProfileTopicData()
 
     val loadUserData = SingleLiveEvent<Boolean?>()
     val loadUserPetData = SingleLiveEvent<Boolean?>()
-    val loadTopicUsedGoodsEvent = SingleLiveEvent<ProfileEvent>()
-    val loadUserPostsThumbDataEvent = SingleLiveEvent<ProfileEvent>()
+    val loadTopicUsedGoodsData = SingleLiveEvent<Boolean?>()
+    val shareKakaoData = SingleLiveEvent<FeedTemplate?>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setResultCode(resultCode: Int) {
@@ -141,6 +143,8 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
             apiUser.requestProfileMain(scheduler = scheduler, authorization = authorization, userId = userId,
                     responseData = {
                         PrintLog.d("requestProfileMain success", it.toString(), viewModelTag)
+                        this.userData = UserData(id = userId, nickName = it.nickName,
+                                introduction = it.introduction, profileImage = it.profileImg)
                         // 자신의 프로필일 경우 팔로워 버튼 활성화
                         // 다른 사람 프로필일 경우, 팔로워(팔로잉) 수가 0 이상일 경우 팔로워(팔로잉) 버튼 활성화
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
@@ -171,7 +175,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         }
 
         uiData.value = UIModel(isLoading = loadingBar)
-        loadTopicUsedGoodsEvent.postValue(ProfileEvent(status = true))
+        loadTopicUsedGoodsData.value = true
         launch {
             apiUserActivity.requestTopicUsedGoods(scheduler = scheduler, userId = userId, goodsType = goodsType, page = page,
                     responseData = {
@@ -225,9 +229,33 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                     })
         }
     }
+
+    fun shareKakao() {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        launch {
+            Observable.create<FeedTemplate> {
+                val params = ShareContent.kakaoProfileShareBuild(
+                        title = userData.nickName,
+                        description = userData.introduction,
+                        profileImage = userData.profileImage,
+                        userId = userData.id)
+
+                it.onNext(params)
+                it.onComplete()
+            }.with(scheduler = scheduler).subscribe {
+                shareKakaoData.value = it
+            }
+        }
+    }
 }
 
-data class ProfileEvent(val status: Boolean? = null)
+data class UserData(val id: String = "", val nickName: String = "",
+                    val introduction: String = "", val profileImage: String = "")
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
                    val myProfileLayoutVisibility: Int? = null, val otherProfileLayoutVisibility: Int? = null,
                    val followBtnVisibility: Int? = null, val editBtnVisibility: Int? = null,

@@ -78,20 +78,4 @@ object ShareContent {
 
         return content
     }
-
-
-//                FeedTemplate
-//                .newBuilder(ContentObject.newBuilder("kakao link test", profileUrl,
-//                        LinkObject.newBuilder()
-//                                .setWebUrl("https://developers.kakao.com")
-//                                .setMobileWebUrl("https://developers.kakao.com")
-//                                .setAndroidExecutionParams("type=profile&code=$userId").build())
-//                        .setDescrption("descrption").build())
-//                .setSocial(SocialObject.newBuilder().setLikeCount(10).setCommentCount(20).setSharedCount(30).build())
-//                .addButton(ButtonObject("app", LinkObject.newBuilder()
-//                        .setWebUrl("https://developers.kakao.com")
-//                        .setMobileWebUrl("https://developers.kakao.com")
-//                        .setAndroidExecutionParams("type=profile&code=$userId")
-//                        .build()))
-//                .build()
 }

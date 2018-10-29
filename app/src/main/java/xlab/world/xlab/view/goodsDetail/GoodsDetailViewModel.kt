@@ -7,6 +7,11 @@ import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableString
 import android.view.View
+import com.kakao.kakaolink.v2.KakaoLinkResponse
+import com.kakao.kakaolink.v2.KakaoLinkService
+import com.kakao.message.template.CommerceTemplate
+import com.kakao.network.ErrorResult
+import com.kakao.network.callback.ResponseCallback
 import io.reactivex.Observable
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.GoodsDetailInfoAdapter
@@ -51,12 +56,17 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
     val recentViewGoodsData = SingleLiveEvent<ReqRecentViewGoodsData?>()
     val ratingOpenCloseData = SingleLiveEvent<Boolean?>()
     val goodsRatingData = SingleLiveEvent<Int?>()
-    val buyNowEventData = SingleLiveEvent<BuyNowModel>()
+    val buyNowEventData = SingleLiveEvent<Int?>()
     val loadUsedUserData = SingleLiveEvent<Boolean?>()
+    val shareKakaoData = SingleLiveEvent<CommerceTemplate?>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setResultCode(resultCode: Int) {
         this.resultCode = SupportData.setResultCode(oldResultCode = this.resultCode, newResultCode = resultCode)
+    }
+
+    fun backBtnAction() {
+        uiData.postValue(UIModel(resultCode = Activity.RESULT_CANCELED))
     }
 
     fun postRecentViewGoods(authorization: String, recentViewGoods: ReqRecentViewGoodsData) {
@@ -484,13 +494,13 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestAddCart(scheduler = scheduler, authorization = authorization, goodsNo = goodsData!!.goods.no, count = count,
                     responseData = {
-                        PrintLog.d("requestAddCart success", it.toString())
+                        PrintLog.d("requestAddCart success", it.toString(), viewModelTag)
                         uiData.value = UIModel(isLoading = false, cartToastShow = true)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestAddCart fail", errorData.message)
+                            PrintLog.e("requestAddCart fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -508,20 +518,45 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
             apiGodo.requestAddCart(scheduler = scheduler, authorization = authorization, goodsNo = goodsData!!.goods.no, count = count,
                     responseData = {
                         uiData.value = UIModel(isLoading = false)
-                        buyNowEventData.value = BuyNowModel(sno = it.sno)
+                        buyNowEventData.value = it.sno
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestAddCart fail", errorData.message)
+                            PrintLog.e("requestAddCart fail", errorData.message, viewModelTag)
                         }
                     })
         }
     }
+
+    fun shareKakao() {
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        launch {
+            Observable.create<CommerceTemplate> {
+                goodsData?.let { goodsData ->
+                    val params = ShareContent.kakaoGoodsShareBuild(
+                            title = goodsData.goods.name,
+                            description = "",
+                            price = goodsData.goods.price,
+                            goodsImage = goodsData.goods.mainImage,
+                            goodsCode = goodsData.goods.code)
+
+                    it.onNext(params)
+                    it.onComplete()
+                }
+            }.with(scheduler = scheduler).subscribe {
+                shareKakaoData.value = it
+            }
+        }
+    }
 }
 
-data class BuyNowModel(val sno: Int? = null)
-data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val cartToastShow: Boolean? = null,
+data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null, val cartToastShow: Boolean? = null,
                    val isGuest: Boolean? = null, val buyOptionDialogShow: Int? = null,
                    val topicMatchData: GoodsDetailTopicMatchData? = null, val topicMatchVisibility: Int? = null,
                    val goodsRatingData: GoodsDetailRatingData? = null, val goodsRatingUpdateIndex: Int? = null,

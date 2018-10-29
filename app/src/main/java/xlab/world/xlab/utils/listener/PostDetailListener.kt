@@ -3,20 +3,24 @@ package xlab.world.xlab.utils.listener
 import android.app.Activity
 import android.support.v4.app.FragmentManager
 import android.support.v4.content.res.ResourcesCompat
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
+import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.view.dialog.DefaultDialog
 import xlab.world.xlab.utils.view.dialog.DialogCreator
+import xlab.world.xlab.utils.view.dialog.ShareBottomDialog
 import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
 
-class PostDetailListener(context: Activity,
+class PostDetailListener(context: AppCompatActivity,
                          private val fragmentManager: FragmentManager,
                          private val postMoreEvent: (Int?, Int?) -> Unit,
                          private val likePostEvent: (Int) -> Unit,
-                         private val savePostEvent: (Int) -> Unit) {
+                         private val savePostEvent: (Int) -> Unit,
+                         private val postShareEvent: (AppConstants.ShareType, Int) -> Unit) {
 
     private val spHelper: SPHelper by context.inject()
 
@@ -48,6 +52,19 @@ class PostDetailListener(context: Activity,
                 }
             })
 
+    private val shareDialog = DialogCreator.shareDialog(
+            context = context,
+            listener = object: ShareBottomDialog.Listener {
+                override fun onCopyLink(tag: Any?) {
+                    postShareEvent(AppConstants.ShareType.COPY_LINK, tag as Int)
+                }
+
+                override fun onShareKakao(tag: Any?) {
+                    postShareEvent(AppConstants.ShareType.KAKAO, tag as Int)
+                }
+            }
+    )
+
     private val loginDialog = DialogCreator.loginDialog(context = context)
 
 
@@ -77,5 +94,12 @@ class PostDetailListener(context: Activity,
             if (view.tag is Int)
                 savePostEvent(view.tag as Int)
         }
+    }
+
+    // 포스트 공유하기
+    val sharePostListener = View.OnClickListener { view ->
+        // 공유하기
+        shareDialog.showDialog(manager = context.supportFragmentManager, dialogTag = "shareDialog",
+                tagData = view.tag)
     }
 }

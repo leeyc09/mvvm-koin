@@ -16,17 +16,20 @@ import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.PostDetailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.listener.PostDetailListener
+import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.ShareViewModel
 import xlab.world.xlab.view.main.MainViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
 
 class FeedFollowingFragment: Fragment(), View.OnClickListener {
     private val mainViewModel: MainViewModel by viewModel()
     private val postDetailViewModel: PostDetailViewModel by viewModel()
+    private val shareViewModel: ShareViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
     private var needInitData
@@ -61,13 +64,23 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
 
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
-        postDetailListener = postDetailListener ?: PostDetailListener(context = context as Activity, fragmentManager = (context as AppCompatActivity).supportFragmentManager,
+        postDetailListener = postDetailListener ?: PostDetailListener(context = context as AppCompatActivity, fragmentManager = (context as AppCompatActivity).supportFragmentManager,
                 postMoreEvent = { _, _ ->},
                 likePostEvent = { position ->
                     postDetailViewModel.likePost(authorization = spHelper.authorization, selectIndex = position)
                 },
                 savePostEvent = { position ->
                     postDetailViewModel.savePost(context = context!!, authorization = spHelper.authorization, selectIndex = position)
+                },
+                postShareEvent = { shareType, position ->
+                    when (shareType) {
+                        AppConstants.ShareType.COPY_LINK -> {
+
+                        }
+                        AppConstants.ShareType.KAKAO -> {
+                            postDetailViewModel.shareKakao(selectIndex = position)
+                        }
+                    }
                 })
 
         // following feed recycler view & adapter 초기화
@@ -79,7 +92,7 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
                 likePostListener = postDetailListener!!.likePostListener,
                 commentsListener = defaultListener!!.commentsListener,
                 savePostListener = postDetailListener!!.savePostListener,
-                sharePostListener = View.OnClickListener {  },
+                sharePostListener = postDetailListener!!.sharePostListener,
                 hashTagListener = defaultListener!!.hashTagListener,
                 goodsListener = defaultListener!!.goodsListener)
         recyclerView.adapter = followingFeedAdapter
@@ -172,6 +185,13 @@ class FeedFollowingFragment: Fragment(), View.OnClickListener {
             eventData?.let { isLoading ->
                 followingFeedAdapter?.dataLoading = isLoading
                 needInitData = false
+            }
+        })
+
+        // post share kakao 이벤트 observe
+        postDetailViewModel.shareKakaoData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { params ->
+                shareViewModel.shareKakao(context = context!!, shareParams = params)
             }
         })
     }

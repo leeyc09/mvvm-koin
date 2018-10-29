@@ -125,6 +125,18 @@ object DialogCreator {
         return dialog
     }
 
+    fun profileMoreSelectDialog(context: Activity, listener: TwoSelectBottomDialog.Listener): TwoSelectBottomDialog {
+        val dialog = TwoSelectBottomDialog.newDialog(
+                firstText = context.getString(R.string.share),
+                firstColor = ResourcesCompat.getColor(context.resources, R.color.color000000, null),
+                secondText = context.getString(R.string.report),
+                secondColor = ResourcesCompat.getColor(context.resources, R.color.colorDE5359, null))
+
+        dialog.handle(listener = listener)
+
+        return dialog
+    }
+
     fun shareDialog(context: Activity, listener: ShareBottomDialog.Listener): ShareBottomDialog {
         val dialog = ShareBottomDialog.newDialog()
         dialog.handle(listener = listener)

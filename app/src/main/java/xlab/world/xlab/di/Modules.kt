@@ -11,6 +11,7 @@ import xlab.world.xlab.server.`interface`.*
 import xlab.world.xlab.server.provider.*
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
+import xlab.world.xlab.view.ShareViewModel
 import xlab.world.xlab.view.cart.CartViewModel
 import xlab.world.xlab.view.comment.CommentViewModel
 import xlab.world.xlab.view.completePurchase.CompletePurchaseViewModel
@@ -123,6 +124,8 @@ val viewModelModule: Module = applicationContext {
     viewModel { CRRDetailViewModel(apiGodo = get(), networkCheck = get(), scheduler = get()) }
     // ViewModel for Goods Rating View
     viewModel { GoodsRatingViewModel(apiShop = get(), apiPet = get(), apiUserActivity = get(), networkCheck = get(), scheduler = get()) }
+    // ViewModel for Share
+    viewModel { ShareViewModel(networkCheck = get(), scheduler = get()) }
 }
 
 val utilModule: Module = applicationContext {

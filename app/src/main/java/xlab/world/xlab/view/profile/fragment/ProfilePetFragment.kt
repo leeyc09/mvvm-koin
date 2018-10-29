@@ -122,12 +122,10 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
         })
 
         // load topic used goods 이벤트 observe
-        profileViewModel.loadTopicUsedGoodsEvent.observe(owner = this, observer = android.arch.lifecycle.Observer { loadTopicUsedGoodsEvent ->
-            loadTopicUsedGoodsEvent?.let { _ ->
-                loadTopicUsedGoodsEvent.status?.let { isLoading ->
-                    goodsThumbnailAdapter?.dataLoading = isLoading
-                    needInitData = false
-                }
+        profileViewModel.loadTopicUsedGoodsData.observe(owner = this, observer = android.arch.lifecycle.Observer { loadTopicUsedGoodsEvent ->
+            loadTopicUsedGoodsEvent?.let { isLoading ->
+                goodsThumbnailAdapter?.dataLoading = isLoading
+                needInitData = false
             }
         })
     }

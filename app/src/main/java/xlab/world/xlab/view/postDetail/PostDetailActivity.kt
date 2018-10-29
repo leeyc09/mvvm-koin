@@ -20,9 +20,11 @@ import xlab.world.xlab.utils.listener.UserDefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.ShareViewModel
 
 class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
     private val postDetailViewModel: PostDetailViewModel by viewModel()
+    private val shareViewModel: ShareViewModel by viewModel()
     private val spHelper: SPHelper by inject()
 
     private lateinit var defaultToast: DefaultToast
@@ -110,6 +112,16 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
                 },
                 savePostEvent = { position ->
                     postDetailViewModel.savePost(context = this, authorization = spHelper.authorization, selectIndex = position)
+                },
+                postShareEvent = { shareType, position ->
+                    when (shareType) {
+                        AppConstants.ShareType.COPY_LINK -> {
+
+                        }
+                        AppConstants.ShareType.KAKAO -> {
+                            postDetailViewModel.shareKakao(selectIndex = position)
+                        }
+                    }
                 })
         userDefaultListener = UserDefaultListener(context = this,
                 followUserEvent = { position ->
@@ -124,7 +136,7 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
                 likePostListener = postDetailListener.likePostListener,
                 commentsListener = defaultListener.commentsListener,
                 savePostListener = postDetailListener.savePostListener,
-                sharePostListener = View.OnClickListener {  },
+                sharePostListener = postDetailListener.sharePostListener,
                 hashTagListener = defaultListener.hashTagListener,
                 goodsListener = defaultListener.goodsListener)
         recyclerView.adapter = postDetailAdapter
@@ -180,6 +192,13 @@ class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
                     postDetailViewModel.setResultCode(resultCode =  Activity.RESULT_OK)
                     actionBackBtn.performClick()
                 }
+            }
+        })
+
+        // post share kakao 이벤트 observe
+        postDetailViewModel.shareKakaoData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { params ->
+                shareViewModel.shareKakao(context = this, shareParams = params)
             }
         })
     }
