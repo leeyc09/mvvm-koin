@@ -11,10 +11,6 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.kakao.kakaolink.v2.KakaoLinkResponse
-import com.kakao.kakaolink.v2.KakaoLinkService
-import com.kakao.network.ErrorResult
-import com.kakao.network.callback.ResponseCallback
 import kotlinx.android.synthetic.main.action_bar_my_shop.*
 import kotlinx.android.synthetic.main.activity_goods_detail.*
 import org.koin.android.architecture.ext.viewModel
@@ -32,7 +28,7 @@ import xlab.world.xlab.utils.view.dialog.*
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
-import xlab.world.xlab.view.ShareViewModel
+import xlab.world.xlab.viewModel.ShareViewModel
 import xlab.world.xlab.view.cart.CartViewModel
 import xlab.world.xlab.view.goodsDetail.fragment.GoodsDetailInfoFragment
 import xlab.world.xlab.view.goodsDetail.fragment.GoodsDetailPostFragment

@@ -22,7 +22,7 @@ import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
-import xlab.world.xlab.view.ShareViewModel
+import xlab.world.xlab.viewModel.ShareViewModel
 import xlab.world.xlab.view.main.MainViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
 

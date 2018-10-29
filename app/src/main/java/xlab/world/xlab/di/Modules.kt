@@ -11,7 +11,7 @@ import xlab.world.xlab.server.`interface`.*
 import xlab.world.xlab.server.provider.*
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
-import xlab.world.xlab.view.ShareViewModel
+import xlab.world.xlab.viewModel.ShareViewModel
 import xlab.world.xlab.view.cart.CartViewModel
 import xlab.world.xlab.view.comment.CommentViewModel
 import xlab.world.xlab.view.completePurchase.CompletePurchaseViewModel

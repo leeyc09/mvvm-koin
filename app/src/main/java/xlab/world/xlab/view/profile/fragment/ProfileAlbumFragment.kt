@@ -22,11 +22,10 @@ import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
-import xlab.world.xlab.view.ShareViewModel
+import xlab.world.xlab.viewModel.ShareViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
 import xlab.world.xlab.view.posts.PostsViewModel
 import xlab.world.xlab.view.profile.ProfileActivity
-import xlab.world.xlab.view.profile.ProfileViewModel
 
 class ProfileAlbumFragment: Fragment(), View.OnClickListener {
     private val postsViewModel: PostsViewModel by viewModel()

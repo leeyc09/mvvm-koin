@@ -26,7 +26,7 @@ import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
-import xlab.world.xlab.view.ShareViewModel
+import xlab.world.xlab.viewModel.ShareViewModel
 import xlab.world.xlab.view.notice.NoticeViewModel
 import xlab.world.xlab.view.profile.fragment.ProfileAlbumFragment
 import xlab.world.xlab.view.profile.fragment.ProfilePetFragment

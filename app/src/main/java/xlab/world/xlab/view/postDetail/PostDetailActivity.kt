@@ -20,7 +20,7 @@ import xlab.world.xlab.utils.listener.UserDefaultListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.toast.DefaultToast
-import xlab.world.xlab.view.ShareViewModel
+import xlab.world.xlab.viewModel.ShareViewModel
 
 class PostDetailActivity : AppCompatActivity(), View.OnClickListener {
     private val postDetailViewModel: PostDetailViewModel by viewModel()

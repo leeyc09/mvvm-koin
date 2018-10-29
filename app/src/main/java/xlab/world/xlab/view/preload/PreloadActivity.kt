@@ -33,7 +33,7 @@ class PreloadActivity: AppCompatActivity() {
                 spHelper.logout()
                 RunActivity.loginActivity(context = this@PreloadActivity,
                         isComePreLoadActivity = true,
-                        linkData = null)
+                        linkData = intent.data)
                 finish()
             }
         }
@@ -50,14 +50,6 @@ class PreloadActivity: AppCompatActivity() {
     }
 
     private fun onSetup() {
-        intent.data?.let { data ->
-            val type: String? = data.getQueryParameter("type")
-            val code: String? = data.getQueryParameter("code")
-
-            type?.let { value -> PrintLog.d("linkData type", value, "linkData") } ?: PrintLog.d("type", "null", "linkData")
-            code?.let { value -> PrintLog.d("linkData code", value, "linkData") } ?: PrintLog.d("code", "null", "linkData")
-        } ?: PrintLog.d("linkData", "null", "linkData")
-
         printAppInfo()
 
         // Toast, Dialog 초기화

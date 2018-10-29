@@ -26,11 +26,13 @@ import xlab.world.xlab.view.main.fragment.FeedFollowingFragment
 import xlab.world.xlab.view.main.fragment.FeedShopFragment
 import xlab.world.xlab.view.notice.NoticeViewModel
 import xlab.world.xlab.view.notification.NotificationViewModel
+import xlab.world.xlab.viewModel.ShareViewModel
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val mainViewModel: MainViewModel by viewModel()
     private val notificationViewModel: NotificationViewModel by viewModel()
     private val noticeViewModel: NoticeViewModel by viewModel()
+    private val shareViewModel: ShareViewModel by viewModel()
     private val fontColorSpan: FontColorSpan by inject()
     private val spHelper: SPHelper by inject()
     private val permissionHelper: PermissionHelper by inject()
@@ -194,6 +196,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         notificationViewModel.loadExistNewNotification(authorization = spHelper.authorization)
         noticeViewModel.loadExistNewNotification(authorization = spHelper.authorization)
+
+        shareViewModel.linkShareActivity(data = intent.data)
     }
 
     private fun onBindEvent() {
@@ -263,6 +267,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             uiData?.let {_->
                 uiData.newNoticeDotVisibility?.let {
                     profileDotView.visibility = it
+                }
+            }
+        })
+
+        // TODO: Share View Model
+        // link data activity 이동 이벤트 observe
+        shareViewModel.linkData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.userId?.let {
+                    RunActivity.profileActivity(context = this, userId = it)
+                }
+                eventData.postId?.let {
+                    RunActivity.postDetailActivity(context = this, postId = it, goComment = false)
+                }
+                eventData.goodsCode?.let {
+                    RunActivity.goodsDetailActivity(context = this, goodsCode = it)
                 }
             }
         })
