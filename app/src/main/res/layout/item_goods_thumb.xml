@@ -39,9 +39,8 @@
             android:id="@+id/matchBarLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="97"
+            android:layout_weight="0"
             android:orientation="horizontal"
-            android:background="@color/colorDE5359"
             android:paddingEnd="5dp"
             android:paddingStart="0dp"
             android:gravity="end">
@@ -50,11 +49,11 @@
                 android:id="@+id/textViewMatchValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="97"
                 android:textSize="14sp"
                 android:textColor="@color/color000000"
                 android:gravity="end"/>
             <xlab.world.xlab.utils.view.textView.TextViewBoldHan
+                android:id="@+id/textViewMatchUnit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/matching_unit"

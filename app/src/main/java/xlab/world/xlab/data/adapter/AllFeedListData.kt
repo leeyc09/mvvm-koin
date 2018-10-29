@@ -11,4 +11,5 @@ data class AllFeedListData(val dataType: Int,
                            val matchColor: Int = 0,
                            val postId: String = "",
                            val postsType: Int = AppConstants.POSTS_IMAGE,
-                           val youTubeVideoID: String = ""): Serializable
+                           val youTubeVideoID: String = "",
+                           var withAnimation: Boolean = true): Serializable

@@ -1,7 +1,6 @@
 package xlab.world.xlab.adapter.recyclerView
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.CardView
@@ -10,19 +9,17 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.google.android.youtube.player.YouTubeThumbnailView
-import kotlinx.android.synthetic.main.item_goods_thumb.view.*
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.AllFeedData
 import xlab.world.xlab.data.adapter.AllFeedListData
-import xlab.world.xlab.data.adapter.TopicSettingListData
 import xlab.world.xlab.utils.support.AppConstants
-import xlab.world.xlab.utils.support.SupportData
 
 class AllFeedAdapter(private val context: Context,
                      private val postListener: View.OnClickListener,
@@ -144,6 +141,7 @@ class AllFeedAdapter(private val context: Context,
         private val percentLayout: LinearLayout = view.findViewById(R.id.percentLayout)
         private val matchBarLayout: LinearLayout = view.findViewById(R.id.matchBarLayout)
         private val textViewMatchValue: TextView = view.findViewById(R.id.textViewMatchValue)
+        private val textViewMatchUnit: TextView = view.findViewById(R.id.textViewMatchUnit)
         private val percentEmptyLayout: View = view.findViewById(R.id.percentEmptyLayout)
 
         override fun display(item: AllFeedListData, position: Int) {
@@ -158,31 +156,65 @@ class AllFeedAdapter(private val context: Context,
 
             // 인기율 안보기 -> % 가림
             if (matchVisible != View.VISIBLE) {
-                percentLayout.visibility = View.GONE
+                // 안보이는 애니메이션은 한번만 동작하도록
+                // 이후에는 애니메이션 없이 바로 뷰 안보이게
+                if (item.withAnimation) {
+                    val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_hide)
+                    // 애니매이션 유지
+                    percentBarAni.fillAfter = true
+                    percentBarAni.isFillEnabled = true
+                    percentBarAni.setAnimationListener(object : Animation.AnimationListener {
+                        override fun onAnimationStart(p0: Animation?) {
+                        }
+
+                        override fun onAnimationEnd(p0: Animation?) {
+                            percentLayout.visibility = View.GONE
+                            item.withAnimation = false
+                        }
+
+                        override fun onAnimationRepeat(p0: Animation?) {
+                        }
+                    })
+                    val percentAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_percent_hide)
+                    // 애니매이션 유지
+                    percentAni.fillAfter = true
+                    percentAni.isFillEnabled = true
+
+                    matchBarLayout.startAnimation(percentBarAni)
+                    textViewMatchValue.startAnimation(percentAni)
+                    textViewMatchUnit.startAnimation(percentAni)
+                } else {
+                    percentLayout.visibility = View.GONE
+                }
             } else {
                 // guest or topic 없는 유저 -> question mark 보이기
                 if (item.showQuestionMark) {
-                    percentLayout.visibility = View.VISIBLE
                     setPercentBar(percentValue = "? ", percentColor = item.matchColor, percentWeight = 90f)
+                    // 애니매이션 동작 꺼져있으면 on 으로
+                    if (!item.withAnimation) item.withAnimation = true
 
                     // ? 터치 이벤트
                     matchBarLayout.setOnClickListener(questionListener)
                 } else {
-                    // 인기도 50 이하 -> % bar 안보이게
+                    // 인기도 50 이하 -> % bar 안보이게 (애니메이션 X)
                     if (item.matchingPercent < 50) {
                         percentLayout.visibility = View.GONE
                     } else {
-                        percentLayout.visibility = View.VISIBLE
                         setPercentBar(percentValue = item.matchingPercent.toString(), percentColor = item.matchColor, percentWeight = item.matchingPercent.toFloat())
+                        // 애니매이션 동작 꺼져있으면 on 으로
+                        if (!item.withAnimation) item.withAnimation = true
                     }
                 }
             }
+
             // goods 터치 이벤트
             mainLayout.tag = item.goodsCd
             mainLayout.setOnClickListener(goodsListener)
         }
 
         private fun setPercentBar(percentValue: String, percentColor: Int, percentWeight: Float) {
+            percentLayout.visibility = View.VISIBLE
+
             // 인기도 & topic color 설정
             textViewMatchValue.setText(percentValue, TextView.BufferType.SPANNABLE)
             matchBarLayout.setBackgroundColor(percentColor)
@@ -194,6 +226,12 @@ class AllFeedAdapter(private val context: Context,
             percentEmptyParams.gravity = Gravity.BOTTOM
             matchBarLayout.layoutParams = percentParams
             percentEmptyLayout.layoutParams = percentEmptyParams
+
+            val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_show)
+            matchBarLayout.startAnimation(percentBarAni)
+            val percentAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_percent_show)
+            textViewMatchValue.startAnimation(percentAni)
+            textViewMatchUnit.startAnimation(percentAni)
         }
     }
 
