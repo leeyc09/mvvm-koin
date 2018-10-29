@@ -1,5 +1,6 @@
 package xlab.world.xlab.utils.fcm
 
+import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -12,11 +13,14 @@ import android.widget.RemoteViews
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import xlab.world.xlab.R
+import xlab.world.xlab.utils.support.IntentPassName
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SPHelper
+import xlab.world.xlab.view.preload.PreloadActivity
 
 
 class MyFirebaseMessagingService: FirebaseMessagingService() {
+    private val tag = "FCM"
     /**
      * Called if InstanceID token is updated. This may occur if the security of
      * the previous token had been compromised. Note that this is called when the InstanceID token
@@ -69,12 +73,10 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
      * @param messageBody FCM message body received.
      */
     private fun sendNotification(data: Map<String, String>) {
-        // notification touch intent
-//        val intent = Intent(this, PreloadActivity::class.java)
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//        val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-//                PendingIntent.FLAG_ONE_SHOT)
 //        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+
+        PrintLog.d("appIsInBackground", appIsInBackground().toString(), tag)
+        PrintLog.d("data", data.toString(), tag)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -93,6 +95,20 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
                         .setAutoCancel(true)
             }
             else -> null
+        }
+
+        if (appIsInBackground()) {
+            // notification touch intent
+            val intent = Intent(this, PreloadActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent.putExtra(IntentPassName.NOTIFICATION_TYPE, data["notiType"])
+            intent.putExtra(IntentPassName.NOTIFICATION_DATA, data["data"])
+
+            val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT)
+            notificationBuilder?.let {
+                notificationBuilder.setContentIntent(pendingIntent)
+            }
         }
 
         notificationBuilder?.let {
@@ -129,5 +145,21 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
         }
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
+    }
+
+    private fun appIsInBackground(): Boolean {
+        val am = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val runningProcesses = am.runningAppProcesses
+
+        runningProcesses.forEach { processInfo ->
+            if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                 processInfo.pkgList.forEach { activeProcess ->
+                     if (activeProcess == packageName)
+                         return false
+                 }
+            }
+        }
+
+        return true
     }
 }

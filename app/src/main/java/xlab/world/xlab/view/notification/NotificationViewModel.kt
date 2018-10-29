@@ -9,10 +9,7 @@ import xlab.world.xlab.data.adapter.SocialNotificationListData
 import xlab.world.xlab.server.provider.ApiNotificationProvider
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
-import xlab.world.xlab.utils.support.NetworkCheck
-import xlab.world.xlab.utils.support.PrintLog
-import xlab.world.xlab.utils.support.ResultCodeData
-import xlab.world.xlab.utils.support.SupportData
+import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
@@ -26,6 +23,7 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
     private var socialNotificationData: SocialNotificationData = SocialNotificationData()
 
     val loadNotificationEventData = SingleLiveEvent<Boolean?>()
+    val notificationRunData = SingleLiveEvent<NotificationRunModel?>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setResultCode(resultCode: Int) {
@@ -132,8 +130,33 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
             }
         }
     }
+
+    fun notificationRun(notificationType: String?, notificationData: String?) {
+        launch {
+            Observable.create<Any> {
+                notificationType?.let{_->PrintLog.d("notificationType", notificationType, viewModelTag)}?:PrintLog.d("notificationType", "null", viewModelTag)
+                notificationData?.let{_->PrintLog.d("notificationData", notificationData, viewModelTag)}?:PrintLog.d("notificationData", "null", viewModelTag)
+
+                if (notificationType != null && notificationData != null) {
+                    when (notificationType.toInt()) {
+                        AppConstants.SOCIAL_NOTIFICATION_FOLLOW -> {
+                            notificationRunData.postValue(NotificationRunModel(userId = notificationData))
+                        }
+                        AppConstants.SOCIAL_NOTIFICATION_LIKE_POST -> {
+                            notificationRunData.postValue(NotificationRunModel(postId = notificationData))
+                        }
+                        AppConstants.SOCIAL_NOTIFICATION_POST_COMMENT -> {
+                            notificationRunData.postValue(NotificationRunModel(commentPostId = notificationData))
+                        }
+                    }
+                }
+                it.onComplete()
+            }.with(scheduler = scheduler).subscribe {}
+        }
+    }
 }
 
+data class NotificationRunModel(val userId: String? = null, val postId: String? = null, val commentPostId: String? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
                    val socialNotificationData: SocialNotificationData? = null, val socialNotificationDataUpdate: Boolean? = null,
                    val existNewSocialNotification: Boolean? = null, val noNotificationVisibility: Int? = null,

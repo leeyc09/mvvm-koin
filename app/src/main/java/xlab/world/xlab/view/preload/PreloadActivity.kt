@@ -1,13 +1,17 @@
 package xlab.world.xlab.view.preload
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Base64
+import android.webkit.CookieManager
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.BuildConfig
+import xlab.world.xlab.utils.support.IntentPassName
 import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.RunActivity
 import xlab.world.xlab.utils.support.SPHelper
@@ -38,6 +42,7 @@ class PreloadActivity: AppCompatActivity() {
             }
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        Fabric.with(this, Crashlytics())
@@ -115,7 +120,9 @@ class PreloadActivity: AppCompatActivity() {
                             userLevel = loginData.userLevel,
                             userEmail = loginData.email,
                             push = loginData.isPushAlarmOn)
-                    RunActivity.mainActivity(context = this, linkData = intent.data)
+                    RunActivity.mainActivity(context = this, linkData = intent.data,
+                            notificationType = intent.getStringExtra(IntentPassName.NOTIFICATION_TYPE),
+                            notificationData = intent.getStringExtra(IntentPassName.NOTIFICATION_DATA))
                     finish()
                 }
                 eventData.isExpireToken?.let {

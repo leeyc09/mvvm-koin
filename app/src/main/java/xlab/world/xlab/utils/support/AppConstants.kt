@@ -31,7 +31,7 @@ object AppConstants {
     // used goods type
     const val GOODS_PET = 1
 
-    // link data type
+    // share link data type
     const val LINK_PROFILE = "profile"
     const val LINK_POST = "post"
     const val LINK_GOODS = "goods"

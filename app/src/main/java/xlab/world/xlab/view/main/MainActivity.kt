@@ -261,6 +261,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
+        // notification activity 이동 이벤트 observe
+        notificationViewModel.notificationRunData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let { _ ->
+                eventData.userId?.let {
+                    RunActivity.profileActivity(context = this, userId = it)
+                }
+                eventData.postId?.let {
+                    RunActivity.postDetailActivity(context = this, postId = it, goComment = false)
+                }
+                eventData.commentPostId?.let {
+                    RunActivity.postDetailActivity(context = this, postId = it, goComment = true)
+                }
+            }
+        })
+
         // TODO: Notice View Model
         // UI 이벤트 observe
         noticeViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
@@ -283,6 +298,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 eventData.goodsCode?.let {
                     RunActivity.goodsDetailActivity(context = this, goodsCode = it)
+                }
+                eventData.noData?.let {
+                    notificationViewModel.notificationRun(notificationType = intent.getStringExtra(IntentPassName.NOTIFICATION_TYPE),
+                            notificationData = intent.getStringExtra(IntentPassName.NOTIFICATION_DATA))
                 }
             }
         })
@@ -316,9 +335,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     companion object {
-        fun newIntent(context: Context, linkData: Uri?): Intent {
+        fun newIntent(context: Context, linkData: Uri?,
+                      notificationType: String?, notificationData: String?): Intent {
             val intent = Intent(context, MainActivity::class.java)
             intent.data = linkData
+            intent.putExtra(IntentPassName.NOTIFICATION_TYPE, notificationType)
+            intent.putExtra(IntentPassName.NOTIFICATION_DATA, notificationData)
 
             return intent
         }

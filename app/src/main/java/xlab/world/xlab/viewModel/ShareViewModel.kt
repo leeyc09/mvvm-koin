@@ -71,15 +71,17 @@ class ShareViewModel(private val networkCheck: NetworkCheck,
                     } else {
                         type?.let { value -> PrintLog.d("linkData type", value, viewModelTag) } ?: PrintLog.d("type", "null", viewModelTag)
                         code?.let { value -> PrintLog.d("linkData code", value, viewModelTag) } ?: PrintLog.d("code", "null", viewModelTag)
+                        linkData.postValue(LinkDataModel(noData = true))
                     }
                     it.onComplete()
-                } ?: PrintLog.d("linkData", "null", viewModelTag)
-            }.with(scheduler = scheduler).subscribe {
-                linkData.value = LinkDataModel()
-            }
+                } ?: let { _->
+                    PrintLog.d("linkData", "null", viewModelTag)
+                    linkData.postValue(LinkDataModel(noData = true))
+                }
+            }.with(scheduler = scheduler).subscribe {}
         }
     }
 }
 
-data class LinkDataModel(val userId: String? = null, val postId: String? = null, val goodsCode: String? = null)
+data class LinkDataModel(val userId: String? = null, val postId: String? = null, val goodsCode: String? = null, val noData: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null)

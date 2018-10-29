@@ -125,6 +125,9 @@ class SocialNotificationAdapter(private val context: Context,
                     thumbnailLayout.visibility = View.INVISIBLE
                     contentStr += context.getString(R.string.noti_social_follow)
                 }
+                else -> {
+                    thumbnailLayout.visibility = View.INVISIBLE
+                }
             }
 
             // notification 내용

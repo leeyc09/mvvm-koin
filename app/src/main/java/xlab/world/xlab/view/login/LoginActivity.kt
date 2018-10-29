@@ -246,7 +246,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
         loginViewModel.finishViewData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let {_->
                 eventData.runMainActivity?.let {
-                    RunActivity.mainActivity(context = this, linkData = null)
+                    RunActivity.mainActivity(context = this, linkData = null, notificationType = null, notificationData = null)
                     finish()
                 }
                 eventData.runGuestMode?.let {
@@ -293,7 +293,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchLis
                     RunActivity.localRegisterActivity(context = this)
                 }
                 R.id.guestBtn -> { // 둘러보기(게스트 모드)
-                    RunActivity.mainActivity(context = this, linkData = intent.data)
+                    RunActivity.mainActivity(context = this, linkData = intent.data, notificationType = null, notificationData = null)
                     finish()
                 }
                 R.id.loginBtn -> { // 로컬 로그인 버튼

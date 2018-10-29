@@ -22,7 +22,7 @@ class MainViewModel(private val apiPost: ApiPostProvider,
                     private val apiShop: ApiShopProvider,
                     private val networkCheck: NetworkCheck,
                     private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "Main"
+    private val viewModelTag = "Main"
 
     val loadAllFeedDataEvent = SingleLiveEvent<LoadFeedDataEvent>()
     val loadExploreFeedDataEvent = SingleLiveEvent<LoadFeedDataEvent>()
@@ -238,7 +238,6 @@ class MainViewModel(private val apiPost: ApiPostProvider,
         }
         return categoryGoodsData
     }
-
 }
 
 data class MatchData(val percent: Int, val color: Int)

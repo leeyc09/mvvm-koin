@@ -87,8 +87,8 @@ object RunActivity {
         context.startActivity(intent)
     }
 
-    fun mainActivity(context: Activity, linkData: Uri?) {
-        val intent = MainActivity.newIntent(context = context, linkData = linkData)
+    fun mainActivity(context: Activity, linkData: Uri?, notificationType: String?, notificationData: String?) {
+        val intent = MainActivity.newIntent(context = context, linkData = linkData, notificationType = notificationType, notificationData = notificationData)
         context.startActivity(intent)
     }
 

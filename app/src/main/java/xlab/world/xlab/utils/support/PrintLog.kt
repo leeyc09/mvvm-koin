@@ -13,16 +13,16 @@ object PrintLog {
     // Log for debug
     fun d(title:String, log: String, tag: String? = null) {
         if (BuildConfig.DEBUG)
-            Log.d("$defaultTag $tag", "$title => $log")
+            Log.d("$defaultTag/$tag", "$title => $log")
     }
     // Log for error
     fun e(title:String, log: String, tag: String? = null) {
         if (BuildConfig.DEBUG)
-            Log.e("$defaultTag $tag", "$title => $log")
+            Log.e("$defaultTag/$tag", "$title => $log")
     }
     // Log for information
     fun i(title:String, log: String, tag: String? = null) {
         if (BuildConfig.DEBUG)
-            Log.i("$defaultTag $tag", "$title => $log")
+            Log.i("$defaultTag/$tag", "$title => $log")
     }
 }
