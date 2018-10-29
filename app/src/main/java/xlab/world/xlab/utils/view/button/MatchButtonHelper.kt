@@ -3,6 +3,7 @@ package xlab.world.xlab.utils.view.button
 import android.app.Activity
 import android.content.Context
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.*
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
@@ -59,7 +60,7 @@ class MatchButtonHelper (rootView: View,
                     isMatchShow = !isMatchShow
                     matchButtonChange(isMatchShow)
                     listener.matchVisibility(
-                            if (matchSettingBtn.isSelected) View.VISIBLE // show match percent
+                            if (isMatchShow) View.VISIBLE // show match percent
                             else View.GONE // hide match percent
                     )
                 }
@@ -68,12 +69,30 @@ class MatchButtonHelper (rootView: View,
     }
 
     private fun matchButtonChange(match: Boolean) {
-        matchSettingBtn.isSelected = match
-        matchBtn.isSelected = match
-        imageViewLogo.isSelected = match
+        // 버튼 애니메이션
+        val settingAni =
+                if (match) AnimationUtils.loadAnimation(context, R.anim.match_setting_btn_show)
+                else AnimationUtils.loadAnimation(context, R.anim.match_setting_btn_hide)
+        settingAni.fillAfter = true
+        settingAni.isFillEnabled = true
 
-        matchSettingBtn.visibility =
-                if (match) View.VISIBLE
-                else View.GONE
+        matchSettingBtn.startAnimation(settingAni)
+
+        val btnAni =
+                if (match) AnimationUtils.loadAnimation(context, R.anim.match_btn_show)
+                else AnimationUtils.loadAnimation(context, R.anim.match_btn_hide)
+        btnAni.fillAfter = true
+        btnAni.isFillEnabled = true
+
+        matchBtn.startAnimation(btnAni)
+        // 매칭율 버튼 상태에 따라서 로고 변경
+        imageViewLogo.isSelected = match
+        // 매칭률 상태 저장
+//        matchSettingBtn.isSelected = match
+//        matchBtn.isSelected = match
+
+//        matchSettingBtn.visibility =
+//                if (match) View.VISIBLE
+//                else View.GONE
     }
 }
