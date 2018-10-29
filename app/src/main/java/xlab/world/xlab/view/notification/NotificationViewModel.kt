@@ -23,6 +23,8 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
 
     private var resultCode = ResultCodeData.LOAD_OLD_DATA
 
+    private var socialNotificationData: SocialNotificationData = SocialNotificationData()
+
     val loadNotificationEventData = SingleLiveEvent<Boolean?>()
     val uiData = MutableLiveData<UIModel>()
 
@@ -34,6 +36,7 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
         uiData.postValue(UIModel(resultCode = resultCode))
     }
 
+    // 새로운 알림 있는지 확인
     fun loadExistNewNotification(authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
@@ -56,21 +59,21 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
         }
     }
 
-    fun loadSocialNotificationData(authorization: String, page: Int) {
+    fun loadSocialNotificationData(authorization: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
-        uiData.value = UIModel(isLoading = true)
+        uiData.value = UIModel(isLoading = loadingBar)
         loadNotificationEventData.value = true
         launch {
             apiNotification.requestSocialNotification(scheduler = scheduler, authorization = authorization, page = page,
                     responseData = {
-                        val socialNotificationData = SocialNotificationData(total = it.total, nextPage = page + 1)
+                        val newSocialNotificationData = SocialNotificationData(total = it.total, nextPage = page + 1)
                         it.notification?.forEach { notification ->
-                            socialNotificationData.items.add(SocialNotificationListData(
+                            newSocialNotificationData.items.add(SocialNotificationListData(
                                     type = notification.type,
                                     userId = notification.fromUserId,
                                     userProfileUrl = notification.fromUserProfile,
@@ -88,11 +91,20 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
                             ))
                         }
 
-                        uiData.value = UIModel(isLoading = false,
-                                socialNotificationData = socialNotificationData)
+                        if (page == 1) {
+                            this.socialNotificationData.updateData(socialNotificationData = newSocialNotificationData)
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
+                                    socialNotificationData = this.socialNotificationData,
+                                    existNewSocialNotification = it.newNotification,
+                                    noNotificationVisibility = if (this.socialNotificationData.items.isEmpty()) View.VISIBLE else View.GONE)
+                        } else {
+                            this.socialNotificationData.addData(socialNotificationData = newSocialNotificationData)
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
+                                    socialNotificationDataUpdate = true)
+                        }
                     },
                     errorData = { errorData ->
-                        uiData.value = UIModel(isLoading = false)
+                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
                             PrintLog.d("requestSocialNotification fail", errorData.message)
                         }
@@ -100,14 +112,14 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
         }
     }
 
-    fun loadShopNotificationData(authorization: String, page: Int) {
+    fun loadShopNotificationData(authorization: String, page: Int, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
             return
         }
 
-        uiData.value = UIModel(isLoading = true)
+        uiData.value = UIModel(isLoading = loadingBar)
         loadNotificationEventData.value = true
         launch {
             Observable.create<ShopNotificationData> {
@@ -116,13 +128,14 @@ class NotificationViewModel(private val apiNotification: ApiNotificationProvider
                 it.onNext(shopNotificationData)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
-                uiData.value = UIModel(isLoading = false, shopNotificationData = it)
+                uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, shopNotificationData = it)
             }
         }
     }
 }
 
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
-                   val socialNotificationData: SocialNotificationData? = null,
+                   val socialNotificationData: SocialNotificationData? = null, val socialNotificationDataUpdate: Boolean? = null,
+                   val existNewSocialNotification: Boolean? = null, val noNotificationVisibility: Int? = null,
                    val shopNotificationData: ShopNotificationData? = null,
                    val newNotificationDotVisibility: Int? = null)

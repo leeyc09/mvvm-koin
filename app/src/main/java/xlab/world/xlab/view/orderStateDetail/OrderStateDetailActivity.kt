@@ -89,9 +89,9 @@ class OrderStateDetailActivity : AppCompatActivity(), View.OnClickListener {
         PrintLog.d("resultCode", resultCode.toString(), this::class.java.name)
         PrintLog.d("requestCode", requestCode.toString(), this::class.java.name)
 
+        orderStateViewModel.setResultCode(resultCode = resultCode)
         when (resultCode) {
             Activity.RESULT_OK -> {
-                orderStateViewModel.setResultCodeOK()
                 when (requestCode) {
                     RequestCodeData.ORDER_DETAIL -> { // 주문 상세
                         orderStateViewModel.loadOrderStateList(authorization = spHelper.authorization)
@@ -108,18 +108,19 @@ class OrderStateDetailActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
-                setResult(ResultCodeData.LOGOUT_SUCCESS)
-                finish()
+                actionBackBtn.performClick()
             }
         }
     }
 
     private fun onSetup() {
+        // 액션버튼 비활성화
         actionBtn.visibility = View.GONE
 
         // appBarLayout 애니메이션 없애기
         appBarLayout.stateListAnimator = null
 
+        // Toast, Dialog 초기화
         defaultToast = DefaultToast(context = this)
         progressDialog = DefaultProgressDialog(context = this)
         orderCancelDialog = DialogCreator.orderCancelDialog(context = this,
@@ -128,6 +129,7 @@ class OrderStateDetailActivity : AppCompatActivity(), View.OnClickListener {
                 receiveConfirmListener = receiveConfirmListener,
                 buyDecideListener = buyDecideListener)
 
+        // Listener 초기화
         defaultListener = DefaultListener(context = this)
 
         // goods order adapter & recycler 초기화
@@ -195,36 +197,30 @@ class OrderStateDetailActivity : AppCompatActivity(), View.OnClickListener {
 
         // order cancel 이벤트 observe
         myShoppingViewModel.orderCancelEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.status?.let { isSuccess ->
-                    if (isSuccess) {
-                        orderStateViewModel.setResultCodeOK()
-                        orderStateViewModel.loadOrderStateList(authorization = spHelper.authorization)
-                    }
+            eventData?.let { isSuccess ->
+                if (isSuccess) {
+                    orderStateViewModel.setResultCode(resultCode = Activity.RESULT_OK)
+                    orderStateViewModel.loadOrderStateList(authorization = spHelper.authorization)
                 }
             }
         })
 
         // order receive confirm 이벤트 observe
         myShoppingViewModel.orderReceiveConfirmEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.status?.let { isSuccess ->
-                    if (isSuccess) {
-                        orderStateViewModel.setResultCodeOK()
-                        orderStateViewModel.loadOrderStateList(authorization = spHelper.authorization)
-                    }
+            eventData?.let { isSuccess ->
+                if (isSuccess) {
+                    orderStateViewModel.setResultCode(resultCode = Activity.RESULT_OK)
+                    orderStateViewModel.loadOrderStateList(authorization = spHelper.authorization)
                 }
             }
         })
 
         // buy decide confirm 이벤트 observe
         myShoppingViewModel.buyDecideEventData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
-            eventData?.let { _ ->
-                eventData.goods?.let {
-                    orderStateViewModel.setResultCodeOK()
-                    orderStateViewModel.loadOrderStateList(authorization = spHelper.authorization)
-                    myShoppingViewModel.addUsedGoods(authorization = spHelper.authorization, goods = it)
-                }
+            eventData?.let { goods ->
+                orderStateViewModel.setResultCode(resultCode = Activity.RESULT_OK)
+                orderStateViewModel.loadOrderStateList(authorization = spHelper.authorization)
+                myShoppingViewModel.addUsedGoods(authorization = spHelper.authorization, goods = goods)
             }
         })
     }

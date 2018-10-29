@@ -15,7 +15,7 @@ import xlab.world.xlab.view.SingleLiveEvent
 class WithDrawViewModel(private val apiUser: ApiUserProvider,
                         private val networkCheck: NetworkCheck,
                         private val scheduler: SchedulerProvider): AbstractViewModel() {
-    private val tag = "WithDraw"
+    private val viewModelTag = "WithDraw"
     private var withdrawReason: String? = null
 
     val withdrawEventData = SingleLiveEvent<WithdrawEvent>()
@@ -29,7 +29,7 @@ class WithDrawViewModel(private val apiUser: ApiUserProvider,
                 it.onNext((this.withdrawReason != null) && isAgree)
                 it.onComplete()
             }.with(scheduler = scheduler).subscribe {
-                PrintLog.d("enableWithdraw", it.toString())
+                PrintLog.d("enableWithdraw", it.toString(), viewModelTag)
                 uiData.value = UIModel(enableWithdraw = it)
             }
         }
@@ -51,7 +51,7 @@ class WithDrawViewModel(private val apiUser: ApiUserProvider,
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("requestWithdraw fail", errorData.message)
+                            PrintLog.e("requestWithdraw fail", errorData.message, viewModelTag)
                         }
                         uiData.value = UIModel(isLoading = false)
                     })

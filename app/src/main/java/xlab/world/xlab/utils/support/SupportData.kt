@@ -50,7 +50,7 @@ object SupportData {
                     newResultCode
                 else oldResultCode
             }
-            else -> newResultCode
+            else -> oldResultCode
         }
 
         PrintLog.d("setResultCode", resultCode.toString(), "SupportData")

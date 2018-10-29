@@ -165,8 +165,10 @@ class GoodsOrderAdapter(private val context: Context,
             moreBtn.tag = item
             moreBtn.setOnClickListener(moreListener)
 
-            stateLayout.tag = item.invoiceNo
-            stateLayout.setOnClickListener(deliverTrackingListener)
+            if (item.invoiceNo.isNotEmpty()) { // 송장번호 있는 경우만 터치 가능하게
+                stateLayout.tag = item.invoiceNo
+                stateLayout.setOnClickListener(deliverTrackingListener)
+            }
 
             orderDetailListener?.let {
                 mainLayout.tag = item.orderNo

@@ -57,6 +57,8 @@ class NotificationActivity : AppCompatActivity(), View.OnClickListener {
                 when (requestCode) {
                     RequestCodeData.PROFILE, // 프로필
                     RequestCodeData.POST_DETAIL -> { // 포스트 상세
+                        socialNotificationFragment.reloadNotification(loadingBar = null)
+                        shopNotificationFragment.reloadNotification(loadingBar = null)
                     }
                 }
             }
@@ -116,6 +118,13 @@ class NotificationActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         }
+    }
+
+    // 탭 dot 보이기 & 숨기기
+    fun tabDataUpdate(index: Int, extraData: Boolean) {
+        val tabData = tabLayoutHelper.getTabData(index = index)
+        tabData.extraData = extraData
+        tabLayoutHelper.updateTabView(index = index)
     }
 
     companion object {

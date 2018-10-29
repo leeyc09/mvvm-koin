@@ -19,6 +19,7 @@ import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
+import xlab.world.xlab.view.notification.NotificationActivity
 import xlab.world.xlab.view.notification.NotificationViewModel
 
 class SocialNotificationFragment: Fragment() {
@@ -55,8 +56,10 @@ class SocialNotificationFragment: Fragment() {
         defaultToast = defaultToast ?: DefaultToast(context = context!!)
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
 
+        // listener 초기화
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
 
+        // notification adapter & recycler 초기화
         socialNotificationAdapter = socialNotificationAdapter?: SocialNotificationAdapter(context = context!!,
                 profileListener = defaultListener!!.profileListener,
                 postListener = defaultListener!!.postListener,
@@ -68,7 +71,7 @@ class SocialNotificationFragment: Fragment() {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         if (needInitData)
-            notificationViewModel.loadSocialNotificationData(authorization = spHelper.authorization, page = 1)
+            reloadNotification(loadingBar = true)
         else
             setLayoutVisibility()
     }
@@ -95,15 +98,16 @@ class SocialNotificationFragment: Fragment() {
                     defaultToast?.showToast(message = it)
                 }
                 uiData.socialNotificationData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        // notification 없으면 no notification 띄우기
-                        setBundleVisibilityData(noNotificationLayout =
-                        if (it.items.isEmpty()) View.VISIBLE
-                        else View.GONE)
-                        socialNotificationAdapter?.updateData(socialNotificationData = it)
-                    }
-                    else
-                        socialNotificationAdapter?.addData(socialNotificationData = it)
+                    socialNotificationAdapter?.linkData(socialNotificationData = it)
+                }
+                uiData.socialNotificationDataUpdate?.let {
+                    socialNotificationAdapter?.notifyDataSetChanged()
+                }
+                uiData.existNewSocialNotification?.let {
+                    (context as NotificationActivity).tabDataUpdate(index = 0, extraData = it)
+                }
+                uiData.noNotificationVisibility?.let {
+                    setBundleVisibilityData(noNotificationLayout = it)
                 }
             }
         })
@@ -117,6 +121,14 @@ class SocialNotificationFragment: Fragment() {
         })
     }
 
+    fun reloadNotification(loadingBar: Boolean?) {
+        context?.let {
+            notificationViewModel.loadSocialNotificationData(authorization = spHelper.authorization, page = 1, loadingBar = loadingBar)
+        } ?: let {
+            needInitData = true
+        }
+    }
+
     private fun setLayoutVisibility() {
         noNotificationLayout?.visibility = getBundleNoNotificationVisibility()
     }
@@ -128,7 +140,6 @@ class SocialNotificationFragment: Fragment() {
 
         setLayoutVisibility()
     }
-
 
     companion object {
         fun newFragment(): SocialNotificationFragment {

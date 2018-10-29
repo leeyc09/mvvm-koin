@@ -16,6 +16,7 @@ import xlab.world.xlab.utils.rx.with
 import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.utils.support.NetworkCheck
 import xlab.world.xlab.utils.support.PrintLog
+import xlab.world.xlab.utils.support.SupportData
 import xlab.world.xlab.view.AbstractViewModel
 import xlab.world.xlab.view.SingleLiveEvent
 
@@ -32,11 +33,30 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
     private var initProfileData = ResShopProfileData()
     private var recentProfileData = ResShopProfileData()
 
-    val orderCancelEventData = SingleLiveEvent<MyShopEvent>()
-    val orderReceiveConfirmEventData = SingleLiveEvent<MyShopEvent>()
-    val buyDecideEventData = SingleLiveEvent<BuyDecideEvent>()
-    val addUsedGoodsEventData = SingleLiveEvent<MyShopEvent>()
+    val orderCancelEventData = SingleLiveEvent<Boolean?>()
+    val orderReceiveConfirmEventData = SingleLiveEvent<Boolean?>()
+    val buyDecideEventData = SingleLiveEvent<GoodsOrderListData?>()
     val uiData = MutableLiveData<UIModel>()
+
+    fun setResultCode(resultCode: Int) {
+        this.resultCode = SupportData.setResultCode(oldResultCode = this.resultCode, newResultCode = resultCode)
+    }
+
+    fun backBtnAction() {
+        uiData.postValue(UIModel(resultCode = resultCode))
+    }
+
+    fun profileEditActionBackBtnAction() {
+        launch {
+            Observable.create<Boolean> {
+                it.onNext(initProfileData != recentProfileData)
+                it.onComplete()
+            }.with(scheduler).subscribe {
+                uiData.value = UIModel(resultCode = if (it) null else Activity.RESULT_CANCELED,
+                        cancelDialogShow = if (it) true else null)
+            }
+        }
+    }
 
     fun loadShopProfile(authorization: String) {
         // 네트워크 연결 확인
@@ -100,7 +120,7 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestOrderStateCnt(scheduler = scheduler, authorization = authorization,
                     responseData = {
-                        PrintLog.d("requestOrderStateCnt success", it.toString())
+                        PrintLog.d("requestOrderStateCnt success", it.toString(), viewModelTag)
                         uiData.value = UIModel(isLoading = false,
                                 completePaymentCnt = it.orderStateCnt[0].toString(), completePaymentEnable = it.orderStateCnt[0] > 0,
                                 deliveryCnt = it.orderStateCnt[1].toString(), deliveryEnable = it.orderStateCnt[1] > 0,
@@ -110,7 +130,7 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestOrderStateCnt fail", errorData.message)
+                            PrintLog.e("requestOrderStateCnt fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -127,7 +147,7 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestOrderList(scheduler = scheduler, authorization = authorization,
                     responseData = {
-                        PrintLog.d("requestOrderList success", it.toString())
+                        PrintLog.d("requestOrderList success", it.toString(), viewModelTag)
                         val newGoodsOrderData = GoodsOrderData(total = it.total)
                         it.goodsList?.forEach { goods->
                             newGoodsOrderData.items.add(GoodsOrderListData(
@@ -157,21 +177,9 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestOrderList fail", errorData.message)
+                            PrintLog.e("requestOrderList fail", errorData.message, viewModelTag)
                         }
                     })
-        }
-    }
-
-    fun profileEditActionBackBtnAction() {
-        launch {
-            Observable.create<Boolean> {
-                it.onNext(initProfileData != recentProfileData)
-                it.onComplete()
-            }.with(scheduler).subscribe {
-                uiData.value = UIModel(resultCode = if (it) null else Activity.RESULT_CANCELED,
-                        cancelDialogShow = if (it) true else null)
-            }
         }
     }
 
@@ -205,12 +213,12 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
             apiGodo.requestOrderCancel(scheduler = scheduler, authorization = authorization, orderNo = orderNo,
                     responseData = {
                         uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_order_cancel_success))
-                        orderCancelEventData.value = MyShopEvent(status = true)
+                        orderCancelEventData.value = true
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestOrderCancel fail", errorData.message)
+                            PrintLog.e("requestOrderCancel fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -228,12 +236,12 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
             apiGodo.requestOrderReceiveConfirm(scheduler = scheduler, authorization = authorization, orderNo = orderNo, sno = sno,
                     responseData = {
                         uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_receive_confirm_success))
-                        orderReceiveConfirmEventData.value = MyShopEvent(status = true)
+                        orderReceiveConfirmEventData.value = true
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestOrderReceiveConfirm fail", errorData.message)
+                            PrintLog.e("requestOrderReceiveConfirm fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -251,12 +259,12 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
             apiGodo.requestBuyDecide(scheduler = scheduler, authorization = authorization, orderNo = goods.orderNo, sno = goods.sno,
                     responseData = {
                         uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_buy_decide_success))
-                        buyDecideEventData.value = BuyDecideEvent(goods = goods)
+                        buyDecideEventData.value = goods
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestBuyDecide fail", errorData.message)
+                            PrintLog.e("requestBuyDecide fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -283,15 +291,13 @@ class MyShoppingViewModel(private val apiGodo: ApiGodoProvider,
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("requestPostUsedGoods fail", errorData.message)
+                            PrintLog.e("requestPostUsedGoods fail", errorData.message, viewModelTag)
                         }
                     })
         }
     }
 }
 
-data class BuyDecideEvent(val goods: GoodsOrderListData? = null)
-data class MyShopEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
                    val actionBtnEnable: Boolean? = null, val cancelDialogShow: Boolean? = null,
                    val shopName: String? = null, val shopEmail: String? = null,

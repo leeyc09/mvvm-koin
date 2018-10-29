@@ -78,9 +78,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
     }
     private val ratingCancelListener = object: DefaultDialog.Listener {
         override fun onOkayTouch(tag: Any?) {
-//            goodsDetailViewModel.ratingCancel(position = tag as Int,
-//                    goodsRatingData = goodsDetailRatingAdapter.getItem(position = tag),
-//                    authorization = spHelper.authorization)
+            goodsDetailViewModel.ratingCancel(selectIndex = tag as Int, authorization = spHelper.authorization)
         }
     }
     private val buyGoodsListener = object: BuyGoodsOptionDialog.Listener {

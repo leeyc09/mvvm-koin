@@ -16,6 +16,7 @@ import xlab.world.xlab.view.AbstractViewModel
 class OrderDetailViewModel(private val apiGodo: ApiGodoProvider,
                            private val networkCheck: NetworkCheck,
                            private val scheduler: SchedulerProvider): AbstractViewModel() {
+    private val viewModelTag = "OrderDetail"
 
     private var resultCode = Activity.RESULT_CANCELED
 
@@ -23,9 +24,12 @@ class OrderDetailViewModel(private val apiGodo: ApiGodoProvider,
 
     val uiData = MutableLiveData<UIModel>()
 
-    fun setResultCodeOK() {
-        if (this.resultCode == Activity.RESULT_CANCELED)
-            this.resultCode = Activity.RESULT_OK
+    fun setResultCode(resultCode: Int) {
+        this.resultCode = SupportData.setResultCode(oldResultCode = this.resultCode, newResultCode = resultCode)
+    }
+
+    fun backBtnAction() {
+        uiData.postValue(UIModel(resultCode = resultCode))
     }
 
     fun loadOrderDetail(authorization: String, orderNo: String) {
@@ -39,7 +43,7 @@ class OrderDetailViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestOrderDetail(scheduler = scheduler, authorization = authorization, orderNo = orderNo,
                     responseData = {
-                        PrintLog.d("requestOrderList success", it.toString())
+                        PrintLog.d("requestOrderList success", it.toString(), viewModelTag)
                         val newOrderGoodsData = GoodsOrderData(total = it.total)
                         // 주문 상품 목록
                         it.goodsList?.forEach { goods->
@@ -116,14 +120,10 @@ class OrderDetailViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestOrderList fail", errorData.message)
+                            PrintLog.e("requestOrderList fail", errorData.message, viewModelTag)
                         }
                     })
         }
-    }
-
-    fun backBtnAction() {
-        uiData.postValue(UIModel(resultCode = resultCode))
     }
 }
 

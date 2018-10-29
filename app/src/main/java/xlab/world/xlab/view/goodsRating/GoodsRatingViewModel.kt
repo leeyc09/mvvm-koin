@@ -24,6 +24,7 @@ class GoodsRatingViewModel(private val apiShop: ApiShopProvider,
                            private val apiUserActivity: ApiUserActivityProvider,
                            private val networkCheck: NetworkCheck,
                            private val scheduler: SchedulerProvider): AbstractViewModel() {
+    private val viewModelTag = "GoodsRating"
 
     private var goodsCode = ""
     private var goodsImage = ""
@@ -47,6 +48,7 @@ class GoodsRatingViewModel(private val apiShop: ApiShopProvider,
         launch {
             apiShop.requestGoodsSimple(scheduler = scheduler, goodsCode = goodsCode,
                     responseData = {
+                        PrintLog.d("requestGoodsSimpleData success", it.toString(), viewModelTag)
                         this.goodsImage = it.image
                         this.goodsName = it.name
                         this.goodsBrand = it.brand
@@ -56,7 +58,7 @@ class GoodsRatingViewModel(private val apiShop: ApiShopProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestGoodsSimpleData fail", errorData.message)
+                            PrintLog.e("requestGoodsSimpleData fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -73,7 +75,7 @@ class GoodsRatingViewModel(private val apiShop: ApiShopProvider,
         launch {
             apiPet.requestGoodsDetailPets(scheduler = scheduler, authorization = authorization, goodsCode = goodsCode,
                     responseData = {
-                        PrintLog.d("requestGoodsDetailPets success", it.toString())
+                        PrintLog.d("requestGoodsDetailPets success", it.toString(), viewModelTag)
                         val newGoodsRatingData = GoodsRatingData()
                         it.petsData?.forEach { pet ->
                             newGoodsRatingData.items.add(GoodsRatingListData(
@@ -96,7 +98,7 @@ class GoodsRatingViewModel(private val apiShop: ApiShopProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestGoodsDetailPets fail", errorData.message)
+                            PrintLog.e("requestGoodsDetailPets fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -171,12 +173,12 @@ class GoodsRatingViewModel(private val apiShop: ApiShopProvider,
             apiUserActivity.requestDeleteUsedGoods(scheduler = scheduler, authorization = authorization,
                     goodsCode = goodsCode, topicId = ratingData.petId,
                     responseData = {
-                        PrintLog.d("requestDeleteUsedGoods success", ratingData.toString())
+                        PrintLog.d("requestDeleteUsedGoods success", ratingData.toString(), viewModelTag)
                         end(true)
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("requestDeleteUsedGoods fail", errorData.message)
+                            PrintLog.e("requestDeleteUsedGoods fail", errorData.message, viewModelTag)
                         }
                         end(true)
                     })
@@ -200,12 +202,12 @@ class GoodsRatingViewModel(private val apiShop: ApiShopProvider,
                     ))
             apiUserActivity.requestPostUsedGoods(scheduler = scheduler, authorization = authorization, reqUsedGoodsData = reqUsedGoodsData,
                     responseData = {
-                        PrintLog.d("requestPostUsedGoods success", ratingData.toString())
+                        PrintLog.d("requestPostUsedGoods success", ratingData.toString(), viewModelTag)
                         end(true)
                     },
                     errorData = { errorData ->
                         errorData?.let {
-                            PrintLog.d("requestPostUsedGoods fail", errorData.message)
+                            PrintLog.e("requestPostUsedGoods fail", errorData.message, viewModelTag)
                         }
                         end(true)
                     })

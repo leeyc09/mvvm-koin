@@ -81,8 +81,10 @@ class OrderCRRActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun onSetup() {
+        // 액션 버튼 비활성화
         actionBtn.visibility = View.GONE
 
+        // 은행 계좌번호 번호만 입력 가능하게
         editTextBankAccount.filters = arrayOf(letterOrDigitInputFilter)
 
         // Toast, Dialog 초기화

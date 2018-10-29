@@ -30,7 +30,7 @@ class SocialNotificationAdapter(private val context: Context,
                                 private val commentListener: View.OnClickListener) : RecyclerView.Adapter<SocialNotificationAdapter.ViewHolder>() {
     private val fontColorSpan: FontColorSpan by (context as Activity).inject()
 
-    private val socialNotificationData: SocialNotificationData = SocialNotificationData()
+    private var socialNotificationData: SocialNotificationData = SocialNotificationData()
     var dataLoading: Boolean
         get() = this.socialNotificationData.isLoading
         set(value) { this.socialNotificationData.isLoading = value }
@@ -49,29 +49,9 @@ class SocialNotificationAdapter(private val context: Context,
             .placeholder(imagePlaceHolder)
             .error(imagePlaceHolder)
 
-    fun getItem(position: Int): SocialNotificationListData {
-        return socialNotificationData.items[position]
-    }
-
-    fun updateData(socialNotificationData: SocialNotificationData) {
-        this.socialNotificationData.items.clear()
-        this.socialNotificationData.items.addAll(socialNotificationData.items)
-
-        this.socialNotificationData.isLoading = false
-        this.socialNotificationData.total = socialNotificationData.total
-        this.socialNotificationData.nextPage = 2
-
+    fun linkData(socialNotificationData: SocialNotificationData) {
+        this.socialNotificationData = socialNotificationData
         notifyDataSetChanged()
-    }
-
-    fun addData(socialNotificationData: SocialNotificationData) {
-        val size: Int = itemCount
-        this.socialNotificationData.items.addAll(socialNotificationData.items)
-
-        this.socialNotificationData.isLoading = false
-        this.socialNotificationData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override

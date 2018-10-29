@@ -11,7 +11,7 @@ import xlab.world.xlab.utils.support.AppConstants
 import xlab.world.xlab.view.AbstractViewModel
 
 class GoodsInfoVewModel(private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "GoodsInfo"
+    private val viewModelTag = "GoodsInfo"
 
     val uiData = MutableLiveData<UIModel>()
 

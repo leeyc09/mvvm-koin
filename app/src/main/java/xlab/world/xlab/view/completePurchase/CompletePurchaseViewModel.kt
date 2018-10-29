@@ -19,6 +19,7 @@ import xlab.world.xlab.view.AbstractViewModel
 class CompletePurchaseViewModel(private val apiGodo: ApiGodoProvider,
                                 private val networkCheck: NetworkCheck,
                                 private val scheduler: SchedulerProvider): AbstractViewModel() {
+    private val viewModelTag = "CompletePurchase"
 
     val uiData = MutableLiveData<UIModel>()
 
@@ -33,7 +34,7 @@ class CompletePurchaseViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestOrderDetail(scheduler = scheduler, authorization = authorization, orderNo = orderNo,
                     responseData = {
-                        PrintLog.d("requestOrderDetail success", it.toString())
+                        PrintLog.d("requestOrderDetail success", it.toString(), viewModelTag)
                         // 결제 방식에 따른 타이틀 & 결제 가격 화면 설정
                         var titleStr: SpannableString? = null // 타이틀 이름
                         var subTitleVisibility: Int? = null // 서브 타이틀 보이기 & 숨기기
@@ -121,7 +122,7 @@ class CompletePurchaseViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestOrderDetail fail", errorData.message)
+                            PrintLog.e("requestOrderDetail fail", errorData.message, viewModelTag)
                         }
                     })
         }

@@ -28,7 +28,7 @@ import java.net.URLEncoder
 class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
                         private val networkCheck: NetworkCheck,
                         private val scheduler: SchedulerProvider): AbstractViewModel() {
-    val tag = "BuyGoods"
+    private val viewModelTag = "BuyGoods"
 
     private var intentFrom: Int = AppConstants.FROM_GOODS_DETAIL
 
@@ -56,7 +56,7 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
                 it.onComplete()
             }.with(scheduler).subscribe {
                 // 프로그래스바 시작
-                PrintLog.d("webViewLoadUrl", it)
+                PrintLog.d("webViewLoadUrl", it, viewModelTag)
                 uiData.value = UIModel(isLoading = true, webViewLoadUrl = it, webViewVisibility = View.GONE)
             }
         }
@@ -95,9 +95,9 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
                 }
                 url.contains(ApiURL.GODO_BUY_GOODS_FINISH_WITH_ORDER_NO_PAGE) -> { // 구매 완료 페이지 로딩 -> 구매 화면 종료
                     val orderNo = url.replace(ApiURL.GODO_BUY_GOODS_FINISH_WITH_ORDER_NO_PAGE, "")
-                    PrintLog.d("original url", url)
-                    PrintLog.d("replace url", ApiURL.GODO_BUY_GOODS_FINISH_WITH_ORDER_NO_PAGE)
-                    PrintLog.d("orderNo", orderNo)
+                    PrintLog.d("original url", url, viewModelTag)
+                    PrintLog.d("replace url", ApiURL.GODO_BUY_GOODS_FINISH_WITH_ORDER_NO_PAGE, viewModelTag)
+                    PrintLog.d("orderNo", orderNo, viewModelTag)
                     if (intentFrom == AppConstants.FROM_GOODS_DETAIL) { // 상품 상세에서 넘어온 경우 -> 장바구니에서 해당 상품 삭제 필요
                         deleteCartData(authorization = authorization, sno = snoList.first().toString()) {
                             pageLoadingEventData.postValue(PageLoadingModel(finishOrderNo = orderNo))
@@ -309,7 +309,7 @@ class BuyGoodsViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestDeleteCart fail", errorData.message)
+                            PrintLog.e("requestDeleteCart fail", errorData.message, viewModelTag)
                         }
                     })
         }

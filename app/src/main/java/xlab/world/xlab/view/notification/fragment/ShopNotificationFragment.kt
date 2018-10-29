@@ -67,7 +67,7 @@ class ShopNotificationFragment: Fragment() {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         if (needInitData)
-            notificationViewModel.loadShopNotificationData(authorization = spHelper.authorization, page = 1)
+            reloadNotification(loadingBar = true)
         else
             setLayoutVisibility()
     }
@@ -116,6 +116,14 @@ class ShopNotificationFragment: Fragment() {
         })
     }
 
+    fun reloadNotification(loadingBar: Boolean?) {
+        context?.let {
+            notificationViewModel.loadShopNotificationData(authorization = spHelper.authorization, page = 1, loadingBar = loadingBar)
+        } ?: let {
+            needInitData = true
+        }
+    }
+
     private fun setLayoutVisibility() {
         noNotificationLayout?.visibility = getBundleNoNotificationVisibility()
     }
@@ -127,7 +135,6 @@ class ShopNotificationFragment: Fragment() {
 
         setLayoutVisibility()
     }
-
 
     companion object {
         fun newFragment(): ShopNotificationFragment {

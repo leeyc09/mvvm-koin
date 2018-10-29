@@ -416,7 +416,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                     ))
             apiUserActivity.requestPostUsedGoods(scheduler = scheduler, authorization = authorization, reqUsedGoodsData = reqUsedGoodsData,
                     responseData = {
-                        PrintLog.d("requestPostUsedGoods success", it.toString())
+                        PrintLog.d("requestPostUsedGoods success", it.toString(), viewModelTag)
                         ratingData.rating = selectRatingData.rating
 
                         uiData.value = UIModel(isLoading = false, goodsRatingUpdateIndex = selectRatingData.position)
@@ -424,13 +424,13 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestPostUsedGoods fail", errorData.message)
+                            PrintLog.e("requestPostUsedGoods fail", errorData.message, viewModelTag)
                         }
                     })
         }
     }
 
-    fun ratingCancel(position: Int, goodsRatingData: GoodsDetailRatingListData, authorization: String) {
+    fun ratingCancel(selectIndex: Int, authorization: String) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
@@ -439,16 +439,17 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
 
         uiData.value = UIModel(isLoading = true)
         launch {
+            val goodsRatingData = this.goodsDetailRatingData.items[selectIndex]
             apiUserActivity.requestDeleteUsedGoods(scheduler = scheduler, authorization = authorization,
                     goodsCode = goodsCode, topicId = goodsRatingData.petId,
                     responseData = {
                         goodsRatingData.rating = AppConstants.GOODS_RATING_NONE
-                        uiData.value = UIModel(isLoading = false, goodsRatingUpdateIndex = position)
+                        uiData.value = UIModel(isLoading = false, goodsRatingUpdateIndex = selectIndex)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestDeleteUsedGoods fail", errorData.message)
+                            PrintLog.e("requestDeleteUsedGoods fail", errorData.message, viewModelTag)
                         }
                     })
         }

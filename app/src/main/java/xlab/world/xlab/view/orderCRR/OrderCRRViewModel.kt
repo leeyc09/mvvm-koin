@@ -21,6 +21,7 @@ import xlab.world.xlab.view.AbstractViewModel
 class OrderCRRViewModel(private val apiGodo: ApiGodoProvider,
                         private val networkCheck: NetworkCheck,
                         private val scheduler: SchedulerProvider): AbstractViewModel() {
+    private val viewModelTag = "OrderCRR"
 
     private var crrMode: Int = RequestCodeData.ORDER_REFUND
     private var orderNo: String = ""
@@ -81,7 +82,7 @@ class OrderCRRViewModel(private val apiGodo: ApiGodoProvider,
         launch {
             apiGodo.requestOrderDetail(scheduler = scheduler, authorization = authorization, orderNo = orderNo,
                     responseData = {
-                        PrintLog.d("requestOrderList success", it.toString())
+                        PrintLog.d("requestOrderList success", it.toString(), viewModelTag)
                         val newCrrGoodsData = CartData(total = 0)
                         it.goodsList?.forEach { goods ->
                             val newData = CartListData(
@@ -133,7 +134,7 @@ class OrderCRRViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestOrderList fail", errorData.message)
+                            PrintLog.e("requestOrderList fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -265,7 +266,7 @@ class OrderCRRViewModel(private val apiGodo: ApiGodoProvider,
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("requestOrderCRR fail", errorData.message)
+                            PrintLog.e("requestOrderCRR fail", errorData.message, viewModelTag)
                         }
                     })
         }
