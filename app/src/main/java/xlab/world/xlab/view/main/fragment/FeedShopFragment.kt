@@ -38,10 +38,10 @@ class FeedShopFragment: Fragment() {
             arguments?.putInt("matchVisibility", value)
         }
 
-    private var shopFeedAdapter: ShopFeedAdapter? = null
-
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
+
+    private var shopFeedAdapter: ShopFeedAdapter? = null
 
     private var defaultListener: DefaultListener? = null
     private var searchEditorActionListener: TextView.OnEditorActionListener? = null

@@ -218,7 +218,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
 
                             isShowGoodsKeyword = this.goodsKeywordData.items.isNotEmpty()
                             uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
-                                    keywordData = keywordData,
+                                    keywordData = this.goodsKeywordData,
                                     keywordVisibility = if (isShowGoodsKeyword) View.VISIBLE else View.GONE,
                                     keywordArrowRotation = if (isShowGoodsKeyword) 180f else 0f,
                                     searchGoodsData = this.searchGoodsData,

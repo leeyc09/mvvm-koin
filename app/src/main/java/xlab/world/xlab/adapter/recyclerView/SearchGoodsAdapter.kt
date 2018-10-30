@@ -11,6 +11,8 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -20,6 +22,7 @@ import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.SearchGoodsData
 import xlab.world.xlab.data.adapter.SearchGoodsListData
 import xlab.world.xlab.utils.support.AppConstants
+import xlab.world.xlab.utils.support.PrintLog
 import xlab.world.xlab.utils.support.SupportData
 
 class SearchGoodsAdapter(private val context: Context,
@@ -116,6 +119,7 @@ class SearchGoodsAdapter(private val context: Context,
         private val percentLayout: LinearLayout = goodsThumbLayout.findViewById(R.id.percentLayout)
         private val matchBarLayout: LinearLayout = goodsThumbLayout.findViewById(R.id.matchBarLayout)
         private val textViewMatchValue: TextView = goodsThumbLayout.findViewById(R.id.textViewMatchValue)
+        private val textViewMatchUnit: TextView = view.findViewById(R.id.textViewMatchUnit)
         private val percentEmptyLayout: View = goodsThumbLayout.findViewById(R.id.percentEmptyLayout)
 
         private val textViewPrice: TextView = view.findViewById(R.id.textViewPrice)
@@ -137,25 +141,90 @@ class SearchGoodsAdapter(private val context: Context,
 
             // 인기율 안보기 -> % 가림
             if (matchVisible != View.VISIBLE) {
-                percentLayout.visibility = View.GONE
+                // 안보이는 애니메이션은 한번만 동작하도록
+                // 이후에는 애니메이션 없이 바로 뷰 안보이게
+                if (item.withAnimation) {
+                    setPercentBar(percentValue = item.matchingPercent.toString(), percentColor = item.matchColor, percentWeight = item.matchingPercent.toFloat())
+
+                    val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_hide)
+                    // 애니매이션 유지
+                    percentBarAni.fillAfter = true
+                    percentBarAni.isFillEnabled = true
+                    percentBarAni.setAnimationListener(object : Animation.AnimationListener {
+                        override fun onAnimationStart(p0: Animation?) {
+                        }
+
+                        override fun onAnimationEnd(p0: Animation?) {
+                            percentLayout.visibility = View.GONE
+                            item.withAnimation = false
+                        }
+
+                        override fun onAnimationRepeat(p0: Animation?) {
+                        }
+                    })
+                    val percentAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_percent_hide)
+                    // 애니매이션 유지
+                    percentAni.fillAfter = true
+                    percentAni.isFillEnabled = true
+
+                    matchBarLayout.startAnimation(percentBarAni)
+                    textViewMatchValue.startAnimation(percentAni)
+                    textViewMatchUnit.startAnimation(percentAni)
+                } else {
+                    percentLayout.visibility = View.GONE
+                }
             } else {
                 // guest or topic 없는 유저 -> question mark 보이기
                 if (item.showQuestionMark) {
-                    percentLayout.visibility = View.VISIBLE
                     setPercentBar(percentValue = "? ", percentColor = item.matchColor, percentWeight = 90f)
+                    // 애니매이션 동작 꺼져있으면 on 으로
+                    if (!item.withAnimation) item.withAnimation = true
+
+                    val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_show)
+                    matchBarLayout.startAnimation(percentBarAni)
+                    val percentAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_percent_show)
+                    textViewMatchValue.startAnimation(percentAni)
+                    textViewMatchUnit.startAnimation(percentAni)
 
                     // ? 터치 이벤트
                     matchBarLayout.setOnClickListener(questionListener)
                 } else {
-                    // 인기도 50 이하 -> % bar 안보이게
+                    // 인기도 50 이하 -> % bar 안보이게 (애니메이션 X)
                     if (item.matchingPercent < 50) {
                         percentLayout.visibility = View.GONE
                     } else {
-                        percentLayout.visibility = View.VISIBLE
                         setPercentBar(percentValue = item.matchingPercent.toString(), percentColor = item.matchColor, percentWeight = item.matchingPercent.toFloat())
+                        // 애니매이션 동작 꺼져있으면 on 으로
+                        if (!item.withAnimation) item.withAnimation = true
+
+                        val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_show)
+                        matchBarLayout.startAnimation(percentBarAni)
+                        val percentAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_percent_show)
+                        textViewMatchValue.startAnimation(percentAni)
+                        textViewMatchUnit.startAnimation(percentAni)
                     }
                 }
             }
+//            if (matchVisible != View.VISIBLE) {
+//                percentLayout.visibility = View.GONE
+//            } else {
+//                // guest or topic 없는 유저 -> question mark 보이기
+//                if (item.showQuestionMark) {
+//                    percentLayout.visibility = View.VISIBLE
+//                    setPercentBar(percentValue = "? ", percentColor = item.matchColor, percentWeight = 90f)
+//
+//                    // ? 터치 이벤트
+//                    matchBarLayout.setOnClickListener(questionListener)
+//                } else {
+//                    // 인기도 50 이하 -> % bar 안보이게
+//                    if (item.matchingPercent < 50) {
+//                        percentLayout.visibility = View.GONE
+//                    } else {
+//                        percentLayout.visibility = View.VISIBLE
+//                        setPercentBar(percentValue = item.matchingPercent.toString(), percentColor = item.matchColor, percentWeight = item.matchingPercent.toFloat())
+//                    }
+//                }
+//            }
 
             textViewPrice.setText(SupportData.applyPriceFormat(price = item.price), TextView.BufferType.SPANNABLE)
             textViewTitle.setText(item.title, TextView.BufferType.SPANNABLE)
@@ -167,6 +236,8 @@ class SearchGoodsAdapter(private val context: Context,
         }
 
         private fun setPercentBar(percentValue: String, percentColor: Int, percentWeight: Float) {
+            percentLayout.visibility = View.VISIBLE
+
             // 인기도 & topic color 설정
             textViewMatchValue.setText(percentValue, TextView.BufferType.SPANNABLE)
             matchBarLayout.setBackgroundColor(percentColor)

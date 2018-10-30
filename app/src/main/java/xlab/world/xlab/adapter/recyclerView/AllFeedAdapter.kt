@@ -159,6 +159,7 @@ class AllFeedAdapter(private val context: Context,
                 // 안보이는 애니메이션은 한번만 동작하도록
                 // 이후에는 애니메이션 없이 바로 뷰 안보이게
                 if (item.withAnimation) {
+                    setPercentBar(percentValue = item.matchingPercent.toString(), percentColor = item.matchColor, percentWeight = item.matchingPercent.toFloat())
                     val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_hide)
                     // 애니매이션 유지
                     percentBarAni.fillAfter = true
@@ -193,6 +194,12 @@ class AllFeedAdapter(private val context: Context,
                     // 애니매이션 동작 꺼져있으면 on 으로
                     if (!item.withAnimation) item.withAnimation = true
 
+                    val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_show)
+                    matchBarLayout.startAnimation(percentBarAni)
+                    val percentAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_percent_show)
+                    textViewMatchValue.startAnimation(percentAni)
+                    textViewMatchUnit.startAnimation(percentAni)
+
                     // ? 터치 이벤트
                     matchBarLayout.setOnClickListener(questionListener)
                 } else {
@@ -203,6 +210,12 @@ class AllFeedAdapter(private val context: Context,
                         setPercentBar(percentValue = item.matchingPercent.toString(), percentColor = item.matchColor, percentWeight = item.matchingPercent.toFloat())
                         // 애니매이션 동작 꺼져있으면 on 으로
                         if (!item.withAnimation) item.withAnimation = true
+
+                        val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_show)
+                        matchBarLayout.startAnimation(percentBarAni)
+                        val percentAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_percent_show)
+                        textViewMatchValue.startAnimation(percentAni)
+                        textViewMatchUnit.startAnimation(percentAni)
                     }
                 }
             }
@@ -226,12 +239,6 @@ class AllFeedAdapter(private val context: Context,
             percentEmptyParams.gravity = Gravity.BOTTOM
             matchBarLayout.layoutParams = percentParams
             percentEmptyLayout.layoutParams = percentEmptyParams
-
-            val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_show)
-            matchBarLayout.startAnimation(percentBarAni)
-            val percentAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_percent_show)
-            textViewMatchValue.startAnimation(percentAni)
-            textViewMatchUnit.startAnimation(percentAni)
         }
     }
 

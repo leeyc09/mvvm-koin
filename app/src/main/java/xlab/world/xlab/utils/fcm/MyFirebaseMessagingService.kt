@@ -46,22 +46,26 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
             remoteMessage.from?.let {
                 PrintLog.d("FCM From", it)
             }
-            // Check if message contains a data payload.
-            if (remoteMessage.data.isNotEmpty()) {
-                PrintLog.d("Message data payload", remoteMessage.data.toString())
-                sendNotification(remoteMessage.data)
-            }
 
-            // Check if message contains a notification payload.
-            if (remoteMessage.notification != null) {
-                remoteMessage.notification!!.body?.let { messageBody ->
-                    PrintLog.d("Message Notification Body", messageBody)
-                    sendNotification(messageBody)
+            // 앱이 꺼져있을 경우에만 푸시 메세지 받음
+            if (appIsInBackground()) {
+                // Check if message contains a data payload.
+                if (remoteMessage.data.isNotEmpty()) {
+                    PrintLog.d("Message data payload", remoteMessage.data.toString())
+                    sendNotification(remoteMessage.data)
                 }
-            }
 
-            // Also if you intend on generating your own notifications as a result of a received FCM
-            // message, here is where that should be initiated. See sendNotification method below.
+                // Check if message contains a notification payload.
+                if (remoteMessage.notification != null) {
+                    remoteMessage.notification!!.body?.let { messageBody ->
+                        PrintLog.d("Message Notification Body", messageBody)
+                        sendNotification(messageBody)
+                    }
+                }
+
+                // Also if you intend on generating your own notifications as a result of a received FCM
+                // message, here is where that should be initiated. See sendNotification method below.
+            }
         }
     }
 
@@ -89,26 +93,21 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
 
         val notificationBuilder: NotificationCompat.Builder? = when (data["type"]) {
             FcmSetting.DEFAULT_NOTIFICATION -> {
+                // notification touch intent
+                val intent = Intent(this, PreloadActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                intent.putExtra(IntentPassName.NOTIFICATION_TYPE, data["notiType"])
+                intent.putExtra(IntentPassName.NOTIFICATION_DATA, data["data"])
+                val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                        PendingIntent.FLAG_ONE_SHOT)
+
                 NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.mipmap.ic_notification)
                         .setContentText(data["message"])
                         .setAutoCancel(true)
+                        .setContentIntent(pendingIntent)
             }
             else -> null
-        }
-
-        if (appIsInBackground()) {
-            // notification touch intent
-            val intent = Intent(this, PreloadActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            intent.putExtra(IntentPassName.NOTIFICATION_TYPE, data["notiType"])
-            intent.putExtra(IntentPassName.NOTIFICATION_DATA, data["data"])
-
-            val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                    PendingIntent.FLAG_ONE_SHOT)
-            notificationBuilder?.let {
-                notificationBuilder.setContentIntent(pendingIntent)
-            }
         }
 
         notificationBuilder?.let {

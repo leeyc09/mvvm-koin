@@ -1,7 +1,5 @@
 package xlab.world.xlab.data.adapter
 
-import android.graphics.Color
-import xlab.world.xlab.utils.support.AppConstants
 import java.io.Serializable
 
 data class SearchGoodsListData(val dataType: Int,
@@ -13,4 +11,5 @@ data class SearchGoodsListData(val dataType: Int,
                                val brand: String = "",
                                var showQuestionMark: Boolean = false,
                                val matchingPercent: Int = 0,
-                               val matchColor: Int = Color.WHITE): Serializable
+                               val matchColor: Int = 0,
+                               var withAnimation: Boolean = true): Serializable

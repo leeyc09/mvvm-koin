@@ -38,10 +38,10 @@ class FeedAllFragment: Fragment() {
             arguments?.putInt("matchVisibility", value)
         }
 
-    private var allFeedAdapter: AllFeedAdapter? = null
-
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
+
+    private var allFeedAdapter: AllFeedAdapter? = null
 
     private var defaultListener: DefaultListener? = null
 
