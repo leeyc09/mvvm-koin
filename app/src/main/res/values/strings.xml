@@ -1,6 +1,6 @@
 <resources>
     <!--TODO: API KEY-->
-    <string name="app_name">mvvm_xlab</string>
+    <string name="app_name">xlab</string>
     <string name="app_api_key">AIzaSyAPzZWCFiKVJ2yURnTLBz4o83NhBjzp4vU</string>
     <string name="facebook_app_id">1866904940202203</string>
     <string name="fb_login_protocol_scheme">fb1866904940202203</string>
