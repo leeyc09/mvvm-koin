@@ -205,26 +205,6 @@ class SearchGoodsAdapter(private val context: Context,
                     }
                 }
             }
-//            if (matchVisible != View.VISIBLE) {
-//                percentLayout.visibility = View.GONE
-//            } else {
-//                // guest or topic 없는 유저 -> question mark 보이기
-//                if (item.showQuestionMark) {
-//                    percentLayout.visibility = View.VISIBLE
-//                    setPercentBar(percentValue = "? ", percentColor = item.matchColor, percentWeight = 90f)
-//
-//                    // ? 터치 이벤트
-//                    matchBarLayout.setOnClickListener(questionListener)
-//                } else {
-//                    // 인기도 50 이하 -> % bar 안보이게
-//                    if (item.matchingPercent < 50) {
-//                        percentLayout.visibility = View.GONE
-//                    } else {
-//                        percentLayout.visibility = View.VISIBLE
-//                        setPercentBar(percentValue = item.matchingPercent.toString(), percentColor = item.matchColor, percentWeight = item.matchingPercent.toFloat())
-//                    }
-//                }
-//            }
 
             textViewPrice.setText(SupportData.applyPriceFormat(price = item.price), TextView.BufferType.SPANNABLE)
             textViewTitle.setText(item.title, TextView.BufferType.SPANNABLE)

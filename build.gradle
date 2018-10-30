@@ -57,7 +57,7 @@ ext {
     retrofit2Version = '2.4.0'
     gsonVersion = '2.8.2'
     facebookSdkVersion='4.35.0'
-    kakaoSdkVersion='1.7.1'
+    kakaoSdkVersion='1.14.0'
     kakaoSdkGroup='com.kakao.sdk'
     glideVersion='4.6.1'
     gpuimageVersion='1.4.1'

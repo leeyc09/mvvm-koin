@@ -85,20 +85,22 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
                     RequestCodeData.TOPIC_SETTING, // 토픽 설정
                     RequestCodeData.GOODS_DETAIL -> { // 상품 상세
                         cartViewModel.loadCartCnt(authorization = spHelper.authorization)
-                        searchViewModel.searchGoods(authorization = spHelper.authorization,
+                        searchViewModel.searchGoods(context = this,
+                                authorization = spHelper.authorization,
                                 searchData = arrayListOf(EditTextTagHelper.SearchData(
                                         text = intent.getStringExtra(IntentPassName.SEARCH_TEXT),
                                         code = intent.getStringExtra(IntentPassName.SEARCH_CODE))),
-                                page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+                                page = 1)
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                searchViewModel.searchGoods(authorization = spHelper.authorization,
+                searchViewModel.searchGoods(context = this,
+                        authorization = spHelper.authorization,
                         searchData = arrayListOf(EditTextTagHelper.SearchData(
                                 text = intent.getStringExtra(IntentPassName.SEARCH_TEXT),
                                 code = intent.getStringExtra(IntentPassName.SEARCH_CODE))),
-                        page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+                        page = 1)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
                 actionBackBtn.performClick()
@@ -159,11 +161,12 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         cartViewModel.loadCartCnt(authorization = spHelper.authorization)
-        searchViewModel.searchGoods(authorization = spHelper.authorization,
+        searchViewModel.searchGoods(context = this,
+                authorization = spHelper.authorization,
                 searchData = arrayListOf(EditTextTagHelper.SearchData(
                         text = intent.getStringExtra(IntentPassName.SEARCH_TEXT),
                         code = intent.getStringExtra(IntentPassName.SEARCH_CODE))),
-                page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+                page = 1)
     }
 
     private fun onBindEvent() {
@@ -172,11 +175,12 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = searchGoodsAdapter.dataLoading, total = searchGoodsAdapter.dataTotal) { _->
-                searchViewModel.searchGoods(authorization = spHelper.authorization,
+                searchViewModel.searchGoods(context = this,
+                        authorization = spHelper.authorization,
                         searchData = arrayListOf(EditTextTagHelper.SearchData(
                                 text = intent.getStringExtra(IntentPassName.SEARCH_TEXT),
                                 code = intent.getStringExtra(IntentPassName.SEARCH_CODE))),
-                        page = searchGoodsAdapter.dataNextPage, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+                        page = searchGoodsAdapter.dataNextPage)
             }
         }
 
@@ -227,11 +231,12 @@ class SearchBrandGoodsActivity : AppCompatActivity(), View.OnClickListener {
         searchViewModel.changeSearchSortTypeData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let { isSuccess ->
                 if (isSuccess)
-                    searchViewModel.searchGoods(authorization = spHelper.authorization,
+                    searchViewModel.searchGoods(context = this,
+                            authorization = spHelper.authorization,
                             searchData = arrayListOf(EditTextTagHelper.SearchData(
                                     text = intent.getStringExtra(IntentPassName.SEARCH_TEXT),
                                     code = intent.getStringExtra(IntentPassName.SEARCH_CODE))),
-                            page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+                            page = 1)
             }
         })
 

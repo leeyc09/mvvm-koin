@@ -82,8 +82,7 @@ class GoodsSearchActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             if (editTextTagHelper.getTagList().size > 0) {
-                searchViewModel.searchGoods(authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(),
-                        page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+                searchViewModel.searchGoods(context = this@GoodsSearchActivity, authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(), page = 1)
             }
         }
     }
@@ -140,14 +139,12 @@ class GoodsSearchActivity : AppCompatActivity(), View.OnClickListener {
                     RequestCodeData.TOPIC_SETTING, // 토픽 설정
                     RequestCodeData.GOODS_DETAIL -> { // 상품 상세
                         cartViewModel.loadCartCnt(authorization = spHelper.authorization)
-                        searchViewModel.searchGoods(authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(),
-                                page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+                        searchViewModel.searchGoods(context = this, authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(), page = 1)
                     }
                 }
             }
             ResultCodeData.LOGIN_SUCCESS -> { // login -> reload all data
-                searchViewModel.searchGoods(authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(),
-                        page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+                searchViewModel.searchGoods(context = this, authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(), page = 1)
             }
             ResultCodeData.LOGOUT_SUCCESS -> { // logout -> finish activity
                 actionBackBtn.performClick()
@@ -247,15 +244,12 @@ class GoodsSearchActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         goodsSwipeRefreshLayout.setOnRefreshListener {
-            searchViewModel.searchGoods(authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(),
-                    page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList), loadingBar = false)
+            searchViewModel.searchGoods(context = this, authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(), page = 1, loadingBar = false)
         }
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = goodsRecyclerView) {
-            ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, total = goodsKeywordAdapter.dataTotal, isLoading = goodsKeywordAdapter.dataLoading) { isScrolled ->
-                if (isScrolled)
-                    searchViewModel.searchGoods(authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(),
-                            page = goodsKeywordAdapter.dataNextPage, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+            ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, total = searchGoodsAdapter.dataTotal, isLoading = searchGoodsAdapter.dataLoading) { _->
+                    searchViewModel.searchGoods(context = this, authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(), page = searchGoodsAdapter.dataNextPage)
             }
         }
 
@@ -317,8 +311,7 @@ class GoodsSearchActivity : AppCompatActivity(), View.OnClickListener {
         searchViewModel.changeSearchSortTypeData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
             eventData?.let { isSuccess ->
                 if (isSuccess)
-                    searchViewModel.searchGoods(authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(),
-                            page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList))
+                    searchViewModel.searchGoods(context = this, authorization = spHelper.authorization, searchData = editTextTagHelper.getTagList(), page = 1)
             }
         })
         // TODO: Cart View Model

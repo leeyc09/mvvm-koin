@@ -110,9 +110,10 @@ class CombinedSearchGoodsFragment: Fragment() {
     private fun onBindEvent() {
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = searchGoodsAdapter!!.dataLoading, total = searchGoodsAdapter!!.dataTotal) { _ ->
-                searchViewModel.searchGoods(authorization = spHelper.authorization,
+                searchViewModel.searchGoods(context = context!!,
+                        authorization = spHelper.authorization,
                         searchData = arrayListOf(EditTextTagHelper.SearchData(text = searchText, code = "")),
-                        page = searchGoodsAdapter!!.dataNextPage, topicColorList = resources.getStringArray(R.array.topicColorStringList),
+                        page = searchGoodsAdapter!!.dataNextPage,
                         withHeader = false)
             }
         }
@@ -155,9 +156,10 @@ class CombinedSearchGoodsFragment: Fragment() {
     fun searchGoodsData(searchText: String, loadingBar: Boolean?) {
         this.searchText = searchText
         context?.let {
-            searchViewModel.searchGoods(authorization = spHelper.authorization,
+            searchViewModel.searchGoods(context = context!!,
+                    authorization = spHelper.authorization,
                     searchData = arrayListOf(EditTextTagHelper.SearchData(text = searchText, code = "")),
-                    page = 1, topicColorList = resources.getStringArray(R.array.topicColorStringList),
+                    page = 1,
                     withHeader = false, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }

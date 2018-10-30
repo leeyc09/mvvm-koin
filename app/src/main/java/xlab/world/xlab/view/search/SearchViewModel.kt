@@ -2,9 +2,11 @@ package xlab.world.xlab.view.search
 
 import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
 import android.graphics.Color
 import android.view.View
 import io.reactivex.Observable
+import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
 import xlab.world.xlab.data.request.ReqGoodsSearchData
 import xlab.world.xlab.data.response.ResGoodsSearchData
@@ -156,8 +158,8 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
         }
     }
 
-    fun searchGoods(authorization: String, searchData: ArrayList<EditTextTagHelper.SearchData>,
-                    page: Int, topicColorList: Array<String>, withHeader: Boolean = true, loadingBar: Boolean? = true) {
+    fun searchGoods(context: Context, authorization: String, searchData: ArrayList<EditTextTagHelper.SearchData>,
+                    page: Int, withHeader: Boolean = true, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
@@ -165,6 +167,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
         }
 
         uiData.value = UIModel(isLoading = loadingBar)
+//        this.searchGoodsData.isLoading = true
         searchGoodsEventData.value = true
         launch {
             // 상품 검색 데이터 추가
@@ -190,6 +193,7 @@ class SearchViewModel(private val apiShop: ApiShopProvider,
                         val goodsData = SearchGoodsData(total = it.goodsTotal, nextPage = page + 1)
                         it.goodsList?.let { goodsList ->
                             goodsList.forEach { goods ->
+                                val topicColorList = context.resources.getStringArray(R.array.topicColorStringList)
                                 val matchData = getPercentValueAndColor(topicColorList = topicColorList,
                                         matchData = goods.topicMatch?.let{_->goods.topicMatch.firstOrNull()}?:let{_->null})
                                 goodsData.items.add(SearchGoodsListData(

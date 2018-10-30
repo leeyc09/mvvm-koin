@@ -63,7 +63,7 @@ class SocialAuth {
     }
 
     fun kakaoLogout() {
-        UserManagement.requestLogout(object : LogoutResponseCallback() {
+        UserManagement.getInstance().requestLogout(object : LogoutResponseCallback() {
             override fun onCompleteLogout() {
                 PrintLog.d("kakao logout", "success", tag)
             }
