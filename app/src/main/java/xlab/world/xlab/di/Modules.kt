@@ -147,8 +147,8 @@ val utilModule: Module = applicationContext {
     bean { GPUImageFilterData() }
 }
 
-//const val xlabRemoteBaseUrl = ApiURL.XLAB_API_URL_SSL
-const val xlabRemoteBaseUrl = "http://192.168.1.11:8080"
+const val xlabRemoteBaseUrl = ApiURL.XLAB_API_URL_SSL
+//const val xlabRemoteBaseUrl = "http://192.168.1.11:8080"
 val remoteModule: Module = applicationContext {
     // provided web components
     bean { createOkHttpClient() }

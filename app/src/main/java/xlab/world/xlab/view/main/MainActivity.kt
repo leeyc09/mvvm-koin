@@ -209,13 +209,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         // 키보드 보일때 매칭 버튼 안보이게
         ViewFunction.showUpKeyboardLayout(view = mainLayout) { visibility ->
             matchBtnLayout.visibility =
-                    if (visibility == View.VISIBLE) View.GONE
+                    if (visibility == View.VISIBLE || viewPager.currentItem == 1 || viewPager.currentItem == 2) View.GONE
                     else View.VISIBLE
         }
 
         ViewFunction.onViewPagerChangePosition(viewPager = viewPager) { position ->
             tabLayoutHelper.changeSelectedTab(selectIndex = position)
             ViewFunction.hideKeyboard(context = this, view = mainLayout)
+            matchBtnLayout.visibility =
+                    if (position == 1 || position == 2) View.GONE  // 팔로잉, 탐색 tab
+                    else View.VISIBLE
         }
     }
 

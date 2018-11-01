@@ -138,7 +138,7 @@ class GoodsDetailStatsAdapter(private val context: Context) : RecyclerView.Adapt
 
             val biggest = Math.max(goodRatio, Math.max(sosoRatio, badRatio))
             val twoDIP = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, context.resources.displayMetrics).toInt()
-            val threeDIP = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, context.resources.displayMetrics).toInt()
+            val threeDIP = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, context.resources.displayMetrics).toInt()
 
             // percent bar 색상, 사이즈
             imageViewGood.isSelected = biggest == goodRatio && goodRatio != 0f

@@ -136,11 +136,11 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0" />
 
-            <View
+            <ImageView
                 android:id="@+id/sosoPercentBar"
                 android:layout_width="0dp"
                 android:layout_height="3dp"
-                android:background="@drawable/gray_black_select_drawable"
+                android:src="@drawable/gray_black_select_drawable"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="@id/sosoPercentGuideline"
                 app:layout_constraintTop_toTopOf="parent"

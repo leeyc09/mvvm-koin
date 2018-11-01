@@ -5,5 +5,5 @@
         android:drawable="@color/colorA4A4A4" />
     <item
         android:state_selected="true"
-        android:drawable="@color/color000000" />
+        android:drawable="@drawable/stats_select_background" />
 </selector>
