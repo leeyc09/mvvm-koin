@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.TextView
 import kotlinx.android.synthetic.main.action_bar_default.*
 import kotlinx.android.synthetic.main.activity_setting.*
+import kotlinx.android.synthetic.main.fragment_new_password.*
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.inject
 import xlab.world.xlab.BuildConfig
@@ -141,6 +142,9 @@ class SettingActivity : AppCompatActivity(), View.OnClickListener {
                 uiData.resultCode?.let {
                     setResult(it)
                     finish()
+                }
+                uiData.passwordVisibility?.let {
+                    changePasswordBtn.visibility = it
                 }
                 uiData.pushAlarm?.let {
                     pushAlarmBtn.isSelected = it

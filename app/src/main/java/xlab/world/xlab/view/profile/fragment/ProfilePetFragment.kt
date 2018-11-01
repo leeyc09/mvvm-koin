@@ -10,10 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_profile_pet.*
 import org.koin.android.architecture.ext.viewModel
+import org.koin.android.ext.android.inject
 import xlab.world.xlab.R
 import xlab.world.xlab.adapter.recyclerView.GoodsThumbnailAdapter
 import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.support.AppConstants
+import xlab.world.xlab.utils.support.SPHelper
 import xlab.world.xlab.utils.support.ViewFunction
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
@@ -22,6 +24,7 @@ import xlab.world.xlab.view.profile.ProfileViewModel
 
 class ProfilePetFragment: Fragment(), View.OnClickListener {
     private val profileViewModel: ProfileViewModel by viewModel()
+    private val spHelper: SPHelper by inject()
 
     private var needInitData
         get() = arguments?.getBoolean("needInitData") ?: true
@@ -89,7 +92,7 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
 
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             ViewFunction.isScrolledRecyclerView(layoutManager = it as GridLayoutManager, isLoading = goodsThumbnailAdapter!!.dataLoading, total = goodsThumbnailAdapter!!.dataTotal) { _ ->
-                profileViewModel.loadTopicUsedGoodsData(context = context!!, userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = goodsThumbnailAdapter!!.dataNextPage)
+                profileViewModel.loadTopicUsedGoodsData(context = context!!, userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = goodsThumbnailAdapter!!.dataNextPage, loginUseId = spHelper.userId)
             }
         }
     }
@@ -108,15 +111,14 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
                     defaultToast!!.showToast(message = it)
                 }
                 uiData.topicUsedGoodsData?.let {
-                    if (it.nextPage <= 2 ) { // 요청한 page => 첫페이지
-                        // used goods 없으면 no used goods 띄우기
-                        setBundleVisibilityData(noGoodsLayout = if (it.items.isEmpty()) View.VISIBLE else View.GONE)
-
-                        goodsThumbnailAdapter?.updateData(goodsThumbnailData = it)
-                        swipeRefreshLayout.isRefreshing = false
-                    }
-                    else
-                        goodsThumbnailAdapter?.addData(goodsThumbnailData = it)
+                    goodsThumbnailAdapter?.linkData(goodsThumbnailData = it)
+                    swipeRefreshLayout.isRefreshing = false
+                }
+                uiData.topicUsedGoodsDataUpdate?.let {
+                    goodsThumbnailAdapter?.notifyDataSetChanged()
+                }
+                uiData.usedGoodsVisibility?.let {
+                    setBundleVisibilityData(noMyGoodsLayout = it.myGoods, noOtherGoodsLayout = it.otherGoods)
                 }
             }
         })
@@ -140,19 +142,22 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
 
     fun reloadPetUsedGoodsData(loadingBar: Boolean?) {
         context?.let {
-            profileViewModel.loadTopicUsedGoodsData(context = context!!, userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1, loadingBar = loadingBar)
+            profileViewModel.loadTopicUsedGoodsData(context = context!!, userId = getBundleUserId(), goodsType = AppConstants.USED_GOODS_PET, page = 1, loginUseId = spHelper.userId, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 
     private fun setLayoutVisibility() {
-        noGoodsLayout?.visibility = getBundleNoGoodsVisibility()
+        noMyGoodsLayout?.visibility = getBundleNoMyGoodsVisibility()
+        noOtherGoodsLayout?.visibility = getBundleNoOtherGoodsVisibility()
     }
 
     private fun getBundleUserId(): String = arguments?.getString("userId") ?: ""
-    private fun getBundleNoGoodsVisibility(): Int = arguments?.getInt("noGoodsLayout") ?: View.INVISIBLE
+    private fun getBundleNoMyGoodsVisibility(): Int = arguments?.getInt("noMyGoodsLayout") ?: View.INVISIBLE
+    private fun getBundleNoOtherGoodsVisibility(): Int = arguments?.getInt("noOtherGoodsLayout") ?: View.INVISIBLE
 
-    private fun setBundleVisibilityData(noGoodsLayout: Int) {
-        arguments?.putInt("noGoodsLayout", noGoodsLayout)
+    private fun setBundleVisibilityData(noMyGoodsLayout: Int, noOtherGoodsLayout: Int) {
+        arguments?.putInt("noMyGoodsLayout", noMyGoodsLayout)
+        arguments?.putInt("noOtherGoodsLayout", noOtherGoodsLayout)
 
         setLayoutVisibility()
     }
@@ -164,7 +169,8 @@ class ProfilePetFragment: Fragment(), View.OnClickListener {
             val args = Bundle()
             args.putString("userId", userId)
             args.putBoolean("needInitData", true)
-            args.putInt("noGoodsLayout", View.INVISIBLE)
+            args.putInt("noMyGoodsLayout", View.INVISIBLE)
+            args.putInt("noOtherGoodsLayout", View.INVISIBLE)
             fragment.arguments = args
 
             return fragment

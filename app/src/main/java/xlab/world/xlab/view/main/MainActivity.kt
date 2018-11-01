@@ -325,7 +325,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
                     mainViewModel.uploadPostBtnAction(authorization = spHelper.authorization,
                             userLevel = spHelper.userLevel)
-
                 }
                 R.id.actionProfileBtn -> { // 프로필 버튼
                     mainViewModel.profileBtnAction(authorization = spHelper.authorization)

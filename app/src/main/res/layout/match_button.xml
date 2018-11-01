@@ -3,8 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:paddingStart="20dp"
-    android:paddingEnd="0dp"
     android:paddingBottom="23dp">
 
     <LinearLayout
@@ -14,28 +12,38 @@
 
         <FrameLayout
             android:id="@+id/matchSettingBtn"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/match_button">
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/topic_setting"
-                android:layout_gravity="center"/>
+            android:layout_width="68dp"
+            android:layout_height="48dp">
+            <FrameLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/match_button"
+                android:layout_gravity="end">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/topic_setting"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/matchBtn"
-            android:layout_width="52dp"
+            android:layout_width="72dp"
             android:layout_height="52dp"
-            android:background="@drawable/match_button"
             android:layout_marginTop="12dp">
-            <ImageView
-                android:id="@+id/imageViewLogo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/logo_selection"
-                android:layout_gravity="center"/>
+            <FrameLayout
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:background="@drawable/match_button"
+                android:layout_gravity="end">
+                <ImageView
+                    android:id="@+id/imageViewLogo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/logo_selection"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
         </FrameLayout>
 
     </LinearLayout>

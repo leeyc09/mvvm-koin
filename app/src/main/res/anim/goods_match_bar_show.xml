@@ -8,22 +8,4 @@
         android:pivotX="0%"
         android:pivotY="0%"
         android:duration="300" />
-    <scale
-        android:fromXScale="104%"
-        android:fromYScale="100%"
-        android:toXScale="98%"
-        android:toYScale="100%"
-        android:pivotX="0%"
-        android:pivotY="0%"
-        android:startOffset="300"
-        android:duration="200" />
-    <scale
-        android:fromXScale="98%"
-        android:fromYScale="100%"
-        android:toXScale="100%"
-        android:toYScale="100%"
-        android:pivotX="0%"
-        android:pivotY="0%"
-        android:startOffset="500"
-        android:duration="100" />
 </set>

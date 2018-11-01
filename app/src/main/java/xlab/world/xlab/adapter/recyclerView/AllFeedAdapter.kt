@@ -11,6 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.view.animation.AnticipateOvershootInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -159,7 +161,8 @@ class AllFeedAdapter(private val context: Context,
                 // 안보이는 애니메이션은 한번만 동작하도록
                 // 이후에는 애니메이션 없이 바로 뷰 안보이게
                 if (item.withAnimation) {
-                    setPercentBar(percentValue = item.matchingPercent.toString(), percentColor = item.matchColor, percentWeight = item.matchingPercent.toFloat())
+                    setPercentBar(percentValue = if (item.showQuestionMark) "? " else item.matchingPercent.toString(), percentColor = item.matchColor,
+                            percentWeight = if (item.showQuestionMark) 90f else item.matchingPercent.toFloat())
                     val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_hide)
                     // 애니매이션 유지
                     percentBarAni.fillAfter = true
@@ -195,6 +198,7 @@ class AllFeedAdapter(private val context: Context,
                     if (!item.withAnimation) item.withAnimation = true
 
                     val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_show)
+                    percentBarAni.interpolator = AnticipateOvershootInterpolator(1.04f)
                     matchBarLayout.startAnimation(percentBarAni)
                     val percentAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_percent_show)
                     textViewMatchValue.startAnimation(percentAni)
@@ -212,6 +216,7 @@ class AllFeedAdapter(private val context: Context,
                         if (!item.withAnimation) item.withAnimation = true
 
                         val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_show)
+                        percentBarAni.interpolator = AnticipateOvershootInterpolator(1.04f)
                         matchBarLayout.startAnimation(percentBarAni)
                         val percentAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_percent_show)
                         textViewMatchValue.startAnimation(percentAni)

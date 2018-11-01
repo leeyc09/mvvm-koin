@@ -144,7 +144,8 @@ class SearchGoodsAdapter(private val context: Context,
                 // 안보이는 애니메이션은 한번만 동작하도록
                 // 이후에는 애니메이션 없이 바로 뷰 안보이게
                 if (item.withAnimation) {
-                    setPercentBar(percentValue = item.matchingPercent.toString(), percentColor = item.matchColor, percentWeight = item.matchingPercent.toFloat())
+                    setPercentBar(percentValue = if (item.showQuestionMark) "? " else item.matchingPercent.toString(), percentColor = item.matchColor,
+                            percentWeight = if (item.showQuestionMark) 90f else item.matchingPercent.toFloat())
 
                     val percentBarAni = AnimationUtils.loadAnimation(context, R.anim.goods_match_bar_hide)
                     // 애니매이션 유지

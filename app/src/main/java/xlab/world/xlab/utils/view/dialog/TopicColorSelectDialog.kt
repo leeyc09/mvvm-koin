@@ -48,7 +48,7 @@ class TopicColorSelectDialog: BottomSheetDialogFragment(), View.OnClickListener 
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        isCancelable = true
+        isCancelable = false
 
         onSetup()
 

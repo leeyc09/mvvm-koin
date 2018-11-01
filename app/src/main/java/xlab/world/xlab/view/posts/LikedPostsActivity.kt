@@ -115,8 +115,8 @@ class LikedPostsActivity : AppCompatActivity(), View.OnClickListener {
                     setResult(it)
                     finish()
                 }
-                uiData.emptyPostVisibility?.let {
-                    textViewEmptyPost.visibility = it
+                uiData.postVisibility?.let {
+                    textViewEmptyPost.visibility = it.myPost
                 }
                 uiData.postsData?.let {
                     postsAdapter.linkData(postThumbnailData = it)

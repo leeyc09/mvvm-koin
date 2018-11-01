@@ -22,7 +22,7 @@ class GoodsThumbnailAdapter(private val context: Context,
                             private val moreItemListener: View.OnClickListener?,
                             private val goodsListener: View.OnClickListener) : RecyclerView.Adapter<GoodsThumbnailAdapter.ViewHolder>() {
 
-    private val goodsThumbnailData: GoodsThumbnailData = GoodsThumbnailData()
+    private var goodsThumbnailData: GoodsThumbnailData = GoodsThumbnailData()
     var dataLoading: Boolean
         get() = this.goodsThumbnailData.isLoading
         set(value) { this.goodsThumbnailData.isLoading = value }
@@ -37,25 +37,9 @@ class GoodsThumbnailAdapter(private val context: Context,
             .placeholder(imagePlaceHolder)
             .error(imagePlaceHolder)
 
-    fun updateData(goodsThumbnailData: GoodsThumbnailData) {
-        this.goodsThumbnailData.items.clear()
-        this.goodsThumbnailData.items.addAll(goodsThumbnailData.items)
-
-        this.goodsThumbnailData.isLoading = false
-        this.goodsThumbnailData.total = goodsThumbnailData.total
-        this.goodsThumbnailData.nextPage = 2
-
+    fun linkData(goodsThumbnailData: GoodsThumbnailData) {
+        this.goodsThumbnailData = goodsThumbnailData
         notifyDataSetChanged()
-    }
-
-    fun addData(goodsThumbnailData: GoodsThumbnailData) {
-        val size: Int = itemCount
-        this.goodsThumbnailData.items.addAll(goodsThumbnailData.items)
-
-        this.goodsThumbnailData.isLoading = false
-        this.goodsThumbnailData.nextPage += 1
-
-        notifyItemRangeChanged(size, itemCount)
     }
 
     override fun getItemViewType(position: Int): Int {

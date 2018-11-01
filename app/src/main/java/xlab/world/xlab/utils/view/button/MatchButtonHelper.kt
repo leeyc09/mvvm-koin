@@ -3,6 +3,7 @@ package xlab.world.xlab.utils.view.button
 import android.app.Activity
 import android.content.Context
 import android.view.View
+import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
 import org.koin.android.ext.android.inject
@@ -19,6 +20,8 @@ class MatchButtonHelper (rootView: View,
 
     private val spHelper: SPHelper by context.inject()
     private val loginDialog = DialogCreator.loginDialog(context = context)
+
+    private var withAnimation: Boolean = true
 
     interface Listener {
         fun matchVisibility(visibility: Int)
@@ -69,30 +72,40 @@ class MatchButtonHelper (rootView: View,
     }
 
     private fun matchButtonChange(match: Boolean) {
-        // 버튼 애니메이션
-        val settingAni =
-                if (match) AnimationUtils.loadAnimation(context, R.anim.match_setting_btn_show)
-                else AnimationUtils.loadAnimation(context, R.anim.match_setting_btn_hide)
-        settingAni.fillAfter = true
-        settingAni.isFillEnabled = true
+        if (withAnimation) {
+            // 버튼 애니메이션
+            val settingAni =
+                    if (match) AnimationUtils.loadAnimation(context, R.anim.match_setting_btn_show)
+                    else AnimationUtils.loadAnimation(context, R.anim.match_setting_btn_hide)
+            settingAni.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(p0: Animation?) {
+                    if (match)
+                        matchSettingBtn.visibility = View.VISIBLE
+                }
 
-        matchSettingBtn.startAnimation(settingAni)
+                override fun onAnimationEnd(p0: Animation?) {
+                    if (!match)
+                        matchSettingBtn.visibility = View.GONE
+                    withAnimation = false
+                }
 
+                override fun onAnimationRepeat(p0: Animation?) {
+                }
+            })
+            settingAni.fillAfter = true
+            settingAni.isFillEnabled = true
+            matchSettingBtn.startAnimation(settingAni)
+        } else {
+            matchSettingBtn.visibility = if (match) View.VISIBLE else View.GONE
+        }
         val btnAni =
                 if (match) AnimationUtils.loadAnimation(context, R.anim.match_btn_show)
                 else AnimationUtils.loadAnimation(context, R.anim.match_btn_hide)
         btnAni.fillAfter = true
         btnAni.isFillEnabled = true
-
         matchBtn.startAnimation(btnAni)
+
         // 매칭율 버튼 상태에 따라서 로고 변경
         imageViewLogo.isSelected = match
-        // 매칭률 상태 저장
-//        matchSettingBtn.isSelected = match
-//        matchBtn.isSelected = match
-
-//        matchSettingBtn.visibility =
-//                if (match) View.VISIBLE
-//                else View.GONE
     }
 }

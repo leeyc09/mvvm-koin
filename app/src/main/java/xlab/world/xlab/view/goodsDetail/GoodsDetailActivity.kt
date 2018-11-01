@@ -338,6 +338,15 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
+        // button Action 이벤트 observe
+        goodsDetailViewModel.btnActionData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let {_->
+                eventData.cart?.let {
+                    RunActivity.cartActivity(context = this)
+                }
+            }
+        })
+
         // TODO: Cart View Model
         // UI 이벤트 observe
         cartViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
@@ -369,7 +378,7 @@ class GoodsDetailActivity : AppCompatActivity(), View.OnClickListener {
                             tagData = null)
                 }
                 R.id.actionCartBtn -> { // 장바구니
-                    RunActivity.cartActivity(context = this)
+                    goodsDetailViewModel.cartBtnAction(authorization = spHelper.authorization)
                 }
                 R.id.brandBtn -> { // 브랜드 상품 보기
                     RunActivity.searchBrandGoodsActivity(context = this,

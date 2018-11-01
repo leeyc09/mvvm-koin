@@ -19,10 +19,7 @@ import xlab.world.xlab.adapter.recyclerView.ProfileTopicAdapter
 import xlab.world.xlab.adapter.viewPager.ViewStatePagerAdapter
 import xlab.world.xlab.utils.font.FontColorSpan
 import xlab.world.xlab.utils.support.*
-import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
-import xlab.world.xlab.utils.view.dialog.DialogCreator
-import xlab.world.xlab.utils.view.dialog.ShareBottomDialog
-import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
+import xlab.world.xlab.utils.view.dialog.*
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.tabLayout.TabLayoutHelper
 import xlab.world.xlab.utils.view.toast.DefaultToast
@@ -49,6 +46,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var postUploadTypeSelectDialog: TwoSelectBottomDialog
     private lateinit var profileMoreDialog: TwoSelectBottomDialog
     private lateinit var shareDialog: ShareBottomDialog
+    private lateinit var loginDialog: DefaultDialog
 
     private lateinit var tabLayoutHelper: TabLayoutHelper
 
@@ -75,6 +73,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
         override fun onSecondBtnClick(tag: Any?) {
             // 신고하기
+            profileViewModel.userReport(context = this@ProfileActivity, authorization = spHelper.authorization, respondentId = spHelper.userId)
         }
     }
     private val shareDialogListener = object: ShareBottomDialog.Listener {
@@ -179,6 +178,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         postUploadTypeSelectDialog = DialogCreator.postUploadTypeSelectDialog(context = this)
         profileMoreDialog = DialogCreator.profileMoreSelectDialog(context = this, listener = profileMoreDialogListener)
         shareDialog = DialogCreator.shareDialog(context = this, listener = shareDialogListener)
+        loginDialog = DialogCreator.loginDialog(context = this)
 
         // 프래그먼트 초기화
         profileAlbumFragment = ProfileAlbumFragment.newFragment(userId = intent.getStringExtra(IntentPassName.USER_ID))
@@ -253,6 +253,9 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     setResult(it)
                     finish()
                 }
+                uiData.isGuest?.let {
+                    loginDialog.showDialog(tag = null)
+                }
                 uiData.myProfileLayoutVisibility?.let {
                     myProfileActionLayout.visibility = it
                 }
@@ -325,6 +328,19 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
+        // button Action 이벤트 observe
+        profileViewModel.btnActionData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let {_->
+                eventData.post?.let {
+                    RunActivity.postUploadPictureActivity(context = this, postId = "", youTubeVideoId = "")
+                }
+                eventData.postTypeDialog?.let {
+                    postUploadTypeSelectDialog.showDialog(manager = supportFragmentManager, dialogTag = "postUploadTypeSelectDialog",
+                            tagData = null)
+                }
+            }
+        })
+
         // TODO: Notice View Model
         // UI 이벤트 observe
         noticeViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
@@ -349,8 +365,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                         return
                     }
 
-                    postUploadTypeSelectDialog.showDialog(manager = supportFragmentManager, dialogTag = "postUploadTypeSelectDialog",
-                            tagData = null)
+                    profileViewModel.uploadPostBtnAction(userLevel = spHelper.userLevel)
                 }
                 R.id.actionMyShopBtn -> { // 마이쇼핑
                     RunActivity.myShoppingActivity(context = this)
@@ -365,7 +380,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                     profileMoreDialog.showDialog(manager = supportFragmentManager, dialogTag = "profileMoreDialog", tagData = null)
                 }
                 R.id.followBtn -> { // 팔로우 버튼
-                    profileViewModel.setResultCode(resultCode = Activity.RESULT_OK)
                     profileViewModel.userFollow(authorization = spHelper.authorization, userId = intent.getStringExtra(IntentPassName.USER_ID))
                 }
                 R.id.followerLayout -> { // 팔로워

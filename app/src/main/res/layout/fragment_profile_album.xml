@@ -30,7 +30,8 @@
 
     <!--TODO: No Item-->
     <LinearLayout
-        android:id="@+id/noPostsLayout"
+        android:visibility="gone"
+        android:id="@+id/noMyPostsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -44,14 +45,12 @@
         android:layout_marginTop="93dp">
 
         <ImageView
-            android:id="@+id/imageViewUpload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/main_upload"
             android:layout_gravity="center"/>
 
         <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
-            android:id="@+id/textViewNoUploadPost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/no_upload_post_my"
@@ -61,7 +60,6 @@
             android:layout_marginTop="10dp"/>
 
         <LinearLayout
-            android:id="@+id/uploadTextLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -82,6 +80,28 @@
                 android:layout_gravity="center"/>
 
         </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/noOtherPostsLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="135dp">
+
+        <xlab.world.xlab.utils.view.textView.TextViewMediumNoto
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_upload_post"
+            android:textSize="13sp"
+            android:textColor="@color/enable_000000_bfbfbf"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"/>
 
     </LinearLayout>
 

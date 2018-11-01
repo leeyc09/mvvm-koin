@@ -17,6 +17,8 @@ class RecentViewViewModel(private val apiShop: ApiShopProvider,
                           private val scheduler: SchedulerProvider): AbstractViewModel() {
     val tag = "RecentView"
 
+    private var goodsThumbnailData: GoodsThumbnailData = GoodsThumbnailData()
+
     val loadRecentViewGoodsEventData = SingleLiveEvent<RecentViewEvent>()
     val uiData = MutableLiveData<UIModel>()
 
@@ -41,15 +43,22 @@ class RecentViewViewModel(private val apiShop: ApiShopProvider,
                                     goodsCd = goods.code
                             )))
                         }
-                        val emptyVisibility =
-                                if (page == 1) {
-                                    if (recentViewGoodsData.items.isEmpty()) View.VISIBLE
-                                    else View.GONE
-                                }
-                                else null
 
-                        uiData.value = UIModel(isLoading = false, recentViewGoodsData = recentViewGoodsData,
-                                emptyVisibility = emptyVisibility)
+                        if (page == 1) {
+                            this.goodsThumbnailData.updateData(goodsThumbnailData = recentViewGoodsData)
+                            val emptyVisibility =
+                                    if (page == 1) {
+                                        if (recentViewGoodsData.items.isEmpty()) View.VISIBLE
+                                        else View.GONE
+                                    }
+                                    else null
+
+                            uiData.value = UIModel(isLoading = false, recentViewGoodsData = this.goodsThumbnailData,
+                                    emptyVisibility = emptyVisibility)
+                        } else {
+                            this.goodsThumbnailData.addData(goodsThumbnailData = recentViewGoodsData)
+                            uiData.value = UIModel(isLoading = false, recentViewGoodsDataUpdate = true)
+                        }
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
@@ -63,5 +72,5 @@ class RecentViewViewModel(private val apiShop: ApiShopProvider,
 
 data class RecentViewEvent(val status: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null,
-                   val recentViewGoodsData: GoodsThumbnailData? = null,
+                   val recentViewGoodsData: GoodsThumbnailData? = null, val recentViewGoodsDataUpdate: Boolean? = null,
                    val emptyVisibility: Int? = null)

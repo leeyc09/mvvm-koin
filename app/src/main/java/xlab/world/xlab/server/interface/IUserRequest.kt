@@ -3,10 +3,7 @@ package xlab.world.xlab.server.`interface`
 import io.reactivex.Observable
 import okhttp3.RequestBody
 import retrofit2.http.*
-import xlab.world.xlab.data.request.ReqLoginData
-import xlab.world.xlab.data.request.ReqRegisterData
-import xlab.world.xlab.data.request.ReqConfirmEmailData
-import xlab.world.xlab.data.request.ReqPasswordData
+import xlab.world.xlab.data.request.*
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.ApiURL
 
@@ -80,4 +77,8 @@ interface IUserRequest {
     @GET(ApiURL.USER_USED_ITEM)
     fun getGoodsUsedUser(@Query("goodsCode") goodsCode: String,
                          @Query("page") page: Int): Observable<ResGoodsUsedUserData>
+
+    @POST(ApiURL.USER_REPORT)
+    fun userReport(@Header("Authorization") authorization: String,
+                   @Body reqUserReportData: ReqUserReportData): Observable<ResMessageData>
 }

@@ -69,7 +69,7 @@ class PostsViewModel(private val apiShop: ApiShopProvider,
                             this.postThumbnailData.updateData(postThumbnailData = likedPostsData)
                             uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
                                     postsData = this.postThumbnailData,
-                                    emptyPostVisibility = if (this.postThumbnailData.items.isEmpty()) View.VISIBLE else View.GONE)
+                                    postVisibility = VisibilityData(myPost = if (this.postThumbnailData.items.isEmpty()) View.VISIBLE else View.GONE, otherPost = View.GONE))
                         } else {
                             this.postThumbnailData.addData(postThumbnailData = likedPostsData)
                             uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
@@ -108,7 +108,15 @@ class PostsViewModel(private val apiShop: ApiShopProvider,
                                     youTubeVideoID = post.youTubeVideoID
                             ))
                         }
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, postsData = postsThumbnailData)
+
+                        if (page == 1) {
+                            this.postThumbnailData.updateData(postThumbnailData = postsThumbnailData)
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, postsData = this.postThumbnailData,
+                                    postVisibility = VisibilityData(myPost = if (this.postThumbnailData.items.isEmpty()) View.VISIBLE else View.GONE, otherPost = View.GONE))
+                        } else {
+                            this.postThumbnailData.addData(postThumbnailData = postsThumbnailData)
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, postsDataUpdate = true)
+                        }
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
@@ -169,7 +177,7 @@ class PostsViewModel(private val apiShop: ApiShopProvider,
         }
     }
 
-    fun loadUserPostsThumbData(userId: String, page:Int, loadingBar: Boolean? = true) {
+    fun loadUserPostsThumbData(userId: String, page:Int, loginUseId: String, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
@@ -200,9 +208,13 @@ class PostsViewModel(private val apiShop: ApiShopProvider,
                                 postsThumbData.items.add(0, PostThumbnailListData(dataType = AppConstants.ADAPTER_HEADER))
                             }
                             this.postThumbnailData.updateData(postThumbnailData = postsThumbData)
+                            val emptyPost = this.postThumbnailData.items.isEmpty()
+
+                            val myPostVisibility = if (userId == loginUseId && emptyPost) View.VISIBLE else View.GONE
+                            val otherPostVisibility = if (userId != loginUseId && emptyPost) View.VISIBLE else View.GONE
                             uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
                                     postsData = this.postThumbnailData,
-                                    emptyPostVisibility = if (this.postThumbnailData.items.isEmpty()) View.VISIBLE else View.GONE)
+                                    postVisibility = VisibilityData(myPost = myPostVisibility, otherPost = otherPostVisibility))
                         } else {
                             this.postThumbnailData.addData(postThumbnailData = postsThumbData)
                             uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
@@ -223,7 +235,7 @@ class PostsViewModel(private val apiShop: ApiShopProvider,
     }
 }
 
-data class PostsEvent(val status: Boolean? = null)
+data class VisibilityData(val myPost: Int, val otherPost: Int)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
-                   val emptyPostVisibility: Int? = null, val postsTotal: Int? = null,
+                   val postVisibility: VisibilityData? = null, val postsTotal: Int? = null,
                    val postsData: PostThumbnailData? = null, val postsDataUpdate: Boolean? = null)

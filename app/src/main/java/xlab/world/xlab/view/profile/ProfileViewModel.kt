@@ -8,6 +8,7 @@ import com.kakao.message.template.FeedTemplate
 import io.reactivex.Observable
 import xlab.world.xlab.R
 import xlab.world.xlab.data.adapter.*
+import xlab.world.xlab.data.request.ReqUserReportData
 import xlab.world.xlab.server.provider.*
 import xlab.world.xlab.utils.rx.SchedulerProvider
 import xlab.world.xlab.utils.rx.with
@@ -28,11 +29,13 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
 
     private var userData: UserData = UserData()
     private var topicData: ProfileTopicData = ProfileTopicData()
+    private var usedGoodsData: GoodsThumbnailData = GoodsThumbnailData()
 
     val loadUserData = SingleLiveEvent<Boolean?>()
     val loadUserPetData = SingleLiveEvent<Boolean?>()
     val loadTopicUsedGoodsData = SingleLiveEvent<Boolean?>()
     val shareKakaoData = SingleLiveEvent<FeedTemplate?>()
+    val btnActionData = SingleLiveEvent<BtnActionModel?>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setResultCode(resultCode: Int) {
@@ -53,6 +56,13 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
 
     fun backBtnAction() {
         uiData.postValue(UIModel(resultCode = resultCode))
+    }
+
+    fun uploadPostBtnAction(userLevel: Int) {
+        // 유저 레벨이 admin 이면 post upload type 선택 다이얼로그 띄우기
+        // 일반이면 바로 post upload 화면으로
+        btnActionData.postValue(BtnActionModel(post = if (userLevel == AppConstants.ADMIN_USER_LEVEL) null else true,
+                postTypeDialog = if (userLevel == AppConstants.ADMIN_USER_LEVEL) true else null))
     }
 
     // 프로필 타입 설정
@@ -167,7 +177,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         }
     }
 
-    fun loadTopicUsedGoodsData(context: Context, userId: String, goodsType: Int, page: Int, loadingBar: Boolean? = true) {
+    fun loadTopicUsedGoodsData(context: Context, userId: String, goodsType: Int, page: Int, loginUseId: String, loadingBar: Boolean? = true) {
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
@@ -179,6 +189,7 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         launch {
             apiUserActivity.requestTopicUsedGoods(scheduler = scheduler, userId = userId, goodsType = goodsType, page = page,
                     responseData = {
+                        PrintLog.d("requestTopicUsedGoods success", it.toString(), viewModelTag)
                         val topicUsedGoodsData = GoodsThumbnailData(total = it.total, nextPage = page + 1)
                         it.goods?.forEach { goods ->
                             topicUsedGoodsData.items.add(GoodsThumbnailListData(
@@ -188,26 +199,42 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
                             ))
                         }
 
-                        // 첫 페이지 & used goods 존재 -> 헤더 설정
-                        if (topicUsedGoodsData.items.isNotEmpty() && page == 1) {
-                            topicUsedGoodsData.items.add(0, GoodsThumbnailListData(
-                                    dataType = AppConstants.ADAPTER_HEADER,
-                                    headerTitle = context.getString(R.string.goods)))
-                        }
+                        if (page == 1) {
+                            // 첫 페이지 & used goods 존재 -> 헤더 설정
+                            if (topicUsedGoodsData.items.isNotEmpty()) {
+                                topicUsedGoodsData.items.add(0, GoodsThumbnailListData(
+                                        dataType = AppConstants.ADAPTER_HEADER,
+                                        headerTitle = context.getString(R.string.goods)))
+                            }
+                            this.usedGoodsData.updateData(goodsThumbnailData = topicUsedGoodsData)
+                            val emptyGoods = this.usedGoodsData.items.isEmpty()
 
-                        PrintLog.d("requestTopicUsedGoods success", topicUsedGoodsData.toString())
-                        uiData.value = UIModel(isLoading = loadingBar?.let{_->false}, topicUsedGoodsData = topicUsedGoodsData)
+                            val myGoodsVisibility = if (userId == loginUseId && emptyGoods) View.VISIBLE else View.GONE
+                            val otherGoodsVisibility = if (userId != loginUseId && emptyGoods) View.VISIBLE else View.GONE
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
+                                    topicUsedGoodsData = this.usedGoodsData,
+                                    usedGoodsVisibility = VisibilityData(myGoods = myGoodsVisibility, otherGoods = otherGoodsVisibility))
+                        } else {
+                            this.usedGoodsData.addData(goodsThumbnailData = topicUsedGoodsData)
+                            uiData.value = UIModel(isLoading = loadingBar?.let{_->false},
+                                    topicUsedGoodsDataUpdate = true)
+                        }
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = loadingBar?.let{_->false})
                         errorData?.let {
-                            PrintLog.d("requestTopicUsedGoods fail", errorData.message)
+                            PrintLog.e("requestTopicUsedGoods fail", errorData.message, viewModelTag)
                         }
                     })
         }
     }
 
     fun userFollow(authorization: String, userId: String) {
+        if (SupportData.isGuest(authorization = authorization)) {
+            uiData.postValue(UIModel(isGuest = true))
+            return
+        }
+
         // 네트워크 연결 확인
         if (!networkCheck.isNetworkConnected()) {
             uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
@@ -218,13 +245,14 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
         launch {
             apiFollow.requestFollow(scheduler = scheduler, authorization = authorization, userId = userId,
                     responseData = {
-                        PrintLog.d("follow success", it.status.toString())
+                        PrintLog.d("follow success", it.status.toString(), viewModelTag)
                         uiData.value = UIModel(isLoading = false, followState = it.status)
+                        setResultCode(resultCode = Activity.RESULT_OK)
                     },
                     errorData = { errorData ->
                         uiData.value = UIModel(isLoading = false)
                         errorData?.let {
-                            PrintLog.d("follow fail", errorData.message)
+                            PrintLog.e("follow fail", errorData.message, viewModelTag)
                         }
                     })
         }
@@ -252,17 +280,48 @@ class ProfileViewModel(private val apiUser: ApiUserProvider,
             }
         }
     }
+
+    fun userReport(context: Context, authorization: String, respondentId: String) {
+        if (SupportData.isGuest(authorization = authorization)) {
+            uiData.postValue(UIModel(isGuest = true))
+            return
+        }
+        // 네트워크 연결 확인
+        if (!networkCheck.isNetworkConnected()) {
+            uiData.postValue(UIModel(toastMessage = networkCheck.networkErrorMsg))
+            return
+        }
+
+        uiData.value = UIModel(isLoading = true)
+        launch {
+            val reportData = ReqUserReportData(respondentID = respondentId)
+
+            apiUser.requestUserReport(scheduler = scheduler, authorization = authorization, reqUserReportData = reportData,
+                    responseData = {
+                        uiData.value = UIModel(isLoading = false, toastMessage = context.getString(R.string.toast_success_report))
+                    },
+                    errorData = { errorData ->
+                        uiData.value = UIModel(isLoading = false)
+                        errorData?.let {
+                            PrintLog.e("requestUserReport fail", errorData.message, viewModelTag)
+                        }
+                    })
+        }
+    }
 }
 
+data class VisibilityData(val myGoods: Int, val otherGoods: Int)
+data class BtnActionModel(val post: Boolean? = null, val postTypeDialog: Boolean? = null)
 data class UserData(val id: String = "", val nickName: String = "",
                     val introduction: String = "", val profileImage: String = "")
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null,
-                   val myProfileLayoutVisibility: Int? = null, val otherProfileLayoutVisibility: Int? = null,
+                   val isGuest: Boolean? = null, val myProfileLayoutVisibility: Int? = null, val otherProfileLayoutVisibility: Int? = null,
                    val followBtnVisibility: Int? = null, val editBtnVisibility: Int? = null,
                    val profileImage: String? = null, val nickName: String? = null, val introduction: String? = null,
                    val followerCnt: String? = null, val followerEnable: Boolean? = null,
                    val followingCnt: String? = null, val followingEnable: Boolean? = null,
                    val followState: Boolean? = null,
                    val topicData: ProfileTopicData? = null, val topicDataUpdate: Boolean? = null,
-                   val topicUsedGoodsData: GoodsThumbnailData? = null,
+                   val topicUsedGoodsData: GoodsThumbnailData? = null, val topicUsedGoodsDataUpdate: Boolean? = null,
+                   val usedGoodsVisibility: VisibilityData? = null,
                    val postsThumbData: PostThumbnailData? = null)

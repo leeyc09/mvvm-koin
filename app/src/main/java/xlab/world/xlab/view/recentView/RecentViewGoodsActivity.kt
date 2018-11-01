@@ -122,10 +122,10 @@ class RecentViewGoodsActivity : AppCompatActivity(), View.OnClickListener {
                     defaultToast.showToast(message = it)
                 }
                 uiData.recentViewGoodsData?.let {
-                    if (it.nextPage <= 2 ) // 요청한 page => 첫페이지
-                        recentViewGoodsAdapter.updateData(goodsThumbnailData = it)
-                    else
-                        recentViewGoodsAdapter.addData(goodsThumbnailData = it)
+                    recentViewGoodsAdapter.linkData(goodsThumbnailData = it)
+                }
+                uiData.recentViewGoodsDataUpdate?.let {
+                    recentViewGoodsAdapter.notifyDataSetChanged()
                 }
                 uiData.emptyVisibility?.let {
                     textViewEmpty.visibility = it

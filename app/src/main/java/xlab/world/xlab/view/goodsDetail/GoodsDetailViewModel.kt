@@ -59,6 +59,7 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
     val buyNowEventData = SingleLiveEvent<Int?>()
     val loadUsedUserData = SingleLiveEvent<Boolean?>()
     val shareKakaoData = SingleLiveEvent<CommerceTemplate?>()
+    val btnActionData = SingleLiveEvent<BtnActionModel?>()
     val uiData = MutableLiveData<UIModel>()
 
     fun setResultCode(resultCode: Int) {
@@ -554,8 +555,19 @@ class GoodsDetailViewModel(private val apiGodo: ApiGodoProvider,
             }
         }
     }
+
+    fun cartBtnAction(authorization: String) {
+        // login 확인
+        if (SupportData.isGuest(authorization)) { // guest
+            uiData.postValue(UIModel(isGuest = true))
+            return
+        }
+
+        btnActionData.postValue(BtnActionModel(cart = true))
+    }
 }
 
+data class BtnActionModel(val cart: Boolean? = null)
 data class UIModel(val isLoading: Boolean? = null, val toastMessage: String? = null, val resultCode: Int? = null, val cartToastShow: Boolean? = null,
                    val isGuest: Boolean? = null, val buyOptionDialogShow: Int? = null,
                    val topicMatchData: GoodsDetailTopicMatchData? = null, val topicMatchVisibility: Int? = null,

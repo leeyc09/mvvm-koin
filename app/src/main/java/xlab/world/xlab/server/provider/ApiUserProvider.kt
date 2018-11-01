@@ -2,10 +2,7 @@ package xlab.world.xlab.server.provider
 
 import io.reactivex.disposables.Disposable
 import okhttp3.RequestBody
-import xlab.world.xlab.data.request.ReqConfirmEmailData
-import xlab.world.xlab.data.request.ReqLoginData
-import xlab.world.xlab.data.request.ReqPasswordData
-import xlab.world.xlab.data.request.ReqRegisterData
+import xlab.world.xlab.data.request.*
 import xlab.world.xlab.data.response.*
 import xlab.world.xlab.server.`interface`.IUserRequest
 import xlab.world.xlab.server.errorHandle
@@ -89,6 +86,9 @@ interface ApiUserProvider {
     fun requestGoodsUsedUser(scheduler: SchedulerProvider, goodsCode: String, page: Int,
                              responseData: (ResGoodsUsedUserData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 
+    // user report 요청
+    fun requestUserReport(scheduler: SchedulerProvider, authorization: String, reqUserReportData: ReqUserReportData,
+                          responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable
 }
 
 class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
@@ -293,6 +293,17 @@ class ApiUser(private val iUserRequest: IUserRequest): ApiUserProvider {
     override fun requestGoodsUsedUser(scheduler: SchedulerProvider, goodsCode: String, page: Int,
                                       responseData: (ResGoodsUsedUserData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
         return iUserRequest.getGoodsUsedUser(goodsCode = goodsCode, page = page)
+                .with(scheduler = scheduler)
+                .subscribe({
+                    responseData(it)
+                }, {
+                    errorData(errorHandle<ResMessageErrorData>(it))
+                })
+    }
+
+    override fun requestUserReport(scheduler: SchedulerProvider, authorization: String, reqUserReportData: ReqUserReportData,
+                                   responseData: (ResMessageData) -> Unit, errorData: (ResMessageErrorData?) -> Unit): Disposable {
+        return iUserRequest.userReport(authorization = authorization, reqUserReportData = reqUserReportData)
                 .with(scheduler = scheduler)
                 .subscribe({
                     responseData(it)

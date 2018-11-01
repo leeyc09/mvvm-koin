@@ -20,18 +20,23 @@ import xlab.world.xlab.utils.listener.DefaultListener
 import xlab.world.xlab.utils.listener.PostDetailListener
 import xlab.world.xlab.utils.support.*
 import xlab.world.xlab.utils.view.dialog.DefaultProgressDialog
+import xlab.world.xlab.utils.view.dialog.DialogCreator
+import xlab.world.xlab.utils.view.dialog.TwoSelectBottomDialog
 import xlab.world.xlab.utils.view.recyclerView.CustomItemDecoration
 import xlab.world.xlab.utils.view.toast.DefaultToast
 import xlab.world.xlab.viewModel.ShareViewModel
 import xlab.world.xlab.view.postDetail.PostDetailViewModel
 import xlab.world.xlab.view.posts.PostsViewModel
 import xlab.world.xlab.view.profile.ProfileActivity
+import xlab.world.xlab.view.profile.ProfileViewModel
 
 class ProfileAlbumFragment: Fragment(), View.OnClickListener {
+    private val profileViewModel: ProfileViewModel by viewModel()
     private val postsViewModel: PostsViewModel by viewModel()
     private val postDetailViewModel: PostDetailViewModel by viewModel()
     private val shareViewModel: ShareViewModel by viewModel()
     private val spHelper: SPHelper by inject()
+    private val permissionHelper: PermissionHelper by inject()
 
     private var needInitData
         get() = arguments?.getBoolean("needInitData") ?: true
@@ -41,6 +46,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
 
     private var defaultToast: DefaultToast? = null
     private var progressDialog: DefaultProgressDialog? = null
+    private var postUploadTypeSelectDialog: TwoSelectBottomDialog? = null
 
     private var postThumbnailAdapter: PostThumbnailAdapter? = null
     private var postDetailAdapter: PostDetailAdapter? = null
@@ -69,6 +75,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
         // Toast, Dialog 초기화
         defaultToast = defaultToast ?: DefaultToast(context = context!!)
         progressDialog = progressDialog ?: DefaultProgressDialog(context = context!!)
+        postUploadTypeSelectDialog = postUploadTypeSelectDialog ?: DialogCreator.postUploadTypeSelectDialog(context = context as Activity)
 
         // listener 초기화
         defaultListener = defaultListener ?: DefaultListener(context = context as Activity)
@@ -154,7 +161,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
     }
 
     private fun onBindEvent() {
-        noPostsLayout.setOnClickListener(this) // 포스트 업로드
+        noMyPostsLayout.setOnClickListener(this) // 포스트 업로드
 
         swipeRefreshLayout.setOnRefreshListener {
             reloadAlbumPostsData(loadingBar = null)
@@ -163,7 +170,7 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
         ViewFunction.onRecyclerViewScrolledDown(recyclerView = recyclerView) {
             if (it is GridLayoutManager) { // post thumbnail adapter
                 ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = postThumbnailAdapter!!.dataLoading, total = postThumbnailAdapter!!.dataTotal) { _ ->
-                    postsViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = postThumbnailAdapter!!.dataNextPage)
+                    postsViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = postThumbnailAdapter!!.dataNextPage, loginUseId = spHelper.userId)
                 }
             } else if (it is LinearLayoutManager) { // post detail adapter
                 ViewFunction.isScrolledRecyclerView(layoutManager = it, isLoading = postDetailAdapter!!.dataLoading, total = postDetailAdapter!!.dataTotal) { _ ->
@@ -174,6 +181,20 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
     }
 
     private fun observeViewModel() {
+        // TODO: Profile View Model
+        // button Action 이벤트 observe
+        profileViewModel.btnActionData.observe(owner = this, observer = android.arch.lifecycle.Observer { eventData ->
+            eventData?.let {_->
+                eventData.post?.let {
+                    RunActivity.postUploadPictureActivity(context = context as Activity, postId = "", youTubeVideoId = "")
+                }
+                eventData.postTypeDialog?.let {
+                    postUploadTypeSelectDialog?.showDialog(manager = (context as AppCompatActivity).supportFragmentManager, dialogTag = "postUploadTypeSelectDialog",
+                            tagData = null)
+                }
+            }
+        })
+
         // TODO: Posts View Model
         // UI 이벤트 observe
         postsViewModel.uiData.observe(this, android.arch.lifecycle.Observer { uiData ->
@@ -194,8 +215,8 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                 uiData.postsDataUpdate?.let {
                     postThumbnailAdapter?.notifyDataSetChanged()
                 }
-                uiData.emptyPostVisibility?.let {
-                    setBundleVisibilityData(noPostsLayout = it)
+                uiData.postVisibility?.let {
+                    setBundleVisibilityData(noMyPostsLayout = it.myPost, noOtherPostsLayout = it.otherPost)
                 }
             }
         })
@@ -240,10 +261,6 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
                     (context as ProfileActivity).setResultCodeFromFragment(resultCode = Activity.RESULT_OK)
                     postDetailAdapter?.notifyItemChanged(it)
                 }
-                uiData.noPostVisibility?.let {
-                    // post 없으면 no post 띄우기
-                    setBundleVisibilityData(noPostsLayout = it)
-                }
             }
         })
 
@@ -269,7 +286,14 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         v?.let {
             when (v.id) {
-                R.id.noPostsLayout -> { // 포스트 업로드
+                R.id.noMyPostsLayout -> { // 포스트 업로드
+                    // 권한 체크
+                    if (!permissionHelper.hasPermission(context = context as Activity, permissions = permissionHelper.cameraPermissions)) {
+                        permissionHelper.requestCameraPermissions(context = context as Activity)
+                        return
+                    }
+
+                    profileViewModel.uploadPostBtnAction(userLevel = spHelper.userLevel)
                 }
             }
         }
@@ -277,20 +301,23 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
 
     fun reloadAlbumPostsData(loadingBar: Boolean?) {
         context?.let {
-            postsViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = 1, loadingBar = loadingBar)
+            postsViewModel.loadUserPostsThumbData(userId = getBundleUserId(), page = 1, loginUseId = spHelper.userId, loadingBar = loadingBar)
             postDetailViewModel.loadUserPostsDetailData(authorization = spHelper.authorization, userId = getBundleUserId(), page = 1, loginUserId = spHelper.userId, loadingBar = loadingBar)
         } ?:let { needInitData = true }
     }
 
     private fun setLayoutVisibility() {
-        noPostsLayout?.visibility = getBundleNoPostsVisibility()
+        noMyPostsLayout?.visibility = getBundleNoMyPostsVisibility()
+        noOtherPostsLayout?.visibility = getBundleNoOtherPostsVisibility()
     }
 
     private fun getBundleUserId(): String = arguments?.getString("userId") ?: ""
-    private fun getBundleNoPostsVisibility(): Int = arguments?.getInt("noPostsLayout") ?: View.INVISIBLE
+    private fun getBundleNoMyPostsVisibility(): Int = arguments?.getInt("noMyPostsLayout") ?: View.INVISIBLE
+    private fun getBundleNoOtherPostsVisibility(): Int = arguments?.getInt("noOtherPostsLayout") ?: View.INVISIBLE
 
-    private fun setBundleVisibilityData(noPostsLayout: Int) {
-        arguments?.putInt("noPostsLayout", noPostsLayout)
+    private fun setBundleVisibilityData(noMyPostsLayout: Int, noOtherPostsLayout: Int) {
+        arguments?.putInt("noMyPostsLayout", noMyPostsLayout)
+        arguments?.putInt("noOtherPostsLayout", noOtherPostsLayout)
 
         setLayoutVisibility()
     }
@@ -302,7 +329,8 @@ class ProfileAlbumFragment: Fragment(), View.OnClickListener {
             val args = Bundle()
             args.putString("userId", userId)
             args.putBoolean("needInitData", true)
-            args.putInt("noPostsLayout", View.INVISIBLE)
+            args.putInt("noMyPostsLayout", View.INVISIBLE)
+            args.putInt("noOtherPostsLayout", View.INVISIBLE)
             fragment.arguments = args
 
             return fragment
